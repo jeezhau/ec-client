@@ -1,0 +1,52 @@
+######服务器参数############
+server:
+  port: 8000
+  servlet:
+    session:
+      timeout: 1800
+    context-path: /
+        
+  tomcat:
+    uri-encoding: UTF-8
+spring:
+    datasource:
+        name: wxmp
+        url: jdbc:mysql://192.168.0.104:3306/wxmp
+        username: jee
+        password: jee8901
+        # 使用druid数据源
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+mybatis:
+  mapper-locations: classpath:/mapping/*.xml
+  type-aliases-package: com.mofanyouxuan.model
+ 
+logging:
+  level:
+    com.jeekhan.wx.mapper: DEBUG
+######微信参数############
+wx:
+#userId 公众号
+  PUBLIC-USER-ID: gh_ed70fd57008b
+#appId
+  APPID: wx8864bd7398aa5270
+#appSecret
+  APPSECRET: c2c15a91c950e8a6fc106192b044adfb
+#token
+  TOKEN: 1314
+
+  
+######业务参数############
+#用户注册URL、注销URL
+busi:
+  user-create-url: 'http://localhost:8080/mfyx/user-create'
+  user-cancel-url: 'http://localhost:8080/mfyx/user-cancel'
+  
+######系统参数############  
+sys:
+  tmp-file-dir: '/Users/jeekhan/wxmp/tmp/'
+  qrcode-file-dir: '/Users/jeekhan/wxmp/qrcode/'
+  material-file-dir: '/Users/jeekhan/wxmp/material/'
+  kf-headimg-dir: '/Users/jeekhan/wxmp/headimg/'
+  wxmenu-file-dir: '/Users/jeekhan/wxmp/wxmenu/'
+  
