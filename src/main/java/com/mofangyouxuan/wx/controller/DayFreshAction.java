@@ -28,5 +28,7 @@ public class DayFreshAction {
 		map.put("sys_func", "dayfresh");
 		return "page-dayfresh-index";
 	}
+	
+	
 
 }

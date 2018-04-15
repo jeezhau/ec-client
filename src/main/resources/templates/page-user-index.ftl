@@ -19,8 +19,8 @@
     
     <link href="/css/weui.css" rel="stylesheet">
 </head>
-<body class="light-gray-bg">
 
+<body class="light-gray-bg">
 <header>
   <div class="weui-navbar">
     <div class="weui-navbar__item weui-bar__item_on" onclick="$(this).addClass('weui-bar__item_on');$(this).siblings().removeClass('weui-bar__item_on');$('#userBasic').show();$('#userVip').hide();">
@@ -46,45 +46,85 @@
       </div>
       <div class="row" style="margin:30px 1px 15px 1px;">
        <ul class="nav nav-pills nav-stacked" style="max-width: 350px;">
-         <li class="active" style="background-color:white">
-           <a href="#">
+         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
+           <a href="#" >
              <span class="badge pull-right" style="background-color:rgb(239,239,239);border:none">查询所有  &gt;</span>
              <img alt="" src="/icons/订单.png" width="20px" height="20px"> 我的订单
            </a>
          </li>
-         <li style="background-color:white">
+         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
+           <a href="#">
+             <span class="badge pull-right" style="background-color:rgb(239,239,239)">打开收藏柜 &gt;</span>
+             <img alt="" src="/icons/收藏.png" width="20px" height="20px"> 我的收藏
+           </a>
+         </li>
+         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
            <a href="#">
              <span class="badge pull-right" style="background-color:rgb(239,239,239)">修改资料  &gt;</span>
              <img alt="" src="/icons/个人信息.png" width="20px" height="20px"> 个人资料
            </a>
          </li>
-         <li style="background-color:white">
+         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
            <a href="#">
              <span class="badge pull-right" style="background-color:rgb(239,239,239)">编辑  &gt;</span>
              <img alt="" src="/icons/地址.png" width="20px" height="20px"> 收货地址
            </a>
          </li>
-         <li style="background-color:white">
+         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
            <a href="#">
              <span class="badge pull-right" style="background-color:rgb(239,239,239)"> 联系我们  &gt;</span>
              <img alt="" src="/icons/客服.png" width="20px" height="20px"> 官方客服
            </a>
          </li> 
-         <li style="background-color:white">
+         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
            <a href="#">
-             <span class="badge pull-right" style="background-color:rgb(239,239,239)"> 我的二维码  &gt;</span>
+             <span class="badge pull-right" style="background-color:rgb(239,239,239)"> 推广二维码  &gt;</span>
              <img alt="" src="/icons/服务号-营销推广.png" width="20px" height="20px"> 我要推广
+           </a>
+         </li>       
+       </ul>
+      </div>
+    </div>
+    <!-- 会员信息管理-->
+    <div class="row" id="userVip" style="display:none"> 
+      <div class="row" style="padding:10px 10px;background-color:#880000">
+        <div class="row" style="margin:10px 25%;vertical-algin:center;text-align:center">
+          <img alt="" src="/images/mfyx_logo.jpeg" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" > 
+        </div>
+        <div class="row" style="width:60%;margin:10px 20%;color:gray">
+          <span class="pull-left"><img alt="" src="/icons/积分.png" width="20px" height="20px"> 0 </span >
+          <span class="pull-right"><img alt="" src="/icons/余额.png" width="20px" height="20px"> 0.00 </span>
+        </div>
+      </div>
+      <div class="row" style="margin:30px 1px 15px 1px;">
+       <ul class="nav nav-pills nav-stacked" style="max-width: 350px;">
+         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
+           <a href="#" >
+             <span class="badge pull-right" style="background-color:rgb(239,239,239);border:none">申请转出  &gt;</span>
+             <img alt="" src="/icons/提现.png" width="20px" height="20px"> 提现
+           </a>
+         </li>
+         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
+           <a href="#">
+             <span class="badge pull-right" style="background-color:rgb(239,239,239)">查询所有交易  &gt;</span>
+             <img alt="" src="/icons/查看明细.png" width="20px" height="20px"> 交易明细
+           </a>
+         </li>
+         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
+           <a href="#">
+             <span class="badge pull-right" style="background-color:rgb(239,239,239)"> 联系我们  &gt;</span>
+             <img alt="" src="/icons/客服.png" width="20px" height="20px"> 官方客服
+           </a>
+         </li>
+         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
+           <a href="#">
+             <span class="badge pull-right" style="background-color:rgb(239,239,239)"> 申请开通或关闭  &gt;</span>
+             <img alt="" src="/icons/合作伙伴.png" width="20px" height="20px"> 合作伙伴
            </a>
          </li>        
        </ul>
       </div>
       
-    </div>
-    <!-- 会员信息管理-->
-    <div class="row" id="userVip" style="display:none"> 
-      <div class="panel panel-info panel-body">
-		会员信息
-      </div>
     </div>    
 </div>
 <footer>

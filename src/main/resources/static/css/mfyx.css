@@ -1,8 +1,54 @@
-footer{
-    width: 100%;
-    height:100px;   /* footer的高度一定要是固定值*/ 
-    position:absolute;
-    bottom:0px;
-    left:0px;
-    background: white;
+.goods-container { 
+	/*商品列表容器CSS */
+	padding:1px 1px;
+	overflow:scroll
+}
+
+.goods-item { 
+	/*商品列表CSS */
+	margin:3px 0;
+	padding:3px 3px;
+	width:100%;
+	height:160px;
+	vertical-algin:center;
+	text-align:center;
+	background-color:white
+}
+
+.goods-item_main-img{
+	/*商品列表左侧主图容器CSS */
+	padding:1px 3px;
+	vertical-algin:center;
+	text-align:center
+}
+
+.goods-item_main-img-size{
+	/*商品列表左侧主图尺寸CSS */
+	width:100%; /*190px最优*/
+	height:153px
+}
+
+.goods-item_info{
+	/*商品列表右侧信息CSS */
+	vertical-algin:center;
+	text-align:center
+}
+
+.goods-item_info-desc{
+	/*商品列表右侧信息简要描述CSS */
+	height:90px;
+	overflow:hidden;
+	text-align:left
+}
+
+.goods-item_info-price{
+	/*商品列表右侧信息单价描述CSS */
+	padding-top:3px;
+	color:red;
+	text-decoration:blink
+}
+
+.goods-item_info-order{
+	/*商品列表右侧信息下单按钮CSS */
+	padding:3px 12px
 }

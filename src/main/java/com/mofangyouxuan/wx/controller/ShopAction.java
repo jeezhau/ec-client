@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 @Controller
 @RequestMapping("/shop")
 @SessionAttributes({"isDayFresh","sys_func"})
-public class ShopMgrAction {
+public class ShopAction {
 	
 	/**
 	 * 获取商城管理主页
@@ -27,5 +27,5 @@ public class ShopMgrAction {
 		map.put("sys_func", "shop");
 		return "page-shop-index";
 	}
-
+	
 }
