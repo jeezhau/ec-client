@@ -23,8 +23,10 @@ public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter{
     public void addInterceptors(InterceptorRegistry registry) {
         // addPathPatterns 用于添加拦截规则, 这里假设拦截 /url 后面的全部链接
         // excludePathPatterns 用户排除拦截
-        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/**");
-
+        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/user/**");
+        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/goods/**");
+        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/order/**");
+        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/srvcenter/**");
         super.addInterceptors(registry);
     }
 }

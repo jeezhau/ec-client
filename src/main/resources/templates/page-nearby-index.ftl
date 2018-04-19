@@ -45,6 +45,7 @@
     </div>
   </div>  
 </div>
+
 <footer>
   <#include "/page-bottom-menu.ftl" encoding="utf8"> 
 </footer>

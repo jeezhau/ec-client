@@ -39,8 +39,10 @@ wx:
 ######业务参数############
 #用户注册URL、注销URL
 busi:
-  user-create-url: 'http://localhost:8080/mfyx/user-create'
-  user-cancel-url: 'http://localhost:8080/mfyx/user-cancel'
+  mfyx-server-url: 'http://localhost:8080/mfyx'
+  user-basic-get-url: '/user/get'
+  user-basic-update-url: '/user/update'
+  qrcode-spread-url: '/qrcode/spread'
   
 ######系统参数############  
 sys:

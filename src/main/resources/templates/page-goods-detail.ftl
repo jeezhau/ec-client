@@ -78,7 +78,7 @@
     <!-- 前三条买家评价 -->
     <div class="row" style="margin:1px 0px;background-color:white;">
       <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">买家评价(10)</span>
-      <span class="pull-right" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">查看全部&gt;</span>
+      <span class="pull-right" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray"><a href="/appraise/index/goodsId">查看全部&gt;</a></span>
     </div>
     <div class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
      <div class="row">
@@ -87,9 +87,6 @@
      </div>
      <div class="row">
        非常好，味道不错，水分充足，以后一定经常关注。
-     </div>
-     <div class="row" style="font-weight:lighter;font-size:80%;color:gray">
-       重量：3斤大果
      </div>
     </div>
     
@@ -142,10 +139,10 @@
   <div class="row">
     <!-- 同类推荐 -->
   </div> 
-  <div class="row" style="margin:30px 0">
-  </div>
+
 </div><!-- end of container -->
-<footer style="left:0px;bottom:0px;padding:0 0">
+<footer >
+  <div class="row" style="margin:50px 0"></div>
   <div class="weui-tabbar" style="position:fixed;left:0px;bottom:0px">
     	<a href="/shop/index" class="weui-tabbar__item " >
 	    <span style="display: inline-block;position: relative;">

@@ -1,4 +1,5 @@
  <!-- 商城管理底部主菜单--> 
+  <div class="row" style="height:30px"></div>
   <div class="weui-tabbar" style="position:fixed;left:0px;bottom:0px">
     <#if isDayFresh=='1'>
     	 <a href="/dayfresh/index/today" class="weui-tabbar__item <#if sys_func=='dayfresh'>weui-bar__item_on </#if>" >
@@ -27,7 +28,7 @@
 	    </span>
 	    <p class="weui-tabbar__label">服务中心</p>
 	</a>
-	<a href="/user/index" class="weui-tabbar__item <#if sys_func=='user'>weui-bar__item_on </#if>" >
+	<a href="/user/index/basic" class="weui-tabbar__item <#if sys_func=='user'>weui-bar__item_on </#if>" >
 	    <img src="/icons/个人信息.png" alt="" class="weui-tabbar__icon">
 	    <p class="weui-tabbar__label">个人中心</p>
 	</a>

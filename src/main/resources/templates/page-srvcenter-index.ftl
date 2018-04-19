@@ -162,7 +162,7 @@
     </div>
   </div>    
 </div>
-<footer style="position:fiexd;left:0;bottom:0">
+<footer>
   <#include "/page-bottom-menu.ftl" encoding="utf8"> 
 </footer>
 <#if errmsg??>

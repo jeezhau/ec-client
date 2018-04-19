@@ -131,7 +131,7 @@
   </div> 
     
 </div><!-- end of container -->
-<footer style="left:0px;bottom:0px">
+<footer >
   <#include "/page-bottom-menu.ftl" encoding="utf8"> 
 </footer>
 </body>
