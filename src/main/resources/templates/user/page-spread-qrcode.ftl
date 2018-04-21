@@ -37,7 +37,7 @@
         <div class="thumbnail">
 	      <img id="qrcodeshow" alt="推广二维码" src="${showurl}" width="80%" height="80%">
 	      <div class="caption">
-		    <p style="text-align:center">我的推广二维码</p>
+		    <p style="text-align:center">我的推广二维码(有效期28天后自动重新生成新的)</p>
 	      </div>
 	      <form action="/user/spread">
         		<input type="hidden" name="create" value="1">
@@ -63,7 +63,7 @@
   </div>
 </div><!-- end of container -->
 <footer>
-  <#include "/page-bottom-menu.ftl" encoding="utf8"> 
+  <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
 </footer>
 <#if errmsg??>
 <!-- 错误提示模态框（Modal） -->

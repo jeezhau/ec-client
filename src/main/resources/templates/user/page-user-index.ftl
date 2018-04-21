@@ -47,13 +47,13 @@
       <div class="row" style="margin:30px 1px 15px 1px;">
        <ul class="nav nav-pills nav-stacked" style="max-width: 350px;">
          <li style="background-color:white" >
-           <a href="#" >
+           <a href="/order/show/all" >
              <span class=" pull-right" style="border:none">查询所有  &gt;</span>
              <img alt="" src="/icons/订单.png" width="20px" height="20px"> 我的订单
            </a>
            <span class="row">
-             <span class="col-xs-3">
-                <a href="#" class="weui-tabbar__item ">
+             <span class="col-xs-2"  style="padding:0 3px">
+                <a href="/order/show/forPay" class="weui-tabbar__item ">
                     <span style="display: inline-block;position: relative;">
                         <img src="/icons/等待付款.png" alt="" class="weui-tabbar__icon">
                         <span class="weui-badge" style="position: absolute;top: -2px;right: -13px;">8</span>
@@ -61,8 +61,8 @@
                     <p class="weui-tabbar__label">待付款</p>
                 </a>
               </span>
-              <span class="col-xs-3">
-                <a href="#" class="weui-tabbar__item ">
+              <span class="col-xs-2"  style="padding:0 3px">
+                <a href="/order/show/forDelivery" class="weui-tabbar__item " >
                     <span style="display: inline-block;position: relative;">
                         <img src="/icons/待发货.png" alt="" class="weui-tabbar__icon">
                         <span class="weui-badge" style="position: absolute;top: -2px;right: -13px;">8</span>
@@ -70,8 +70,8 @@
                     <p class="weui-tabbar__label">待发货</p>
                 </a>
               </span>
-              <span class="col-xs-3">
-                <a href="#" class="weui-tabbar__item ">
+              <span class="col-xs-2" style="padding:0 3px">
+                <a href="/order/show/forTake" class="weui-tabbar__item ">
                     <span style="display: inline-block;position: relative;">
                         <img src="/icons/待收货.png" alt="" class="weui-tabbar__icon">
                         <span class="weui-badge" style="position: absolute;top: -2px;right: -13px;">8</span>
@@ -80,13 +80,22 @@
                 </a>
                 </a>
               </span>
-              <span class="col-xs-3">
-                <a href="#" class="weui-tabbar__item ">
+              <span class="col-xs-2" style="padding:0 3px">
+                <a href="/order/show/forAppraise" class="weui-tabbar__item ">
                     <span style="display: inline-block;position: relative;">
                         <img src="/icons/待评价.png" alt="" class="weui-tabbar__icon">
                         <span class="weui-badge" style="position: absolute;top: -2px;right: -13px;">8</span>
                     </span>
                     <p class="weui-tabbar__label">待评价</p>
+                </a>
+              </span>
+              <span class="col-xs-3" style="padding:0 3px">
+                <a href="/order/show/forRefund" class="weui-tabbar__item ">
+                    <span style="display: inline-block;position: relative;">
+                        <img src="/icons/无忧售后.png" alt="" class="weui-tabbar__icon">
+                        <span class="weui-badge" style="position: absolute;top: -2px;right: -13px;">8</span>
+                    </span>
+                    <p class="weui-tabbar__label">退换货</p>
                 </a>
               </span>
             </span>
@@ -162,7 +171,7 @@
            </a>
          </li>
          <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
-           <a href="<#if vipBasic.status = '1'><#else>#</#if>">
+           <a href="<#if vipBasic.status = '1'>/partner/index<#else>#</#if>">
              <span class="badge pull-right" style="background-color:rgb(239,239,239)"> 申请开通或关闭  &gt;</span>
              <img alt="" src="/icons/合作伙伴.png" width="20px" height="20px"> 合作伙伴
            </a>
@@ -207,7 +216,7 @@ function getBasic(){
 //getBasic();
 </script>
 <footer>
-  <#include "/page-bottom-menu.ftl" encoding="utf8"> 
+  <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
 </footer>
 <#if errmsg??>
 <!-- 错误提示模态框（Modal） -->

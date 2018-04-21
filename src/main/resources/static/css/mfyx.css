@@ -1,6 +1,6 @@
 .goods-container { 
 	/*商品列表容器CSS */
-	padding:1px 1px;
+	padding:0px 0px;
 	overflow:scroll
 }
 
@@ -9,10 +9,6 @@
 	margin:3px 0;
 	padding:3px 3px;
 	width:100%;
-	height:160px;
-	vertical-algin:center;
-	text-align:center;
-	background-color:white
 }
 
 .goods-item_main-img{
@@ -31,7 +27,6 @@
 .goods-item_info{
 	/*商品列表右侧信息CSS */
 	vertical-algin:center;
-	text-align:center
 }
 
 .goods-item_info-desc{
@@ -44,6 +39,7 @@
 .goods-item_info-price{
 	/*商品列表右侧信息单价描述CSS */
 	padding-top:3px;
+	padding-bottom:3px;
 	color:red;
 	text-decoration:blink
 }

@@ -18,32 +18,13 @@
     <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     
     <link href="/css/weui.css" rel="stylesheet">
+    
+    <link href="/css/mfyx.css" rel="stylesheet">
 </head>
 <body class="light-gray-bg">
-<div style="height:3px;background-color:#E0E0E0 ;margin-bottom:5px;"></div>
-<header>
-  <div class="weui-navbar">
-    <div class="weui-navbar__item <#if mode = 'today'> weui-bar__item_on </#if>" onclick="$(this).addClass('weui-bar__item_on');$(this).siblings().removeClass('weui-bar__item_on');">
-	今日热荐
-	</div>
-	<div class="weui-navbar__item <#if mode = 'tomorrow'> weui-bar__item_on </#if>" onclick="$(this).addClass('weui-bar__item_on');$(this).siblings().removeClass('weui-bar__item_on');">
-    明日主推
-	</div>
-	<div class="weui-navbar__item <#if mode = 'history'> weui-bar__item_on </#if>" onclick="$(this).addClass('weui-bar__item_on');$(this).siblings().removeClass('weui-bar__item_on');">
-    历史推出
-	</div>
-  </div>
-
-</header>
-<div class="container">
-  <div class="row">
-
-  </div>
-</div>
 <footer>
-  <#include "/page-bottom-menu.ftl" encoding="utf8"> 
+  <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
 </footer>
-<#if errmsg??>
 <!-- 错误提示模态框（Modal） -->
 <div class="modal fade " id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorTitle" aria-hidden="false" data-backdrop="static">
 	<div class="modal-dialog">
@@ -65,7 +46,5 @@
 <script>
 $("#errorModal").modal('show');
 </script>
-</#if>
-
 </body>
-</html>
+

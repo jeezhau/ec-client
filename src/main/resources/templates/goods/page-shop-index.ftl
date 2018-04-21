@@ -23,7 +23,7 @@
 </head>
 <body class="light-gray-bg">
 <header >
-  <#include "/page-shop-top-menu.ftl" encoding="utf8"> 
+  <#include "/menu/page-shop-top-menu.ftl" encoding="utf8"> 
   <div class="page searchbar js_show">
     <div class="page__bd">
         <!--<a href="javascript:;" class="weui-btn weui-btn_primary">点击展现searchBar</a>-->
@@ -107,32 +107,34 @@
             cancelSearch();
             $searchInput.blur();
         });
-    });</script> 
+    });
+  </script> 
 </header>
 <div class="container goods-container">
   <div class="row goods-item" >
-    <div class="col-xs-7 goods-item_main-img">
-      <a href="/goods/detail/goodsId"><img title="190X153最优" alt="" src="/images/mfyx_logo.jpeg" class="goods-item_main-img-size"></a>
-    </div>
-    <div class="col-xs-5 goods-item_info">
-      <div class="goods-item_info-desc">
-	        是非得失分身乏术地方简单描述
-	        简单描述史蒂夫舒服舒服的方sdfsfsf首发首发对
-      </div>
-      <div>
-      	<p class="goods-item_info-price">优惠价¥: <span>0.00</span></p>
-      </div>
-      <div>
-        <a class="btn btn-danger goods-item_info-order" href="/order/order/begin/goodsId">
-          <span style="color:white">立即下单</span>
-        </a>
-      </div>
+    <div class="row " style="padding:0 8px;background-color:white">
+	    <div class="col-xs-6 goods-item_main-img">
+	      <a href="/goods/detail/goodsId"><img title="190X150最优" alt="" src="/images/mfyx_logo.jpeg" class="goods-item_main-img-size"></a>
+	    </div>
+	    <div class="col-xs-6 goods-item_info" style="padding-left:1px">
+	      <div class="goods-item_info-desc" >
+		        是非得失分身乏术地方简单描述简单描述史蒂夫舒服舒服的方sdfsfsf首发首发对
+	      </div>
+	      <div class="goods-item_info-price">
+	      	<span class="pull-left ">惠¥: <span>0.00</span>元</span>
+	      	<span class="pull-right ">库存: <span>100</span>件</span>
+	      </div>
+	      <div style="text-align:center">
+	        <a class="btn btn-danger goods-item_info-order" href="/order/order/begin/goodsId"><span style="color:white">立即下单</span></a>
+	        <a class="btn btn-primary goods-item_info-order" href="/order/order/begin/goodsId"><span style="color:white">加入收藏</span></a>
+	      </div>
+	    </div>
     </div>
   </div> 
     
 </div><!-- end of container -->
 <footer >
-  <#include "/page-bottom-menu.ftl" encoding="utf8"> 
+  <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
 </footer>
 </body>
 </html>

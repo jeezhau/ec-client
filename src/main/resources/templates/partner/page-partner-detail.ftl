@@ -107,7 +107,6 @@ var editFormVue = new Vue({
 			city:[]
 		},
 		param:{
-			openId:'',
 			nickname:'',
 			birthday:'',
 			phone:'',
@@ -140,7 +139,6 @@ var editFormVue = new Vue({
 			});
 		},
 		reset: function(){
-			this.param.openId = this.initData.openId;
 			this.param.nickname = this.initData.nickname;
 			this.param.phone = this.initData.phone;
 			this.param.birthday = this.initData.birthday;
@@ -160,7 +158,6 @@ function getBasic(){
 		success: function(jsonRet,status,xhr){
 			if(jsonRet){
 				if(0 == jsonRet.errcode){
-					editFormVue.param.openId = jsonRet.datas.openId;
 					editFormVue.param.nickname = jsonRet.datas.nickname;
 					editFormVue.param.phone = jsonRet.datas.phone;
 					editFormVue.param.birthday = jsonRet.datas.birthday;
@@ -171,7 +168,6 @@ function getBasic(){
 					editFormVue.param.favourite = jsonRet.datas.favourite;
 					editFormVue.param.introduce = jsonRet.datas.introduce;
 					
-					editFormVue.initData.openId = jsonRet.datas.openId;
 					editFormVue.initData.nickname = jsonRet.datas.nickname;
 					editFormVue.initData.phone = jsonRet.datas.phone;
 					editFormVue.initData.birthday = jsonRet.datas.birthday;

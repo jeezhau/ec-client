@@ -2,15 +2,12 @@ package com.mofangyouxuan.wx.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -26,7 +23,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.UserBasic;
-import com.mofangyouxuan.wx.utils.HttpUtils;
+import com.mofangyouxuan.service.UserVipService;
 
 /**
  * 个人中心管理
@@ -37,19 +34,6 @@ import com.mofangyouxuan.wx.utils.HttpUtils;
 @RequestMapping("/user")
 @SessionAttributes({"openId","vipBasic","userBasic","isDayFresh","sys_func"})
 public class UserAction {
-	
-	@Value("${busi.mfyx-server-url}")
-	private String mfyxServerUrl;
-	
-	@Value("${busi.user-basic-get-url}")
-	private String userBasicGetUrl;
-	
-	@Value("${busi.user-basic-update-url}")
-	private String userBasicUpdateUrl;
-	
-	@Value("${busi.qrcode-spread-url}")
-	private String qrCodeSpreadUrl;
-	
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
@@ -69,7 +53,7 @@ public class UserAction {
 		}
 		map.put("mode", mode);
 		map.put("sys_func", "user");
-		return "page-user-index";
+		return "user/page-user-index";
 	}
 	
 	
@@ -81,24 +65,18 @@ public class UserAction {
 	 */
 	@RequestMapping("/basic/get")
 	@ResponseBody
-	public String getUserBasci(ModelMap map) throws JSONException  {
+	public Object getUserBasci(ModelMap map) throws JSONException  {
 		String openId = (String) map.get("openId");
 		JSONObject jsonRet = new JSONObject();
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("openId", openId);
-		String strRet = HttpUtils.doPost(this.mfyxServerUrl + userBasicGetUrl, params);
-		try {
-			JSONObject ret = new JSONObject(strRet);
-			if(ret.has("id")) {//成功
-				jsonRet.put("errcode", 0);
-				jsonRet.put("errmsg", "ok");
-				jsonRet.put("datas", ret);
-			}else {
-				jsonRet = ret;
-			}
-		}catch(Exception e) {
-			jsonRet.put("errcode", "-1");
-			jsonRet.put("errmsg", "系统出现异常，异常信息：" + e.getMessage());
+		UserBasic basic = UserVipService.getUserBasic(openId);
+		if(basic != null) {//成功
+			jsonRet.put("errcode", 0);
+			jsonRet.put("errmsg", "ok");
+			jsonRet.put("datas", basic.getJSON());
+			map.put("userBasic", basic);
+		}else {
+			jsonRet.put("errcode", -1);
+			jsonRet.put("errmsg", "获取用户基本信息失败！");
 		}
 		return jsonRet.toString();
 	}
@@ -110,7 +88,7 @@ public class UserAction {
 	@RequestMapping("/basic/edit")
 	public String editBasic() {
 		
-		return "page-user-basic";
+		return "user/page-basic-detail";
 	}
 	
 	/**
@@ -122,7 +100,7 @@ public class UserAction {
 	 */
 	@RequestMapping(value="/basic/update",method=RequestMethod.POST)
 	@ResponseBody
-	public String updateBasic(@Valid UserBasic basic,BindingResult result) throws JSONException {
+	public String updateBasic(@Valid UserBasic basic,BindingResult result,ModelMap map) throws JSONException {
 		JSONObject jsonRet = new JSONObject();
 		try {
 			//用户信息验证结果处理
@@ -137,31 +115,16 @@ public class UserAction {
 				return jsonRet.toString();
 			}
 			
-			String openId = basic.getOpenId();
-			if(openId == null || openId.length()<6) {
-				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-				jsonRet.put("errmsg", " openid: not null and length range is 6-100. ");
-				return jsonRet.toString();
-			}
-			//数据重复性检查
-			String registType = "2";
-			Map<String,Object> params = new HashMap<String,Object>();
-			params.put("registType", registType);
-			params.put("openId", openId);
-			params.put("nickname", basic.getNickname());
-			params.put("birthday", basic.getBirthday());
-			params.put("phone", basic.getPhone());
-			params.put("sex", basic.getSex());
-			params.put("province", basic.getProvince());
-			params.put("city", basic.getCity());
-			params.put("favourite", basic.getFavourite());
-			params.put("profession", basic.getProfession());
-			params.put("introduce", basic.getIntroduce());
-			String strRet = HttpUtils.doPost(this.mfyxServerUrl + this.userBasicUpdateUrl, params);
-			return strRet;
+			basic.setOpenId((String) map.get("openId"));
+//			if(openId == null || openId.length()<6) {
+//				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+//				jsonRet.put("errmsg", " openid: not null and length range is 6-100. ");
+//				return jsonRet.toString();
+//			}
+			return UserVipService.updateUserBasic(basic);
 		}catch(Exception e) {
 			//数据处理
-			jsonRet.put("errcode", ErrCodes.USER_EXCEPTION);
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
 			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
 		return jsonRet.toString();
@@ -169,7 +132,7 @@ public class UserAction {
 	}
 	
 	/**
-	 * 获取推广信息
+	 * 获取用户推广信息
 	 * 1、取已推广用户数量；
 	 * 2、获取最新推广二维码；
 	 * @param create		是否强制重新生成
@@ -180,19 +143,19 @@ public class UserAction {
 	@RequestMapping("/spread")
 	public String getSpread(String create,ModelMap map) throws JSONException {
 		String openId = (String)map.get("openId");
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("openId", openId);
 		if(create != null && "1".equals(create.trim())){
-			params.put("create", "1");
+			create = "1";
+		}else {
+			create = "0";
 		}
-		String strRet = HttpUtils.doPost(this.mfyxServerUrl+this.qrCodeSpreadUrl, params);
-		JSONObject ret = new JSONObject(strRet);
+		JSONObject ret = UserVipService.getSpreadQrCode(openId,create);
 		if(ret.has("errcode") && ret.getInt("errcode") == 0) {
 			map.put("showurl", ret.getString("showurl"));
 			map.put("count", ret.getInt("count"));
 		}else {
 			map.put("errmsg", ret.getString("errmsg"));
 		}
-		return "page-user-qrcode";
+		return "user/page-spread-qrcode";
 	}
+	
 }

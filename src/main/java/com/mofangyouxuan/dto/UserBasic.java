@@ -5,7 +5,6 @@ import java.util.Date;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -71,6 +70,8 @@ public class UserBasic {
     private Date updateTime;
 
     private String status;
+    
+    private String json;
 
     public Integer getId() {
         return id;
@@ -251,4 +252,12 @@ public class UserBasic {
     public void setStatus(String status) {
         this.status = status == null ? null : status.trim();
     }
+    
+    public String getJSON() {
+    		return this.json;
+    }
+    
+    public void setJSON(String json) {
+    		this.json = json;
+    }    
 }
