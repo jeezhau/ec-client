@@ -23,12 +23,12 @@ wxmp:
 #token
   TOKEN: 1314
  #微信管理平台访问 
-  wxmp-server-url: 'http://localhost:9000'
+  wxmp-server-url: 'http://172.18.235.107:9000'
   jsapi-sign-url: '/jsapi/sign'
   
 ######业务参数-摩放优选服务中心访问############
 mfyx:
-  mfyx-server-url: 'http://192.168.0.102:8080'
+  mfyx-server-url: 'http://172.18.235.107:8080'
   user-basic-get-url: '/user/get'
   user-basic-update-url: '/user/update'
   spread-qrcode-url: '/qrcode/spread'
@@ -47,12 +47,12 @@ mfyx:
   
 ######系统参数############  
 sys:
-  local-server-url: 'http://192.168.0.102:8000'
-  tmp-file-dir: '/Users/jeekhan/wxmp/tmp/'
-  qrcode-file-dir: '/Users/jeekhan/wxmp/qrcode/'
-  material-file-dir: '/Users/jeekhan/wxmp/material/'
-  kf-headimg-dir: '/Users/jeekhan/wxmp/headimg/'
-  wxmenu-file-dir: '/Users/jeekhan/wxmp/wxmenu/'
+  local-server-url: 'http://172.18.235.107:8000'
+  tmp-file-dir: '/tmp/wxmp/'
+  qrcode-file-dir: '/var/wxmp/qrcode/'
+  material-file-dir: '/var/wxmp/material/'
+  kf-headimg-dir: '/var/wxmp/headimg/'
+  wxmenu-file-dir: '/var/wxmp/wxmenu/'
   
   
   

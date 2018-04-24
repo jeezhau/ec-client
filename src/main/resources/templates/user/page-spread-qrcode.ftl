@@ -30,19 +30,19 @@
   <div class="row" style="width:100%;margin:5px 0px 1px 0px;padding:0px 8px;background-color:white">
 	  <div class="row" style="padding-top:5px;font-size:18px">
 	    <label class="col-xs-6 control-label" style="padding-right:1px;text-align:center">已推广用户数：</label>
-	    <label class="col-xs-6 control-label" style="padding-left:1px">${count}</label>
+	    <label class="col-xs-6 control-label" style="padding-left:1px">${count!0}</label>
 	  </div>  	  
 
       <div class="row">
         <div class="thumbnail">
-	      <img id="qrcodeshow" alt="推广二维码" src="${showurl}" width="80%" height="80%">
+	      <img id="qrcodeshow" alt="推广二维码" src="${showurl!''}" width="80%" height="80%">
 	      <div class="caption">
 		    <p style="text-align:center">我的推广二维码(有效期28天后自动重新生成新的)</p>
 	      </div>
 	      <form action="/user/spread">
         		<input type="hidden" name="create" value="1">
         		<div style="text-align:center">
-        			<button type="button" class="btn btn-primary">重新生成</button>
+        			<button type="submit" class="btn btn-primary">重新生成</button>
         		</div>
            </form>
         </div>

@@ -8,6 +8,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 public class UserBasic {
 	
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -65,14 +67,14 @@ public class UserBasic {
 
     private Integer senceId;
 
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date registTime;
 
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
     private String status;
     
-    private String json;
-
     public Integer getId() {
         return id;
     }
@@ -252,12 +254,5 @@ public class UserBasic {
     public void setStatus(String status) {
         this.status = status == null ? null : status.trim();
     }
-    
-    public String getJSON() {
-    		return this.json;
-    }
-    
-    public void setJSON(String json) {
-    		this.json = json;
-    }    
+       
 }

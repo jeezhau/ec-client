@@ -22,27 +22,27 @@ public class PartnerMgrService {
 	private static String partnerChangeStatusUrl;
 	private static String partnerReviewUrl;
 	
-	@Value("${busi.mfyx-server-url}")
+	@Value("${mfyx.mfyx-server-url}")
 	public void setMfyxServerUrl(String mfyxServerUrl) {
 		PartnerMgrService.mfyxServerUrl = mfyxServerUrl;
 	}
-	@Value("${busi.partner-get-url}")
+	@Value("${mfyx.partner-get-url}")
 	public  void setPartnerBasicGetUrl(String partnerBasicGetUrl) {
 		PartnerMgrService.partnerBasicGetUrl = partnerBasicGetUrl;
 	}
-	@Value("${busi.partner-create-url}")
+	@Value("${mfyx.partner-create-url}")
 	public void setPartnerBasicCreateUrl(String partnerBasicCreateUrl) {
 		PartnerMgrService.partnerBasicCreateUrl = partnerBasicCreateUrl;
 	}
-	@Value("${busi.partner-update-url}")
+	@Value("${mfyx.partner-update-url}")
 	public  void setPartnerBasicUpdateUrl(String partnerBasicUpdateUrl) {
 		PartnerMgrService.partnerBasicUpdateUrl = partnerBasicUpdateUrl;
 	}
-	@Value("${busi.partner-change-status-url}")
+	@Value("${mfyx.partner-change-status-url}")
 	public  void setPartnerChangeStatusUrl(String partnerChangeStatusUrl) {
 		PartnerMgrService.partnerChangeStatusUrl = partnerChangeStatusUrl;
 	}
-	@Value("${busi.partner-review-url}")
+	@Value("${mfyx.partner-review-url}")
 	public static void setPartnerReviewUrl(String partnerReviewUrl) {
 		PartnerMgrService.partnerReviewUrl = partnerReviewUrl;
 	}

@@ -4,20 +4,25 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
+import com.mofangyouxuan.common.SysConfigParam;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.PartnerMgrService;
+import com.mofangyouxuan.service.WXMPService;
 
 /**
  * 合作伙伴管理
@@ -28,6 +33,8 @@ import com.mofangyouxuan.service.PartnerMgrService;
 @RequestMapping("/partner")
 @SessionAttributes({"openId","vipBasic","userBasic","partnerBasic"})
 public class PartnerAction {
+	@Value("${sys.local-server-url}")
+	private String localServerUrl;
 	
 	/**
 	 * 获取合作伙伴管理首页
@@ -42,6 +49,7 @@ public class PartnerAction {
 			map.put("errmsg", "您尚未激活会员账户功能！")	;
 			return "forward:/user/index/vip" ;
 		}
+		
 		return "partner/page-partner-index";
 	}
 	
@@ -58,7 +66,22 @@ public class PartnerAction {
 			map.put("errmsg", "您尚未激活会员账户功能！")	;
 			return "forward:/user/index/vip" ;
 		}
-		//获取合作伙伴已有信息
+		map.put("APP_ID", SysConfigParam.APP_ID);
+		String nonceStr = "wddgwefw";
+		Long timestamp = System.currentTimeMillis();
+		String url = localServerUrl + "/partner/edit";
+		String signature = "";
+		try {
+			JSONObject json = WXMPService.getSignature(url, timestamp, nonceStr);
+			if(json.containsKey("signature")) {
+				signature = json.getString("signature");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		map.put("nonceStr", nonceStr);
+		map.put("timestamp", timestamp);
+		map.put("signature", signature);
 		
 		return "partner/page-partner-detail";
 	}
@@ -70,6 +93,7 @@ public class PartnerAction {
 	 * @throws JSONException 
 	 */
 	@RequestMapping("/get")
+	@ResponseBody
 	public Object getPartner(ModelMap map){
 		JSONObject jsonRet = new JSONObject();
 		VipBasic vip = (VipBasic)map.get("vipBasic");
@@ -80,18 +104,23 @@ public class PartnerAction {
 		}
 		
 		if(!"1".equals(vip.getIsPartner())) {
-			jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
+			jsonRet.put("errcode", 0);
 			jsonRet.put("errmsg", "您还没开通合作伙伴功能！");
 			return jsonRet.toString();
+		}else {
+			PartnerBasic partner = null;
+			try{
+				partner = PartnerMgrService.getPartner(vip.getVipId());
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+			if(partner == null) {
+				jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
+				jsonRet.put("errmsg", "获取合作伙伴信息失败！");
+				return jsonRet.toString();
+			}
+			return partner;
 		}
-		
-		PartnerBasic partner = PartnerMgrService.getPartner(vip.getVipId());
-		if(partner == null) {
-			jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
-			jsonRet.put("errmsg", "获取合作伙伴信息失败！");
-			return jsonRet.toString();
-		}
-		return partner;
 	}
 
 

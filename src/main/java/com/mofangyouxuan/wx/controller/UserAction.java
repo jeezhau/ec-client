@@ -6,8 +6,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.service.UserVipService;
@@ -47,7 +46,7 @@ public class UserAction {
 	 * @throws JSONException 
 	 */
 	@RequestMapping("/index/{mode}")
-	public String getIndex(@PathVariable("mode")String mode,ModelMap map) throws JSONException {
+	public String getIndex(@PathVariable("mode")String mode,ModelMap map){
 		if(!"basic".equals(mode) && !"vip".equals(mode)) {
 			mode = "basic";
 		}
@@ -65,14 +64,14 @@ public class UserAction {
 	 */
 	@RequestMapping("/basic/get")
 	@ResponseBody
-	public Object getUserBasci(ModelMap map) throws JSONException  {
+	public Object getUserBasci(ModelMap map)   {
 		String openId = (String) map.get("openId");
 		JSONObject jsonRet = new JSONObject();
 		UserBasic basic = UserVipService.getUserBasic(openId);
 		if(basic != null) {//成功
 			jsonRet.put("errcode", 0);
 			jsonRet.put("errmsg", "ok");
-			jsonRet.put("datas", basic.getJSON());
+			jsonRet.put("datas", JSONObject.toJSON(basic));
 			map.put("userBasic", basic);
 		}else {
 			jsonRet.put("errcode", -1);
@@ -100,7 +99,7 @@ public class UserAction {
 	 */
 	@RequestMapping(value="/basic/update",method=RequestMethod.POST)
 	@ResponseBody
-	public String updateBasic(@Valid UserBasic basic,BindingResult result,ModelMap map) throws JSONException {
+	public String updateBasic(@Valid UserBasic basic,BindingResult result,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
 			//用户信息验证结果处理
@@ -141,7 +140,7 @@ public class UserAction {
 	 * @throws JSONException 
 	 */
 	@RequestMapping("/spread")
-	public String getSpread(String create,ModelMap map) throws JSONException {
+	public String getSpread(String create,ModelMap map)  {
 		String openId = (String)map.get("openId");
 		if(create != null && "1".equals(create.trim())){
 			create = "1";
@@ -149,9 +148,9 @@ public class UserAction {
 			create = "0";
 		}
 		JSONObject ret = UserVipService.getSpreadQrCode(openId,create);
-		if(ret.has("errcode") && ret.getInt("errcode") == 0) {
+		if(ret.containsKey("errcode") && ret.getIntValue("errcode") == 0) {
 			map.put("showurl", ret.getString("showurl"));
-			map.put("count", ret.getInt("count"));
+			map.put("count", ret.getIntValue("count"));
 		}else {
 			map.put("errmsg", ret.getString("errmsg"));
 		}

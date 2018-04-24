@@ -29,7 +29,7 @@
   <div class="row" style="margin-top:30px;text-align:center;vertical-align:center">
     <div class="col-xs-6" >
       <div style="background-color:#3CB371">
-	    <a href="/partner/basic/save" >
+	    <a href="/partner/edit" >
 		    <img src="/icons/合作伙伴-申请开通.png" alt="" width="90px" height="90px">
 		    <p >申请开通／我是谁</p>
 		</a>
@@ -57,7 +57,7 @@
 		    <img src="/icons/运费模板管理.png" alt="" width="90px" height="90px">
 		    <p>运费模版管理</p>
 		</a>
-	   <div style="background-color:#3CB371">
+	  </div>
     </div>
   </div>
 
