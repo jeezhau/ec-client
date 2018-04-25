@@ -26,7 +26,7 @@ public class ServiceCenerAction {
 	public String getIndex(@PathVariable("mode")String mode,ModelMap map) {
 		map.put("sys_func", "srvcenter");
 		map.put("mode", mode);
-		return "page-srvcenter-index";
+		return "srvcenter/page-srvcenter-index";
 	}
 	
 	/**
@@ -36,7 +36,7 @@ public class ServiceCenerAction {
 	@RequestMapping("/complain/getall")
 	public String getComplainAll(String userId) {
 		
-		return "page-complain-all";
+		return "srvcenter/page-complain-all";
 	}
 	
 	/**
@@ -46,7 +46,7 @@ public class ServiceCenerAction {
 	@RequestMapping("/suggest/getall")
 	public String getSuggestAll(String userId) {
 		
-		return "page-suggest-all";
+		return "srvcenter/page-suggest-all";
 	}	
 	
 	

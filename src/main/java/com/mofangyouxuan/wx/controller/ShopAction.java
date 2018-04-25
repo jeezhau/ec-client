@@ -25,7 +25,7 @@ public class ShopAction {
 		
 		map.put("isDayFresh", "0");	//访问的每日鲜推，系统默认为访问商城管理
 		map.put("sys_func", "shop");
-		return "page-shop-index";
+		return "goods/page-shop-index";
 	}
 	
 }

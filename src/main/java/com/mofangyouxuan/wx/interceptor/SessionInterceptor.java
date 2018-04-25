@@ -32,7 +32,7 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 		
-		String contextPath = request.getContextPath();  
+		//String contextPath = request.getContextPath();  
 		HttpSession session = request.getSession();
 		
 		String openId = (String) session.getAttribute("openId");
@@ -45,8 +45,6 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 		
 		String isDayFresh = (String) request.getSession().getAttribute("isDayFresh");
 		String sysFunc = (String) request.getSession().getAttribute("sys_func");
-		UserBasic userBasic = (UserBasic) request.getSession().getAttribute("userBasic");
-		VipBasic vipBasic = (VipBasic) request.getSession().getAttribute("vipBasic");
 		if(isDayFresh == null) {
 			session.setAttribute("isDayFresh", "0");
 		}
@@ -55,11 +53,12 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 		}
 		
 		session.setAttribute("openId", openId);
-		
+		UserBasic userBasic = (UserBasic) request.getSession().getAttribute("userBasic");
+		VipBasic vipBasic = (VipBasic) request.getSession().getAttribute("vipBasic");
 		if(userBasic == null || userBasic.getId() == null) {
 			userBasic = UserVipService.getUserBasic(openId);
 			if(userBasic == null) {
-				response.sendRedirect(contextPath + "/error/page-no-user.html");
+				response.sendRedirect("/error/nouser");
 				return false;
 			}
 			session.setAttribute("userBasic", userBasic);

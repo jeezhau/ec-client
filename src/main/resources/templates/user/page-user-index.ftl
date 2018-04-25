@@ -37,11 +37,11 @@
     <div class="row" id="userBasic" style="display:<#if mode='basic'>block<#else>none</#if>"> 
       <div class="row" style="padding:10px 10px;background-color:#880000">
         <div class="row" style="margin:10px 25%;vertical-algin:center;text-align:center">
-          <img alt="" src="${userBasic.headimgurl!!''}" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" > 
+          <img alt="" src="${(userBasic.headimgurl)!''}" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" > 
         </div>
         <div class="row" style="width:60%;margin:10px 20%;color:gray">
           <span class="pull-left"><img alt="" src="<#if userBasic.sex='1'>/icons/性别-男.png<#elseif userBasic.sex='2'>/icons/性别-女.png<#else>/icons/性别-未知.png</#if>" width="20px" height="20px"> ${userBasic.nickname} </span >
-          <span class="pull-right"><img alt="" src="/icons/电话.png" width="20px" height="20px"> ${userBasic.phone} </span>
+          <span class="pull-right"><img alt="" src="/icons/电话.png" width="20px" height="20px"> ${(userBasic.phone)!''} </span>
         </div>
       </div>
       <div class="row" style="margin:30px 1px 15px 1px;">
@@ -172,7 +172,7 @@
          </li>
          <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
            <a href="<#if vipBasic.status = '1'>/partner/index<#else>#</#if>">
-             <span class="badge pull-right" style="background-color:rgb(239,239,239)"> 申请开通或关闭  &gt;</span>
+             <span class="badge pull-right" style="background-color:rgb(239,239,239)"> 申请开通商铺  &gt;</span>
              <img alt="" src="/icons/合作伙伴.png" width="20px" height="20px"> 合作伙伴
            </a>
          </li>

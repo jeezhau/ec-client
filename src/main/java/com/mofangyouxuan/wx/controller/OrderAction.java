@@ -27,7 +27,7 @@ public class OrderAction {
 	@RequestMapping("/order/begin/{goodsId}")
 	public String beginOrder(@PathVariable("goodsId")String goodsId,ModelMap map) {
 		
-		return "page-order-begin";
+		return "order/page-order-begin";
 	}
 	
 	/**
@@ -40,7 +40,7 @@ public class OrderAction {
 	public String beginPay(String jsonOrder) {
 		
 		
-		return "page-pay-begin";
+		return "order/page-pay-begin";
 	}
 	
 	/**
@@ -53,7 +53,7 @@ public class OrderAction {
 	public String finishPay(String jsonOrder) {
 		
 		
-		return "page-pay-finished";
+		return "order/page-pay-finished";
 	}
 	
 	/**
@@ -76,7 +76,7 @@ public class OrderAction {
 			status = "all";
 		}
 		map.put("status", status);
-		return "page-order-show";
+		return "order/page-order-show";
 	}
 	
 	/**

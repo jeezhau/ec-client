@@ -28,7 +28,7 @@ public class GoodsAction {
 	@RequestMapping("/detail/{goodsId}")
 	public String getDetail(@PathVariable("goodsId")String goodsId,ModelMap map) {
 		
-		return "page-goods-detail";
+		return "goods/page-goods-detail";
 	}
 	
 	/**

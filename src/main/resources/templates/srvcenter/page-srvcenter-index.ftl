@@ -163,7 +163,7 @@
   </div>    
 </div>
 <footer>
-  <#include "/page-bottom-menu.ftl" encoding="utf8"> 
+  <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
 </footer>
 <#if errmsg??>
 <!-- 错误提示模态框（Modal） -->

@@ -65,7 +65,6 @@ public class UserVipService {
 		String strRet = HttpUtils.doPost(mfyxServerUrl + userBasicGetUrl, params);
 		try {
 			JSONObject ret = JSONObject.parseObject(strRet);
-			SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
 			if(ret.containsKey("id")) {//成功
 //				userBasic = new UserBasic();
 //				userBasic.setOpenId(openId);

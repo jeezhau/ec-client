@@ -1,10 +1,13 @@
 package com.mofangyouxuan.wx.controller;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -12,14 +15,16 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.common.SysConfigParam;
 import com.mofangyouxuan.dto.PartnerBasic;
-import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.PartnerMgrService;
 import com.mofangyouxuan.service.WXMPService;
@@ -35,7 +40,10 @@ import com.mofangyouxuan.service.WXMPService;
 public class PartnerAction {
 	@Value("${sys.local-server-url}")
 	private String localServerUrl;
+	@Value("${sys.tmp-file-dir}")
+	private String tmpFileDir;
 	
+	private String[] certTypeArr = {"logo","idcard1","idcard2","licence"}; 	//当前支持的证件类型
 	/**
 	 * 获取合作伙伴管理首页
 	 * @return
@@ -49,7 +57,11 @@ public class PartnerAction {
 			map.put("errmsg", "您尚未激活会员账户功能！")	;
 			return "forward:/user/index/vip" ;
 		}
-		
+		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
+		if(partner == null) {
+			partner = PartnerMgrService.getPartner(vipBasic.getVipId());
+			map.put("partnerBasic", partner);
+		}
 		return "partner/page-partner-index";
 	}
 	
@@ -58,7 +70,7 @@ public class PartnerAction {
 	 * @return
 	 */
 	@RequestMapping("/edit")
-	public String basicEdit(ModelMap map) {
+	public String editBasic(ModelMap map) {
 		VipBasic vipBasic = (VipBasic) map.get("vipBasic");
 		if(vipBasic == null) {
 			return "error/page-no-user";
@@ -66,9 +78,9 @@ public class PartnerAction {
 			map.put("errmsg", "您尚未激活会员账户功能！")	;
 			return "forward:/user/index/vip" ;
 		}
-		map.put("APP_ID", SysConfigParam.APP_ID);
+		
 		String nonceStr = "wddgwefw";
-		Long timestamp = System.currentTimeMillis();
+		Long timestamp = System.currentTimeMillis()/1000;
 		String url = localServerUrl + "/partner/edit";
 		String signature = "";
 		try {
@@ -79,11 +91,15 @@ public class PartnerAction {
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		map.put("nonceStr", nonceStr);
-		map.put("timestamp", timestamp);
-		map.put("signature", signature);
 		
-		return "partner/page-partner-detail";
+		map.put("partner", map.get("partnerBasic"));
+		map.put("APP_ID", SysConfigParam.APP_ID);
+		map.put("nonceStr", nonceStr);
+		map.put("timestamp", timestamp + "");
+		map.put("signature", signature);
+		map.put("certShowBaseUrl", PartnerMgrService.getCertShowBaseUrl(vipBasic.getVipId()));
+		
+		return "partner/page-partner-edit";
 	}
 	
 	/**
@@ -103,81 +119,22 @@ public class PartnerAction {
 			return jsonRet.toString();
 		}
 		
-		if(!"1".equals(vip.getIsPartner())) {
-			jsonRet.put("errcode", 0);
-			jsonRet.put("errmsg", "您还没开通合作伙伴功能！");
-			return jsonRet.toString();
-		}else {
-			PartnerBasic partner = null;
-			try{
-				partner = PartnerMgrService.getPartner(vip.getVipId());
-			}catch(Exception e) {
-				e.printStackTrace();
-			}
-			if(partner == null) {
-				jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
-				jsonRet.put("errmsg", "获取合作伙伴信息失败！");
-				return jsonRet.toString();
-			}
-			return partner;
-		}
-	}
-
-
-	/**
-	 * 开通创建合作伙伴
-	 * @param basic	合作伙伴信息
-	 * @param result 字段验证结果
-	 * 
-	 * @return {errcode:0,errmsg:"ok"} 
-	 * @throws JSONException
-	 */
-	@RequestMapping(value="/create",method=RequestMethod.POST)
-	public String create(@Valid PartnerBasic basic,BindingResult result,ModelMap map)  {
-		JSONObject jsonRet = new JSONObject();
-		UserBasic user = (UserBasic)map.get("userBasic");
-		VipBasic vip = (VipBasic)map.get("vipBasic");
-		try {
-			//用户信息验证结果处理
-			if(result.hasErrors()){
-				StringBuilder sb = new StringBuilder();
-				List<ObjectError> list = result.getAllErrors();
-				for(ObjectError e :list){
-					sb.append(e.getDefaultMessage());
-				}
-				jsonRet.put("errmsg", sb.toString());
-				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-				return jsonRet.toString();
-			}
-
-			//数据检查
-			if(!"1".equals(vip.getStatus()) ) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "系统中没有该会员或未激活！");
-				return jsonRet.toString();
-			}
-			
-			//数据处理
-			basic.setUserId(user.getId());
-			String ret = PartnerMgrService.create(basic);
-			JSONObject retObj = JSONObject.parseObject(ret);
-			if(retObj.containsKey("partnerId")) {
-				basic.setId(retObj.getInteger("partnerId"));
-				basic.setStatus("0");
-				map.put("partnerBasic", basic);
-			}
-			return ret;
+		PartnerBasic partner = null;
+		try{
+			partner = PartnerMgrService.getPartner(vip.getVipId());
 		}catch(Exception e) {
-			//数据处理
-			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
-			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+			e.printStackTrace();
 		}
-		return jsonRet.toString();
+		if(partner == null) {
+			jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
+			jsonRet.put("errmsg", "获取合作伙伴信息失败！");
+			return jsonRet.toString();
+		}
+		return partner;
 	}
 	
-	
 	/**
-	 * 更新合作伙伴
+	 * 保存合作伙伴信息
 	 * 
 	 * @param basic	合作伙伴信息
 	 * @param result 字段验证结果
@@ -185,11 +142,12 @@ public class PartnerAction {
 	 * @return {errcode:0,errmsg:"ok"}
 	 * @throws JSONException 
 	 */
-	@RequestMapping(value="/update",method=RequestMethod.POST)
-	public String update(@Valid PartnerBasic basic,BindingResult result,ModelMap map){
+	@RequestMapping(value="/save",method=RequestMethod.POST)
+	@ResponseBody
+	public String saveBasic(@Valid PartnerBasic basic,BindingResult result,ModelMap map){
 		JSONObject jsonRet = new JSONObject();
-		UserBasic user = (UserBasic)map.get("userBasic");
-		PartnerBasic partner = (PartnerBasic)map.get("partnerBasic");
+		VipBasic vip = (VipBasic)map.get("vipBasic");
+		PartnerBasic oldPartner = (PartnerBasic)map.get("partnerBasic");
 		try {
 			//用户信息验证结果处理
 			if(result.hasErrors()){
@@ -203,24 +161,32 @@ public class PartnerAction {
 				return jsonRet.toString();
 			}
 			//数据检查
-			if(partner == null ) {
-				jsonRet.put("errcode", ErrCodes.PARTNER_PARAM_ERROR);
-				jsonRet.put("errmsg", "您还未开通合作伙伴！");
+			if(vip == null || !"1".equals(vip.getStatus())) {
+				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
+				jsonRet.put("errmsg", "系统中没有该会员或未激活！");
 				return jsonRet.toString();
 			}
 			//数据处理
-			basic.setId(partner.getId());
-			basic.setUserId(user.getId());
+			if(oldPartner != null && oldPartner.getId() != null) {
+				basic.setId(oldPartner.getId());
+			}else {
+				basic.setId(null);
+			}
+			basic.setUserId(vip.getVipId());
+			basic.setUpdateTime(new Date());
 			basic.setReviewLog("");
 			basic.setReviewOpr(null);
 			basic.setReviewTime(null);
-			basic.setCertDir(null); 
-			basic.setUpdateTime(null);
-			
-			String strRet = PartnerMgrService.update(basic);
+			String strRet = "";
+			if(oldPartner == null || oldPartner.getId() == null) {
+				strRet = PartnerMgrService.create(basic);
+			}else {
+				strRet = PartnerMgrService.update(basic);
+			}
 			JSONObject retObj = JSONObject.parseObject(strRet);
-			if(retObj.containsKey("errcode") && retObj.getIntValue("errcode") == 0) {
+			if(retObj.containsKey("errcode") && retObj.getIntValue("errcode") == 0) {//更新成功
 				basic.setStatus("0");
+				basic.setId(retObj.getInteger("partnerId"));
 				map.put("partnerBasic", basic);
 			}
 			return strRet;
@@ -275,5 +241,75 @@ public class PartnerAction {
 		}
 		return jsonRet.toString();
 	}
+	
+	/**
+	 * 证件照上传
+	 * @param certType	证件类型
+	 * @param image		照片,jpg格式
+	 * @param currUserId	当前操作用户
+	 * @return
+	 */
+	@RequestMapping("/cert/upload")
+	@ResponseBody
+	public String uploadCert(@RequestParam(value="certType",required=true)String certType,
+			@RequestParam(value="image")MultipartFile image,ModelMap map) {
+		
+		JSONObject jsonRet = new JSONObject();
+		VipBasic vip = (VipBasic)map.get("vipBasic");
+		File tmpImg = null;
+		try {
+			if(image == null || image.isEmpty()) {
+				jsonRet.put("errcode", ErrCodes.PARTNER_PARAM_ERROR);
+				jsonRet.put("errmsg", "证件照片信息不可为空！");
+				return jsonRet.toString();
+			}
+			//文件类型判断
+			String imgType = image.getOriginalFilename().substring(image.getOriginalFilename().lastIndexOf('.')+1);
+			if(!"jpg".equalsIgnoreCase(imgType) && !"jpeg".equalsIgnoreCase(imgType) && !"png".equalsIgnoreCase(imgType)) {
+				jsonRet.put("errcode", -888);
+				jsonRet.put("errmsg", "证件图片文件必须是jpg,jpeg,png格式！");
+				return jsonRet.toString();
+			}
+			//证件类型判断
+			boolean flag = false;
+			for(String tp:certTypeArr) {
+				if(tp.equals(certType)) {
+					flag = true;
+					break;
+				}
+			}
+			if(!flag) {
+				jsonRet.put("errcode", -888);
+				jsonRet.put("errmsg", "证件类型只可是：" + Arrays.toString(certTypeArr) + "！");
+				return jsonRet.toString();
+			}
+			//数据检查
+			if(vip == null || !"1".equals(vip.getStatus()) ) {
+				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
+				jsonRet.put("errmsg", "系统中没有该会员或未激活！");
+				return jsonRet.toString();
+			}
+			File dir = new File(this.tmpFileDir);
+			if(!dir.exists()) {
+				dir.mkdirs();
+			}
+			tmpImg = new File(dir,image.getOriginalFilename()); //生成临时文件
+			FileUtils.copyInputStreamToFile(image.getInputStream(), tmpImg);
+			
+			String ret = PartnerMgrService.uploadCert(tmpImg, certType,vip.getVipId());
+			jsonRet = JSONObject.parseObject(ret);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", -777);
+			jsonRet.put("errmsg", "系统异常，异常信息：" + e.getMessage());
+		}finally {
+			if(tmpImg != null) {
+				tmpImg.delete();
+			}
+		}
+		return jsonRet.toString();
+	}
+	
 	
 }

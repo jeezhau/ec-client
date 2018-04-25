@@ -8,6 +8,10 @@
 	    </span>
 	    <p class="weui-tabbar__label">每日鲜推</p>
       </a>
+      <a href="/nearby/index" class="weui-tabbar__item <#if sys_func=='nearby'>weui-bar__item_on </#if>" >
+	    <img src="/icons/附近商家.png" alt="" class="weui-tabbar__icon">
+	    <p class="weui-tabbar__label">优选同城</p>
+	  </a>
 	<#else>
     	<a href="/shop/index" class="weui-tabbar__item <#if sys_func=='shop'>weui-bar__item_on </#if>" >
 	    <span style="display: inline-block;position: relative;">
@@ -20,7 +24,6 @@
 	    <p class="weui-tabbar__label">优选同城</p>
 	</a>
     </#if>
-
 	<a href="/srvcenter/index/about" class="weui-tabbar__item <#if sys_func=='srvcenter'>weui-bar__item_on </#if>" >
 	    <span style="display: inline-block;position: relative;">
 	        <img src="/icons/服务.png" alt="" class="weui-tabbar__icon">

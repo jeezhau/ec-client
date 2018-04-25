@@ -11,7 +11,13 @@ server:
 
 logging:
   level:
-    com.jeekhan.wx.mapper: DEBUG
+    com.jeekhan.wx: DEBUG
+    
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10Mb
+      max-request-size: 10Mb
 ######微信参数############
 wxmp:
 #userId 公众号

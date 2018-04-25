@@ -15,7 +15,7 @@ import com.mofangyouxuan.wx.utils.PageCond;
  */
 @Controller
 @RequestMapping("/appraise")
-public class CommentAction {
+public class AppraiseAction {
 	
 	/**
 	 * 获取商品评论显示首页
@@ -25,7 +25,7 @@ public class CommentAction {
 	public String getCommentShowIndex(@PathVariable("goodsId")String goodsId,ModelMap map) {
 		//返回商品信息
 		
-		return "page-appraise-show";
+		return "order/page-appraise-show";
 	}
 	
 	
