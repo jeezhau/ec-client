@@ -1,5 +1,7 @@
 package com.mofangyouxuan.wx.interceptor;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -8,8 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import com.mofangyouxuan.dto.Category;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
+import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.service.UserVipService;
 
 
@@ -24,10 +28,10 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 	Logger log = LoggerFactory.getLogger(SessionInterceptor.class);
 	
 	
-	
 	/**
 	 * 检查用户是否登陆，如果为登陆则返回登陆页面
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
@@ -67,6 +71,12 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 		if(vipBasic == null || vipBasic.getVipId() == null) {
 			vipBasic = UserVipService.getVipBasic(openId);
 			session.setAttribute("vipBasic", vipBasic);
+		}
+		
+		List<Category> categories = (List<Category>) session.getAttribute("categories");
+		if(categories == null) {
+			categories = GoodsService.getCategories();
+			session.setAttribute("categories", categories);
 		}
         return true; 
 	}

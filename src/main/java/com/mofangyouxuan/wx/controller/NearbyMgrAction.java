@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
  */
 @Controller
 @RequestMapping("/nearby")
-@SessionAttributes({"isDayFresh","sys_func"})
+@SessionAttributes({"isDayFresh","sys_func","vipBasic","partnerBasic","categories"})
 public class NearbyMgrAction {
 	
 	/**

@@ -52,6 +52,13 @@ mfyx:
   city-get-cities-url: '/city/city/getbyprov/'
   city-get-areas-url: '/city/area/getbycity/'
 
+  goods-add-url: '/goods/add'
+  goods-update-url: '/goods/update'
+  goods-get-url: '/goods/get/'
+  goods-getall-url: '/goods/getall'
+  goods-change-status-url: '/goods/changeStatus'
+  goods-change-stock-url: '/goods/changeStock'
+  goods-category-url: '/goods/category'
   
 ######系统参数############  
 sys:

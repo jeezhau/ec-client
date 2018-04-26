@@ -1,5 +1,5 @@
  <!-- 商城管理底部主菜单--> 
-  <div class="row" style="height:30px"></div>
+  <div class="row" style="height:50px"></div>
   <div class="weui-tabbar" style="position:fixed;left:0px;bottom:0px">
     <#if isDayFresh=='1'>
     	 <a href="/dayfresh/index/today" class="weui-tabbar__item <#if sys_func=='dayfresh'>weui-bar__item_on </#if>" >

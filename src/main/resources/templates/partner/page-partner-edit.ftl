@@ -146,7 +146,7 @@
       </div>        
       <div class="form-group">
         <div style="text-align:center">
-          <button type="button" class="btn btn-info" style="margin:20px" @click="getLocation"><span style="color:red">*</span>请在经营详细地址位置操作并同意获取地址</button>
+          <button type="button" class="btn btn-info" style="margin:20px" @click="getLocation"><span style="color:red">*</span>获取当前经营地址</button>
         </div>
       </div> 
       <div class="form-group">
@@ -216,7 +216,7 @@ var partnerContainerVue = new Vue({
 		},
 		review:{
 			status:'${(partner.status)!"0"}',
-			reviewTime:'${(partner.reviewTime)?string("yyyy-MM-dd HH:mm:ss")}' ,
+			reviewTime:'${(partner.reviewTime)!''?string("yyyy-MM-dd HH:mm:ss")}' ,
 			reviewLog:"${(partner.reviewLog)!''}"
 		},
 		param:{
