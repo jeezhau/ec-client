@@ -54,7 +54,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class HttpUtils {
     private static RequestConfig requestConfig;	
-    private static String TEMP_FILE_DIR = "";			//文件临时保存目录
+    //private static String TEMP_FILE_DIR = "";			//文件临时保存目录
     private static final int MAX_TIMEOUT = 7000;	//连接超时
 
     static {
@@ -190,7 +190,7 @@ public class HttpUtils {
      * @param json json对象
      * @return
      */
-    public static String doPost(String apiUrl, Object json) {
+    public static String doPost(String apiUrl, String json) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         String httpStr = null;
         HttpPost httpPost = new HttpPost(apiUrl);
@@ -198,7 +198,7 @@ public class HttpUtils {
 
         try {
             httpPost.setConfig(requestConfig);
-            StringEntity stringEntity = new StringEntity(json.toString(),"UTF-8");//解决中文乱码问题
+            StringEntity stringEntity = new StringEntity(json,"UTF-8");//解决中文乱码问题
             stringEntity.setContentEncoding("UTF-8");
             stringEntity.setContentType("application/json");
             httpPost.setEntity(stringEntity);
@@ -345,7 +345,7 @@ public class HttpUtils {
      * @return
      * @throws IOException 
      */
-    public static String doPostSSL(String apiUrl, Object json) {
+    public static String doPostSSL(String apiUrl, String json) {
         CloseableHttpClient httpClient = createSSLConnSocketFactory();
         HttpPost httpPost = new HttpPost(apiUrl);
         CloseableHttpResponse response = null;
@@ -353,7 +353,7 @@ public class HttpUtils {
 
         try {
             httpPost.setConfig(requestConfig);
-            StringEntity stringEntity = new StringEntity(json.toString(),"UTF-8");//解决中文乱码问题
+            StringEntity stringEntity = new StringEntity(json,"UTF-8");//解决中文乱码问题
             stringEntity.setContentEncoding("UTF-8");
             stringEntity.setContentType("application/json");
             httpPost.setEntity(stringEntity);
@@ -546,10 +546,11 @@ public class HttpUtils {
 	
 	/**
 	 * 文件下载（GET）
+	 * @param fileSaveDir 文件本地保存目录
 	 * @param apiUrl	文件下载路径
 	 * @return
 	 */
-	public static File downloadFile(String apiUrl){
+	public static File downloadFile(String fileSaveDir,String apiUrl){
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		CloseableHttpResponse httpResponse = null;
 		HttpGet httpGet = new HttpGet(apiUrl);
@@ -570,9 +571,9 @@ public class HttpUtils {
             String type = typeHead.substring(typeHead.lastIndexOf("/"));
             String fileName = UUID.randomUUID().toString() + "." +type;
             if(fileHead != null){
-            	fileName = fileHead.getValue();
+            		fileName = fileHead.getValue();
             }
-            File file = new File(TEMP_FILE_DIR + fileName);
+            File file = new File(fileSaveDir + fileName);
             FileUtils.copyInputStreamToFile(in, file);
             return file;
 		} catch (IOException e) {
@@ -595,12 +596,13 @@ public class HttpUtils {
 	
 	/**
 	 *  SSL 文件下载（GET）
+	 * @param fileSaveDir 文件本地保存目录
 	 * @param apiUrl	文件下载路径
 	 * @return
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 */
-	public static File downloadFileSSL(String apiUrl){
+	public static File downloadFileSSL(String fileSaveDir,String apiUrl){
 		CloseableHttpClient httpClient = createSSLConnSocketFactory();
 		CloseableHttpResponse httpResponse = null;
 		HttpGet httpGet = new HttpGet(apiUrl);
@@ -623,7 +625,7 @@ public class HttpUtils {
             if(fileHead != null){
             	fileName = fileHead.getValue();
             }
-            File file = new File(TEMP_FILE_DIR + fileName);
+            File file = new File(fileSaveDir + fileName);
             FileUtils.copyInputStreamToFile(in, file);
             return file;
 		} catch (IOException e) {
@@ -645,12 +647,13 @@ public class HttpUtils {
 	
 	/**
      * 下载文件（SSL POST），JSON形式参数
+     * @param fileSaveDir 文件本地保存目录
      * @param apiUrl API接口URL
      * @param json JSON对象
      * @return
      * @throws IOException 
      */
-    public static File downloadFileSSL(String apiUrl, Object json) {
+    public static File downloadFileSSL(String fileSaveDir,String apiUrl, Object json) {
         CloseableHttpClient httpClient = createSSLConnSocketFactory();
         HttpPost httpPost = new HttpPost(apiUrl);
         CloseableHttpResponse response = null;
@@ -677,7 +680,7 @@ public class HttpUtils {
             if(fileHead != null){
             	fileName = fileHead.getValue();
             }
-            File file = new File(TEMP_FILE_DIR + fileName);
+            File file = new File(fileSaveDir + fileName);
             FileUtils.copyInputStreamToFile(in, file);
             return file;
         } catch (Exception e) {

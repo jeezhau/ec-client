@@ -216,7 +216,7 @@ var partnerContainerVue = new Vue({
 		},
 		review:{
 			status:'${(partner.status)!"0"}',
-			reviewTime:'${(partner.reviewTime)!''?string("yyyy-MM-dd HH:mm:ss")}' ,
+			reviewTime:'' ,
 			reviewLog:"${(partner.reviewLog)!''}"
 		},
 		param:{
@@ -422,7 +422,7 @@ $(document).on('ready', function() {
             image: {width: "100px", height: "100px"},
         },
         initialPreview: [ //预览图片的设置
-            '<img src="${certShowBaseUrl}/logo" alt="LOGO照片" class="file-preview-image" style="width:96px">'
+            '<img src="/partner/cert/show/logo" alt="LOGO照片" class="file-preview-image" style="width:96px">'
         ]
     });
     //异步上传错误结果处理
@@ -471,7 +471,7 @@ $(document).on('ready', function() {
             image: {width: "100px", height: "100px"},
         },
         initialPreview: [ //预览图片的设置
-            '<img src="${certShowBaseUrl}/idcard1" alt="法人身份证正面" class="file-preview-image" style="width:96px">'
+            '<img src="/partner/cert/show/idcard1" alt="法人身份证正面" class="file-preview-image" style="width:96px">'
         ]
     });
     //异步上传错误结果处理
@@ -520,7 +520,7 @@ $(document).on('ready', function() {
             image: {width: "100px", height: "100px"},
         },
         initialPreview: [ //预览图片的设置
-            '<img src="${certShowBaseUrl}/idcard2" alt="法人身份证反面" class="file-preview-image" style="width:100px;height:100px">'
+            '<img src="/partner/cert/show/idcard2" alt="法人身份证反面" class="file-preview-image" style="width:100px;height:100px">'
         ]
     });
     //异步上传错误结果处理
@@ -569,7 +569,7 @@ $(document).on('ready', function() {
             image: {width: "100px", height: "100px"},
         },
         initialPreview: [ //预览图片的设置
-            '<img src="${certShowBaseUrl}/licence" alt="营业执照照片" class="file-preview-image" style="width:96px">'
+            '<img src="/partner/cert/show/licence" alt="营业执照照片" class="file-preview-image" style="width:96px">'
         ]
     });
     //异步上传错误结果处理

@@ -60,6 +60,11 @@ mfyx:
   goods-change-stock-url: '/goods/changeStock'
   goods-category-url: '/goods/category'
   
+  image-file-upload-url: '/image/file/upload'
+  image-file-show-url: '/image/file/show/'
+  image-folder-create-url: '/image/folder/create'
+  image-folder-list-url: '/image/folder/list'
+  
 ######系统参数############  
 sys:
   local-server-url: 'http://192.168.0.102:8000'

@@ -59,6 +59,14 @@
 		</a>
 	  </div>
     </div>
+    <div class="col-xs-6" >
+       <div style="background-color:#3CB371">
+	    <a href="/image/index" >
+		    <img src="/icons/图库.png" alt="" width="90px" height="90px">
+		    <p>图库管理</p>
+		</a>
+	  </div>
+    </div>    
   </div>
   <div class="row" style="margin-top:3px;vertical-align:center">
     <div class="col-xs-12">

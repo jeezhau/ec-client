@@ -45,7 +45,7 @@
         </div>
       </div>
       <div class="row" style="margin:30px 1px 15px 1px;">
-       <ul class="nav nav-pills nav-stacked" style="max-width: 350px;">
+       <ul class="nav nav-pills nav-stacked" style="">
          <li style="background-color:white" >
            <a href="/order/show/all" >
              <span class=" pull-right" style="border:none">查询所有  &gt;</span>
@@ -151,7 +151,7 @@
         </div>
       </div>
       <div class="row" style="margin:30px 1px 15px 1px;">
-       <ul class="nav nav-pills nav-stacked" style="max-width: 350px;">
+       <ul class="nav nav-pills nav-stacked" style="">
          <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
            <a href="<#if vipBasic.status = '1'><#else>#</#if>" >
              <span class="badge pull-right" style="background-color:rgb(239,239,239);border:none">申请转出  &gt;</span>

@@ -20,6 +20,7 @@ import com.mofangyouxuan.wx.utils.ObjectToMap;
 @Component
 public class PartnerMgrService {
 	
+	private static String tmpFileDir;
 	private static String mfyxServerUrl;
 	private static String partnerBasicGetUrl;
 	private static String partnerBasicCreateUrl;
@@ -28,6 +29,11 @@ public class PartnerMgrService {
 	private static String partnerReviewUrl;
 	private static String partnerCertUploadUrl;
 	private static String partnerCertShowUrl;
+	
+	@Value("${sys.tmp-file-dir}")
+	public void setTmpFileDir(String url) {
+		tmpFileDir = url;
+	}
 	
 	@Value("${mfyx.mfyx-server-url}")
 	public void setMfyxServerUrl(String mfyxServerUrl) {
@@ -127,24 +133,6 @@ public class PartnerMgrService {
 		return strRet;
 	}
 	
-	/**
-	 * 合作伙伴审批
-	 * @param partnerId
-	 * @param currUserId
-	 * @param review
-	 * @param result
-	 * @return {errcode:0,errmsg:'ok'}
-	 */
-	public static String review(Integer partnerId,Integer currUserId,String review,String result) {
-		JSONObject json = new JSONObject();
-		json.put("partnerId", partnerId);
-		json.put("currUserId", currUserId);
-		json.put("review", review);
-		json.put("result", result);
-		String url = mfyxServerUrl + partnerReviewUrl;
-		String strRet = HttpUtils.doPost(url, JSONObject.toJSON(json));
-		return strRet;
-	}
 	
 	/**
 	 * 证件照片上传
@@ -163,14 +151,15 @@ public class PartnerMgrService {
 	}
 	
 	/**
-	 * 获取证件照的显示路径
+	 * 获取证件照
 	 * @param certType
 	 * @param userId
 	 * @return
 	 */
-	public static String getCertShowBaseUrl(Integer userId) {
-		String url = mfyxServerUrl + partnerCertShowUrl + "/" + userId;
-		return url;
+	public static File showCert(Integer userId,String certType) {
+		String url = mfyxServerUrl + partnerCertShowUrl + userId + "/" + certType;
+		File file = HttpUtils.downloadFile(tmpFileDir,url);
+		return file;
 	}
 
 }

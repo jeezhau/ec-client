@@ -1,10 +1,15 @@
 package com.mofangyouxuan.wx.controller;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.io.FileUtils;
@@ -13,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -97,7 +103,6 @@ public class PartnerAction {
 		map.put("nonceStr", nonceStr);
 		map.put("timestamp", timestamp + "");
 		map.put("signature", signature);
-		map.put("certShowBaseUrl", PartnerMgrService.getCertShowBaseUrl(vipBasic.getVipId()));
 		
 		return "partner/page-partner-edit";
 	}
@@ -311,5 +316,44 @@ public class PartnerAction {
 		return jsonRet.toString();
 	}
 	
+	/**
+	 * 显示证件图片
+	 * @param certType
+	 * @return
+	 */
+	@RequestMapping("/cert/show/{certType}")
+	public void showCert(@PathVariable(value="certType",required=true)String certType,
+			OutputStream out,HttpServletRequest request,HttpServletResponse response,ModelMap map) {
+		try {
+			//数据检查
+			VipBasic vip = (VipBasic) map.get("vipBasic");
+			if(vip == null || !"1".equals(vip.getStatus()) ) {
+				return;
+			}
+			//证件类型判断
+			boolean flag = false;
+			for(String tp:certTypeArr) {
+				if(tp.equals(certType)) {
+					flag = true;
+					break;
+				}
+			}
+			if(!flag) {
+				return;
+			}
+			File file = PartnerMgrService.showCert(vip.getVipId(), certType);
+			if(file == null || !file.exists()) {
+				return;
+			}
+			BufferedImage image = ImageIO.read(file);
+			response.setContentType("image/*");
+			OutputStream os = response.getOutputStream();  
+			String type = file.getName().substring(file.getName().lastIndexOf('.')+1);
+			ImageIO.write(image, type, os); 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	
 }
