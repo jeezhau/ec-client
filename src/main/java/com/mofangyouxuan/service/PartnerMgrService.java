@@ -77,7 +77,7 @@ public class PartnerMgrService {
 		PartnerBasic partner = null;
 		try {
 			JSONObject jsonRet = JSONObject.parseObject(strRet);
-			if(jsonRet.containsKey("id")) {//成功
+			if(jsonRet.containsKey("partnerId")) {//成功
 				partner = JSONObject.parseObject(strRet, PartnerBasic.class);
 				return partner;
 			}

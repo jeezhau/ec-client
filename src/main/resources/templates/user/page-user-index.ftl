@@ -153,25 +153,25 @@
       <div class="row" style="margin:30px 1px 15px 1px;">
        <ul class="nav nav-pills nav-stacked" style="">
          <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
-           <a href="<#if vipBasic.status = '1'><#else>#</#if>" >
+           <a href="<#if vipBasic.status = '1'><#else>javascript:;</#if>" >
              <span class="badge pull-right" style="background-color:rgb(239,239,239);border:none">申请转出  &gt;</span>
              <img alt="" src="/icons/提现.png" width="20px" height="20px"> 提现
            </a>
          </li>
          <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
-           <a href="<#if vipBasic.status = '1'><#else>#</#if>">
+           <a href="<#if vipBasic.status = '1'><#else>javascript:;</#if>">
              <span class="badge pull-right" style="background-color:rgb(239,239,239)">查询所有资金流  &gt;</span>
              <img alt="" src="/icons/查看明细.png" width="20px" height="20px"> 资金变动明细
            </a>
          </li>
          <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
-           <a href="<#if vipBasic.status = '1'><#else>#</#if>">
+           <a href="<#if vipBasic.status = '1'><#else>javascript:;</#if>">
              <span class="badge pull-right" style="background-color:rgb(239,239,239)"> 联系我们  &gt;</span>
              <img alt="" src="/icons/客服.png" width="20px" height="20px"> 官方客服
            </a>
          </li>
          <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
-           <a href="<#if vipBasic.status = '1'>/partner/index<#else>#</#if>">
+           <a href="<#if vipBasic.status = '1'>/partner/index<#else>javascript:;</#if>">
              <span class="badge pull-right" style="background-color:rgb(239,239,239)"> 申请开通商铺  &gt;</span>
              <img alt="" src="/icons/合作伙伴.png" width="20px" height="20px"> 合作伙伴
            </a>

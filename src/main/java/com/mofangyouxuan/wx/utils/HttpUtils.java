@@ -36,7 +36,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -156,8 +155,7 @@ public class HttpUtils {
             httpPost.setConfig(requestConfig);
             List<NameValuePair> pairList = new ArrayList<>(params.size());
             for (Map.Entry<String, Object> entry : params.entrySet()) {
-                NameValuePair pair = new BasicNameValuePair(entry.getKey(), entry
-                        .getValue().toString());
+                NameValuePair pair = new BasicNameValuePair(entry.getKey(), entry.getValue()== null ? "" :entry.getValue().toString());
                 pairList.add(pair);
             }
             httpPost.setEntity(new UrlEncodedFormEntity(pairList, Charset.forName("UTF-8")));
@@ -424,26 +422,18 @@ public class HttpUtils {
 		HttpPost httpPost = new HttpPost(apiUrl);
 		String httpStr;
 		try {
-			// 实现将请求 的参数封装封装到HttpEntity中。
-	       /* EntityBuilder entityBuilder = EntityBuilder.create();
-	        entityBuilder.setContentEncoding("utf-8");
-	        entityBuilder.setContentType(ContentType.MULTIPART_FORM_DATA);
-	        List<NameValuePair> pairList = new ArrayList<NameValuePair>(paramPairs.size());
-            for (Map.Entry<String, String> entry : paramPairs.entrySet()) {
-                NameValuePair pair = new BasicNameValuePair(entry.getKey(), entry.getValue());
-                pairList.add(pair);
-            }
-	        entityBuilder.setParameters(pairList);
-	        entityBuilder.setFile(file);
-	        HttpEntity reqEntity = entityBuilder.build();*/
-	        FileBody fileBody = new FileBody(file);
+	        
 			MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+			FileBody fileBody = new FileBody(file);
 			entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);// 以浏览器兼容模式运行，防止文件名乱码。
 			entityBuilder.addPart(fileField, fileBody);	//对应服务端类的同名属性<File类型>
 			entityBuilder.setCharset(CharsetUtils.get("UTF-8"));
+			//处理文字字段：放入字段名，字段值，以及contentType
+			ContentType strContent=ContentType.create("text/plain",Charset.forName("UTF-8"));
 			if(paramPairs != null && paramPairs.size()>0){
 				for (Map.Entry<String, String> entry : paramPairs.entrySet()) {
-	                entityBuilder.addPart(entry.getKey(), new StringBody(entry.getValue(),ContentType.DEFAULT_TEXT));
+	                //entityBuilder.addPart(entry.getKey(), new StringBody(entry.getValue(),ContentType.DEFAULT_TEXT));
+					entityBuilder.addTextBody(entry.getKey(), entry.getValue(),strContent);
 	            }
 			}
 			HttpEntity reqEntity = entityBuilder.build();
@@ -491,26 +481,18 @@ public class HttpUtils {
 		HttpPost httpPost = new HttpPost(apiUrl);
 		String httpStr;
 		try {
-			// 实现将请求 的参数封装封装到HttpEntity中。
-	       /* EntityBuilder entityBuilder = EntityBuilder.create();
-	        entityBuilder.setContentEncoding("utf-8");
-	        entityBuilder.setContentType(ContentType.MULTIPART_FORM_DATA);
-	        List<NameValuePair> pairList = new ArrayList<NameValuePair>(paramPairs.size());
-            for (Map.Entry<String, String> entry : paramPairs.entrySet()) {
-                NameValuePair pair = new BasicNameValuePair(entry.getKey(), entry.getValue());
-                pairList.add(pair);
-            }
-	        entityBuilder.setParameters(pairList);
-	        entityBuilder.setFile(file);
-	        HttpEntity reqEntity = entityBuilder.build();*/
-	        FileBody fileBody = new FileBody(file);
+	        
 			MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+			FileBody fileBody = new FileBody(file);
 			entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);	// 以浏览器兼容模式运行，防止文件名乱码。
 			entityBuilder.addPart(fileField, fileBody);	//对应服务端类的同名属性<File类型>
 			entityBuilder.setCharset(CharsetUtils.get("UTF-8"));
+			//处理文字字段：放入字段名，字段值，以及contentType
+			ContentType strContent=ContentType.create("text/plain",Charset.forName("UTF-8"));
 			if(paramPairs != null && paramPairs.size()>0){
 				for (Map.Entry<String, String> entry : paramPairs.entrySet()) {
-	                entityBuilder.addPart(entry.getKey(), new StringBody(entry.getValue(),ContentType.DEFAULT_TEXT));
+	                //entityBuilder.addPart(entry.getKey(), new StringBody(entry.getValue(),ContentType.DEFAULT_TEXT));
+					entityBuilder.addTextBody(entry.getKey(), entry.getValue(),strContent);
 	            }
 			}
 			HttpEntity reqEntity = entityBuilder.build();

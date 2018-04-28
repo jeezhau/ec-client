@@ -37,7 +37,7 @@
     </div>
     <div class="col-xs-6" >
        <div style="background-color:#3CB371">
-	    <a href="/user/index/basic" >
+	    <a href="/goods/manage" >
 		    <img src="/icons/商品管理.png" alt=""  width="90px" height="90px">
 		    <p >商品管理</p>
 		</a>
@@ -46,14 +46,14 @@
     <div class="col-xs-6" >
        <div style="background-color:#3CB371">
 	    <a href="/user/index/basic" >
-		    <img src="/icons/订单管理.png" alt="" width="90px" height="90px">
-		    <p >订单管理</p>
+		    <img src="/icons/销售订单.png" alt="" width="90px" height="90px">
+		    <p >销售订单</p>
 		</a>
        </div>
     </div>
     <div class="col-xs-6" >
        <div style="background-color:#3CB371">
-	    <a href="/user/index/basic" >
+	    <a href="/postage/index" >
 		    <img src="/icons/运费模板管理.png" alt="" width="90px" height="90px">
 		    <p>运费模版管理</p>
 		</a>
@@ -62,7 +62,7 @@
     <div class="col-xs-6" >
        <div style="background-color:#3CB371">
 	    <a href="/image/index" >
-		    <img src="/icons/图库.png" alt="" width="90px" height="90px">
+		    <img src="/icons/图库管理.png" alt="" width="90px" height="90px">
 		    <p>图库管理</p>
 		</a>
 	  </div>

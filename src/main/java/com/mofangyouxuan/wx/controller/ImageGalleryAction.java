@@ -34,7 +34,7 @@ import com.mofangyouxuan.wx.utils.HttpUtils;
  */
 @Controller
 @RequestMapping("/image")
-@SessionAttributes({"openId","vipBasic","userBasic","partnerBasic"})
+@SessionAttributes({"vipBasic","userBasic","partnerBasic"})
 public class ImageGalleryAction {
 	@Value("${sys.tmp-file-dir}")
 	private String tmpFileDir;
@@ -69,8 +69,7 @@ public class ImageGalleryAction {
 			return "forward:/user/index/vip" ;
 		}
 		
-		return "partner/page-image-gallery-mgr";
-		
+		return "image/page-image-manage";
 	}
 	
 	

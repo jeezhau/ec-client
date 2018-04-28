@@ -75,7 +75,7 @@ public class GoodsService {
 		Goods goods = null;
 		try {
 			JSONObject jsonRet = JSONObject.parseObject(strRet);
-			if(jsonRet.containsKey("id")) {//成功
+			if(jsonRet.containsKey("goodsId")) {//成功
 				goods = JSONObject.parseObject(strRet, Goods.class);
 			}
 		}catch(Exception e) {

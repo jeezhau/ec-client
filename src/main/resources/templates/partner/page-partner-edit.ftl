@@ -48,7 +48,7 @@
 <div class="container" id="partnerContainer" style="padding:0px 0px;oveflow:scroll">
   <div class="row">
      <ul class="nav nav-tabs" style="margin:0 15%">
-	  <li style="width:50%" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#editPartner').show();$('#reviewInfo').hide();">
+	  <li class="active" style="width:50%" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#editPartner').show();$('#reviewInfo').hide();">
 	    <a href="javascript:;">基本信息编辑</a>
 	  </li>
 	  <li style="width:50%" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#editPartner').hide();$('#reviewInfo').show();">
@@ -56,7 +56,7 @@
 	  </li>
 	</ul>
   </div>
-  <div class="row" id="editPartner" style="width:100%;margin:1px 0px 0px 0px;padding:5px 8px;background-color:white;display:none">
+  <div class="row" id="editPartner" style="width:100%;margin:1px 0px 0px 0px;padding:5px 8px;background-color:white;">
     <h5 style="text-align:center">合作伙伴基本信息编辑</h5>
     <h6>
       &nbsp;&nbsp;&nbsp;&nbsp;所有的照片一旦上传，只可使用新照片再次上传替换删除，不可直接删除；页面删除操作只在本地进行，不会删除服务器上的照片数据！<br>
@@ -186,7 +186,7 @@
   	<p>审批时间：{{review.reviewTime}}</p>
   	<p>审批结果：{{getStatus()}} </p>
   	<p>审批意见：{{review.reviewLog}}</p>
-  </div>  
+  </div>
 </div><!-- end of container -->
 <script type="text/javascript">
 var partnerContainerVue = new Vue({
@@ -216,7 +216,7 @@ var partnerContainerVue = new Vue({
 		},
 		review:{
 			status:'${(partner.status)!"0"}',
-			reviewTime:'' ,
+			reviewTime:'${(partner.reviewTime)!''}' ,
 			reviewLog:"${(partner.reviewLog)!''}"
 		},
 		param:{

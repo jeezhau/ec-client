@@ -1,5 +1,7 @@
 package com.mofangyouxuan.wx.controller;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -10,9 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import com.alibaba.fastjson.JSONObject;
+import com.mofangyouxuan.dto.Category;
 import com.mofangyouxuan.dto.Goods;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.VipBasic;
+import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.wx.utils.PageCond;
 
 /**
@@ -30,8 +35,8 @@ public class GoodsAction {
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/mgr")
-	public String getGoodMgrIndex(ModelMap map) {
+	@RequestMapping("/manage")
+	public String getMgrIndex(ModelMap map) {
 		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
 		VipBasic vipBasic = (VipBasic) map.get("vipBasic");
 		if(vipBasic == null) {
@@ -48,23 +53,10 @@ public class GoodsAction {
 			map.put("errmsg", "您当前的合作伙伴状态有误，不可进行商品管理！")	;
 			return "forward:/user/index/vip" ;
 		}
-		return "goods/page-goods-mgr";
+		return "goods/page-goods-manage";
 	}
 	
-	
-	/**
-	 * 获取合作伙伴的所有商品
-	 * @param partnerId
-	 * @param map
-	 * @return
-	 */
-	@RequestMapping("/getall/bypartner/{partnerId}")
-	public String getAllByPartner(Integer partnerId,ModelMap map) {
-		
-		
-		
-		return null;
-	}
+
 	
 	/**
 	 * 获取商品编辑页面
@@ -90,11 +82,18 @@ public class GoodsAction {
 			return "forward:/user/index/vip" ;
 		}
 		//
+		Goods goods = null;
 		if(goodsId != 0) {
 			//获取已有指定商品
+			goods = GoodsService.getGoods(goodsId);
+			if(goods == null) {
+				map.put("errmsg", "没有获取到该指定商品信息！");
+				return "forward:/goods/manage";
+			}
 		}else {
-			
+			goods = new Goods();
 		}
+		map.put("goods", goods);
 		return "goods/page-goods-edit";
 	}
 	
@@ -109,6 +108,20 @@ public class GoodsAction {
 		return null;
 	}
 	
+	
+	/**
+	 * 获取合作伙伴的所有商品
+	 * @param partnerId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/getall/bypartner/{partnerId}")
+	public String getAllByPartner(Integer partnerId,ModelMap map) {
+		
+		
+		
+		return null;
+	}
 	
 	/**
 	 * 获取商品详细信息
@@ -183,6 +196,25 @@ public class GoodsAction {
 		return null;
 	}
 	
+	/**
+	 * 获取商品分类
+	 * @param map
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	@RequestMapping("/categories")
+	@ResponseBody
+	public String getCategories(ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		List<Category> categories = (List<Category>) map.get("categories");
+		if(categories == null) {
+			categories = GoodsService.getCategories();
+		}
+		jsonRet.put("errcode", 0);
+		jsonRet.put("errmsg", "ok");
+		jsonRet.put("categories", categories);
+		return jsonRet.toJSONString();
+	}
 	
 }
 

@@ -172,18 +172,18 @@ public class PartnerAction {
 				return jsonRet.toString();
 			}
 			//数据处理
-			if(oldPartner != null && oldPartner.getId() != null) {
-				basic.setId(oldPartner.getId());
+			if(oldPartner != null && oldPartner.getPartnerId() != null) {
+				basic.setPartnerId(oldPartner.getPartnerId());
 			}else {
-				basic.setId(null);
+				basic.setPartnerId(null);
 			}
-			basic.setUserId(vip.getVipId());
+			basic.setVipId(vip.getVipId());
 			basic.setUpdateTime(new Date());
 			basic.setReviewLog("");
 			basic.setReviewOpr(null);
 			basic.setReviewTime(null);
 			String strRet = "";
-			if(oldPartner == null || oldPartner.getId() == null) {
+			if(oldPartner == null || oldPartner.getPartnerId() == null) {
 				strRet = PartnerMgrService.create(basic);
 			}else {
 				strRet = PartnerMgrService.update(basic);
@@ -191,7 +191,7 @@ public class PartnerAction {
 			JSONObject retObj = JSONObject.parseObject(strRet);
 			if(retObj.containsKey("errcode") && retObj.getIntValue("errcode") == 0) {//更新成功
 				basic.setStatus("0");
-				basic.setId(retObj.getInteger("partnerId"));
+				basic.setPartnerId(retObj.getInteger("partnerId"));
 				map.put("partnerBasic", basic);
 			}
 			return strRet;
@@ -232,7 +232,7 @@ public class PartnerAction {
 			}else {
 				newStatus = "S";
 			}
-			String strRet = PartnerMgrService.changeStatus(old.getId(), old.getUserId());
+			String strRet = PartnerMgrService.changeStatus(old.getPartnerId(), old.getVipId());
 			JSONObject retObj = JSONObject.parseObject(strRet);
 			if(retObj.containsKey("errcode") && retObj.getIntValue("errcode") == 0) {
 				old.setStatus(newStatus);
@@ -328,6 +328,10 @@ public class PartnerAction {
 			//数据检查
 			VipBasic vip = (VipBasic) map.get("vipBasic");
 			if(vip == null || !"1".equals(vip.getStatus()) ) {
+				return;
+			}
+			PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
+			if(partner == null) {
 				return;
 			}
 			//证件类型判断

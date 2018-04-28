@@ -11,9 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.mofangyouxuan.dto.Category;
+import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.GoodsService;
+import com.mofangyouxuan.service.PartnerMgrService;
 import com.mofangyouxuan.service.UserVipService;
 
 
@@ -57,9 +59,10 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 		}
 		
 		session.setAttribute("openId", openId);
-		UserBasic userBasic = (UserBasic) request.getSession().getAttribute("userBasic");
-		VipBasic vipBasic = (VipBasic) request.getSession().getAttribute("vipBasic");
-		if(userBasic == null || userBasic.getId() == null) {
+		UserBasic userBasic = (UserBasic) session.getAttribute("userBasic");
+		VipBasic vipBasic = (VipBasic) session.getAttribute("vipBasic");
+		PartnerBasic partnerBasic = (PartnerBasic) session.getAttribute("partnerBasic");
+		if(userBasic == null || userBasic.getUserId() == null) {
 			userBasic = UserVipService.getUserBasic(openId);
 			if(userBasic == null) {
 				response.sendRedirect("/error/nouser");
@@ -72,7 +75,10 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 			vipBasic = UserVipService.getVipBasic(openId);
 			session.setAttribute("vipBasic", vipBasic);
 		}
-		
+		if(partnerBasic == null) {
+			partnerBasic = PartnerMgrService.getPartner(vipBasic.getVipId());
+			session.setAttribute("partnerBasic", partnerBasic);
+		}
 		List<Category> categories = (List<Category>) session.getAttribute("categories");
 		if(categories == null) {
 			categories = GoodsService.getCategories();

@@ -1,16 +1,18 @@
 package com.mofangyouxuan.dto;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 public class PartnerBasic {
-    private Integer id;
+    private Integer partnerId;
 
-    private Integer userId;
+    private Integer vipId;
 
     @NotNull(message=" 国家：不可为空！")
     @Size(min=2,max=50,message=" 国家：长度范围2-50字符 ！")
@@ -45,7 +47,7 @@ public class PartnerBasic {
     private String legalPeridno;
 
     @NotNull(message=" 企业类型：不可为空！")
-    @Pattern(regexp="^[12]$",message=" 企业类型：取值为【1-小微商户，2-公司】! ")
+    @Pattern(regexp="^[12]$",message=" 企业类型：取值为【1-小微商户，2-公司】")
     private String compType;
     
     @NotNull(message=" 企业名称：不可为空！")
@@ -56,6 +58,7 @@ public class PartnerBasic {
     @Size(min=2,max=100,message=" 营业执照号/身份证号：长度范围5-50字符 ！")
     private String licenceNo;
 
+    @Null
     private String certDir;
 
     @NotNull(message=" 联系电话：不可为空！")
@@ -72,33 +75,36 @@ public class PartnerBasic {
     @Size(min=10,max=600,message=" 经营描述：长度范围10-600字符 ！")
     private String introduce;
     
+    @Null
     private String status;
 
+    @Null
     private Date updateTime;
 
     private String reviewLog;
 
     private Integer reviewOpr;
 
+    @Null
     private Date reviewTime;
 
-    public Integer getId() {
-        return id;
-    }
+    public Integer getPartnerId() {
+		return partnerId;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public void setPartnerId(Integer partnerId) {
+		this.partnerId = partnerId;
+	}
 
-    public Integer getUserId() {
-        return userId;
-    }
+	public Integer getVipId() {
+		return vipId;
+	}
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
+	public void setVipId(Integer vipId) {
+		this.vipId = vipId;
+	}
 
-    public String getCountry() {
+	public String getCountry() {
         return country;
     }
 
@@ -218,7 +224,6 @@ public class PartnerBasic {
         this.locationY = locationY;
     }
 
-    
     public String getIntroduce() {
 		return introduce;
 	}
@@ -259,8 +264,11 @@ public class PartnerBasic {
         this.reviewOpr = reviewOpr;
     }
 
-    public Date getReviewTime() {
-        return reviewTime;
+    public String getReviewTime() {
+    		if(reviewTime == null) {
+    			return "";
+    		}
+        return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(reviewTime);
     }
 
     public void setReviewTime(Date reviewTime) {

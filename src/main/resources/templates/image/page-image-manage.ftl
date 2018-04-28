@@ -196,12 +196,12 @@ var createDirVue = new Vue({
 				success: function(jsonRet,status,xhr){
 					if(jsonRet){
 						if(0 == jsonRet.errcode){
-							//alert("文件夹【" + createDirVue.params.folderName + "】新建成功！！");
 							containerVue.files.push(createDirVue.params.folderName);
 							if(!containerVue.cacheFiles[createDirVue.params.upFolderPath]){//还没有缓存
 								containerVue.cacheFiles[createDirVue.params.upFolderPath] = [];
 							}
-							containerVue.cacheFiles[createDirVue.params.upFolderPath].push(createDirVue.params.folderName);
+							var cache = containerVue.cacheFiles[createDirVue.params.upFolderPath];
+							cache.push(createDirVue.params.folderName);
 						}else{//出现逻辑错误
 							alert(jsonRet.errmsg);
 						}
@@ -288,21 +288,23 @@ function initFileUpload(folderPath){
 			if(0 == jsonRet.errcode){
 				var folderPath = $('#uploadFolderPath').val();
 				var filename = jsonRet.filename;//返回的文件名
-				containerVue.files.push(filename);
+				if(containerVue.files[containerVue.files.length-1] != filename){
+					containerVue.files.push(filename);
+				}
 				if(!containerVue.cacheFiles[folderPath]){//还没有缓存
 					containerVue.cacheFiles[folderPath] = [];
 				}
-				containerVue.cacheFiles[folderPath].push(filename);
-				//$('#upFile').fileinput('clear');
+				var cache = containerVue.cacheFiles[folderPath];
+				if(cache[cache.length-1] != filename){
+					cache.push(filename);
+				}
 				$("#uploadImgModal").modal('hide');
 			}else{//出现逻辑错误
 				alert(jsonRet.errmsg);
-				//$('#upFile').fileinput('clear');
 				$("#uploadImgModal").modal('hide');
 			}
 		}else{
 			alert('系统数据访问失败！')
-			//$('#upFile').fileinput('clear');
 			$("#uploadImgModal").modal('hide');
 		}
 	});

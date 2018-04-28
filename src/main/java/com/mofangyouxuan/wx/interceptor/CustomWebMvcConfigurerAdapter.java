@@ -23,14 +23,15 @@ public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter{
     public void addInterceptors(InterceptorRegistry registry) {
         // addPathPatterns 用于添加拦截规则, 
         // excludePathPatterns 用户排除拦截
-    		registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/**");
-//    	  registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/shop/**");
-//        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/user/**");
-//        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/partner/**");
-//        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/goods/**");
-//        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/order/**");
-//        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/srvcenter/**");
-//        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/imggallery/**");
+    		//registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/**");
+    	    registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/shop/**");
+        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/user/**");
+        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/partner/**");
+        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/goods/**");
+        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/order/**");
+        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/srvcenter/**");
+        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/image/**");
+        
         super.addInterceptors(registry);
     }
 }
