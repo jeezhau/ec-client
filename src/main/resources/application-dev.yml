@@ -65,6 +65,13 @@ mfyx:
   image-folder-create-url: '/image/folder/create'
   image-folder-list-url: '/image/folder/list'
   
+  postage-get-url: '/postage/get/'
+  postage-getbypartner-url: '/postage/getbypartner/'
+  postage-getusingcnt-url: '/postage/getusingcnt/'
+  postage-add-url: '/postage/add'
+  postage-update-url: '/postage/update'
+  postage-delete-url: '/postage/delete'
+  
 ######系统参数############  
 sys:
   local-server-url: 'http://192.168.0.102:8000'

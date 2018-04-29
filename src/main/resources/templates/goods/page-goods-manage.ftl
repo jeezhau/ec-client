@@ -34,7 +34,7 @@
 </header>
 <div class="container goods-container" id="container" style="padding:0 1px;overflow:scroll">
   <div class="row" style="margin:5px 0 "><!-- 管理须知 -->
-    <div class="col-xs-12" style="mar">
+    <div class="col-xs-12" style="">
 	  	<p>商品管理功能：主要用于合作伙伴对商品的整个生命周期的管理；一个商品的一生：新添加--待审核--审核通过--未上架／已上架--已下架--删除 。</p>
 	    <p>须知：<br>
 	      1、一个商品仅在<span>已上架</span>状态时才可进行销售，新添加或修改名称与内容描述的商品需要先审核通过才可上架；<br>

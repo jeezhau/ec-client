@@ -25,9 +25,17 @@ public class ErrCodes {
 	public static int VIP_NO_USER = -103001;		//系统中没有该会员或未激活
 	
 	//合作伙伴管理功能码：104
-	public static int PARTNER_NO_EXISTS = -104001;		//还没开通合作伙伴
+	public static int PARTNER_NO_EXISTS = -104001;	//合作伙伴不存在
 	public static int PARTNER_PARAM_ERROR = -104002;	//参数有错
-	public static int PARTNER_STATUS_ERROR = -104003;	//参数有错
+	public static int PARTNER_STATUS_ERROR = -104003;	//状态有错
+	public static int PARTNER_CERT_IMAGE = -104004;	//证书有错
+	
+	
+	//商品管理功能码：105
+	public static int GOODS_NO_EXISTS = -105001;		//商品不存在
+	public static int GOODS_NO_GOODS = -105002;	//没有商品信息
+	public static int GOODS_PARAM_ERROR = -105003;	//参数格式不正确
+	public static int GOODS_STATUS_ERROR = -105004;	//状态有错
 	
 	//图库管理功能码：106
 	public static int IMAGE_DIR_NO_EXISTS = -106001;		//目录不存在
@@ -36,4 +44,9 @@ public class ErrCodes {
 	public static int IMAGE_FOLDER_LEVEL_LIMIT = -106004; //目录层级限制
 	public static int IMAGE_ALL_FILE_LIMIT = -106005; //总文件数量限制
 	
+	//运费模版管理功能码：106
+	public static int POSTAGE_PARAM_ERROR = -107001;	//参数有错
+	public static int POSTAGE_USING_NOW = -107002;	//模版正在使用中
+	public static int POSTAGE_NO_EXISTS = -107003;	//没有该模版
+	public static int POSTAGE_PRIVILEGE_ERROR = -107004;	//无权执行该操作
 }

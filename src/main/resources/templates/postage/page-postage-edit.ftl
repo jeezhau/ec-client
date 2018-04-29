@@ -22,8 +22,8 @@
     
 </head>
 <body class="light-gray-bg">
-<div class="container" id="postageContainer" style="padding:0px 0px;oveflow:scroll">
-  <div class="row" id="editpostage" style="width:100%;margin:1px 0px 0px 0px;padding:5px 8px;background-color:white;">
+<div class="container" id="postageContainer" style="padding:0px 0px;oveflow-y:scroll">
+  <div class="row" id="editpostage" style="background-color:white;margin:0 0;padding:0 5px">
     <h5 style="text-align:center;margin:15px 0">运费模版信息编辑</h5>
 	<form class="form-horizontal" method ="post" autocomplete="on" enctype="multipart/form-data" role="form" >
       <div class="form-group">
@@ -35,7 +35,7 @@
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">配送范围<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <select class="form-control" v-model="param.isCityWide" required>
+          <select class="form-control" v-model="param.isCityWide" required @change='changeCityWide'>
             <option value="0">全国</option>
             <option value="1">同城</option>
           </select>
@@ -56,7 +56,8 @@
       <div class="form-group" v-if="param.isCityWide === '0' ">
         <label class="col-xs-4 control-label" style="padding-right:1px">全国配送省份<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <select class="form-control" v-model="param.provLimit" required>
+          <select class="form-control" v-model="provLimitArr" multiple required >
+            <option value="全国">全国</option>
             <option v-for="item in metadata.provinces" v-bind:value="item.provName">{{item.provName}}</option>
           </select>
         </div>
@@ -64,16 +65,16 @@
        <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">是否免邮<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <select class="form-control" v-model="param.isFree" required>
+          <select class="form-control" v-model="param.isFree" required @change='changeIsFree'>
             <option value="0">不免邮</option>
             <option value="1">无条件免邮</option>
             <option value="2">重量限制</option>
             <option value="3">金额限制</option>
-            <option value="4">距离限制</option>
+            <option v-if="param.isCityWide==='1'" value="4">距离限制</option>
             <option value="23">重量与金额限制</option>
-            <option value="24">重量与距离限制</option>
-            <option value="34">金额与距离限制</option>
-            <option value="234">重量金额距离限制</option>
+            <option v-if="param.isCityWide==='1'" value="24">重量与距离限制</option>
+            <option v-if="param.isCityWide==='1'" value="34">金额与距离限制</option>
+            <option v-if="param.isCityWide==='1'" value="234">重量金额距离限制</option>
           </select>
         </div>
       </div>           
@@ -86,43 +87,45 @@
       <div class="form-group" v-if="param.isFree.indexOf('3')>=0">
         <label class="col-xs-4 control-label" style="padding-right:1px">免邮金额<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <input type="text" class="form-control" v-model="param.freeAmount" maxLength=10  placeholder="超过该金额免邮" >
+          <input type="text" class="form-control" v-model="param.freeAmount" min=1 maxLength=10  placeholder="超过该金额免邮" >
         </div>
       </div>
-      <div class="form-group" v-if="param.isFree.indexOf('4')>=0">
+      <div class="form-group" v-if="param.isCityWide === '1' && param.isFree.indexOf('4')>=0">
         <label class="col-xs-4 control-label" style="padding-right:1px">免邮距离<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
           <input type="number" class="form-control" v-model="param.freeDist" min=1  max=999999  placeholder="近于该距离免邮" >
         </div>
       </div>
-      <div class="form-group" v-if="param.isFree !== '1' && param.isCityWide === '1'">
-        <label class="col-xs-4 control-label" style="padding-right:1px">起步距离(km)与价格(元)<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
-          <div class="col-xs-6" style="padding-right:1px"><input type="number" class="form-control" v-model="param.firstDist"  min=1  max=999999 placeholder="起步距离"></div>
-          <div class="col-xs-6" style="padding-left:1px"><input type="text" class="form-control" v-model="param.firstDPrice"  maxLength=5  required placeholder="起步距离价格"></div>
-        </div>
-      </div> 
+
       <div class="form-group" v-if="param.isFree !== '1'">
-        <label class="col-xs-4 control-label" style="padding-right:1px">起步重量(kg)与价格(元)<span style="color:red">*</span></label>
+        <label class="col-xs-4 control-label" style="padding-right:1px">首重(kg)与价格(元)<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
           <div class="col-xs-6" style="padding-right:1px"><input type="number" class="form-control" v-model="param.firstWeight"  min=1  max=999999 placeholder="起步重量"></div>
           <div class="col-xs-6" style="padding-left:1px"><input type="text" class="form-control" v-model="param.firstWPrice"  maxLength=5  required placeholder="起步重量价格"></div>
         </div>
       </div>
+      <div class="form-group" v-if="param.isFree !== '1'">
+        <label class="col-xs-4 control-label" style="padding-right:1px">续重(kg)与价格(元)<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:1px">
+          <div class="col-xs-6" style="padding-right:1px"><input type="number" class="form-control" v-model="param.additionWeight"  min=1  max=999999 placeholder="续重"></div>
+          <div class="col-xs-6" style="padding-left:1px"><input type="text" class="form-control" v-model="param.additionWPrice"  maxLength=5  required placeholder="续重价格"></div>
+        </div>
+      </div>  
       <div class="form-group" v-if="param.isFree !== '1' && param.isCityWide === '1'">
-        <label class="col-xs-4 control-label" style="padding-right:1px">续距(kg)与价格(元)<span style="color:red">*</span></label>
+        <label class="col-xs-4 control-label" style="padding-right:1px">首距(km)与价格(元)<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:1px">
+          <div class="col-xs-6" style="padding-right:1px"><input type="number" class="form-control" v-model="param.firstDist"  min=1  max=999999 placeholder="起步距离"></div>
+          <div class="col-xs-6" style="padding-left:1px"><input type="text" class="form-control" v-model="param.firstDPrice"  maxLength=5  required placeholder="起步距离价格"></div>
+        </div>
+      </div>            
+      <div class="form-group" v-if="param.isFree !== '1' && param.isCityWide === '1'">
+        <label class="col-xs-4 control-label" style="padding-right:1px">续距(km)与价格(元)<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
           <div class="col-xs-6" style="padding-right:1px"><input type="number" class="form-control" v-model="param.additionDist"  min=1  max=999999 placeholder="续距"></div>
           <div class="col-xs-6" style="padding-left:1px"><input type="text" class="form-control" v-model="param.additionDPrice"  maxLength=5  required placeholder="续距价格"></div>
         </div>
       </div>       
-      <div class="form-group" v-if="param.isFree !== '1'">
-        <label class="col-xs-4 control-label" style="padding-right:1px">续重(kg)与价格(元)<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
-          <div class="col-xs-6" style="padding-right:1px"><input type="number" class="form-control" v-model="param.fadditionWeight"  min=1  max=999999 placeholder="续重"></div>
-          <div class="col-xs-6" style="padding-left:1px"><input type="text" class="form-control" v-model="param.additionWPrice"  maxLength=5  required placeholder="续重价格"></div>
-        </div>
-      </div>            
+           
       <div class="form-group">
          <div style="text-align:center">
            <button type="button" class="btn btn-info" id="save" style="margin:20px" @click="submit">&nbsp;&nbsp;提 交&nbsp;&nbsp;</button>
@@ -137,11 +140,11 @@ var postageContainerVue = new Vue({
 	el:'#postageContainer',
 	data:{
 		initData:{
-			postageId:'${(postage.postageId)!-1}',
+			postageId:'${(postage.postageId)!''}',
 			postageName:'${(postage.postageName)!''}',
 			isCityWide:'${(postage.isCityWide)!''}',
 			distLimit:'${(postage.distLimit)!''}',
-			provLimit:'${(postage.provLimit)!''}',
+			provLimit:'',
 			isFree:'${(postage.isFree)!''}',
 			freeWeight:'${(postage.freeWeight)!''}',
 			freeAmount:'${(postage.freeAmount)!''}',
@@ -159,11 +162,11 @@ var postageContainerVue = new Vue({
 			provinces:[]
 		},
 		param:{
-			postageId:'${(postage.postageId)!-1}',
+			postageId:'${(postage.postageId)!''}',
 			postageName:'${(postage.postageName)!''}',
 			isCityWide:'${(postage.isCityWide)!''}',
 			distLimit:'${(postage.distLimit)!''}',
-			provLimit:'${(postage.provLimit)!''}',
+			provLimit:'',
 			isFree:'${(postage.isFree)!''}',
 			freeWeight:'${(postage.freeWeight)!''}',
 			freeAmount:'${(postage.freeAmount)!''}',
@@ -176,9 +179,61 @@ var postageContainerVue = new Vue({
 			additionWeight:'${(postage.additionWeight)!''}',
 			additionDPrice:'${(postage.additionDPrice)!''}',
 			additionWPrice:'${(postage.additionWPrice)!''}'
+		},
+		provLimitArr:'${(postage.provLimit)!''}'.split(","),
+	},
+	watch:{
+		provLimitArr :function(){
+			this.param.provLimit = this.provLimitArr.join(',');
+			this.initData.provLimit = this.provLimitArr.join(',');
 		}
 	},
 	methods:{
+		changeCityWide : function(){
+			this.param.isFree = '';
+			if(this.param.isCityWide === '0'){
+				this.param.distLimit = '';
+				this.param.freeDist = '';
+				this.param.firstDist = '';
+				this.param.firstDPrice = '';
+				this.param.additionDist = '';
+				this.param.additionDPrice = '';
+			}else{
+				this.provLimitArr = [];
+			}
+		},
+		changeIsFree: function(){
+			if(!this.param.isFree){
+				return;
+			}
+			
+			if(this.param.isFree.indexOf('2')<0){
+				this.param.freeWeight = '';
+			}
+			if(this.param.isFree.indexOf('3')<0){
+				this.param.freeAmount = '';
+			}
+			if(this.param.isFree.indexOf('4')<0){
+				this.param.freeDist = '';
+				this.param.firstDist = '';
+				this.param.firstDPrice = '';
+				this.param.additionDist = '';
+				this.param.additionDPrice = '';
+			}
+			if(this.param.isFree === '1'){
+				this.param.freeAmount = '';
+				this.param.freeWeight = '';
+				this.param.firstWeight = '';
+				this.param.firstWPrice = '';
+				this.param.additionWeight = '';
+				this.param.additionWPrice = '';
+				this.param.freeDist = '';
+				this.param.firstDist = '';
+				this.param.firstDPrice = '';
+				this.param.additionDist = '';
+				this.param.additionDPrice = '';
+			}
+		},
 		getAllProvinces: function(){
 			$.ajax({
 				url: '/city/province/getall',
@@ -205,9 +260,9 @@ var postageContainerVue = new Vue({
 				success: function(jsonRet,status,xhr){
 					if(jsonRet){
 						if(0 == jsonRet.errcode){
-							alert("合作伙伴基本信息修改成功！");
-							$.extend(postageContainerVue.initData,postageContainerVue.param); 
-							window.location.reload();
+							alert("运费模版信息编辑保存成功！");
+							//$.extend(postageContainerVue.initData,postageContainerVue.param); 
+							window.close();
 						}else{//出现逻辑错误
 							alert(jsonRet.errmsg);
 						}
