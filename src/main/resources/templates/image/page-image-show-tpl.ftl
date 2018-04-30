@@ -48,14 +48,14 @@ var imageGalleryShowVue = new Vue({
 		targetElId: '',		//显示选择图片的元素ID
 		selectedImages:[], 	//已选择的图片
 		
+		
 		folder:['Home'],
 		showMode:"list", 	//显示方式 list 、image
 		files:[],
-		cacheFiles:{
-		
-		}
+		cacheFiles:{}
 	},
 	methods:{
+		callbackFun:null,	//确认回调函数
 		getFolderPath: function(index){
 			var folderPath = "";
 			for(var i = 0;i<=index;i++){
@@ -123,8 +123,8 @@ var imageGalleryShowVue = new Vue({
 				alert("您必须选择[1-" + this.selectCntLimit + "]张图片！");
 				return ;
 			}
-			if(this.targetElId){
-				$('#'+ this.targetElId).val(this.selectedImages.join(','));
+			if(this.callbackFun){
+				this.callbackFun(this.selectedImages.join(','));
 				$('#imageGalleryShowModal').modal('hide');
 			}
 		}

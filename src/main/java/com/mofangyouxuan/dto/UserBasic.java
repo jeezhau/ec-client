@@ -230,7 +230,7 @@ public class UserBasic {
     }
 
     public String getUpdateTime() {
-    	if(this.updateTime != null) {
+    		if(this.updateTime != null) {
 			return sdf.format(this.updateTime);
 		}else {
 			return null;

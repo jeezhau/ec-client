@@ -26,7 +26,8 @@ public class DayFreshAction {
 		map.put("mode", mode);
 		map.put("isDayFresh", "1");	//访问的每日鲜推，系统默认为访问商城管理
 		map.put("sys_func", "dayfresh");
-		return "goods/page-dayfresh-index";
+		
+		return "shop/page-dayfresh-index";
 	}
 	
 	

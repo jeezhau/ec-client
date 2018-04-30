@@ -14,7 +14,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
@@ -31,6 +30,7 @@ import com.mofangyouxuan.wx.utils.ObjectToMap;
  * 1、已被使用中的模版可被编辑修改，但在提交之前给出提示，确认后方可提交后台；
  * 2、已被使用的模版不可删除；
  * 3、同一个合作伙伴下不可有两个同名的模版；
+ * 4、每个合作伙伴的邮费模板有数量限制；
  * @author jeekhan
  *
  */
@@ -81,7 +81,7 @@ public class PostageAction {
 			map.put("errmsg", "您还未开通合作伙伴！");
 			return "forward:/user/index/vip" ;
 		}
-		
+		map.put("sys_func", "partner-postage");
 		return "postage/page-postage-manage";
 	}
 
@@ -122,6 +122,7 @@ public class PostageAction {
 			postage.setPostageId(0l);
 			map.put("postage", postage);
 		}
+		map.put("sys_func", "partner-postage");
 		return "postage/page-postage-edit";
 	}
 	
@@ -291,13 +292,7 @@ public class PostageAction {
 					}
 				}
 				if("0".equals(isCityWide)) {//全国
-					String provLimit = postage.getProvLimit();
-					if(provLimit == null || provLimit.length()<2) {
-						sb.append(" 配送省份： 不可为空！");
-					}
-					if(provLimit.contains("全国")) {
-						postage.setProvLimit("全国");
-					}
+					;
 				}else {//同城
 					if(isFree.contains("4")) {//距离限制免邮
 						Integer freeDist = postage.getFreeDist();

@@ -1,5 +1,6 @@
 package com.mofangyouxuan.dto;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.validation.constraints.Max;
@@ -9,12 +10,16 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 public class Goods {
+	@NotNull(message=" 商品ID：不可为空！")
+	@Min(value=0,message=" 商品ID：取值大于等于0！")
     private Long goodsId;
 
-    @NotNull(message=" 合作伙伴ID：不可为空！ ")
+    //@NotNull(message=" 合作伙伴ID：不可为空！ ")
     private Integer partnerId;
 
     @NotNull(message=" 商品分类ID：不可为空！ ")
+    @Min(value=0,message=" 商品分类ID：取值大于等于0！")
+    @Max(value=99999,message=" 商品分类ID：取值小于等于99999！")
     private Integer categoryId;
 
     @NotNull(message=" 商品名称：不可为空！ ")
@@ -53,15 +58,19 @@ public class Goods {
     @Pattern(regexp="^[1234]$",message=" 配送方式：取值为【1-官方统一配送、2-商家自行配送、3-快递配送、4-客户自取】！ ")
     private String dispatchMode;
 
-    @NotNull(message=" 是否同城销售：不可为空！ ")
-    @Pattern(regexp="^[01]$",message=" 是否同城销售：取值为【0-全国，1-同城】！ ")
+    @NotNull(message=" 销售范围：不可为空！ ")
+    @Pattern(regexp="^[01]$",message=" 销售范围：取值为【0-全国，1-同城】！ ")
     private String isCityWide;
 
+    @Min(value=0,message=" 销售距离范围：最小值为0 ！")
+    @Max(value=999,message=" 销售距离范围：最大值为999！")
     private Integer distLimit;
 
+    @Size(max=1000,message=" 销售省份：长度最大为1000字符！")
     private String provLimit;
 
     @NotNull(message=" 运费模版组：不可为空！ ")
+    @Size(min=1,max=100,message=" 运费模版组ID：长度范围1-100字符！ ")
     private String postageIds;
 
     private Date updateTime;
@@ -160,16 +169,24 @@ public class Goods {
         this.limitedNum = limitedNum;
     }
 
-    public Date getBeginTime() {
-        return beginTime;
+    public String getBeginTime() {
+		if(this.beginTime != null) {
+			return new SimpleDateFormat("yyyy-MM-dd").format(this.beginTime);
+		}else {
+			return null;
+		}
     }
 
     public void setBeginTime(Date beginTime) {
         this.beginTime = beginTime;
     }
 
-    public Date getEndTime() {
-        return endTime;
+    public String getEndTime() {
+		if(this.endTime != null) {
+			return new SimpleDateFormat("yyyy-MM-dd").format(this.endTime);
+		}else {
+			return null;
+		}
     }
 
     public void setEndTime(Date endTime) {
@@ -216,8 +233,12 @@ public class Goods {
         this.postageIds = postageIds == null ? null : postageIds.trim();
     }
 
-    public Date getUpdateTime() {
-        return updateTime;
+    public String getUpdateTime() {
+		if(this.updateTime != null) {
+			return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(this.updateTime);
+		}else {
+			return null;
+		}
     }
 
     public void setUpdateTime(Date updateTime) {
@@ -248,8 +269,12 @@ public class Goods {
         this.reviewOpr = reviewOpr;
     }
 
-    public Date getReviewTime() {
-        return reviewTime;
+    public String getReviewTime() {
+    		if(this.reviewTime != null) {
+			return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(this.reviewTime);
+		}else {
+			return null;
+		}
     }
 
     public void setReviewTime(Date reviewTime) {

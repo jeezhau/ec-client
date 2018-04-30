@@ -240,8 +240,12 @@ public class PartnerBasic {
         this.status = status == null ? null : status.trim();
     }
 
-    public Date getUpdateTime() {
-        return updateTime;
+    public String getUpdateTime() {
+        if(this.updateTime != null) {
+			return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(this.updateTime);
+		}else {
+			return null;
+		}
     }
 
     public void setUpdateTime(Date updateTime) {

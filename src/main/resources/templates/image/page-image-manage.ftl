@@ -57,6 +57,9 @@
   </div>
  
 </div><!-- end of container -->
+<footer>
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
+</footer>
 <script>
 var containerVue = new Vue({
 	el:'#container',
@@ -310,8 +313,6 @@ function initFileUpload(folderPath){
 	});
 }
 </script>
-<footer>
-  <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
-</footer>
+
 </body>
 </html>

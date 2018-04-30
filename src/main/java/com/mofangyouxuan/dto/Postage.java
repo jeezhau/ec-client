@@ -1,6 +1,7 @@
 package com.mofangyouxuan.dto;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.validation.constraints.Max;
@@ -12,6 +13,7 @@ import javax.validation.constraints.Size;
 public class Postage {
 	
 	@NotNull(message=" 模版ID：不可为空！ ")
+	@Min(value=0,message=" 模版ID：取值大于等于0！")
     private Long postageId;
 
     //@NotNull(message=" 合作伙伴ID：不可为空！ ")
@@ -231,8 +233,12 @@ public class Postage {
         this.additionWPrice = additionWPrice;
     }
 
-    public Date getUpdateTime() {
-        return updateTime;
+    public String getUpdateTime() {
+    		if(this.updateTime != null) {
+			return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(this.updateTime);
+		}else {
+			return null;
+		}
     }
 
     public void setUpdateTime(Date updateTime) {

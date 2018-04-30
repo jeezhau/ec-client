@@ -24,35 +24,39 @@
 <body class="light-gray-bg">
 <header >
 	<ul class="nav nav-tabs " style="margin:3px 8px 3px 8px">
-	  <li class="active" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#postageNotice').show();$('#myAllPostages').hide()">
+	  <li  onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#postageNotice').show();$('#myAllPostages').hide()">
 	    <a href="javascript:;"  style="padding:10px 2px">运费模版须知</a>
 	  </li>
-	  <li onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#postageNotice').hide();$('#myAllPostages').show()">
+	  <li class="active" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#postageNotice').hide();$('#myAllPostages').show()">
 	    <a href="javascript:;"  style="padding:10px 2px">我的所有模板</a>
 	  </li>
 	</ul>
 </header>
 <div class="container" id="container" style="oveflow:scroll">
-  <div class="row" style="margin:5px 0 " id="postageNotice"><!-- 管理须知 -->
+  <div class="row" style="margin:5px 0;display:none; " id="postageNotice"><!-- 管理须知 -->
     <div class="col-xs-12" style="">
-	  	<p>商品管理功能：主要用于合作伙伴对商品的整个生命周期的管理；一个商品的一生：新添加--待审核--审核通过--未上架／已上架--已下架--删除 。</p>
+	  	<p>运费模板：在创建商品是必须选择一个模版，用于指定该商品的邮费计算规则。</p>
 	    <p>须知：<br>
-	      1、一个商品仅在<span>已上架</span>状态时才可进行销售，新添加或修改名称与内容描述的商品需要先审核通过才可上架；<br>
-	      2、如果商品审核拒绝，则会说明拒绝理由，可重新修改后再提交审核；<br>
-	      3、合作伙伴所填写的一切商品信息须真实可靠，如发现弄虚作假将被警告，情节严重者将被关店处理；<br>
-	      4、合作伙伴所售卖的商品产生的品质与描述纠纷问题由合作伙伴自己负责；摩放优选不负任何责任且并督促处理；<br>
+	      1、每一个模版有一个适用的配送范围，运费模板的配送必须包含商品的销售范围才可适用于该商品。<br>
+	      2、运费可以无条件免邮、不免邮、有条件免邮；<br>
+	      3、配送范围为同城时，可有配送距离限制：即距离合作伙伴经营地的距离，距离限制适用于商家自己配送以及官方配送；<br>
+	      4、某些省份地区的配送邮费较高，合作伙伴可单独设置该地区或选择不支持该地区配送；<br>
+	      5、有条件免邮，包含：‘重量免邮’即低于该重量免邮，‘金额免邮’即高于该金额免邮，‘距离免邮’即近于该距离免邮仅适用同城；三者可组合设置，即同时满足组合设置条件时免邮；<br>
+	      6、除‘无条件免邮’之外需要设置首重和首重的收费价格，以及续重和续重的收费价格；首重收费0表明首重免邮，续重收费0表面仅收首重邮费，超过首重的额外重量不另外收费；<br>
+	      7、同城配送的非‘无条件免邮’还需要设置首距和首距的收费价格，以及续距和续距的收费价格；首距收费0表明首距免邮，续距收费0表面仅收首距邮费，超过首距的额外距离不另外收费；<br>
+	      8、重量收费与距离收费将叠加计算，须特别注意；<br>
+	      9、每个商品可选多个运费模板，系统将选择符合配送条件的邮费最低的模板；<br>
+	      10、正在被使用中的模版修改时必须要特别注意，修改了配送范围将可能导致部分商品不支持配送而客户下单失败；费用计算信息的修改将可能导致合作伙伴支付的运费与客户支付的运费之间出现差额，差额将由合作伙伴承担；<br>
 	    </p>
+	    <p style="color:red">如果根据模版计算出邮费与合作伙伴支付给官方和第三方快递的邮费不符，差额将由合作伙伴承担！</p>
     </div>
     <div class="col-xs-12" style="margin-top:10px;text-align:center">
-     <a class="btn btn-primary" href="/goods/edit/0">新建模版</a>
-     <p>一旦您新建商品将默认同意以上须知规则！</p>
+     <a class="btn btn-primary" href="/postage/edit/0">新建模版</a>
+     <p>一旦您新建模版将默认同意以上须知规则！</p>
     </div>  
   </div>
   
-  <div class="row" id="myAllPostages" style="display:none">
-	<div class="row" style="margin:0 0;padding-left:20px;">
-      <a class="btn btn-info" href="/postage/edit/0">新建模版</a>
-	</div>
+  <div class="row" id="myAllPostages" >
 	<div class="row">
 	  <ul class="list-group" style="padding:0 0px;background-color:white;margin:5px 20px 0 20px;">
 	    <li v-for="item in postages" class="list-group-item">
@@ -63,6 +67,9 @@
     </div>
   </div>
 </div><!-- end of container -->
+<footer>
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
+</footer>
 <script>
 var containerVue = new Vue({
 	el:'#container',
@@ -133,8 +140,5 @@ var containerVue = new Vue({
 containerVue.getAll();
 </script>
 
-<footer>
-  <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
-</footer>
 </body>
 </html>

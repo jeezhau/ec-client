@@ -109,7 +109,7 @@
          </li>
          <li style="background-color:white" >
            <a href="/user/basic/edit">
-             <span class="badge pull-right" style="background-color:rgb(239,239,239)">查看修改 &gt;</span>
+             <span class="pull-right" style="">查看修改 &gt;</span>
              <img alt="" src="/icons/个人信息.png" width="20px" height="20px"> 个人资料
            </a>
          </li>
@@ -150,38 +150,44 @@
           <div class="col-xs-4" style="padding:0 3px;text-align:center"><span><img alt="" src="/icons/冻结.png" width="20px" height="20px"> ${vipBasic.freeze!!0} </span></div>
         </div>
       </div>
-      <div class="row" style="margin:30px 1px 15px 1px;">
-       <ul class="nav nav-pills nav-stacked" style="">
-         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
-           <a href="<#if vipBasic.status = '1'><#else>javascript:;</#if>" >
-             <span class="badge pull-right" style="background-color:rgb(239,239,239);border:none">申请转出  &gt;</span>
-             <img alt="" src="/icons/提现.png" width="20px" height="20px"> 提现
-           </a>
-         </li>
-         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
-           <a href="<#if vipBasic.status = '1'><#else>javascript:;</#if>">
-             <span class="badge pull-right" style="background-color:rgb(239,239,239)">查询所有资金流  &gt;</span>
-             <img alt="" src="/icons/查看明细.png" width="20px" height="20px"> 资金变动明细
-           </a>
-         </li>
-         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
-           <a href="<#if vipBasic.status = '1'><#else>javascript:;</#if>">
-             <span class="badge pull-right" style="background-color:rgb(239,239,239)"> 联系我们  &gt;</span>
-             <img alt="" src="/icons/客服.png" width="20px" height="20px"> 官方客服
-           </a>
-         </li>
-         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
-           <a href="<#if vipBasic.status = '1'>/partner/index<#else>javascript:;</#if>">
-             <span class="badge pull-right" style="background-color:rgb(239,239,239)"> 申请开通商铺  &gt;</span>
-             <img alt="" src="/icons/合作伙伴.png" width="20px" height="20px"> 合作伙伴
-           </a>
-         </li>
-         <#if vipBasic.status != '1'>
-         <p style="margin:5px 5px;font-size:18px;color:red">您尚未激活会员账户，所有会员功能将不可用！激活方式见：个人心中／我-基本／我要推广！</p>
-         </#if>
-       </ul>
+      <div class="row" style="margin:30px 1px 15px 1px;text-align:center;vertical-align:center">
+	    <div class="col-xs-6" style="padding-right:5px;">
+	      <div style="background-color:white;">
+		    <a href="<#if vipBasic.status = '1'><#else>javascript:;</#if>" >
+			    <img alt="" src="/icons/提现.png" width="90px" height="90px">
+			    <p > 可用余额提现</p>
+			</a>
+	      </div>
+	    </div>
+	    <div class="col-xs-6" style="padding-left:5px">
+	       <div style="background-color:white">
+		    <a href="<#if vipBasic.status = '1'><#else>javascript:;</#if>">
+			    <img alt="" src="/icons/查看明细.png" width="90px" height="90px"> 
+			    <p >资金变动明细</p>
+			</a>
+		  </div>
+	    </div>
+	    <div class="col-xs-6" style="padding-right:5px">
+	       <div style="background-color:white">
+		    <a href="<#if vipBasic.status = '1'><#else>javascript:;</#if>">
+			    <img alt="" src="/icons/客服.png" width="90px" height="90px"> 
+			    <p >官方客服</p>
+			</a>
+	       </div>
+	    </div>
+	    <div class="col-xs-6" style="padding-left:5px">
+	       <div style="background-color:white">
+		   <a href="<#if vipBasic.status = '1'>/partner/index<#else>javascript:;</#if>">
+			    <img alt="" src="/icons/合作伙伴.png" width="90px" height="90px"> 
+			    <p >合作伙伴 </p>
+			</a>
+	       </div>
+	    </div>	
       </div>
     </div>    
+	<#if vipBasic.status != '1'>
+  			<p style="margin:5px 5px;font-size:18px;color:red">您尚未激活会员账户，所有会员功能将不可用！激活方式见：个人心中／我-基本／我要推广！</p>
+  	</#if>
 </div>
 <script type="text/javascript">
 var containerVue = new Vue({

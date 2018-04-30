@@ -31,7 +31,7 @@
   <div class="row">
      <ul class="nav nav-tabs" style="margin:0 15%">
 	  <li style="width:50%" class="active" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#editGoods').show();$('#reviewInfo').hide();">
-	    <a href="javascript:;">基本信息编辑</a>
+	    <a href="javascript:;">商品基本信息编辑</a>
 	  </li>
 	  <li style="width:50%" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#editGoods').hide();$('#reviewInfo').show();">
 	    <a href="javascript:;">审批反馈</a>
@@ -54,22 +54,22 @@
         <label class="col-xs-4 control-label" style="padding-right:1px">商品分类<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
           <select class="form-control"  v-model="param.categoryId" required>
-            <option v-for="item in metadata.categories" v-bind:value="item.id">{{item.name}}</option>
+            <option v-for="item in metadata.categories" v-bind:value="item.categoryId">{{item.categoryName}}</option>
           </select>
         </div>
       </div> 
        <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">商品主图<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <div class="col-xs-9" style="padding-left:0"><input class="form-control"  id="mainImgPath" v-model="param.mainImgPath" required readonly placeholder="请选择图片"></div>
-          <div class="col-xs-3" style="padding-left:0"><button class="btn btn-info" @click="selectImage(1,'mainImgPath')">选择</button></div>
+          <div class="col-xs-9" style="padding-left:0"><input class="form-control"  v-model="param.mainImgPath" required readonly placeholder="请选择图片"></div>
+          <div class="col-xs-3" style="padding-left:0"><button class="btn btn-info" @click="selectImage(1,'main')">选择</button></div>
         </div>
       </div> 
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">商品轮播图<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-           <div class="col-xs-9" style="padding-left:0"><textarea class="col-xs-9 form-control" id="carouselImgPaths" v-model="param.carouselImgPaths" maxLength=500 rows=10 readonly placeholder="请选择图片" ></textarea></div>
-           <div class="col-xs-3" style="padding-left:0"><button class="btn btn-info" @click="selectImage(10,'carouselImgPaths')">选择</button></div>
+           <div class="col-xs-9" style="padding-left:0"><textarea class="col-xs-9 form-control" v-model="param.carouselImgPaths" maxLength=500 rows=10 readonly placeholder="请选择图片" ></textarea></div>
+           <div class="col-xs-3" style="padding-left:0"><button class="btn btn-info" @click="selectImage(10,'carousel')">选择</button></div>
         </div>
       </div>
       <div class="form-group">
@@ -131,7 +131,8 @@
       <div class="form-group" v-if="param.isCityWide === '0' ">
         <label class="col-xs-4 control-label" style="padding-right:1px">全国配送省份<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <select class="form-control" v-model="param.provLimit" required>
+          <select class="form-control" v-model="provLimitArr" required multiple>
+            <option value="全国">全国</option>
             <option v-for="item in metadata.provinces" v-bind:value="item.provName">{{item.provName}}</option>
           </select>
         </div>
@@ -139,17 +140,25 @@
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">运费模版<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <select class="form-control" v-model="param.distrIds" required >
-            <option v-for="item in metadata.postages" v-bind:value="item.postage_id">{{item.name}}</option>
+          <select class="form-control" v-model="postageIdArr" required multiple>
+            <option v-for="item in metadata.postages" v-bind:value="item.postageId">{{item.postageName}}</option>
           </select>
         </div>
       </div>
+      <div class="form-group">
+        <label class="col-xs-4 control-label" style="padding-right:1px">是否立即上架<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:1px">
+          <label style="padding:0 5px"><input type="radio" v-model="param.status" value="0" style="display:inline-block;width:15px;height:15px">否</label>
+          <label style="padding:0 5px"><input type="radio" v-model="param.status" value="1" style="display:inline-block;width:15px;height:15px">是</label>
+        </div>
+      </div>     
       <div class="form-group">
         <div class="col-xs-12" style="padding-left:1px">
           <label class="col-xs-6 control-label" >商品图文描述<span style="color:red">*</span></label>
         </div>
         <div class="col-xs-12" >
-          <textarea class="form-control" v-model="param.goodsDesc"  maxLength=10000  rows=30 required 
+          <input type="hidden" value="${(goods.goodsDesc)!''}" id="hiddenGoodsDesc">
+          <textarea class="form-control" maxLength=10000  rows=30 required v-model="param.goodsDesc"
           placeholder="    请输入10-10000字符的企业经营简介。
     编辑说明：最好请在文本编辑器中编辑好之后复制粘贴于此。
     相关格式说明：如果是一个段落请将段落内容放置于标签: <p>与</p>之间；换行则在句末添加标签：<br>；插入图片使用标签：<img href='  ' width = '100%' > ，href属性的内容来自图库中图片的链接(不是图片名称)。不清楚的话可以问问身边的做软件开发的朋友。"></textarea>
@@ -171,26 +180,29 @@
   	<p>审批意见：{{review.reviewLog}}</p>
   </div>
 </div><!-- end of container -->
+<footer>
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
+</footer>
 <script type="text/javascript">
 var goodsContainerVue = new Vue({
 	el:'#goodsContainer',
 	data:{
 		initData:{
-			goodsId:'${(goods.goodsId)!-1}',
+			goodsId:'${(goods.goodsId)!-1}'.replace(',',''),
 			goodsName:'${(goods.goodsName)!''}',
-			categoryId:'${(goods.categoryId)!''}',
-			goodsDesc:'${(goods.goodsDesc)!''}',
+			categoryId:'${(goods.categoryId)!''}'.replace(',',''),
+			goodsDesc:'',
 			mainImgPath:'${(goods.mainImgPath)!''}',
 			carouselImgPaths:'${(goods.carouselImgPaths)!''}',
-			stock:'${(goods.stock)!''}',
-			limitedNum:'${(goods.limitedNum)!0}',
+			stock:'${(goods.stock)!''}'.replace(',',''),
+			limitedNum:'${(goods.limitedNum)!''}'.replace(',',''),
 			beginTime:'${(goods.beginTime)!''}',
 			endTime:'${(goods.endTime)!''}',
 			dispatchMode:'${(goods.dispatchMode)!''}',
 			isCityWide:'${(goods.isCityWide)!''}',
-			distLimit:'${(goods.distLimit)!''}',
+			distLimit:'${(goods.distLimit)!''}'.replace(',',''),
 			provLimit:'${(goods.provLimit)!''}',
-			distrIds:'${(goods.distrIds)!''}',
+			postageIds:'${(goods.postageIds)!''}',
 			status:'${(goods.status)!''}'
 		},	//初始化的数据
 		metadata:{
@@ -204,22 +216,34 @@ var goodsContainerVue = new Vue({
 			reviewLog:"${(goods.reviewLog)!''}"
 		},
 		param:{
-			id:'${(goods.id)!-1}',
+			goodsId:'${(goods.goodsId)!-1}'.replace(',',''),
 			goodsName:'${(goods.goodsName)!''}',
-			categoryId:'${(goods.categoryId)!''}',
-			goodsDesc:'${(goods.goodsDesc)!''}',
+			categoryId:'${(goods.categoryId)!''}'.replace(',',''),
+			goodsDesc:'',
 			mainImgPath:'${(goods.mainImgPath)!''}',
 			carouselImgPaths:'${(goods.carouselImgPaths)!''}',
-			stock:'${(goods.stock)!''}',
-			limitedNum:'${(goods.limitedNum)!''}',
+			stock:'${(goods.stock)!''}'.replace(',',''),
+			limitedNum:'${(goods.limitedNum)!''}'.replace(',',''),
 			beginTime:'${(goods.beginTime)!''}',
 			endTime:'${(goods.endTime)!''}',
 			dispatchMode:'${(goods.dispatchMode)!''}',
 			isCityWide:'${(goods.isCityWide)!''}',
-			distLimit:'${(goods.distLimit)!''}',
+			distLimit:'${(goods.distLimit)!''}'.replace(',',''),
 			provLimit:'${(goods.provLimit)!''}',
-			distrIds:'${(goods.distrIds)!''}',
+			postageIds:'${(goods.postageIds)!''}',
 			status:'${(goods.status)!''}'
+		},
+		provLimitArr:'${(goods.provLimit)!''}'.split(','),
+		postageIdArr:'${(goods.postageIds)!''}'.split(',')
+	},
+	watch:{
+		provLimitArr :function(){
+			this.param.provLimit = this.provLimitArr.join(',');
+			this.initData.provLimit = this.provLimitArr.join(',');
+		},
+		postageIdArr :function(){
+			this.param.postageIds = this.postageIdArr.join(',');
+			this.initData.postageIds = this.postageIdArr.join(',');
 		}
 	},
 	methods:{
@@ -271,14 +295,38 @@ var goodsContainerVue = new Vue({
 		},
 		getPostages: function(){
 			//获取系统所有的运费模版
-			
+			$.ajax({
+				url: '/postage/getall',
+				method:'post',
+				data: {},
+				success: function(jsonRet,status,xhr){
+					if(jsonRet ){
+						if(jsonRet.postages){
+							goodsContainerVue.metadata.postages = [];
+							for(var i=0;i<jsonRet.postages.length;i++){
+								goodsContainerVue.metadata.postages.push(jsonRet.postages[i]);
+							}
+						}
+					}else{
+						alert('获取数据失败！')
+					}
+				},
+				dataType: 'json'
+			});
 		},
-		selectImage: function(selectCntLimit,targetElId){
+		selectImage: function(selectCntLimit,imgType){
 			//选择商品的图片
 			$('#imageGalleryShowModal').modal('show');
 			imageGalleryShowVue.selectCntLimit = selectCntLimit;
-			imageGalleryShowVue.targetElId = targetElId;
+			//imageGalleryShowVue.targetElId = targetElId;
 			imageGalleryShowVue.selectedImages = [];
+			imageGalleryShowVue.callbackFun = function(images){
+				if(imgType === 'main'){
+					goodsContainerVue.param.mainImgPath = images;
+				}else{
+					goodsContainerVue.param.carouselImgPaths = images;
+				}
+			}
 		},
 		submit: function(){
 			$.ajax({
@@ -288,9 +336,7 @@ var goodsContainerVue = new Vue({
 				success: function(jsonRet,status,xhr){
 					if(jsonRet){
 						if(0 == jsonRet.errcode){
-							alert("合作伙伴基本信息修改成功！");
-							$.extend(goodsContainerVue.initData,goodsContainerVue.param); 
-							window.location.reload();
+							window.location.href='/goods/manage';
 						}else{//出现逻辑错误
 							alert(jsonRet.errmsg);
 						}
@@ -309,54 +355,9 @@ var goodsContainerVue = new Vue({
 
 goodsContainerVue.getCategories();
 goodsContainerVue.getAllProvinces();
-
-function getCities(provCode,areaName){
-	$.ajax({
-		url: '/city/city/getbyprov/' + provCode,
-		method:'post',
-		data: {},
-		success: function(jsonRet,status,xhr){
-			if(jsonRet && typeof jsonRet == 'object' && jsonRet instanceof Array){
-				goodsContainerVue.metadata.cities = [];
-				for(var i=0;i<jsonRet.length;i++){
-					goodsContainerVue.metadata.cities.push(jsonRet[i]);
-				}
-				if(areaName){
-					var cityCode = "";
-					for(var i=0;i<goodsContainerVue.metadata.cities.length;i++){
-						if(goodsContainerVue.metadata.cities[i].cityName == goodsContainerVue.param.city){
-							cityCode = goodsContainerVue.metadata.cities[i].cityCode;
-							break;
-						}
-					}
-					getAreas(cityCode);
-				}
-			}else{
-				alert('获取城市数据(地级市)失败！')
-			}
-		},
-		dataType: 'json'
-	});
-}
-
-function getAreas(cityCode){
-	$.ajax({
-		url: '/city/area/getbycity/' + cityCode,
-		method:'post',
-		data: {},
-		success: function(jsonRet,status,xhr){
-			if(jsonRet && typeof jsonRet == 'object' && jsonRet instanceof Array){
-				goodsContainerVue.metadata.areas = [];
-				for(var i=0;i<jsonRet.length;i++){
-					goodsContainerVue.metadata.areas.push(jsonRet[i]);
-				}
-			}else{
-				alert('获取城市数据(县)失败！')
-			}
-		},
-		dataType: 'json'
-	});
-}
+goodsContainerVue.getPostages();
+goodsContainerVue.param.goodsDesc = $('#hiddenGoodsDesc').val();
+goodsContainerVue.initData.goodsDesc = $('#hiddenGoodsDesc').val();
 </script>
 
 <#include "/image/page-image-show-tpl.ftl" encoding="utf8"> 

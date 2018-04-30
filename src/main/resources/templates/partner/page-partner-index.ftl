@@ -27,40 +27,40 @@
      <h3 style="margin:10px 0;text-align:center" >我是合作伙伴</h3>
   </div>
   <div class="row" style="margin-top:30px;text-align:center;vertical-align:center">
-    <div class="col-xs-6" >
-      <div style="background-color:#3CB371">
+    <div class="col-xs-6" style="padding-right:5px">
+      <div style="background-color:white">
 	    <a href="/partner/edit" >
 		    <img src="/icons/合作伙伴-申请开通.png" alt="" width="90px" height="90px">
 		    <p >基本信息维护</p>
 		</a>
       </div>
     </div>
-    <div class="col-xs-6" >
-       <div style="background-color:#3CB371">
+    <div class="col-xs-6" style="padding-left:5px">
+       <div style="background-color:white">
 	    <a href="/goods/manage" >
 		    <img src="/icons/商品管理.png" alt=""  width="90px" height="90px">
 		    <p >商品管理</p>
 		</a>
 	  </div>
     </div>
-    <div class="col-xs-6" >
-       <div style="background-color:#3CB371">
+    <div class="col-xs-6" style="padding-right:5px">
+       <div style="background-color:white">
 	    <a href="/user/index/basic" >
 		    <img src="/icons/销售订单.png" alt="" width="90px" height="90px">
 		    <p >销售订单</p>
 		</a>
        </div>
     </div>
-    <div class="col-xs-6" >
-       <div style="background-color:#3CB371">
+    <div class="col-xs-6" style="padding-left:5px">
+       <div style="background-color:white">
 	    <a href="/postage/index" >
 		    <img src="/icons/运费模板管理.png" alt="" width="90px" height="90px">
 		    <p>运费模版管理</p>
 		</a>
 	  </div>
     </div>
-    <div class="col-xs-6" >
-       <div style="background-color:#3CB371">
+    <div class="col-xs-6" style="padding-right:5px">
+       <div style="background-color:white">
 	    <a href="/image/index" >
 		    <img src="/icons/图库管理.png" alt="" width="90px" height="90px">
 		    <p>图库管理</p>
@@ -70,7 +70,7 @@
   </div>
   <div class="row" style="margin-top:3px;vertical-align:center">
     <div class="col-xs-12">
-      <div style="background-color:#3CB371;text-align:center;padding:8px 2px;">
+      <div style=";text-align:center;padding:8px 2px;background-color:white">
         <p>诚信用心有爱！</p>
         <p>优选品质，健康你我ta，福乐佳发！</p>
       </div> 
@@ -78,7 +78,7 @@
   </div>
   <div class="row" style="margin-top:3px;vertical-align:center">
     <div class="col-xs-12">
-      <div style="background-color:#3CB371;text-align:center;padding:8px 2px;">
+      <div style=";text-align:center;padding:8px 2px;background-color:white">
         <p>欢迎您加入我们！</p>
         <p>这里将是你我的未来！</p>
       </div> 

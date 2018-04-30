@@ -4,8 +4,8 @@
     <div class="row" style="margin:0 0">
         <ul class="nav navbar-nav nav-tabs" style="padding:0 5px">
         <#list categories as cat>
-            <li onclick="$(this).addClass('active');$(this).siblings().removeClass('active');getGoodsByCat(${cat.id})"> 
-              <a href="javascript:;" style="padding:2px 3px">${cat.name}</a> 
+            <li onclick="$(this).addClass('active');$(this).siblings().removeClass('active');getGoodsByCat(${cat.categoryId})"> 
+              <a href="javascript:;" style="padding:2px 3px">${cat.categoryName}</a> 
             </li>
         </#list>
         </ul>

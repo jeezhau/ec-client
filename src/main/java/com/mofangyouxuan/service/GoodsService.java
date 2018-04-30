@@ -69,19 +69,16 @@ public class GoodsService {
 	 * @param goodsId
 	 * @return {"errcode":-1,"errmsg":"错误信息"} 或 {商品所有字段}
 	 */
-	public static Goods getGoods(Long goodsId) {
+	public static JSONObject getGoods(Long goodsId) {
 		String url = mfyxServerUrl + goodsGetUrl + goodsId;
 		String strRet = HttpUtils.doGet(url);
-		Goods goods = null;
+		JSONObject jsonRet = null;
 		try {
-			JSONObject jsonRet = JSONObject.parseObject(strRet);
-			if(jsonRet.containsKey("goodsId")) {//成功
-				goods = JSONObject.parseObject(strRet, Goods.class);
-			}
+			jsonRet = JSONObject.parseObject(strRet);
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		return goods;
+		return jsonRet;
 	}
 	
 	/**
@@ -158,11 +155,12 @@ public class GoodsService {
 	 * @param goods
 	 * @return {errcode:0,errmsg:'ok',goodsId:111}
 	 */
-	public static JSONObject addGoods(Goods goods) {
+	public static JSONObject addGoods(Goods goods,Integer vipId) {
 		String url = mfyxServerUrl + goodsAddUrl;
 		Map<String, Object> params = new HashMap<String,Object>();
 		String[] excludeFields = {"updateTime","reviewLog","reviewOpr","reviewTime","reviewResult"};
 		params = ObjectToMap.object2Map(goods,excludeFields,false);
+		params.put("currVipId", vipId);
 		String strRet = HttpUtils.doPost(url, params);
 		try {
 			JSONObject jsonRet = JSONObject.parseObject(strRet);
@@ -178,11 +176,12 @@ public class GoodsService {
 	 * @param goods
 	 * @return {errcode:0,errmsg:'ok',goodsId:111}
 	 */
-	public static JSONObject updateGoods(Goods goods) {
+	public static JSONObject updateGoods(Goods goods,Integer vipId) {
 		String url = mfyxServerUrl + goodsUpdateUrl;
 		Map<String, Object> params = new HashMap<String,Object>();
 		String[] excludeFields = {"updateTime","reviewLog","reviewOpr","reviewTime","reviewResult"};
 		params = ObjectToMap.object2Map(goods,excludeFields,false);
+		params.put("currVipId", vipId);
 		String strRet = HttpUtils.doPost(url, params);
 		try {
 			JSONObject jsonRet = JSONObject.parseObject(strRet);

@@ -68,6 +68,7 @@ public class PartnerAction {
 			partner = PartnerMgrService.getPartner(vipBasic.getVipId());
 			map.put("partnerBasic", partner);
 		}
+		map.put("sys_func", "partner-index");
 		return "partner/page-partner-index";
 	}
 	
@@ -103,7 +104,7 @@ public class PartnerAction {
 		map.put("nonceStr", nonceStr);
 		map.put("timestamp", timestamp + "");
 		map.put("signature", signature);
-		
+		map.put("sys_func", "partner-index");
 		return "partner/page-partner-edit";
 	}
 	

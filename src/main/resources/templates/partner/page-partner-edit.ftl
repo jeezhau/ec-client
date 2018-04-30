@@ -188,6 +188,9 @@
   	<p>审批意见：{{review.reviewLog}}</p>
   </div>
 </div><!-- end of container -->
+<footer>
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
+</footer>
 <script type="text/javascript">
 var partnerContainerVue = new Vue({
 	el:'#partnerContainer',

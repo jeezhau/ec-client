@@ -24,7 +24,8 @@ public class NearbyMgrAction {
 	public String getIndex(ModelMap map) {
 		
 		map.put("sys_func", "nearby");
-		return "goods/page-nearby-index";
+		
+		return "shop/page-nearby-index";
 	}
 
 }

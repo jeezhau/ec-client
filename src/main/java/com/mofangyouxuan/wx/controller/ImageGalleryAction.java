@@ -68,7 +68,7 @@ public class ImageGalleryAction {
 			map.put("errmsg", "您还未开通合作伙伴！");
 			return "forward:/user/index/vip" ;
 		}
-		
+		map.put("sys_func", "partner-image");
 		return "image/page-image-manage";
 	}
 	

@@ -135,6 +135,9 @@
 	</form>
   </div>
 </div><!-- end of container -->
+<footer>
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
+</footer>
 <script type="text/javascript">
 var postageContainerVue = new Vue({
 	el:'#postageContainer',
@@ -144,7 +147,7 @@ var postageContainerVue = new Vue({
 			postageName:'${(postage.postageName)!''}',
 			isCityWide:'${(postage.isCityWide)!''}',
 			distLimit:'${(postage.distLimit)!''}',
-			provLimit:'',
+			provLimit:'${(postage.provLimit)!''}',
 			isFree:'${(postage.isFree)!''}',
 			freeWeight:'${(postage.freeWeight)!''}',
 			freeAmount:'${(postage.freeAmount)!''}',
@@ -166,7 +169,7 @@ var postageContainerVue = new Vue({
 			postageName:'${(postage.postageName)!''}',
 			isCityWide:'${(postage.isCityWide)!''}',
 			distLimit:'${(postage.distLimit)!''}',
-			provLimit:'',
+			provLimit:'${(postage.provLimit)!''}',
 			isFree:'${(postage.isFree)!''}',
 			freeWeight:'${(postage.freeWeight)!''}',
 			freeAmount:'${(postage.freeAmount)!''}',
@@ -253,16 +256,39 @@ var postageContainerVue = new Vue({
 			});
 		},
 		submit: function(){
+			if(postageContainerVue.param.postageId>0){
+				$.ajax({
+					url: '/postage/getusingcnt/' + postageContainerVue.param.postageId,
+					method:'post',
+					data: {},
+					success: function(jsonRet,status,xhr){
+						if(jsonRet ){
+							var f = false;
+							if(jsonRet.cnt >= 1){
+								f = confirm('该模版正在被 ' + jsonRet.cnt + " 个商品使用中，运费信息的修改可能导致商品不支持配送而下单失败或邮费需要合作伙伴埋单！您仍确定要修改吗？");
+							}else if(jsonRet.cnt == 0){
+								f = true;
+							}
+							if(f == true){
+								postageContainerVue.saveEdit();
+							}
+						}
+					},
+					dataType: 'json'
+				});
+			}else{
+				postageContainerVue.saveEdit();
+			}
+		},
+		saveEdit : function(){//保存信息编辑
 			$.ajax({
 				url: '/postage/save',
 				method:'post',
-				data: this.param,
+				data: postageContainerVue.param,
 				success: function(jsonRet,status,xhr){
 					if(jsonRet){
 						if(0 == jsonRet.errcode){
-							alert("运费模版信息编辑保存成功！");
-							//$.extend(postageContainerVue.initData,postageContainerVue.param); 
-							window.close();
+							window.location.href='/postage/index';
 						}else{//出现逻辑错误
 							alert(jsonRet.errmsg);
 						}
