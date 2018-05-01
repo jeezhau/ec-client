@@ -7,21 +7,15 @@
 	<title>摩放优选</title>
 	<!-- Bootstrap -->
 	<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
     <!--Vue -->
-    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <!-- -->
     <link href="/css/font-awesome.min.css" rel="stylesheet">
     <link href="/css/templatemo-style.css" rel="stylesheet">
     
-    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <link href="/css/weui.css" rel="stylesheet">
-    
-    <!-- 文件上传 -->
-    <script src="/script/fileinput.min.js" type="text/javascript"></script>
-    <script src="/script/zh.js" type="text/javascript"></script>
-    <link href="/css/fileinput.min.css" rel="stylesheet">
     
     <link href="/css/mfyx.css" rel="stylesheet">
     
@@ -73,11 +67,62 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">商品库存<span style="color:red">*</span></label>
+        <label class="col-xs-4 control-label" style="padding-right:1px">商品产地<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <input type="number" class="form-control" v-model="param.stock"  min=0 max=999999  placeholder="请输入商品库存数量" >
+           <input type="text" class="form-control" v-model="param.place"  max=100 >
+        </div>       
+      </div>
+      <div class="form-group">
+        <label class="col-xs-4 control-label" style="padding-right:1px">生产者<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:1px">
+           <input type="text" class="form-control" v-model="param.vender"  max=100 >
+        </div>       
+      </div>
+      <div class="form-group">
+        <div class="col-xs-12" style="padding-left:1px">
+          <label class="col-xs-6 control-label" >规格明细与库存(名称唯一)<span style="color:red">*</span></label>
         </div>
-      </div> 
+        <div class="col-xs-12"  style="height:300px;overflow:scroll">
+           <table class="table table-striped table-bordered table-condensed">
+             <tr>
+               <th width="40%" style="padding:2px 2px">规格名称</th>
+               <th width="15%" style="padding:2px 2px">数量值</th>
+               <th width="15%" style="padding:2px 2px">单位</th>
+               <th width="15%" style="padding:2px 2px">单价</th>
+               <th width="15%" style="padding:2px 2px">库存件数</th>
+             </tr>
+             <tr v-for="(item,index) in specDetailArr" >
+               <td style="padding:2px 2px">
+                 <input type="text"  style="width:100%" maxlength="20" :value="item.name" @change="setSpecItem('name',index,$event)">
+               </td>
+               <td style="padding:2px 2px">
+                 <input type="number" style="width:100%" min=0 max=999999 :value="item.val" @change="setSpecItem('val',index,$event)">
+               </td>
+               <td style="padding:2px 2px">
+                 <input type="text" style="width:100%" :value="item.unit" maxlength=5 @change="setSpecItem('unit',index,$event)">
+               </td>
+               <td style="padding:2px 2px">
+                 <input type="number" style="width:100%" :value="item.price" min=0 max=99999999 @change="setSpecItem('price',index,$event)">
+               </td>               
+               <td style="padding:2px 2px">
+                 <input type="number" style="width:100%" min=0 max=999999 :value="item.stock" @change="setSpecItem('stock',index,$event)">
+               </td>
+             </tr>
+           </table>
+        </div>       
+      </div>   
+      <div class="form-group">
+        <label class="col-xs-4 control-label" style="padding-right:1px">最低价<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:1px">
+          <input type="number" class="form-control" v-model="param.priceLowest"  readonly>
+        </div>
+      </div>        
+      <div class="form-group">
+        <label class="col-xs-4 control-label" style="padding-right:1px">商品总库存<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:1px">
+          <input type="number" class="form-control" v-model="param.stockSum"  min=0 max=9999999999  readonly>
+        </div>
+      </div>
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">限购数量<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
@@ -166,8 +211,8 @@
       </div>
       <div class="form-group">
          <div style="text-align:center">
-           <button type="button" class="btn btn-info" id="save" style="margin:20px" @click="submit">&nbsp;&nbsp;提 交&nbsp;&nbsp;</button>
-           <button type="button" class="btn btn-warning" id="reset" style="margin:20px" @click="reset">&nbsp;&nbsp;重 置&nbsp;&nbsp; </button>
+           <button type="button" class="btn btn-info" style="margin:20px" @click="submit">&nbsp;&nbsp;提 交&nbsp;&nbsp;</button>
+           <button type="button" class="btn btn-warning" style="margin:20px" @click="reset">&nbsp;&nbsp;重 置&nbsp;&nbsp; </button>
          </div>
       </div>
 	</form>
@@ -194,7 +239,11 @@ var goodsContainerVue = new Vue({
 			goodsDesc:'',
 			mainImgPath:'${(goods.mainImgPath)!''}',
 			carouselImgPaths:'${(goods.carouselImgPaths)!''}',
-			stock:'${(goods.stock)!''}'.replace(',',''),
+			place:'${(goods.place)!''}',
+			vender:'${(goods.verder)!''}',
+			priceLowest:'${(goods.priceLowest)!''}'.replace(',',''),
+			stockSum:'${(goods.stockSum)!''}'.replace(',',''),
+			specDetail:"",
 			limitedNum:'${(goods.limitedNum)!''}'.replace(',',''),
 			beginTime:'${(goods.beginTime)!''}',
 			endTime:'${(goods.endTime)!''}',
@@ -222,7 +271,11 @@ var goodsContainerVue = new Vue({
 			goodsDesc:'',
 			mainImgPath:'${(goods.mainImgPath)!''}',
 			carouselImgPaths:'${(goods.carouselImgPaths)!''}',
-			stock:'${(goods.stock)!''}'.replace(',',''),
+			place:'${(goods.place)!''}',
+			vender:'${(goods.verder)!''}',
+			priceLowest:'${(goods.priceLowest)!''}'.replace(',',''),
+			stockSum:'${(goods.stockSum)!''}'.replace(',',''),
+			specDetail:"",
 			limitedNum:'${(goods.limitedNum)!''}'.replace(',',''),
 			beginTime:'${(goods.beginTime)!''}',
 			endTime:'${(goods.endTime)!''}',
@@ -234,7 +287,8 @@ var goodsContainerVue = new Vue({
 			status:'${(goods.status)!''}'
 		},
 		provLimitArr:'${(goods.provLimit)!''}'.split(','),
-		postageIdArr:'${(goods.postageIds)!''}'.split(',')
+		postageIdArr:'${(goods.postageIds)!''}'.split(','),
+		specDetailArr:JSON.parse('${(goods.specDetail)!"[]"}')
 	},
 	watch:{
 		provLimitArr :function(){
@@ -256,6 +310,85 @@ var goodsContainerVue = new Vue({
     				return "审核通过";
     			}
         		return "其他";
+		},
+		addSpec:function(){
+			if(this.specDetailArr == null){
+				this.specDetailArr = [];
+			}
+			this.specDetailArr.push(new Object({name:'',val:'',unit:'',price:'',stock:''}));
+		},
+		delSpec:function(index){
+			this.specDetailArr.splice(index,1);
+		},
+		setSpecItem:function(field,index,event){
+			var spec = this.specDetailArr[index];
+			var value = $(event.target).val();
+			if(field === 'name'){
+				if(!value){
+					value = '';
+				}
+				value = value.trim();
+				if(value.length>20){
+					alert('规格明细中第 ' + (index+1) + " 条数据的'规格名称'不合规，长度须为2-20字符！");
+					$(event.target).focus();
+					return false;
+				}
+				$(event.target).val(value);
+				spec.name = value;
+			}
+			if(field == 'val' && value){
+				var val = parseInt(value);
+				if(isNaN(val) || val < 1 || val > 999999){
+					alert("规格明细中的第 " + (index+1) + "条的数量值不合规，须为1-999999的整数值！");
+					$(event.target).focus();
+					return false;
+				}
+				$(event.target).val(val);
+				spec.val = val;
+			}
+			if(field == 'unit' && value){
+				value = value.trim();
+				if(value.length < 1 || value.length > 5){
+					alert("规格明细中的第 " + (index+1) + "条的单位不合规，长度须为1-5字符！");
+					$(event.target).focus();
+					return false;
+				}
+				$(event.target).val(value);
+				spec.unit = value;
+			}
+			if(field == 'price' && value){
+				var val = parseFloat(value);
+				if(isNaN(val) || val < 0 || val > 99999999.99){
+					alert("规格明细中的第 " + (index+1) + "条的单价不合规，须为0-99999999.99的数值！");
+					$(event.target).focus();
+					return false;
+				}
+				val = val.toFixed(2);
+				$(event.target).val(val);
+				spec.price = val;
+				if(this.param.priceLowest){
+					if(val<this.param.priceLowest){
+						this.param.priceLowest = val;
+					}
+				}else{
+					this.param.priceLowest = val;
+				}
+			}
+			if(field == 'stock' && value){
+				var val = parseInt(value);
+				if(isNaN(val) || val < 0 || val > 999999){
+					alert("规格明细中的第 " + (index+1) + "条的库存不合规，须为0-999999的整数值！");
+					$(event.target).focus();
+					return false;
+				}
+				$(event.target).val(val);
+				spec.stock = val;
+				if(this.param.stockSum){
+					this.param.stockSum += val;
+				}else{
+					this.param.stockSum = val;
+				}
+			}
 		},
 		getCategories: function(){
 			$.ajax({
@@ -329,6 +462,63 @@ var goodsContainerVue = new Vue({
 			}
 		},
 		submit: function(){
+			//组织规格数据
+			var okSpecArr = [];
+			var stockSum = 0;
+			var priceLowest = 1000000000;
+			for(var i=0;i<this.specDetailArr.length;i++){
+				var spec = this.specDetailArr[i];
+				if(!spec.name){
+					continue;//过滤该条数据
+				}else{
+					spec.name = spec.name.trim();
+				}
+				if(spec.name.length > 20){
+					alert("规格明细中的第 " + (i+1) + "条的规格名称不合规，长度范围：2-20字符！");
+					return;
+				}
+				if(!spec.unit || spec.unit.trim().length > 5){
+					alert("规格明细中的第 " + (index+1) + "条的单位不合规，长度须为1-5字符！");
+					return false;
+				}else{
+					spec.unit = spec.unit.trim();
+				}
+				var val = parseInt(spec.val);
+				if(isNaN(val) || val<1 || val>999999){
+					alert("规格明细中的第 " + (i+1) + "条的数量值不合规，须为1-999999的整数值！");
+					return false;
+				}else{
+					spec.val = val;
+				}
+				var val = parseFloat(spec.price);
+				if(isNaN(val) || val < 0 || val > 99999999){
+					alert("规格明细中的第 " + (index+1) + "条的单价不合规，须为0-99999999的数值！");
+					return false;
+				}else{
+					val = val.toFixed(2);
+					spec.price = val;
+					if(priceLowest > val){
+						priceLowest = val;
+					}
+				}
+				spec.stock = val;
+				var val = parseInt(spec.stock);
+				if(isNaN(val) || val< 0 || val > 999999){
+					alert("规格明细中的第 " + (i+1) + "条的库存不合规，须为0-999999的整数值！");
+					return false;
+				}else{
+					spec.stock = val;
+					stockSum += val;
+				}
+				okSpecArr.push(spec);
+			}
+			if(okSpecArr.length<1){
+				alert("规格明细数据不可为空，至少要有一条数据！");
+				return ;
+			}
+			this.param.specDetail = JSON.stringify(okSpecArr);
+			this.param.priceLowest = priceLowest;
+			this.param.stockSum = stockSum;
 			$.ajax({
 				url: '/goods/save',
 				method:'post',
@@ -356,6 +546,12 @@ var goodsContainerVue = new Vue({
 goodsContainerVue.getCategories();
 goodsContainerVue.getAllProvinces();
 goodsContainerVue.getPostages();
+if(goodsContainerVue.specDetailArr.length<30){
+	var len = 30-goodsContainerVue.specDetailArr.length;
+	for(var i=0;i<len;i++){
+		goodsContainerVue.addSpec();
+	}	
+}
 goodsContainerVue.param.goodsDesc = $('#hiddenGoodsDesc').val();
 goodsContainerVue.initData.goodsDesc = $('#hiddenGoodsDesc').val();
 </script>
