@@ -76,7 +76,7 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 			session.setAttribute("vipBasic", vipBasic);
 		}
 		if(partnerBasic == null) {
-			partnerBasic = PartnerMgrService.getPartner(vipBasic.getVipId());
+			partnerBasic = PartnerMgrService.getPartnerByVip(vipBasic.getVipId());
 			session.setAttribute("partnerBasic", partnerBasic);
 		}
 		List<Category> categories = (List<Category>) session.getAttribute("categories");

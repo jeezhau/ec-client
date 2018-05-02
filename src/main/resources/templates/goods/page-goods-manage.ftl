@@ -45,6 +45,7 @@
 	      5、编辑商品时所使用到的图片须来自于‘图库’；<br>
 	      6、每个商品须有至少一个邮费模板，如果邮费模版的支持配送范围和商品的销售范围不一致时将导致客户下单失败；<br>
 	      7、在商品拥有过个运费模版时，客户下单时将选择满足配送条件且邮费最低的那个模版；<br>
+	      8、合作伙伴须保证提供以下服务：正品保证、同城急速、退货保障、极速发货；
 	    </p>
     </div>
     <div class="col-xs-12" style="margin-top:10px;text-align:center">
@@ -85,16 +86,29 @@
         <button type="button" class="btn btn-info" @click="changeStatus('2')" >&nbsp;批量下架&nbsp;</button>   
       </div>
     </div>
-    <div class="row" style="margin:1px 0">
- 	  <ul class="list-group" style="padding:0 0px;background-color:white;margin:1px 0px;">
-	    <li v-for="item in goodsList" class="list-group-item" style="padding-left:20px;padding-right:20px">
-	      <input type="checkbox" v-model="param.selectedArr" v-bind:value="item.goodsId" style="display:inline-block;padding:0 5px;width:15px;height:15px">
-	      <a v-bind:href="'/goods/edit/' + item.goodsId" style="max-width:80%"><span>{{item.goodsName}}</span></a>
-	      <span style="margin-left:8px;background-color:white;">
-	        <input type="number" v-bind:value="item.stock" style="width:50px;text-align:right" v-on:change="changeStock(item.goodsId,event)">件
-	      </span>
-	    </li>
-	  </ul>
+    <div class="col-xs-12"  style="height:300px;overflow:scroll">
+       <table class="table table-striped table-bordered table-condensed">
+         <tr>
+           <th width="8%" style="padding:2px 2px;text-align:center">选择</th>
+           <th width="60%" style="padding:2px 2px">商品名称</th>
+           <th width="20%" style="padding:2px 2px;text-align:center">库存</th>
+           <th width="15%" style="padding:2px 2px;text-align:center">编辑</th>
+         </tr>
+	     <tr v-for="item in goodsList" >
+            <td style="padding:2px 2px;text-align:center">
+              <input type="checkbox" v-model="selectedArr" v-bind:value="item.goodsId" style="display:inline-block;padding:0 5px;width:15px;height:15px">
+            </td>
+            <td style="padding:2px 2px">
+              <a :href="'/goods/detail/' + item.goodsId">{{item.goodsName}}</a>
+            </td>
+            <td style="padding:2px 2px;text-align:center">
+              <button class="btn btn-primary" style="padding:2px 3px" @click="changeSpec(item.goodsId,item.goodsName,item.specDetail)">规格库存</button>
+            </td>
+            <td style="padding:2px 2px;text-align:center">
+              <a class="btn btn-success" style="padding:2px 3px" :href="'/goods/edit/' + item.goodsId" >&nbsp;&nbsp;编 辑&nbsp;&nbsp;</a>
+            </td>
+	    </tr>
+	  </table>
     </div>
   </div>
 </div><!-- end of container -->
@@ -108,8 +122,10 @@
 		param:{
 			status:'1', 
 			reviewResult:'0',
-			selectedArr:[]
+			pageSize:20,
+			begin:'0'
 		},
+		selectedArr:[],
 		goodsList:[] 
 	 },
 	 methods:{
@@ -121,12 +137,14 @@
 					data: this.param,
 					success: function(jsonRet,status,xhr){
 						if(jsonRet ){
-							if(jsonRet.datas){
+							if(jsonRet.errcode == 0){//
 								for(var i=0;i<jsonRet.datas.length;i++){
 									containerVue.goodsList.push(jsonRet.datas[i]);
 								}
+								containerVue.param.pageSize = jsonRet.pageCond.pageSize;
+								containerVue.param.begin = jsonRet.pageCond.begin;
 							}else{
-								alert(jsonRet.errmsg);
+								//alert(jsonRet.errmsg);
 							}
 						}else{
 							alert('获取数据失败！')
@@ -136,19 +154,19 @@
 				});			 
 		 },
 		 changeStatus: function(newStat){
-			 if(this.param.selectedArr.length<1){
+			 if(this.selectedArr.length<1){
 				 alert("请选择要批量" + (newStat==='1'?'上架':'下架')+ "的商品！");
 				 return
 			 }
 			 $.ajax({
 					url: '/goods/changeStatus',
 					method:'post',
-					data: {'goodsIds':this.param.selectedArr.join(','),'newStatus':newStat},
+					data: {'goodsIds':this.selectedArr.join(','),'newStatus':newStat},
 					success: function(jsonRet,status,xhr){
 						if(jsonRet ){
 							if(jsonRet.errcode ==0){
 								containerVue.getAll();
-								containerVue.param.selectedArr = [];
+								containerVue.selectedArr = [];
 							}else if(jsonRet.errmsg && jsonRet.errmsg != 'ok'){
 								alert(jsonRet.errmsg);
 								
@@ -160,48 +178,244 @@
 					dataType: 'json'
 				});
 		 },
-		 changeStock:function(goodsId,event){
-			 var newCnt = $(event.target).val();
-			 $.ajax({
-					url: '/goods/changeStock',
-					method:'post',
-					data: {'goodsId':goodsId,'newCnt':newCnt},
-					success: function(jsonRet,status,xhr){
-						if(jsonRet ){
-							if(jsonRet.errmsg && jsonRet.errmsg != 'ok'){
-								alert(jsonRet.errmsg);
-							}
-						}else{
-							alert('获取数据失败！')
-						}
-					},
-					dataType: 'json'
-				});
+		 changeSpec : function(goodsId,goodsName,specDetail){
+			 $('#editSpecDetailModal').modal('show');
+			 editSpecDetailVue.goodsId = goodsId;
+			 editSpecDetailVue.goodsName = goodsName;
+			 editSpecDetailVue.specDetailArr = JSON.parse(specDetail);
+			 if(editSpecDetailVue.specDetailArr.length<30){
+				 for(var i=0;i<(30-editSpecDetailVue.specDetailArr.length);i++){
+					 editSpecDetailVue.specDetailArr.push(new Object({name:'',val:'',unit:'',price:'',stock:''}));
+				 }
+			 }
 		 }
 	 }
  });
  containerVue.getAll();
+ 
  
  var winHeight = $(window).height(); //页面可视区域高度   
  var scrollHandler = function () {  
      var pageHieght = $(document.body).height();  
      var scrollHeight = $(window).scrollTop(); //滚动条top   
      var r = (pageHieght - winHeight - scrollHeight) / winHeight;
-     if (r < 0.5) {//0.5是个参数  
-         if (i % 10 === 0) {//每10页做一次停顿！  
-             getData(i);
-             //$(window).unbind('scroll');  
-             $("#btn_Page").show();  
-         } else {  
-             getData(i);  
-             $("#btn_Page").hide();  
-         }  
-     }  
+     if (r < 0.5) {//上拉翻页 
+    	 	containerVue.begin = containerVue.begin + containerVue.pageSize;
+    	 	containerVue.getAll();
+     }
+     if(scrollHeight<0){//下拉刷新
+    	 	containerVue.param.begin = 0;
+    	 	containerVue.param.getAll();
+     }
  }  
  //定义鼠标滚动事件  
- $(window).scroll(scrollHandler);  
- 
+ $("#container").scroll(scrollHandler);  
 
 </script>  
+<!-- 修改商品规格Model -->
+<div class="modal fade " id="editSpecDetailModal" tabindex="-1" role="dialog" aria-labelledby="editSpecDetailModalLabel" aria-hidden="true" data-backdrop="static">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
+            <h4 class="modal-title" id="editSpecDetailModalLabel">修改商品规格与库存</h4>
+         </div>
+         <div class="modal-body">
+		  <div class="row" style="margin-top:10px;">
+		      <div class="form-group">
+		        <label class="col-xs-4 control-label" style="padding-right:1px">商品名称<span style="color:red">*</span></label>
+		        <div class="col-xs-8" style="padding-left:1px">
+		          <input class="form-control" v-model="goodsName" required maxLength="100" readonly>
+		        </div>
+		      </div>
+		      <div class="form-group">
+		        <div class="col-xs-12" style="padding-left:1px">
+		          <label class="col-xs-12 control-label" >规格明细与库存(名称唯一,为空则过滤该条记录)<span style="color:red">*</span></label>
+		        </div>
+		        <div class="col-xs-12"  style="height:300px;overflow:scroll">
+		           <table class="table table-striped table-bordered table-condensed">
+		             <tr>
+		               <th width="40%" style="padding:2px 2px">规格名称</th>
+		               <th width="15%" style="padding:2px 2px">数量值</th>
+		               <th width="15%" style="padding:2px 2px">单位</th>
+		               <th width="15%" style="padding:2px 2px">售价(¥)</th>
+		               <th width="15%" style="padding:2px 2px">库存件数</th>
+		             </tr>
+		             <tr v-for="(item,index) in specDetailArr" >
+		               <td style="padding:2px 2px">
+		                 <input type="text"  style="width:100%" maxlength="20" :value="item.name" @change="setSpecItem('name',index,$event)">
+		               </td>
+		               <td style="padding:2px 2px">
+		                 <input type="number" style="width:100%" min=0 max=999999 :value="item.val" @change="setSpecItem('val',index,$event)">
+		               </td>
+		               <td style="padding:2px 2px">
+		                 <input type="text" style="width:100%" :value="item.unit" maxlength=5 @change="setSpecItem('unit',index,$event)">
+		               </td>
+		               <td style="padding:2px 2px">
+		                 <input type="number" style="width:100%" :value="item.price" min=0 max=99999999 @change="setSpecItem('price',index,$event)">
+		               </td>               
+		               <td style="padding:2px 2px">
+		                 <input type="number" style="width:100%" min=0 max=999999 :value="item.stock" @change="setSpecItem('stock',index,$event)">
+		               </td>
+		             </tr>
+		           </table>
+		        </div>       
+		      </div>
+		  </div>
+		  <div class="row" style="margin-top:15px;text-align:center">
+		  	<button class="btn btn-primary" @click="submit">&nbsp;&nbsp;提 交&nbsp;&nbsp;</button>
+		  	<button type="button" class="btn btn-default" data-dismiss="modal">&nbsp;&nbsp;关 闭&nbsp;&nbsp;</button>
+		  </div>
+		</div>
+     </div>
+   </div>
+</div><!-- end of modal -->
+<script>
+var editSpecDetailVue = new Vue({
+	el:'#editSpecDetailModal',
+	data:{
+		goodsId:'',
+		goodsName: '', 
+		specDetailArr: []
+	},
+	methods:{
+		setSpecItem:function(field,index,event){
+			var spec = this.specDetailArr[index];
+			var value = $(event.target).val();
+			if(field === 'name'){
+				if(!value){
+					value = '';
+				}
+				value = value.trim();
+				if(value.length>20){
+					alert('规格明细中第 ' + (index+1) + " 条数据的'规格名称'不合规，长度须为1-20字符！");
+					$(event.target).focus();
+					return false;
+				}
+				$(event.target).val(value);
+				spec.name = value;
+			}
+			if(field == 'val' && value){
+				var val = parseInt(value);
+				if(isNaN(val) || val < 1 || val > 999999){
+					alert("规格明细中的第 " + (index+1) + "条的数量值不合规，须为1-999999的整数值！");
+					$(event.target).focus();
+					return false;
+				}
+				$(event.target).val(val);
+				spec.val = val;
+			}
+			if(field == 'unit' && value){
+				value = value.trim();
+				if(value.length < 1 || value.length > 5){
+					alert("规格明细中的第 " + (index+1) + "条的单位不合规，长度须为1-5字符！");
+					$(event.target).focus();
+					return false;
+				}
+				$(event.target).val(value);
+				spec.unit = value;
+			}
+			if(field == 'price' && value){
+				var val = parseFloat(value);
+				if(isNaN(val) || val < 0 || val > 99999999.99){
+					alert("规格明细中的第 " + (index+1) + "条的单价不合规，须为0-99999999.99的数值！");
+					$(event.target).focus();
+					return false;
+				}
+				val = val.toFixed(2);
+				$(event.target).val(val);
+				spec.price = val;
+			}
+			if(field == 'stock' && value){
+				var val = parseInt(value);
+				if(isNaN(val) || val < 0 || val > 999999){
+					alert("规格明细中的第 " + (index+1) + "条的库存不合规，须为0-999999的整数值！");
+					$(event.target).focus();
+					return false;
+				}
+				$(event.target).val(val);
+				spec.stock = val;
+			}
+		},
+		submit: function(){
+			//组织规格数据
+			var okSpecArr = [];
+			for(var i=0;i<this.specDetailArr.length;i++){
+				var spec = this.specDetailArr[i];
+				if(!spec.name){
+					continue;//过滤该条数据
+				}else{
+					spec.name = spec.name.trim();
+				}
+				if(spec.name.length > 20){
+					alert("规格明细中的第 " + (i+1) + "条的规格名称不合规，长度范围：2-20字符！");
+					return;
+				}
+				if(!spec.unit || spec.unit.trim().length > 5){
+					alert("规格明细中的第 " + (index+1) + "条的单位不合规，长度须为1-5字符！");
+					return false;
+				}else{
+					spec.unit = spec.unit.trim();
+				}
+				var val = parseInt(spec.val);
+				if(isNaN(val) || val<1 || val>999999){
+					alert("规格明细中的第 " + (i+1) + "条的数量值不合规，须为1-999999的整数值！");
+					return false;
+				}else{
+					spec.val = val;
+				}
+				var val = parseFloat(spec.price);
+				if(isNaN(val) || val < 0 || val > 99999999){
+					alert("规格明细中的第 " + (index+1) + "条的单价不合规，须为0-99999999的数值！");
+					return false;
+				}else{
+					val = val.toFixed(2);
+					spec.price = val;
+				}
+				var val = parseInt(spec.stock);
+				if(isNaN(val) || val< 0 || val > 999999){
+					alert("规格明细中的第 " + (i+1) + "条的库存不合规，须为0-999999的整数值！");
+					return false;
+				}else{
+					spec.stock = val;
+				}
+				okSpecArr.push(spec);
+			}
+			if(okSpecArr.length<1){
+				alert("规格明细数据不可为空，至少要有一条数据！");
+				return ;
+			}
+			for(var i=0;i<okSpecArr.length;i++){
+				for(var j=i+1;j<okSpecArr.length;j++){
+					if(okSpecArr[i].name == okSpecArr[j].name){
+						alert("规格明细不可出现同规格名称的记录！");
+						return false;
+					}
+				}
+			}
+			$.ajax({
+				url: '/goods/changeSpec',
+				method:'post',
+				data: {goodsId:this.goodsId,specDetail:JSON.stringify(okSpecArr)},
+				success: function(jsonRet,status,xhr){
+					if(jsonRet){
+						if(0 == jsonRet.errcode){
+							$('#editSpecDetailModal').modal('hide');
+							containerVue.getAll();
+						}else{//出现逻辑错误
+							alert(jsonRet.errmsg);
+						}
+					}else{
+						alert('系统数据访问失败！')
+					}
+				},
+				dataType: 'json'
+			});
+		}
+	}
+});
+</script>
+
+
 </body>
 </html>

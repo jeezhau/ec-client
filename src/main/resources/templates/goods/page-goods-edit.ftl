@@ -80,7 +80,7 @@
       </div>
       <div class="form-group">
         <div class="col-xs-12" style="padding-left:1px">
-          <label class="col-xs-6 control-label" >规格明细与库存(名称唯一)<span style="color:red">*</span></label>
+          <label class="col-xs-12 control-label" >规格明细与库存(名称唯一,为空则过滤该条记录)<span style="color:red">*</span></label>
         </div>
         <div class="col-xs-12"  style="height:300px;overflow:scroll">
            <table class="table table-striped table-bordered table-condensed">
@@ -88,7 +88,7 @@
                <th width="40%" style="padding:2px 2px">规格名称</th>
                <th width="15%" style="padding:2px 2px">数量值</th>
                <th width="15%" style="padding:2px 2px">单位</th>
-               <th width="15%" style="padding:2px 2px">单价</th>
+               <th width="15%" style="padding:2px 2px">售价(¥)</th>
                <th width="15%" style="padding:2px 2px">库存件数</th>
              </tr>
              <tr v-for="(item,index) in specDetailArr" >
@@ -110,18 +110,6 @@
              </tr>
            </table>
         </div>       
-      </div>   
-      <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">最低价<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
-          <input type="number" class="form-control" v-model="param.priceLowest"  readonly>
-        </div>
-      </div>        
-      <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">商品总库存<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
-          <input type="number" class="form-control" v-model="param.stockSum"  min=0 max=9999999999  readonly>
-        </div>
       </div>
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">限购数量<span style="color:red">*</span></label>
@@ -232,28 +220,6 @@
 var goodsContainerVue = new Vue({
 	el:'#goodsContainer',
 	data:{
-		initData:{
-			goodsId:'${(goods.goodsId)!-1}'.replace(',',''),
-			goodsName:'${(goods.goodsName)!''}',
-			categoryId:'${(goods.categoryId)!''}'.replace(',',''),
-			goodsDesc:'',
-			mainImgPath:'${(goods.mainImgPath)!''}',
-			carouselImgPaths:'${(goods.carouselImgPaths)!''}',
-			place:'${(goods.place)!''}',
-			vender:'${(goods.verder)!''}',
-			priceLowest:'${(goods.priceLowest)!''}'.replace(',',''),
-			stockSum:'${(goods.stockSum)!''}'.replace(',',''),
-			specDetail:"",
-			limitedNum:'${(goods.limitedNum)!''}'.replace(',',''),
-			beginTime:'${(goods.beginTime)!''}',
-			endTime:'${(goods.endTime)!''}',
-			dispatchMode:'${(goods.dispatchMode)!''}',
-			isCityWide:'${(goods.isCityWide)!''}',
-			distLimit:'${(goods.distLimit)!''}'.replace(',',''),
-			provLimit:'${(goods.provLimit)!''}',
-			postageIds:'${(goods.postageIds)!''}',
-			status:'${(goods.status)!''}'
-		},	//初始化的数据
 		metadata:{
 			categories:[],
 			provinces:[],
@@ -293,11 +259,9 @@ var goodsContainerVue = new Vue({
 	watch:{
 		provLimitArr :function(){
 			this.param.provLimit = this.provLimitArr.join(',');
-			this.initData.provLimit = this.provLimitArr.join(',');
 		},
 		postageIdArr :function(){
 			this.param.postageIds = this.postageIdArr.join(',');
-			this.initData.postageIds = this.postageIdArr.join(',');
 		}
 	},
 	methods:{
@@ -329,7 +293,7 @@ var goodsContainerVue = new Vue({
 				}
 				value = value.trim();
 				if(value.length>20){
-					alert('规格明细中第 ' + (index+1) + " 条数据的'规格名称'不合规，长度须为2-20字符！");
+					alert('规格明细中第 ' + (index+1) + " 条数据的'规格名称'不合规，长度须为1-20字符！");
 					$(event.target).focus();
 					return false;
 				}
@@ -383,10 +347,14 @@ var goodsContainerVue = new Vue({
 				}
 				$(event.target).val(val);
 				spec.stock = val;
-				if(this.param.stockSum){
-					this.param.stockSum += val;
-				}else{
-					this.param.stockSum = val;
+				for(var i=0;i<this.specDetailArr.length;i++){
+					var sp = this.specDetailArr[i];
+					if(sp.name && sp.stock)
+					if(this.param.stockSum){
+						this.param.stockSum = parseInt(this.param.stockSum) + parseInt(sp.stock);
+					}else{
+						this.param.stockSum = parseInt(sp.stock);
+					}
 				}
 			}
 		},
@@ -451,7 +419,6 @@ var goodsContainerVue = new Vue({
 			//选择商品的图片
 			$('#imageGalleryShowModal').modal('show');
 			imageGalleryShowVue.selectCntLimit = selectCntLimit;
-			//imageGalleryShowVue.targetElId = targetElId;
 			imageGalleryShowVue.selectedImages = [];
 			imageGalleryShowVue.callbackFun = function(images){
 				if(imgType === 'main'){
@@ -501,7 +468,6 @@ var goodsContainerVue = new Vue({
 						priceLowest = val;
 					}
 				}
-				spec.stock = val;
 				var val = parseInt(spec.stock);
 				if(isNaN(val) || val< 0 || val > 999999){
 					alert("规格明细中的第 " + (i+1) + "条的库存不合规，须为0-999999的整数值！");
@@ -515,6 +481,14 @@ var goodsContainerVue = new Vue({
 			if(okSpecArr.length<1){
 				alert("规格明细数据不可为空，至少要有一条数据！");
 				return ;
+			}
+			for(var i=0;i<okSpecArr.length;i++){
+				for(var j=i+1;j<okSpecArr.length;j++){
+					if(okSpecArr[i].name == okSpecArr[j].name){
+						alert("规格明细不可出现同规格名称的记录！");
+						return false;
+					}
+				}
 			}
 			this.param.specDetail = JSON.stringify(okSpecArr);
 			this.param.priceLowest = priceLowest;
@@ -538,7 +512,7 @@ var goodsContainerVue = new Vue({
 			});
 		},
 		reset: function(){
-			$.extend(goodsContainerVue.param,goodsContainerVue.initData); 
+			window.location.reload();
 		}
 	}
 });
@@ -553,7 +527,6 @@ if(goodsContainerVue.specDetailArr.length<30){
 	}	
 }
 goodsContainerVue.param.goodsDesc = $('#hiddenGoodsDesc').val();
-goodsContainerVue.initData.goodsDesc = $('#hiddenGoodsDesc').val();
 </script>
 
 <#include "/image/page-image-show-tpl.ftl" encoding="utf8"> 

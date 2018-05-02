@@ -22,7 +22,8 @@ public class PartnerMgrService {
 	
 	private static String tmpFileDir;
 	private static String mfyxServerUrl;
-	private static String partnerBasicGetUrl;
+	private static String partnerBasicGetByVipUrl;
+	private static String partnerBasicGetByIdUrl;
 	private static String partnerBasicCreateUrl;
 	private static String partnerBasicUpdateUrl;
 	private static String partnerChangeStatusUrl;
@@ -39,10 +40,14 @@ public class PartnerMgrService {
 	public void setMfyxServerUrl(String mfyxServerUrl) {
 		PartnerMgrService.mfyxServerUrl = mfyxServerUrl;
 	}
-	@Value("${mfyx.partner-get-url}")
-	public  void setPartnerBasicGetUrl(String url) {
-		PartnerMgrService.partnerBasicGetUrl = url;
+	@Value("${mfyx.partner-get-byvip-url}")
+	public  void setPartnerBasicGetByVipUrl(String url) {
+		PartnerMgrService.partnerBasicGetByVipUrl = url;
 	}
+	@Value("${mfyx.partner-get-byid-url}")
+	public  void setPartnerBasicGetByIdUrl(String url) {
+		PartnerMgrService.partnerBasicGetByIdUrl = url;
+	}	
 	@Value("${mfyx.partner-create-url}")
 	public void setPartnerBasicCreateUrl(String url) {
 		PartnerMgrService.partnerBasicCreateUrl = url;
@@ -67,18 +72,19 @@ public class PartnerMgrService {
 	public void setPartnerCertShowUrl(String url) {
 		PartnerMgrService.partnerCertShowUrl = url;
 	}
+
 	/**
-	 * 根据绑定用户获取合作伙伴信息
-	 * @param userId
+	 * 根据绑定会员获取合作伙伴信息
+	 * @param vipId
 	 * @return
 	 */
-	public static PartnerBasic getPartner(Integer userId) {
-		String strRet = HttpUtils.doGet(mfyxServerUrl + partnerBasicGetUrl + userId);
+	public static PartnerBasic getPartnerByVip(Integer vipId) {
+		String strRet = HttpUtils.doGet(mfyxServerUrl + partnerBasicGetByVipUrl + vipId);
 		PartnerBasic partner = null;
 		try {
 			JSONObject jsonRet = JSONObject.parseObject(strRet);
-			if(jsonRet.containsKey("partnerId")) {//成功
-				partner = JSONObject.parseObject(strRet, PartnerBasic.class);
+			if(jsonRet.containsKey("partner")) {//成功
+				partner = JSONObject.toJavaObject(jsonRet.getJSONObject("partner"), PartnerBasic.class);
 				return partner;
 			}
 		}catch(Exception e) {
@@ -87,6 +93,25 @@ public class PartnerMgrService {
 		return partner;
 	}
 	
+	/**
+	 * 根据ID获取合作伙伴信息
+	 * @param partnerId
+	 * @return
+	 */
+	public static PartnerBasic getPartnerById(Integer partnerId) {
+		String strRet = HttpUtils.doGet(mfyxServerUrl + partnerBasicGetByIdUrl + partnerId);
+		PartnerBasic partner = null;
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			if(jsonRet.containsKey("partner")) {//成功
+				partner = JSONObject.toJavaObject(jsonRet.getJSONObject("partner"), PartnerBasic.class);
+				return partner;
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return partner;
+	}
 
 	/**
 	 * 创建合作伙伴

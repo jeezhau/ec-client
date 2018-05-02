@@ -65,7 +65,7 @@ public class PartnerAction {
 		}
 		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
 		if(partner == null) {
-			partner = PartnerMgrService.getPartner(vipBasic.getVipId());
+			partner = PartnerMgrService.getPartnerByVip(vipBasic.getVipId());
 			map.put("partnerBasic", partner);
 		}
 		map.put("sys_func", "partner-index");
@@ -127,7 +127,7 @@ public class PartnerAction {
 		
 		PartnerBasic partner = null;
 		try{
-			partner = PartnerMgrService.getPartner(vip.getVipId());
+			partner = PartnerMgrService.getPartnerByVip(vip.getVipId());
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -322,16 +322,12 @@ public class PartnerAction {
 	 * @param certType
 	 * @return
 	 */
-	@RequestMapping("/cert/show/{certType}")
+	@RequestMapping("/cert/show/{certType}/{partnerId}")
 	public void showCert(@PathVariable(value="certType",required=true)String certType,
+			@PathVariable(value="partnerId",required=true)Integer partnerId,
 			OutputStream out,HttpServletRequest request,HttpServletResponse response,ModelMap map) {
 		try {
-			//数据检查
-			VipBasic vip = (VipBasic) map.get("vipBasic");
-			if(vip == null || !"1".equals(vip.getStatus()) ) {
-				return;
-			}
-			PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
+			PartnerBasic partner = PartnerMgrService.getPartnerById(partnerId);
 			if(partner == null) {
 				return;
 			}
@@ -346,7 +342,7 @@ public class PartnerAction {
 			if(!flag) {
 				return;
 			}
-			File file = PartnerMgrService.showCert(vip.getVipId(), certType);
+			File file = PartnerMgrService.showCert(partner.getVipId(), certType);
 			if(file == null || !file.exists()) {
 				return;
 			}

@@ -85,6 +85,8 @@ public class PartnerBasic {
 
     private Integer reviewOpr;
 
+    private Integer distance;
+    
     @Null
     private Date reviewTime;
 
@@ -278,4 +280,13 @@ public class PartnerBasic {
     public void setReviewTime(Date reviewTime) {
         this.reviewTime = reviewTime;
     }
+
+	public Integer getDistance() {
+		return distance;
+	}
+
+	public void setDistance(Integer distance) {
+		this.distance = distance;
+	}
+    
 }

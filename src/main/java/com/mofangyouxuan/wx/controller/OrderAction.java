@@ -5,17 +5,22 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.alibaba.fastjson.JSONObject;
+import com.mofangyouxuan.dto.Goods;
+import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.wx.utils.PageCond;
 
 /**
  * 下单功能
+ * 1、包含三部分：下单、支付、评价
  * @author jeekhan
  *
  */
 @Controller
 @RequestMapping("/order")
+@SessionAttributes("userBasic")
 public class OrderAction {
 	
 	/**
@@ -24,10 +29,13 @@ public class OrderAction {
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/order/begin/{goodsId}")
-	public String beginOrder(@PathVariable("goodsId")String goodsId,ModelMap map) {
+	@RequestMapping("/place/{goodsId}")
+	public String placeOrder(@PathVariable("goodsId")String goodsId,ModelMap map) {
+		UserBasic user = (UserBasic) map.get("userBasic");
+		Goods goods = null;
 		
-		return "order/page-order-begin";
+		
+		return "order/page-place-order";
 	}
 	
 	/**

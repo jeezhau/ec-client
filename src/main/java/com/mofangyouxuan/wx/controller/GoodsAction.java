@@ -1,5 +1,6 @@
 package com.mofangyouxuan.wx.controller;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -19,13 +20,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.Category;
 import com.mofangyouxuan.dto.Goods;
+import com.mofangyouxuan.dto.GoodsSpec;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.GoodsService;
+import com.mofangyouxuan.service.PartnerMgrService;
 import com.mofangyouxuan.wx.utils.PageCond;
 
 /**
@@ -96,20 +100,25 @@ public class GoodsAction {
 			map.put("errmsg", "您当前的合作伙伴状态有误，不可进行商品管理！")	;
 			return "forward:/user/index/vip" ;
 		}
-		//
+		
 		Goods goods = null;
-		if(goodsId != 0) {
-			//获取已有指定商品
-			JSONObject ret = GoodsService.getGoods(goodsId);
-			if(ret == null || !ret.containsKey("goods")) {
-				map.put("errmsg", "没有获取到该指定商品信息！");
-				return "forward:/goods/manage";
+		try {
+			if(goodsId != 0) {
+				//获取已有指定商品
+				JSONObject ret = GoodsService.getGoods(goodsId);
+				if(ret == null || !ret.containsKey("goods")) {
+					map.put("errmsg", "没有获取到该指定商品信息！");
+					return "forward:/goods/manage";
+				}else {
+					goods = JSONObject.toJavaObject(ret.getJSONObject("goods"),Goods.class);
+				}
 			}else {
-				goods = JSONObject.toJavaObject(ret.getJSONObject("goods"),Goods.class);
+				goods = new Goods();
+				goods.setGoodsId(0l);
 			}
-		}else {
-			goods = new Goods();
-			goods.setGoodsId(0l);
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
 		map.put("goods", goods);
 		map.put("sys_func", "partner-goods");
@@ -151,10 +160,63 @@ public class GoodsAction {
 				jsonRet.put("errcode", ErrCodes.GOODS_PARAM_ERROR);
 				return jsonRet.toString();
 			}
+			//规格检查
+			List<GoodsSpec> specList = JSONArray.parseArray(goods.getSpecDetail(), GoodsSpec.class);
+			if(specList == null || specList.size()<1 || specList.size()>30) {
+				jsonRet.put("errcode", ErrCodes.GOODS_PARAM_ERROR);
+				jsonRet.put("errmsg", "规格信息记录数量为1-30条！");
+				return jsonRet.toString();
+			}
+			StringBuilder sb = new StringBuilder();
+			BigDecimal priceLowest = new BigDecimal(99999999.99);
+			Integer stockSum = 0;
+			for(GoodsSpec spec:specList) {
+				if(spec == null) {
+					sb.append("记录不可为空！");
+				}else {
+					if(spec.getName() == null || spec.getName().length()==0 || spec.getName().length()>20){
+						sb.append("记录【" + JSONObject.toJSONString(spec) + "】规格名称不合规，须为1-20字符！");
+					}
+					if(spec.getVal() == null || spec.getVal()<1 || spec.getVal()>999999) {
+						sb.append("记录【" + JSONObject.toJSONString(spec) + "】数量值不合规，须为1-999999的整数值！");
+					}
+					if(spec.getUnit() == null || spec.getUnit().length()<1 || spec.getUnit().length()>5) {
+						sb.append("记录【" + JSONObject.toJSONString(spec) + "】单位不合规，长度须为1-5字符！");
+					}
+					if(spec.getPrice() == null || spec.getPrice().doubleValue()<0 || spec.getPrice().doubleValue()>99999999.99) {
+						sb.append("记录【" + JSONObject.toJSONString(spec) + "】单价不合规，须为0-99999999.99的数值！");
+					}else {
+						if(priceLowest.compareTo(spec.getPrice()) > 0) {
+							priceLowest = spec.getPrice();
+						}
+					}
+					if(spec.getStock() == null || spec.getStock()<0 || spec.getStock()>999999) {
+						sb.append("记录【" + JSONObject.toJSONString(spec) + "】库存不合规，须为0-999999的整数值！");
+					}else {
+						stockSum += spec.getStock();
+					}
+				}
+			}
+			if(sb.length()>0) {
+				jsonRet.put("errcode", ErrCodes.GOODS_PARAM_ERROR);
+				jsonRet.put("errmsg", "规格信息不合规：" + sb.toString());
+				return jsonRet.toString();
+			}
+			for(int i=0;i<specList.size();i++) {
+				for(int j=i+1;j<specList.size();j++) {
+					if(specList.get(i).getName().equals(specList.get(j).getName())) {
+						jsonRet.put("errcode", ErrCodes.GOODS_PARAM_ERROR);
+						jsonRet.put("errmsg", "规格信息中不可出现同规格名称的记录！");
+						return jsonRet.toString();
+					}
+				}
+			}
+			goods.setPriceLowest(priceLowest);
+			goods.setStockSum(stockSum);
 			//其他验证
 			String isCityWide = goods.getIsCityWide();
 			Integer limitCnt = goods.getLimitedNum();
-			StringBuilder sb = new StringBuilder();
+			sb = new StringBuilder();
 			if("0".equals(isCityWide)) {//全国
 				String provLimit = goods.getProvLimit();
 				if(provLimit == null || provLimit.length()<2) {
@@ -272,6 +334,32 @@ public class GoodsAction {
 		return jsonRet.toString();
 	}
 	
+	/**
+	 * 获取指定商品的详细信息
+	 * @param goodsId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/detail/{goodsId}")
+	public String getDetail(@PathVariable("goodsId")Long goodsId,ModelMap map) {
+		JSONObject obj = GoodsService.getGoods(goodsId);
+		Goods goods = null;
+		PartnerBasic ownPartner = null;
+		try {
+			if(obj == null || !obj.containsKey("goods")) {
+				map.put("errmsg", "获取商品详情失败！");
+			}else {
+				goods = JSONObject.toJavaObject(obj.getJSONObject("goods"),Goods.class);
+				ownPartner = PartnerMgrService.getPartnerById(goods.getPartnerId());
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		map.put("goods", goods);
+		map.put("ownPartner", ownPartner);
+		return "goods/page-goods-detail";
+	}
 	
 	/**
 	 * 变更商品的状态：上架、下架
@@ -320,15 +408,15 @@ public class GoodsAction {
 	}
 	
 	/**
-	 * 修改商户的库存
+	 * 修改商户规格与库存
 	 * @param goodsId
-	 * @param newCnt
+	 * @param specDetail
 	 * @return
 	 */
-	@RequestMapping("/changeStock")
+	@RequestMapping("/changeSpec")
 	@ResponseBody
-	public String changeStock(@RequestParam(value="goodsId",required=true)Long goodsId,
-			@RequestParam(value="newCnt",required=true)Integer newCnt,ModelMap map) {
+	public String changeSpec(@RequestParam(value="goodsId",required=true)Long goodsId,
+			@RequestParam(value="specDetail",required=true)String specDetail,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
 			VipBasic vip = (VipBasic) map.get("vipBasic");
@@ -349,8 +437,50 @@ public class GoodsAction {
 				jsonRet.put("errmsg", "您当前的合作伙伴状态有误，不可进行商品管理！");
 				return jsonRet.toString();
 			}
+			List<GoodsSpec> specList = JSONArray.parseArray(specDetail, GoodsSpec.class);
+			if(specList == null || specList.size()<1 || specList.size()>30) {
+				jsonRet.put("errcode", ErrCodes.GOODS_PARAM_ERROR);
+				jsonRet.put("errmsg", "规格信息记录数量为1-30条！");
+				return jsonRet.toString();
+			}
+			StringBuilder sb = new StringBuilder();
+			for(GoodsSpec spec:specList) {
+				if(spec == null) {
+					sb.append("记录不可为空！");
+				}else {
+					if(spec.getName() == null || spec.getName().length()==0 || spec.getName().length()>20){
+						sb.append("记录【" + JSONObject.toJSONString(spec) + "】规格名称不合规，须为1-20字符！");
+					}
+					if(spec.getVal() == null || spec.getVal()<1 || spec.getVal()>999999) {
+						sb.append("记录【" + JSONObject.toJSONString(spec) + "】数量值不合规，须为1-999999的整数值！");
+					}
+					if(spec.getUnit() == null || spec.getUnit().length()<1 || spec.getUnit().length()>5) {
+						sb.append("记录【" + JSONObject.toJSONString(spec) + "】单位不合规，长度须为1-5字符！");
+					}
+					if(spec.getPrice() == null || spec.getPrice().doubleValue()<0 || spec.getPrice().doubleValue()>99999999.99) {
+						sb.append("记录【" + JSONObject.toJSONString(spec) + "】单价不合规，须为0-99999999.99的数值！");
+					}
+					if(spec.getStock() == null || spec.getStock()<0 || spec.getStock()>999999) {
+						sb.append("记录【" + JSONObject.toJSONString(spec) + "】库存不合规，须为0-999999的整数值！");
+					}
+				}
+			}
+			if(sb.length()>0) {
+				jsonRet.put("errcode", ErrCodes.GOODS_PARAM_ERROR);
+				jsonRet.put("errmsg", "规格信息不合规：" + sb.toString());
+				return jsonRet.toString();
+			}
+			for(int i=0;i<specList.size();i++) {
+				for(int j=i+1;j<specList.size();j++) {
+					if(specList.get(i).getName().equals(specList.get(j).getName())) {
+						jsonRet.put("errcode", ErrCodes.GOODS_PARAM_ERROR);
+						jsonRet.put("errmsg", "规格信息中不可出现同规格名称的记录！");
+						return jsonRet.toString();
+					}
+				}
+			}
 			//数据处理
-			jsonRet = GoodsService.changeStock(partner.getPartnerId(), goodsId, newCnt);
+			jsonRet = GoodsService.changeSpec(partner.getPartnerId(), goodsId, specDetail);
 			if(jsonRet == null) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);

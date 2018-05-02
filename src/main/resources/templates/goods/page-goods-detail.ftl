@@ -22,60 +22,55 @@
     <link href="/css/mfyx.css" rel="stylesheet">
 </head>
 <body class="light-gray-bg">
-<div class="container goods-container" style="oveflow:scroll">
-  <div id="goodsImgCarousel" class="carousel slide goods-item">
+<div class="container goods-container" id="container" style="oveflow:scroll">
+  <!-- 商品名称 -->
+  <div class="row" style="margin:5px 0px 3px 0px;background-color:white;padding:3px 8px;font-size:150%;font-weight:bold;">
+    ${(goods.goodsName)!''}
+  </div> 
+  
+  <div id="myCarousel" class="carousel slide">
     <!-- 轮播（Carousel）指标 -->
     <ol class="carousel-indicators">
-        <li data-target="#goodsImgCarousel" data-slide-to="1" class="active"></li>
-        <li data-target="#goodsImgCarousel" data-slide-to="2"></li>
-        <li data-target="#goodsImgCarousel" data-slide-to="3"></li>
-        <li data-target="#goodsImgCarousel" data-slide-to="4"></li>
-        <li data-target="#goodsImgCarousel" data-slide-to="5"></li>
+        <li v-for="item,index in courselImgPaths" data-target="#myCarousel" :data-slide-to="index" v-bind:class="{ active: index===0 }"></li>
     </ol>   
     <!-- 轮播（Carousel）项目 -->
-    <div class="carousel-inner" style="height:100%">
-        <div class="item active">
-            <img src="/images/slide1.png" alt="First slide">
-        </div>
-        <div class="item">
-            <img src="/images/slide2.jpeg" alt="Second slide">
-        </div>
-        <div class="item">
-            <img src="/images/slide3.JPG" alt="Third slide">
-        </div>
-        <div class="item">
-            <img src="/images/slide4.png" alt="Four slide">
-        </div>
-        <div class="item">
-            <img src="/images/slide5.jpeg" alt="Five slide">
+    <div class="carousel-inner">
+        <div  v-bind:class="[{active:(index===0)}, 'item']" v-for="imgpath,index in courselImgPaths" >
+            <img :src="'/image/file/show/' + imgpath" >
         </div>
     </div>
     <!-- 轮播（Carousel）导航 -->
-    <a class="carousel-control left" href="#goodsImgCarousel" 
+    <a class="carousel-control left" href="#myCarousel" 
        data-slide="prev"> <span _ngcontent-c3="" aria-hidden="true" class="glyphicon glyphicon-chevron-right"></span></a>
-    <a class="carousel-control right" href="#goodsImgCarousel" 
+    <a class="carousel-control right" href="#myCarousel" 
        data-slide="next">&rsaquo;</a>
   </div>
-  <div class="row" style="margin:5px 0px 3px 0px;background-color:white">
-    <!-- 售卖参数 -->
-    <div class="col-xs-6"><span class="pull-left" style="color:red">优惠价¥: <span>0.00</span> </span>
-    </div>
-    <div class="col-xs-6 pull-right">
-    <span class="pull-right">已卖: <span>123</span> 件</span>
-    </div>
+  
+  <!-- 售卖信息 -->
+  <div class="row" style="margin:5px 0px 3px 0px;background-color:white;color:red">
+    <div class="col-xs-4" style="padding-right:3px;">最低价(¥)：<span>${(goods.priceLowest)!''}</span></div>
+    <div class="col-xs-4" style="padding:0 3px;">总库存：<span>${(goods.stockSum)!''}</span></div>
+    <div class="col-xs-4" style="padding-left:3px;">已售：<span style="color:red">${(goods.saledCnt)!''}</span></div>
   </div>
-  <div class="row" style="margin:5px 0px 3px 0px;padding:3px 3px;background-color:white;font-weight:bold;">
-    是否哈里哈；哈佛；是否哈；水立方加快立法；还是立刻发货司法考试发挥水库
+  
+  <!-- 商家信息 -->
+  <div class="row" style="margin:5px 0px 3px 0px;background-color:white;padding:3px 8px;">
+    <a href="'/partner/detail/${(ownPartner.partnerId)?string('#')}">
+     <img class="pull-left" alt="" src="/partner/cert/show/logo/${(ownPartner.partnerId)?string('#')}" style="width:25px;height:25px;border-radius:30%">
+    </a>
+   <span class="pull-right">${(ownPartner.province)!''}-${(ownPartner.city)!''}-${(ownPartner.area)!''}</span>
   </div>
+
+  <!-- 服务特点 -->
   <div class="row" style="margin:5px 0px 3px 0px;font-weight:lighter;font-size:80%">
-    <!-- 服务特点 -->
     <div class="col-xs-3" style="padding:0 3px"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">正品保证</span></div>
     <div class="col-xs-3" style="padding:0 3px"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">同城急速</span></div>
-    <div class="col-xs-3" style="padding:0 3px"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">7天退货</span></div>
-    <div class="col-xs-3" style="padding:0 3px"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">30小时发货</span></div>
+    <div class="col-xs-3" style="padding:0 3px"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">退货保障</span></div>
+    <div class="col-xs-3" style="padding:0 3px"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">极速发货</span></div>
   </div>
-  <div class="row" style="margin:5px 0px 3px 0px;" onclick="">
-    <!-- 前三条买家评价 -->
+  
+  <!--  ====== 前三条买家评价 ======= -->
+  <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
     <div class="row" style="margin:1px 0px;background-color:white;">
       <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">买家评价(10)</span>
       <span class="pull-right" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray"><a href="/appraise/index/goodsId">查看全部&gt;</a></span>
@@ -88,59 +83,69 @@
      <div class="row">
        非常好，味道不错，水分充足，以后一定经常关注。
      </div>
-    </div>
-    
+    </div>    
   </div>
+  
+  <!--  ====== 商品参数详细信息 =====   -->
   <div class="row" style="margin:5px 0px 3px 0px;">
-    <!-- 商品参数详细信息 -->
     <div class="row" style="margin:1px 0px;background-color:white;">
-      <span style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">宝贝规格</span>
+      <span style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">商品参数</span>
     </div>
-    <div class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
-      <span>产地：昆明</span><br>
-      <span>重量：3斤</span>
-      <span>库存：100件</span>
+    <div class="row" style="margin:1px 0px;padding:0 8px;background-color:white;">
+      <div class="row">
+        <div class="col-xs-12"> 产地：<span>${(goods.place)!''}</span></div>
+        <div class="col-xs-12"> 生产者：<span>${(goods.vender)!''}</span></div>
+      </div>
+       <table class="table table-striped table-bordered table-condensed">
+         <tr>
+           <th width="40%" style="padding:2px 2px">名称</th>
+           <th width="20%" style="padding:2px 2px">量值</th>
+           <th width="20%" style="padding:2px 2px">售价(¥)</th>
+           <th width="20%" style="padding:2px 2px">库存件数</th>
+         </tr>
+         <tr v-for="item in specDetailArr" >
+           <td style="padding:2px 2px">
+             <span style="width:100%" >{{item.name}}</span>
+           </td>
+           <td style="padding:2px 2px">
+              <span style="width:100%" >{{item.val}} {{item.unit}}</span>
+           </td>
+           <td style="padding:2px 2px">
+              <span style="width:100%" >{{item.price}}</span>
+           </td>               
+           <td style="padding:2px 2px">
+              <span style="width:100%" >{{item.stock}}</span>
+           </td>
+         </tr>
+       </table>
     </div>
   </div>
+  
+  <!--  ====== 商品详情 =====  -->
   <div class="row" style="margin:5px 0px 3px 0px;">
-    <!-- 商品详情 -->
     <div class="row" style="margin:1px 0px;background-color:white;">
       <span style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">宝贝详情</span>
     </div>
     <div class="row" style="width:100%;margin:1px 0px;padding:0 8px;background-color:white;">
-           比较运算符  
-      
-    表达式中支持的比较运算符有如下几个:  
-     =或者==:判断两个值是否相等.  
-    !=:判断两个值是否不等.  
-    gt:判断左边值是否大于右边值  
-    gte:判断左边值是否大于等于右边值  
-    lt:判断左边值是否小于右边值  
-    lte:判断左边值是否小于等于右边值  
-      
-    注意:=和!=可以用于字符串,数值和日期来比较是否相等,但=和!=两边必须是相同类型的值,否则会产生错误,
-    而且FreeMarker是精确比 较,”x”,”x “,”X”是不等的.其它的运行符可以作用于数字和日期,但不能作用于字符串,大部分的时候,使用gt等字母运算符代替>会有更好的效果,
-    因为 FreeMarker会把>解释成FTL标签的结束字符,当然,也可以使用括号来避免这种情况,如: 
-               比较运算符  
-      
-    表达式中支持的比较运算符有如下几个:  
-     =或者==:判断两个值是否相等.  
-    !=:判断两个值是否不等.  
-    gt:判断左边值是否大于右边值  
-    gte:判断左边值是否大于等于右边值  
-    lt:判断左边值是否小于右边值  
-    lte:判断左边值是否小于等于右边值  
-      
-    注意:=和!=可以用于字符串,数值和日期来比较是否相等,但=和!=两边必须是相同类型的值,否则会产生错误,
-    而且FreeMarker是精确比 较,”x”,”x “,”X”是不等的.其它的运行符可以作用于数字和日期,但不能作用于字符串,大部分的时候,使用gt等字母运算符代替>会有更好的效果,
-    因为 FreeMarker会把>解释成FTL标签的结束字符,当然,也可以使用括号来避免这种情况,如:  
+      ${(goods.goodsDesc)!''}
     </div>
   </div> 
+  
+  <!-- 同类推荐 -->
   <div class="row">
-    <!-- 同类推荐 -->
+    
   </div> 
 
 </div><!-- end of container -->
+<script type="text/javascript">
+var containerVue = new Vue({
+	el:'#container',
+	data:{
+		courselImgPaths:'${(goods.carouselImgPaths)!""}'.split(','),
+		specDetailArr:JSON.parse('${(goods.specDetail)!"[]"}')
+	}
+});
+</script>
 <footer >
   <div class="row" style="margin:50px 0"></div>
   <div class="weui-tabbar" style="position:fixed;left:0px;bottom:0px">
@@ -154,10 +159,16 @@
 	    <span style="display: inline-block;position: relative;">
 	        <img src="/icons/收藏.png" alt="" class="weui-tabbar__icon">
 	    </span>
-	    <p class="weui-tabbar__label">收藏</p>
+	    <p class="weui-tabbar__label">加入收藏</p>
      </a>
-    <a href="/order/order/begin/goodsId" class="weui-tabbar__item " style='background-color:red;'>
-	    <span class="weui-tabbar__label" style="text-align:center;vertical-align:middle;font-size:20px;color:white">立即下单</span>
+     <a href="/partner/detail/${(ownPartner.partnerId)?string('#')}" class="weui-tabbar__item " >
+	    <span style="display: inline-block;position: relative;">
+	        <img src="/icons/商家.png" alt="" class="weui-tabbar__icon">
+	    </span>
+	    <p class="weui-tabbar__label">逛商家</p>
+     </a>    
+     <a href="/order/order/begin/${(goods.goodsId)?string('#')}" class="weui-tabbar__item " style='background-color:red;text-align:center;vertical-align:center;'>
+	    <span class="weui-tabbar__label" style="font-size:20px;color:white">立即下单</span>
      </a>     	
   </div>
 </footer>

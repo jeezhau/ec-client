@@ -28,28 +28,22 @@
 <div class="container goods-container" id="container" style="padding:0 1px;overflow:scroll">
   <div class="row" style="margin:0 0;overflow:scroll">
     <div v-for="goods in goodsList" class="col-xs-6" style="padding:0px 0px;">
-        <div class="row" style="margin:1px 1px;padding:0 10px;background-color:white;text-align:center;vertical-align:center" >
-          <a v-bind:href="'/partner/detail/' + goods.partnerId">
-	        <img class="pull-left" alt="" src="/images/mfyx_logo.jpeg" style="width:25px;height:25px;border-radius:30%">
-	      </a>
-	      <span class="pull-right">昆明市-官渡区</span>
-        </div>
 	    <div style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
 	      <a v-bind:href="'/goods/detail/' + goods.goodsId">
-	        <img title="190X150最优" alt="" src="/images/mfyx_logo.jpeg" style="width:90%;height:150px">
+	        <img alt="" :src="'/image/file/show/' + goods.mainImgPath" style="width:90%;height:150px">
 	      </a>
 	    </div>
 	    <div style="margin:1px 1px;" >
 	      <div style="margin:1px 0;padding:0 5px;background-color:white" >
-		        是非得失分身乏术地方简单描述简单描述史蒂夫舒
+		        {{goods.goodsName}}
 	      </div>
 	      <div style="margin:1px 0px;padding:0 5px;background-color:white;color:red" >
-	      	<span class="pull-left ">惠¥: <span>0.00</span>元</span>
-	      	<span class="pull-right ">库存: <span>100</span>件</span>
+	      	<span class="pull-left ">惠¥: <span>{{goods.priceLowest}}</span>元</span>
+	      	<span class="pull-right ">库存: <span>{{goods.stockSum}}</span>件</span>
 	      </div>
 	      <div style="margin:1px 0px 2px 0;padding:0 5px 3px 5px;background-color:white;text-align:center" >
-	        <a class="btn btn-danger " style="padding:3px 12px" href="/order/order/begin/goodsId"><span style="color:white">立即下单</span></a>
-	        <a class="btn btn-primary" style="padding:3px 12px"href="/order/order/begin/goodsId"><span style="color:white">加入收藏</span></a>
+	        <a class="btn btn-danger " style="padding:3px 12px" :href="'/order/order/begin/'+ goods.goodsId"><span style="color:white">立即下单</span></a>
+	        <a class="btn btn-primary" style="padding:3px 12px" :href="'/order/order/begin/' + goods.goodsId"><span style="color:white">加入收藏</span></a>
 	      </div>
 	    </div>
     </div>
@@ -60,40 +54,71 @@
 	 el:'#container',
 	 data:{
 		param:{
-			mode:'cat', //cat、keywords
+			categoryId:'', 
+			keywords:'',
+			pageSize:20,
+			begin:0
 		},
-		goodsList:[{goodsId:123,partnerId:999},{goodsId:123,partnerId:999},{goodsId:123,partnerId:999},{goodsId:123,partnerId:999},
-			{goodsId:123,partnerId:999},{goodsId:123,partnerId:999},{goodsId:123,partnerId:999},{goodsId:123,partnerId:999}] 
+		goodsList:[] 
 	 },
 	 methods:{
-		 
+		 getAll: function(){
+			 containerVue.goodsList = [];
+			 $.ajax({
+					url: '/shop/getall',
+					method:'post',
+					data: this.param,
+					success: function(jsonRet,status,xhr){
+						if(jsonRet ){
+							if(jsonRet.errcode == 0){//
+								for(var i=0;i<jsonRet.datas.length;i++){
+									containerVue.goodsList.push(jsonRet.datas[i]);
+								}
+								containerVue.param.pageSize = jsonRet.pageCond.pageSize;
+								containerVue.param.begin = jsonRet.pageCond.begin;
+							}else{
+								//alert(jsonRet.errmsg);
+							}
+						}else{
+							alert('获取数据失败！')
+						}
+					},
+					dataType: 'json'
+				});			 
+		 }
 	 }
  });
- //设置查询方式
- function setSearchMode(mode,param){
-	 if(mode == "cat"){//分类
-		 
-	 }
+ containerVue.getAll();
+ //分类查询
+ function getGoodsByCat(categoryId){
+	 containerVue.param.categoryId = categoryId;
+	 containerVue.param.begin = 0;
+	 containerVue.getAll();
  }
-  
+ function getGoodsByKey(keywords){
+	 if(keywords){
+		 containerVue.param.keywords = keywords;
+		 containerVue.param.begin = 0;
+		 containerVue.getAll();
+	 }
+ } 
+ 
  var winHeight = $(window).height(); //页面可视区域高度   
  var scrollHandler = function () {  
      var pageHieght = $(document.body).height();  
      var scrollHeight = $(window).scrollTop(); //滚动条top   
      var r = (pageHieght - winHeight - scrollHeight) / winHeight;
-     if (r < 0.5) {//0.5是个参数  
-         if (i % 10 === 0) {//每10页做一次停顿！  
-             getData(i);
-             //$(window).unbind('scroll');  
-             $("#btn_Page").show();  
-         } else {  
-             getData(i);  
-             $("#btn_Page").hide();  
-         }  
-     }  
+     if (r < 0.5) {//上拉翻页 
+    	 	containerVue.begin = containerVue.begin + containerVue.pageSize;
+    	 	containerVue.getAll();
+     }
+     if(scrollHeight<0){//下拉刷新
+    	 	containerVue.param.begin = 0;
+    	 	containerVue.getAll();
+     }
  }  
  //定义鼠标滚动事件  
- $(window).scroll(scrollHandler);  
+ $("#container").scroll(scrollHandler); 
  
 
 </script>  

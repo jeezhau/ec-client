@@ -27,7 +27,7 @@ public class GoodsService {
 	private static String goodsGetUrl;
 	private static String goodsGetallUrl;
 	private static String goodsChangeStatusUrl;
-	private static String goodsChangeStockUrl;
+	private static String goodsChangeSpecUrl;
 	private static String goodsCategoryUrl;
 	
 	@Value("${mfyx.mfyx-server-url}")
@@ -55,9 +55,9 @@ public class GoodsService {
 	public void setGoodsChangeStatusUrl(String goodsChangeStatusUrl) {
 		GoodsService.goodsChangeStatusUrl = goodsChangeStatusUrl;
 	}
-	@Value("${mfyx.goods-change-stock-url}")
-	public void setGoodsChangeStockUrl(String goodsChangeStockUrl) {
-		GoodsService.goodsChangeStockUrl = goodsChangeStockUrl;
+	@Value("${mfyx.goods-change-spec-url}")
+	public void setGoodsChangeSpecUrl(String goodsChangeSpecUrl) {
+		GoodsService.goodsChangeSpecUrl = goodsChangeSpecUrl;
 	}
 	@Value("${mfyx.goods-category-url}")
 	public void setGoodsCategoryUrl(String goodsCategoryUrl) {
@@ -67,7 +67,7 @@ public class GoodsService {
 	/**
 	 * 
 	 * @param goodsId
-	 * @return {"errcode":-1,"errmsg":"错误信息"} 或 {商品所有字段}
+	 * @return {"errcode":-1,"errmsg":"错误信息",goods:{...}} 
 	 */
 	public static JSONObject getGoods(Long goodsId) {
 		String url = mfyxServerUrl + goodsGetUrl + goodsId;
@@ -131,15 +131,15 @@ public class GoodsService {
 	 * 
 	 * @param partnerId
 	 * @param goodsId
-	 * @param newCnt
+	 * @param specDetail
 	 * @return {errcode:0,errmsg:"ok"}
 	 */
-	public static JSONObject changeStock(Integer partnerId,Long goodsId,Integer newCnt) {
-		String url = mfyxServerUrl + goodsChangeStockUrl;
+	public static JSONObject changeSpec(Integer partnerId,Long goodsId,String specDetail) {
+		String url = mfyxServerUrl + goodsChangeSpecUrl;
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("goodsId", goodsId);
 		params.put("partnerId", partnerId);
-		params.put("newCnt", newCnt);
+		params.put("specDetail", specDetail);
 		String strRet = HttpUtils.doPost(url, params);
 		try {
 			JSONObject jsonRet = JSONObject.parseObject(strRet);
