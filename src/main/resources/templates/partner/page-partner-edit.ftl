@@ -188,9 +188,7 @@
   	<p>审批意见：{{review.reviewLog}}</p>
   </div>
 </div><!-- end of container -->
-<footer>
-  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
-</footer>
+
 <script type="text/javascript">
 var partnerContainerVue = new Vue({
 	el:'#partnerContainer',
@@ -266,15 +264,8 @@ var partnerContainerVue = new Vue({
 						for(var i=0;i<jsonRet.length;i++){
 							partnerContainerVue.metadata.provinces.push(jsonRet[i]);
 						}
-						if(partnerContainerVue.param.city){
-							var provCode = "";
-							for(var i=0;i<partnerContainerVue.metadata.provinces.length;i++){
-								if(partnerContainerVue.metadata.provinces[i].provName == partnerContainerVue.param.province){
-									provCode = partnerContainerVue.metadata.provinces[i].provCode;
-									break;
-								}
-							}
-							getCities(provCode,partnerContainerVue.param.area);
+						if(partnerContainerVue.param.city){//有城市参数
+							getCities();
 						}
 					}else{
 						alert('获取城市数据(省份)失败！')
@@ -288,26 +279,12 @@ var partnerContainerVue = new Vue({
 			partnerContainerVue.param.area = '';
 			partnerContainerVue.metadata.cities = [];
 			partnerContainerVue.metadata.areas = [];
-			var provCode = "";
-			for(var i=0;i<partnerContainerVue.metadata.provinces.length;i++){
-				if(partnerContainerVue.metadata.provinces[i].provName == partnerContainerVue.param.province){
-					provCode = partnerContainerVue.metadata.provinces[i].provCode;
-					break;
-				}
-			}
-			getCities(provCode);
+			getCities();
 		},
 		changeCity: function(){
 			partnerContainerVue.param.area = '';
 			partnerContainerVue.metadata.areas = [];
-			var cityCode = "";
-			for(var i=0;i<partnerContainerVue.metadata.cities.length;i++){
-				if(partnerContainerVue.metadata.cities[i].cityName == partnerContainerVue.param.city){
-					cityCode = partnerContainerVue.metadata.cities[i].cityCode;
-					break;
-				}
-			}
-			getAreas(cityCode);
+			getAreas();
 		},
 		getLocation:function(){
 			this.param.locationX = 12.2345;
@@ -336,20 +313,20 @@ var partnerContainerVue = new Vue({
 		},
 		reset: function(){
 			$.extend(partnerContainerVue.param,partnerContainerVue.initData); 
-			var provCode = "";
-			for(var i=0;i<partnerContainerVue.metadata.provinces.length;i++){
-				if(partnerContainerVue.metadata.provinces[i].provName == partnerContainerVue.param.province){
-					provCode = partnerContainerVue.metadata.provinces[i].provCode;
-					break;
-				}
-			}
-			getCities(provCode,partnerContainerVue.param.area);
+			getCities();
 		}
 	}
 });
 
 partnerContainerVue.getAllProvinces();
-function getCities(provCode,areaName){
+function getCities(){
+	var provCode = "";
+	for(var i=0;i<partnerContainerVue.metadata.provinces.length;i++){
+		if(partnerContainerVue.metadata.provinces[i].provName == partnerContainerVue.param.province){
+			provCode = partnerContainerVue.metadata.provinces[i].provCode;
+			break;
+		}
+	}
 	$.ajax({
 		url: '/city/city/getbyprov/' + provCode,
 		method:'post',
@@ -360,15 +337,8 @@ function getCities(provCode,areaName){
 				for(var i=0;i<jsonRet.length;i++){
 					partnerContainerVue.metadata.cities.push(jsonRet[i]);
 				}
-				if(areaName){
-					var cityCode = "";
-					for(var i=0;i<partnerContainerVue.metadata.cities.length;i++){
-						if(partnerContainerVue.metadata.cities[i].cityName == partnerContainerVue.param.city){
-							cityCode = partnerContainerVue.metadata.cities[i].cityCode;
-							break;
-						}
-					}
-					getAreas(cityCode);
+				if(partnerContainerVue.param.area){
+					getAreas();
 				}
 			}else{
 				alert('获取城市数据(地级市)失败！')
@@ -378,7 +348,14 @@ function getCities(provCode,areaName){
 	});
 }
 
-function getAreas(cityCode){
+function getAreas(){
+	var cityCode = "";
+	for(var i=0;i<partnerContainerVue.metadata.cities.length;i++){
+		if(partnerContainerVue.metadata.cities[i].cityName == partnerContainerVue.param.city){
+			cityCode = partnerContainerVue.metadata.cities[i].cityCode;
+			break;
+		}
+	}
 	$.ajax({
 		url: '/city/area/getbycity/' + cityCode,
 		method:'post',
@@ -425,7 +402,7 @@ $(document).on('ready', function() {
             image: {width: "100px", height: "100px"},
         },
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/logo" alt="LOGO照片" class="file-preview-image" style="width:96px">'
+            '<img src="/partner/cert/show/logo/${(partner.partnerId)!''}" alt="LOGO照片" class="file-preview-image" style="width:96px">'
         ]
     });
     //异步上传错误结果处理
@@ -474,7 +451,7 @@ $(document).on('ready', function() {
             image: {width: "100px", height: "100px"},
         },
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/idcard1" alt="法人身份证正面" class="file-preview-image" style="width:96px">'
+            '<img src="/partner/cert/show/idcard1/${(partner.partnerId)!''}" alt="法人身份证正面" class="file-preview-image" style="width:96px">'
         ]
     });
     //异步上传错误结果处理
@@ -523,7 +500,7 @@ $(document).on('ready', function() {
             image: {width: "100px", height: "100px"},
         },
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/idcard2" alt="法人身份证反面" class="file-preview-image" style="width:100px;height:100px">'
+            '<img src="/partner/cert/show/idcard2/${(partner.partnerId)!''}" alt="法人身份证反面" class="file-preview-image" style="width:100px;height:100px">'
         ]
     });
     //异步上传错误结果处理
@@ -572,7 +549,7 @@ $(document).on('ready', function() {
             image: {width: "100px", height: "100px"},
         },
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/licence" alt="营业执照照片" class="file-preview-image" style="width:96px">'
+            '<img src="/partner/cert/show/licence/${(partner.partnerId)!''}" alt="营业执照照片" class="file-preview-image" style="width:96px">'
         ]
     });
     //异步上传错误结果处理
@@ -622,5 +599,10 @@ $(document).on('ready', function() {
 $("#errorModal").modal('show');
 </script>
 </#if>
+
+<footer>
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
+</footer>
+
 </body>
 </html>

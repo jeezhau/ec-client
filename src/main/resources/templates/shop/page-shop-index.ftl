@@ -29,7 +29,7 @@
   <div class="row" style="margin:0 0;overflow:scroll">
     <div v-for="goods in goodsList" class="col-xs-6" style="padding:0px 0px;">
 	    <div style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
-	      <a v-bind:href="'/goods/detail/' + goods.goodsId">
+	      <a v-bind:href="'/goods/show/' + goods.goodsId">
 	        <img alt="" :src="'/image/file/show/' + goods.mainImgPath" style="width:90%;height:150px">
 	      </a>
 	    </div>
@@ -42,7 +42,7 @@
 	      	<span class="pull-right ">库存: <span>{{goods.stockSum}}</span>件</span>
 	      </div>
 	      <div style="margin:1px 0px 2px 0;padding:0 5px 3px 5px;background-color:white;text-align:center" >
-	        <a class="btn btn-danger " style="padding:3px 12px" :href="'/order/order/begin/'+ goods.goodsId"><span style="color:white">立即下单</span></a>
+	        <a class="btn btn-danger " style="padding:3px 12px" :href="'/order/place/'+ goods.goodsId"><span style="color:white">立即下单</span></a>
 	        <a class="btn btn-primary" style="padding:3px 12px" :href="'/order/order/begin/' + goods.goodsId"><span style="color:white">加入收藏</span></a>
 	      </div>
 	    </div>

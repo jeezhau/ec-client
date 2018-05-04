@@ -27,7 +27,7 @@
   <div class="row" style="margin:5px 0px 3px 0px;background-color:white;padding:3px 8px;font-size:150%;font-weight:bold;">
     ${(goods.goodsName)!''}
   </div> 
-  
+  <!-- 图片轮播 -->
   <div id="myCarousel" class="carousel slide">
     <!-- 轮播（Carousel）指标 -->
     <ol class="carousel-indicators">
@@ -55,10 +55,10 @@
   
   <!-- 商家信息 -->
   <div class="row" style="margin:5px 0px 3px 0px;background-color:white;padding:3px 8px;">
-    <a href="'/partner/detail/${(ownPartner.partnerId)?string('#')}">
-     <img class="pull-left" alt="" src="/partner/cert/show/logo/${(ownPartner.partnerId)?string('#')}" style="width:25px;height:25px;border-radius:30%">
+    <a href="'/partner/mcht/${(goods.partnerId)?string('#')}">
+     <img class="pull-left" alt="" src="/partner/cert/show/logo/${(goods.partnerId)?string('#')}" style="width:25px;height:25px;border-radius:30%">
     </a>
-   <span class="pull-right">${(ownPartner.province)!''}-${(ownPartner.city)!''}-${(ownPartner.area)!''}</span>
+   <span class="pull-right">${(goods.partner.province)!''}-${(goods.partner.area)!''}-${(goods.partner.addr)!''}</span>
   </div>
 
   <!-- 服务特点 -->
@@ -161,13 +161,13 @@ var containerVue = new Vue({
 	    </span>
 	    <p class="weui-tabbar__label">加入收藏</p>
      </a>
-     <a href="/partner/detail/${(ownPartner.partnerId)?string('#')}" class="weui-tabbar__item " >
+     <a href="/partner/mcht/${(goods.partnerId)?string('#')}" class="weui-tabbar__item " >
 	    <span style="display: inline-block;position: relative;">
 	        <img src="/icons/商家.png" alt="" class="weui-tabbar__icon">
 	    </span>
 	    <p class="weui-tabbar__label">逛商家</p>
      </a>    
-     <a href="/order/order/begin/${(goods.goodsId)?string('#')}" class="weui-tabbar__item " style='background-color:red;text-align:center;vertical-align:center;'>
+     <a href="/order/place/${(goods.goodsId)?string('#')}" class="weui-tabbar__item " style='background-color:red;text-align:center;vertical-align:center;'>
 	    <span class="weui-tabbar__label" style="font-size:20px;color:white">立即下单</span>
      </a>     	
   </div>

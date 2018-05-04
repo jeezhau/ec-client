@@ -72,7 +72,7 @@
     <div class="col-xs-12">
       <div style=";text-align:center;padding:8px 2px;background-color:white">
         <p>诚信用心有爱！</p>
-        <p>优选品质，健康你我ta，福乐佳发！</p>
+        <p>优选品质，健康你我ta，福乐一家！</p>
       </div> 
     </div>
   </div>

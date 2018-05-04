@@ -29,11 +29,10 @@ import com.mofangyouxuan.dto.GoodsSpec;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.GoodsService;
-import com.mofangyouxuan.service.PartnerMgrService;
 import com.mofangyouxuan.wx.utils.PageCond;
 
 /**
- * 商品新获取 
+ * 商品管理功能 
  * @author jeekhan
  *
  */
@@ -105,7 +104,7 @@ public class GoodsAction {
 		try {
 			if(goodsId != 0) {
 				//获取已有指定商品
-				JSONObject ret = GoodsService.getGoods(goodsId);
+				JSONObject ret = GoodsService.getGoods(false,goodsId);
 				if(ret == null || !ret.containsKey("goods")) {
 					map.put("errmsg", "没有获取到该指定商品信息！");
 					return "forward:/goods/manage";
@@ -214,23 +213,8 @@ public class GoodsAction {
 			goods.setPriceLowest(priceLowest);
 			goods.setStockSum(stockSum);
 			//其他验证
-			String isCityWide = goods.getIsCityWide();
 			Integer limitCnt = goods.getLimitedNum();
 			sb = new StringBuilder();
-			if("0".equals(isCityWide)) {//全国
-				String provLimit = goods.getProvLimit();
-				if(provLimit == null || provLimit.length()<2) {
-					sb.append(" 销售省份： 不可为空！");
-				}
-				if(provLimit.contains("全国")) {
-					goods.setProvLimit("全国");
-				}
-			}else {//同城
-				Integer distLimit = goods.getDistLimit();
-				if(distLimit == null) {
-					sb.append(" 销售距离范围： 不可为空！");
-				}
-			}
 			if(limitCnt > 0) {
 				String begin = goods.getBeginTime();
 				String end = goods.getEndTime();
@@ -306,7 +290,7 @@ public class GoodsAction {
 			JSONObject sortParams = new JSONObject();
 			sortParams.put("time", "1#1");
 			//{errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
-			jsonRet = GoodsService.searchGoods(params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
+			jsonRet = GoodsService.searchGoods(false,params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
 		}catch(Exception e) {
 			e.printStackTrace();
 			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
@@ -321,11 +305,11 @@ public class GoodsAction {
 	 * @param goodsId
 	 * @return {"errcode":-1,"errmsg":"错误信息",goods:{...}} 
 	 */
-	@RequestMapping("/get/{goodsId}")
+	@RequestMapping("/getown/{goodsId}")
 	@ResponseBody
 	public String getById(@PathVariable("goodsId")Long goodsId,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
-		jsonRet = GoodsService.getGoods(goodsId);
+		jsonRet = GoodsService.getGoods(false,goodsId);
 		if(jsonRet == null) {
 			jsonRet = new JSONObject();
 			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
@@ -334,31 +318,48 @@ public class GoodsAction {
 		return jsonRet.toString();
 	}
 	
+	
 	/**
-	 * 获取指定商品的详细信息
+	 * 获取商品详细信息
+	 * @param goodsId
+	 * @return {"errcode":-1,"errmsg":"错误信息",goods:{...}} 
+	 */
+	@RequestMapping("/get/{goodsId}")
+	@ResponseBody
+	public String getByIdWithPartner(@PathVariable("goodsId")Long goodsId,ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		jsonRet = GoodsService.getGoods(true,goodsId);
+		if(jsonRet == null) {
+			jsonRet = new JSONObject();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "获取商品详情失败！");
+		}
+		return jsonRet.toString();
+	}
+	
+	
+	/**
+	 * 获取指定商品的详细信息并展示，包含展示部分合作伙伴信息
 	 * @param goodsId
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/detail/{goodsId}")
-	public String getDetail(@PathVariable("goodsId")Long goodsId,ModelMap map) {
-		JSONObject obj = GoodsService.getGoods(goodsId);
+	@RequestMapping("/show/{goodsId}")
+	public String show(@PathVariable("goodsId")Long goodsId,ModelMap map) {
+		JSONObject obj = GoodsService.getGoods(true,goodsId);
 		Goods goods = null;
-		PartnerBasic ownPartner = null;
 		try {
 			if(obj == null || !obj.containsKey("goods")) {
 				map.put("errmsg", "获取商品详情失败！");
 			}else {
 				goods = JSONObject.toJavaObject(obj.getJSONObject("goods"),Goods.class);
-				ownPartner = PartnerMgrService.getPartnerById(goods.getPartnerId());
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
 		map.put("goods", goods);
-		map.put("ownPartner", ownPartner);
-		return "goods/page-goods-detail";
+		return "goods/page-goods-show";
 	}
 	
 	/**

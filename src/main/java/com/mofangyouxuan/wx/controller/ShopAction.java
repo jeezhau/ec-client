@@ -54,7 +54,7 @@ public class ShopAction {
 			sortParams.put("sale", "1#1");
 			sortParams.put("time", "2#1");
 			//{errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
-			jsonRet = GoodsService.searchGoods(params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
+			jsonRet = GoodsService.searchGoods(true,params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
 		}catch(Exception e) {
 			e.printStackTrace();
 			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);

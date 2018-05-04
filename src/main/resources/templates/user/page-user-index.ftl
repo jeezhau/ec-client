@@ -114,9 +114,9 @@
            </a>
          </li>
          <li style="background-color:white" >
-           <a href="#">
+           <a href="/receiver/manage">
              <span class=" pull-right" >编辑  &gt;</span>
-             <img alt="" src="/icons/地址.png" width="20px" height="20px"> 收货地址
+             <img alt="" src="/icons/地址管理.png" width="20px" height="20px"> 收货地址
            </a>
          </li>
          <li style="background-color:white" >

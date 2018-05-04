@@ -25,7 +25,8 @@ public class GoodsService {
 	private static String goodsAddUrl;
 	private static String goodsUpdateUrl;
 	private static String goodsGetUrl;
-	private static String goodsGetallUrl;
+	private static String goodsGetallNopartnerUrl;
+	private static String goodsGetallWithPartnerUrl;
 	private static String goodsChangeStatusUrl;
 	private static String goodsChangeSpecUrl;
 	private static String goodsCategoryUrl;
@@ -47,9 +48,13 @@ public class GoodsService {
 	public void setGoodsGetRrl(String url) {
 		GoodsService.goodsGetUrl = url;
 	}
-	@Value("${mfyx.goods-getall-url}")
-	public void setGoodsGetallRrl(String url) {
-		GoodsService.goodsGetallUrl = url;
+	@Value("${mfyx.goods-getall-nopartner-url}")
+	public void setGoodsGetallNopartnerUrl(String url) {
+		GoodsService.goodsGetallNopartnerUrl = url;
+	}
+	@Value("${mfyx.goods-getall-withpartner-url}")
+	public void setGoodsGetallWithPartnerUrl(String url) {
+		GoodsService.goodsGetallWithPartnerUrl = url;
 	}
 	@Value("${mfyx.goods-change-status-url}")
 	public void setGoodsChangeStatusUrl(String goodsChangeStatusUrl) {
@@ -66,11 +71,13 @@ public class GoodsService {
 	
 	/**
 	 * 
+	 * @param hasPartner 是否包含合作伙伴数据
 	 * @param goodsId
 	 * @return {"errcode":-1,"errmsg":"错误信息",goods:{...}} 
 	 */
-	public static JSONObject getGoods(Long goodsId) {
-		String url = mfyxServerUrl + goodsGetUrl + goodsId;
+	public static JSONObject getGoods(boolean hasPartner,Long goodsId) {
+		String flag = hasPartner ? "1" : "0";
+		String url = mfyxServerUrl + goodsGetUrl + goodsId + "/" + flag;
 		String strRet = HttpUtils.doGet(url);
 		JSONObject jsonRet = null;
 		try {
@@ -82,14 +89,14 @@ public class GoodsService {
 	}
 	
 	/**
-	 * 
+	 * @param hasPartner 是否包含合作伙伴数据
 	 * @param jsonSearchParams
 	 * @param jsonSortParams
 	 * @param jsonPageCond
 	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
 	 */
-	public static JSONObject searchGoods(String jsonSearchParams,String jsonSortParams,String jsonPageCond) {
-		String url = mfyxServerUrl + goodsGetallUrl;
+	public static JSONObject searchGoods(boolean hasPartner,String jsonSearchParams,String jsonSortParams,String jsonPageCond) {
+		String url = mfyxServerUrl + (hasPartner==true?goodsGetallWithPartnerUrl:goodsGetallNopartnerUrl);
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("jsonSearchParams", jsonSearchParams);
 		params.put("jsonSortParams", jsonSortParams);

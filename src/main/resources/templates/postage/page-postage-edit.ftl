@@ -31,7 +31,18 @@
         <div class="col-xs-8" style="padding-left:1px">
           <input class="form-control" v-model="param.postageName" required maxLength="20" placeHolder="请输入模版名称2-20字符">
         </div>
-      </div>         
+      </div>
+      <div class="form-group">
+        <label class="col-xs-4 control-label" style="padding-right:1px">配送模式<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:1px">
+          <select class="form-control" v-model="dispModeArr" required multiple>
+            <option value="1">官方统一配送</option>
+            <option value="2">商家自行配送</option>
+            <option value="3">快递配送</option>
+            <option value="4">客户自取</option>
+          </select>
+        </div>
+      </div>               
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">配送范围<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
@@ -142,31 +153,13 @@
 var postageContainerVue = new Vue({
 	el:'#postageContainer',
 	data:{
-		initData:{
-			postageId:'${(postage.postageId)!''}',
-			postageName:'${(postage.postageName)!''}',
-			isCityWide:'${(postage.isCityWide)!''}',
-			distLimit:'${(postage.distLimit)!''}',
-			provLimit:'${(postage.provLimit)!''}',
-			isFree:'${(postage.isFree)!''}',
-			freeWeight:'${(postage.freeWeight)!''}',
-			freeAmount:'${(postage.freeAmount)!''}',
-			freeDist:'${(postage.freeDist)!''}',
-			firstDist:'${(postage.firstDist)!''}',
-			firstWeight:'${(postage.firstWeight)!''}',
-			firstDPrice:'${(postage.firstDPrice)!''}',
-			firstWPrice:'${(postage.firstWPrice)!''}',
-			additionDist:'${(postage.additionDist)!''}',
-			additionWeight:'${(postage.additionWeight)!''}',
-			additionDPrice:'${(postage.additionDPrice)!''}',
-			additionWPrice:'${(postage.additionWPrice)!''}'
-		},	//初始化的数据
 		metadata:{
 			provinces:[]
 		},
 		param:{
 			postageId:'${(postage.postageId)!''}',
 			postageName:'${(postage.postageName)!''}',
+			dispatchMode:'${(postage.dispatchMode)!''}',
 			isCityWide:'${(postage.isCityWide)!''}',
 			distLimit:'${(postage.distLimit)!''}',
 			provLimit:'${(postage.provLimit)!''}',
@@ -184,11 +177,17 @@ var postageContainerVue = new Vue({
 			additionWPrice:'${(postage.additionWPrice)!''}'
 		},
 		provLimitArr:'${(postage.provLimit)!''}'.split(","),
+		dispModeArr:'${(postage.dispatchMode)!''}'.split(","),
 	},
 	watch:{
 		provLimitArr :function(){
 			this.param.provLimit = this.provLimitArr.join(',');
-			this.initData.provLimit = this.provLimitArr.join(',');
+		},
+		dispModeArr:function(){
+			this.param.dispatchMode = this.dispModeArr.join('');
+			if(this.param.dispatchMode.indexOf('4')>=0){
+				this.param.isFree = '1';
+			}
 		}
 	},
 	methods:{
@@ -209,7 +208,9 @@ var postageContainerVue = new Vue({
 			if(!this.param.isFree){
 				return;
 			}
-			
+			if(this.param.dispatchMode && this.param.dispatchMode.indexOf('4')>=0){
+				this.param.isFree = '1';
+			}
 			if(this.param.isFree.indexOf('2')<0){
 				this.param.freeWeight = '';
 			}
@@ -300,7 +301,7 @@ var postageContainerVue = new Vue({
 			});
 		},
 		reset: function(){
-			$.extend(postageContainerVue.param,postageContainerVue.initData); 
+			window.location.reload();
 		}
 	}
 });

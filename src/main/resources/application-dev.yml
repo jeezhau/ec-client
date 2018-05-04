@@ -57,7 +57,8 @@ mfyx:
   goods-add-url: '/goods/add'
   goods-update-url: '/goods/update'
   goods-get-url: '/goods/get/'
-  goods-getall-url: '/goods/getall'
+  goods-getall-nopartner-url: '/goods/getallnopartner'
+  goods-getall-withpartner-url: '/goods/getallwithpartner'
   goods-change-status-url: '/goods/changeStatus'
   goods-change-spec-url: '/goods/changeSpec'
   goods-category-url: '/goods/category'
@@ -73,6 +74,12 @@ mfyx:
   postage-add-url: '/postage/add'
   postage-update-url: '/postage/update'
   postage-delete-url: '/postage/delete'
+  
+  receiver-getdefault-url: '/receiver/{userId}/getdefault'
+  receiver-getbyuser-url: '/receiver/{userId}/getbyuser'
+  receiver-save-url: '/receiver/{userId}/save'
+  receiver-delete-url: '/receiver/{userId}/delete/{recvId}'
+  receiver-setdefault-url: '/receiver/{userId}/setdefault/{recvId}'
   
 ######系统参数############  
 sys:

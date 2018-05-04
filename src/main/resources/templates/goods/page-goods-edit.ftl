@@ -7,14 +7,15 @@
 	<title>摩放优选</title>
 	<!-- Bootstrap -->
 	<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.js"></script>
-    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <!--Vue -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <!-- -->
     <link href="/css/font-awesome.min.css" rel="stylesheet">
     <link href="/css/templatemo-style.css" rel="stylesheet">
     
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <link href="/css/weui.css" rel="stylesheet">
     
     <link href="/css/mfyx.css" rel="stylesheet">
@@ -128,47 +129,6 @@
         <div class="col-xs-8" style="padding-left:1px">
           <input type="date" class="form-control" v-model="param.endTime"  maxLength=20  required placeholder="请输入限购开始时间">
         </div>
-      </div>      
-      <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">配送模式<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
-          <select class="form-control" v-model="param.dispatchMode" required>
-            <option value="1">官方统一配送</option>
-            <option value="2">商家自行配送</option>
-            <option value="3">快递配送</option>
-            <option value="4">客户自取</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">销售范围<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
-          <select class="form-control" v-model="param.isCityWide" required>
-            <option value="0">全国</option>
-            <option value="1">同城</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group" v-if="param.isCityWide === '1' ">
-        <label class="col-xs-4 control-label" style="padding-right:1px">同城配送距离<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
-          <select class="form-control" v-model="param.distLimit" required>
-            <option value="0">全城</option>
-            <option value="3">3km以内</option>
-            <option value="5">5km以内</option>
-            <option value="10">10km以内</option>
-            <option value="20">20km以内</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group" v-if="param.isCityWide === '0' ">
-        <label class="col-xs-4 control-label" style="padding-right:1px">全国配送省份<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
-          <select class="form-control" v-model="provLimitArr" required multiple>
-            <option value="全国">全国</option>
-            <option v-for="item in metadata.provinces" v-bind:value="item.provName">{{item.provName}}</option>
-          </select>
-        </div>
       </div>
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">运费模版<span style="color:red">*</span></label>
@@ -222,7 +182,6 @@ var goodsContainerVue = new Vue({
 	data:{
 		metadata:{
 			categories:[],
-			provinces:[],
 			postages:[]
 		},
 		review:{
@@ -238,28 +197,20 @@ var goodsContainerVue = new Vue({
 			mainImgPath:'${(goods.mainImgPath)!''}',
 			carouselImgPaths:'${(goods.carouselImgPaths)!''}',
 			place:'${(goods.place)!''}',
-			vender:'${(goods.verder)!''}',
-			priceLowest:'${(goods.priceLowest)!''}'.replace(',',''),
-			stockSum:'${(goods.stockSum)!''}'.replace(',',''),
+			vender:'${(goods.vender)!''}',
+			//priceLowest:'${(goods.priceLowest)!''}'.replace(',',''),
+			//stockSum:'${(goods.stockSum)!''}'.replace(',',''),
 			specDetail:"",
 			limitedNum:'${(goods.limitedNum)!''}'.replace(',',''),
 			beginTime:'${(goods.beginTime)!''}',
 			endTime:'${(goods.endTime)!''}',
-			dispatchMode:'${(goods.dispatchMode)!''}',
-			isCityWide:'${(goods.isCityWide)!''}',
-			distLimit:'${(goods.distLimit)!''}'.replace(',',''),
-			provLimit:'${(goods.provLimit)!''}',
 			postageIds:'${(goods.postageIds)!''}',
 			status:'${(goods.status)!''}'
 		},
-		provLimitArr:'${(goods.provLimit)!''}'.split(','),
 		postageIdArr:'${(goods.postageIds)!''}'.split(','),
 		specDetailArr:JSON.parse('${(goods.specDetail)!"[]"}')
 	},
 	watch:{
-		provLimitArr :function(){
-			this.param.provLimit = this.provLimitArr.join(',');
-		},
 		postageIdArr :function(){
 			this.param.postageIds = this.postageIdArr.join(',');
 		}
@@ -330,13 +281,13 @@ var goodsContainerVue = new Vue({
 				val = val.toFixed(2);
 				$(event.target).val(val);
 				spec.price = val;
-				if(this.param.priceLowest){
+				/* if(this.param.priceLowest){
 					if(val<this.param.priceLowest){
 						this.param.priceLowest = val;
 					}
 				}else{
 					this.param.priceLowest = val;
-				}
+				} */
 			}
 			if(field == 'stock' && value){
 				var val = parseInt(value);
@@ -347,15 +298,14 @@ var goodsContainerVue = new Vue({
 				}
 				$(event.target).val(val);
 				spec.stock = val;
+				
+				/* this.param.stockSum = 0;
 				for(var i=0;i<this.specDetailArr.length;i++){
 					var sp = this.specDetailArr[i];
-					if(sp.name && sp.stock)
-					if(this.param.stockSum){
-						this.param.stockSum = parseInt(this.param.stockSum) + parseInt(sp.stock);
-					}else{
-						this.param.stockSum = parseInt(sp.stock);
+					if(sp.name && sp.stock){
+						this.param.stockSum = this.param.stockSum + parseInt(sp.stock);
 					}
-				}
+				} */
 			}
 		},
 		getCategories: function(){
@@ -371,24 +321,6 @@ var goodsContainerVue = new Vue({
 						}
 					}else{
 						alert('获取商品分类数据失败！')
-					}
-				},
-				dataType: 'json'
-			});
-		},
-		getAllProvinces: function(){
-			$.ajax({
-				url: '/city/province/getall',
-				method:'post',
-				data: {},
-				success: function(jsonRet,status,xhr){
-					if(jsonRet && typeof jsonRet == 'object' && jsonRet instanceof Array){
-						goodsContainerVue.metadata.provinces = [];
-						for(var i=0;i<jsonRet.length;i++){
-							goodsContainerVue.metadata.provinces.push(jsonRet[i]);
-						}
-					}else{
-						alert('获取城市数据(省份)失败！')
 					}
 				},
 				dataType: 'json'
@@ -431,8 +363,8 @@ var goodsContainerVue = new Vue({
 		submit: function(){
 			//组织规格数据
 			var okSpecArr = [];
-			var stockSum = 0;
-			var priceLowest = 1000000000;
+			//var stockSum = 0;
+			//var priceLowest = 1000000000;
 			for(var i=0;i<this.specDetailArr.length;i++){
 				var spec = this.specDetailArr[i];
 				if(!spec.name){
@@ -464,9 +396,9 @@ var goodsContainerVue = new Vue({
 				}else{
 					val = val.toFixed(2);
 					spec.price = val;
-					if(priceLowest > val){
+					/* if(priceLowest > val){
 						priceLowest = val;
-					}
+					} */
 				}
 				var val = parseInt(spec.stock);
 				if(isNaN(val) || val< 0 || val > 999999){
@@ -474,7 +406,7 @@ var goodsContainerVue = new Vue({
 					return false;
 				}else{
 					spec.stock = val;
-					stockSum += val;
+					//stockSum += val;
 				}
 				okSpecArr.push(spec);
 			}
@@ -491,8 +423,6 @@ var goodsContainerVue = new Vue({
 				}
 			}
 			this.param.specDetail = JSON.stringify(okSpecArr);
-			this.param.priceLowest = priceLowest;
-			this.param.stockSum = stockSum;
 			$.ajax({
 				url: '/goods/save',
 				method:'post',
@@ -518,7 +448,6 @@ var goodsContainerVue = new Vue({
 });
 
 goodsContainerVue.getCategories();
-goodsContainerVue.getAllProvinces();
 goodsContainerVue.getPostages();
 if(goodsContainerVue.specDetailArr.length<30){
 	var len = 30-goodsContainerVue.specDetailArr.length;

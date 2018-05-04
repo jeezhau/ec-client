@@ -60,13 +60,17 @@
       <div class="form-group">
         <label class="col-xs-3 control-label">所在省份</label>
         <div class="col-xs-8">
-          <input class="form-control" v-model="param.province" maxLength=100 placeholder="请输入省份" >
+          <select class="form-control" v-model="param.province" v-on:change="changeProvince">
+            <option v-for="item in metadata.provinces" v-bind:value="item.provName">{{item.provName}}</option>
+          </select>
         </div>
       </div>         
       <div class="form-group">
         <label for="city" class="col-xs-3 control-label">所在城市</label>
         <div class="col-xs-8">
-          <input class="form-control" v-model="param.city"  maxLength=100 placeholder="请输入城市" >
+          <select class="form-control"  v-model="param.city" >
+            <option v-for="item in metadata.cities" v-bind:value="item.cityName">{{item.cityName}}</option>
+          </select>
         </div>
       </div> 
       <div class="form-group">
@@ -102,9 +106,9 @@ var editFormVue = new Vue({
 	el:'#editForm',
 	data:{
 		initData:{},	//初始化的数据
-		medadata:{
-			province:[],
-			city:[]
+		metadata:{
+			provinces:[],
+			cities:[]
 		},
 		param:{
 			nickname:'',
@@ -119,6 +123,33 @@ var editFormVue = new Vue({
 		}
 	},
 	methods:{
+		getAllProvinces: function(){
+			$.ajax({
+				url: '/city/province/getall',
+				method:'post',
+				data: {},
+				success: function(jsonRet,status,xhr){
+					if(jsonRet && typeof jsonRet == 'object' && jsonRet instanceof Array){
+						editFormVue.metadata.provinces = [];
+						for(var i=0;i<jsonRet.length;i++){
+							editFormVue.metadata.provinces.push(jsonRet[i]);
+						}
+						if(editFormVue.param.city){//有城市参数
+							getCities();
+						}
+					}else{
+						alert('获取城市数据(省份)失败！')
+					}
+				},
+				dataType: 'json'
+			});
+		},
+		changeProvince: function(){
+			editFormVue.param.city = '';
+			editFormVue.param.area = '';
+			editFormVue.metadata.cities = [];
+			getCities();
+		},
 		submit: function(){
 			$.ajax({
 				url: '/user/basic/update',
@@ -139,15 +170,8 @@ var editFormVue = new Vue({
 			});
 		},
 		reset: function(){
-			this.param.nickname = this.initData.nickname;
-			this.param.phone = this.initData.phone;
-			this.param.birthday = this.initData.birthday;
-			this.param.sex = this.initData.sex;
-			this.param.province = this.initData.province;
-			this.param.city = this.initData.city;
-			this.param.profession = this.initData.profession;
-			this.param.favourite = this.initData.favourite;
-			this.param.introduce = this.initData.introduce;
+			$.extend(editFormVue.param,editFormVue.initData); 
+			getCities();
 		}
 	}
 });
@@ -168,15 +192,9 @@ function getBasic(){
 					editFormVue.param.favourite = jsonRet.datas.favourite;
 					editFormVue.param.introduce = jsonRet.datas.introduce;
 					
-					editFormVue.initData.nickname = jsonRet.datas.nickname;
-					editFormVue.initData.phone = jsonRet.datas.phone;
-					editFormVue.initData.birthday = jsonRet.datas.birthday;
-					editFormVue.initData.sex = jsonRet.datas.sex;
-					editFormVue.initData.province = jsonRet.datas.province;
-					editFormVue.initData.city = jsonRet.datas.city;
-					editFormVue.initData.profession = jsonRet.datas.profession;
-					editFormVue.initData.favourite = jsonRet.datas.favourite;
-					editFormVue.initData.introduce = jsonRet.datas.introduce;
+					$.extend(editFormVue.initData,editFormVue.param); 
+					
+					editFormVue.getAllProvinces();
 				}else{//出现逻辑错误
 					alert(jsonRet.errmsg);
 				}
@@ -188,6 +206,32 @@ function getBasic(){
 	});
 }
 getBasic();
+
+function getCities(){
+	var provCode = "";
+	for(var i=0;i<editFormVue.metadata.provinces.length;i++){
+		if(editFormVue.metadata.provinces[i].provName == editFormVue.param.province){
+			provCode = editFormVue.metadata.provinces[i].provCode;
+			break;
+		}
+	}
+	$.ajax({
+		url: '/city/city/getbyprov/' + provCode,
+		method:'post',
+		data: {},
+		success: function(jsonRet,status,xhr){
+			if(jsonRet && typeof jsonRet == 'object' && jsonRet instanceof Array){
+				editFormVue.metadata.cities = [];
+				for(var i=0;i<jsonRet.length;i++){
+					editFormVue.metadata.cities.push(jsonRet[i]);
+				}
+			}else{
+				alert('获取城市数据(地级市)失败！')
+			}
+		},
+		dataType: 'json'
+	});
+}
 </script>
 <#if errmsg??>
 <!-- 错误提示模态框（Modal） -->
@@ -212,5 +256,10 @@ getBasic();
 $("#errorModal").modal('show');
 </script>
 </#if>
+
+<footer>
+  <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
+</footer>
+
 </body>
 </html>

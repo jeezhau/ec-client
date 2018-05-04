@@ -99,7 +99,7 @@
               <input type="checkbox" v-model="selectedArr" v-bind:value="item.goodsId" style="display:inline-block;padding:0 5px;width:15px;height:15px">
             </td>
             <td style="padding:2px 2px">
-              <a :href="'/goods/detail/' + item.goodsId">{{item.goodsName}}</a>
+              <a :href="'/goods/show/' + item.goodsId">{{item.goodsName}}</a>
             </td>
             <td style="padding:2px 2px;text-align:center">
               <button class="btn btn-primary" style="padding:2px 3px" @click="changeSpec(item.goodsId,item.goodsName,item.specDetail)">规格库存</button>
@@ -112,16 +112,14 @@
     </div>
   </div>
 </div><!-- end of container -->
-<footer>
-  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
-</footer>
+
 <script type="text/javascript">
  var containerVue = new Vue({
 	 el:'#container',
 	 data:{
 		param:{
 			status:'1', 
-			reviewResult:'0',
+			reviewResult:'1',
 			pageSize:20,
 			begin:'0'
 		},
@@ -416,6 +414,9 @@ var editSpecDetailVue = new Vue({
 });
 </script>
 
+<footer>
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
+</footer>
 
 </body>
 </html>

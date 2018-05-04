@@ -50,6 +50,7 @@ public class PartnerAction {
 	private String tmpFileDir;
 	
 	private String[] certTypeArr = {"logo","idcard1","idcard2","licence"}; 	//当前支持的证件类型
+	
 	/**
 	 * 获取合作伙伴管理首页
 	 * @return
@@ -106,6 +107,24 @@ public class PartnerAction {
 		map.put("signature", signature);
 		map.put("sys_func", "partner-index");
 		return "partner/page-partner-edit";
+	}
+	
+
+	/**
+	 * 获取合作伙伴的商户展示页面信息
+	 * @param partnerId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/mcht/{partnerId}")
+	public String getMcht(@PathVariable("partnerId")Integer partnerId,ModelMap map) {
+
+		PartnerBasic partner = PartnerMgrService.getPartnerById(partnerId);
+		if(partner == null) {
+			
+		}
+
+		return "partner/page-partner-mcht";
 	}
 	
 	/**
