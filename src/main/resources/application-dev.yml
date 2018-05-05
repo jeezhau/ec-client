@@ -81,6 +81,10 @@ mfyx:
   receiver-delete-url: '/receiver/{userId}/delete/{recvId}'
   receiver-setdefault-url: '/receiver/{userId}/setdefault/{recvId}'
   
+  order-get-url: '/order/get/{orderId}'
+  order-create-url: '/order/{userId}/create'
+  order-update-url: '/order/{userId}/update'
+    
 ######系统参数############  
 sys:
   local-server-url: 'http://192.168.0.102:8000'

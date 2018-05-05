@@ -11,6 +11,7 @@ public class ErrCodes {
 	//通用功能码：100
 	public static int COMMON_EXCEPTION = -100001; //出现系统异常
 	public static int COMMON_DB_ERROR = -100002;	//数据库处理失败
+	public static int COMMON_PARAM_ERROR = -100003;	//参数格式不正确
 	
 	//用户管理功能码：101
 	public static int USER_PARAM_ERROR = -101001;	//参数格式不正确
