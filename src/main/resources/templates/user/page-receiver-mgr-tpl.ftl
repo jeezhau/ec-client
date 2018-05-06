@@ -262,7 +262,7 @@ var editReceiverVue = new Vue({
 				success: function(jsonRet,status,xhr){
 					if(jsonRet){
 						if(0 == jsonRet.errcode){
-							containerVue.getAll();
+							receiverManageVue.getAll();
 							$('#editReceiverModal').modal('hide');
 						}else{//出现逻辑错误
 							alert(jsonRet.errmsg);

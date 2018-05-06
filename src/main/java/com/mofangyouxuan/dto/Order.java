@@ -5,16 +5,19 @@ import java.math.BigInteger;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 public class Order {
-	
     private BigInteger orderId;
-    
-    @NotNull(message=" 下单用户：不可为空！")
+
     private Integer userId;
 
-    private Integer goodsId;
+    @NotNull(message=" 商品ID：不可为空！")
+    private Long goodsId;
 
+    @NotNull(message=" 商品购买信息：不可为空！")
+    @Size(min=10,max=1000,message=" 商品购买信息：长度10-1000字符！")
     private String goodsSpec;
 
     private BigDecimal carrage;
@@ -23,26 +26,47 @@ public class Order {
 
     private Date createTime;
 
+    @Size(max=60,message=" 备注信息：最长600字符！")
     private String remark;
 
     private String status;
 
+    @NotNull(message=" 配送模式：不可为空！")
+    @Pattern(regexp="^[1234]$",message=" 配送模式：取值为【1-官方统一配送、2-商家自行配送、3-快递配送、4-客户自取】！")
     private String dispatchMode;
 
-    private Integer postageId;
+    @NotNull(message=" 邮费模板：不可为空！")
+    private Long postageId;
+    
+    @NotNull(message=" 收件人信息ID：不可为空！")
+    private Long recvId;
 
+    @NotNull(message=" 收件人姓名：不可为空！")
+    @Size(min=2,max=100,message=" 收件人姓名：长度2-100字符！")
     private String recvName;
 
+    @NotNull(message=" 收件人电话：不可为空！")
+    @Size(min=6,max=20,message=" 收件人电话：长度6-20字符！")
     private String recvPhone;
 
+    @NotNull(message=" 收件人国家：不可为空！")
+    @Size(min=2,max=100,message=" 收件人国家：长度2-100字符！")
     private String recvCountry;
 
+    @NotNull(message=" 收件人省份：不可为空！")
+    @Size(min=2,max=100,message=" 收件人省份：长度2-100字符！")
     private String recvProvince;
 
+    @NotNull(message=" 收件人城市：不可为空！")
+    @Size(min=2,max=100,message=" 收件人城市：长度2-100字符！")
     private String recvCity;
 
+    @NotNull(message=" 收件人区县：不可为空！")
+    @Size(min=2,max=100,message=" 收件人区县：长度2-100字符！")
     private String recvArea;
 
+    @NotNull(message=" 收件人街道地址：不可为空！")
+    @Size(min=2,max=255,message=" 收件人街道地址：长度2-255字符！")
     private String recvAddr;
 
     private String logisticsComp;
@@ -51,9 +75,9 @@ public class Order {
 
     private Date sendTime;
 
-    private Date signTime;
-
     private String signUser;
+
+    private Date signTime;
 
     private Integer scoreLogistics;
 
@@ -62,12 +86,18 @@ public class Order {
     private Integer scoreMerchant;
 
     private String appraiseStatus;
+
+    private Date appraiseTime;
+
+    private Date aftersalesApplyTime;
+
+    private Date aftersalesDealTime;
     
+    private String appraiseInfo;
+
     private String aftersalesReason;
 
     private String aftersalesResult;
-
-    private String appraiseInfo;
 
     public BigInteger getOrderId() {
         return orderId;
@@ -85,11 +115,11 @@ public class Order {
         this.userId = userId;
     }
 
-    public Integer getGoodsId() {
+    public Long getGoodsId() {
         return goodsId;
     }
 
-    public void setGoodsId(Integer goodsId) {
+    public void setGoodsId(Long goodsId) {
         this.goodsId = goodsId;
     }
 
@@ -149,11 +179,11 @@ public class Order {
         this.dispatchMode = dispatchMode == null ? null : dispatchMode.trim();
     }
 
-    public Integer getPostageId() {
+    public Long getPostageId() {
         return postageId;
     }
 
-    public void setPostageId(Integer postageId) {
+    public void setPostageId(Long postageId) {
         this.postageId = postageId;
     }
 
@@ -237,20 +267,20 @@ public class Order {
         this.sendTime = sendTime;
     }
 
-    public Date getSignTime() {
-        return signTime;
-    }
-
-    public void setSignTime(Date signTime) {
-        this.signTime = signTime;
-    }
-
     public String getSignUser() {
         return signUser;
     }
 
     public void setSignUser(String signUser) {
         this.signUser = signUser == null ? null : signUser.trim();
+    }
+
+    public Date getSignTime() {
+        return signTime;
+    }
+
+    public void setSignTime(Date signTime) {
+        this.signTime = signTime;
     }
 
     public Integer getScoreLogistics() {
@@ -284,7 +314,40 @@ public class Order {
     public void setAppraiseStatus(String appraiseStatus) {
         this.appraiseStatus = appraiseStatus == null ? null : appraiseStatus.trim();
     }
+
+    public Date getAppraiseTime() {
+        return appraiseTime;
+    }
+
+    public void setAppraiseTime(Date appraiseTime) {
+        this.appraiseTime = appraiseTime;
+    }
+
+    public Date getAftersalesApplyTime() {
+        return aftersalesApplyTime;
+    }
+
+    public void setAftersalesApplyTime(Date aftersalesApplyTime) {
+        this.aftersalesApplyTime = aftersalesApplyTime;
+    }
+
+    public Date getAftersalesDealTime() {
+        return aftersalesDealTime;
+    }
+
+    public void setAftersalesDealTime(Date aftersalesDealTime) {
+        this.aftersalesDealTime = aftersalesDealTime;
+    }
     
+
+    public String getAppraiseInfo() {
+        return appraiseInfo;
+    }
+
+    public void setAppraiseInfo(String appraiseInfo) {
+        this.appraiseInfo = appraiseInfo == null ? null : appraiseInfo.trim();
+    }
+
     public String getAftersalesReason() {
         return aftersalesReason;
     }
@@ -301,11 +364,13 @@ public class Order {
         this.aftersalesResult = aftersalesResult == null ? null : aftersalesResult.trim();
     }
 
-    public String getAppraiseInfo() {
-        return appraiseInfo;
-    }
+	public Long getRecvId() {
+		return recvId;
+	}
 
-    public void setAppraiseInfo(String appraiseInfo) {
-        this.appraiseInfo = appraiseInfo == null ? null : appraiseInfo.trim();
-    }
+	public void setRecvId(Long recvId) {
+		this.recvId = recvId;
+	}
+    
+    
 }

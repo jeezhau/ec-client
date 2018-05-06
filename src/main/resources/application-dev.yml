@@ -84,7 +84,10 @@ mfyx:
   order-get-url: '/order/get/{orderId}'
   order-create-url: '/order/{userId}/create'
   order-update-url: '/order/{userId}/update'
-    
+  order-checkdata-url: '/order/{userId}/checkData' 
+  order-search-url: '/order/getall' 
+  order-count-partiby-status-url: '/order/count/partibystatus'  
+  
 ######系统参数############  
 sys:
   local-server-url: 'http://192.168.0.102:8000'

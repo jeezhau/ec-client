@@ -49,19 +49,24 @@
     <a class="carousel-control right" href="#myCarousel" 
        data-slide="next">&rsaquo;</a>
   </div>
-   <!-- 商家信息 -->
-  <div class="row" style="margin:5px 15px;background-color:white;padding:3px 8px;">
+  <!-- 商家信息 -->
+  <div class="row" style="margin:3px 15px;background-color:white;padding:3px 8px;">
     <a href="'/partner/mcht/${(goods.partnerId)?string('#')}">
      <img class="pull-left" alt="" src="/partner/cert/show/logo/${(goods.partnerId)?string('#')}" style="width:25px;height:25px;border-radius:30%">
     </a>
    <span class="pull-right">${(goods.partner.province)!''}-${(goods.partner.area)!''}-${(goods.partner.addr)!''}</span>
   </div> 
-   
-  <form action="/order/pay/begin">
+  <!-- 限购信息 -->
+  <div v-if="goods.limitedNum > 0" class="row" style="margin:3px 15px;background-color:white;color:red;padding:3px 8px;">
+   <span class="pull-left">每人限购数量(包括已购)：{{goods.limitedNum}} 件</span>
+   <span class="pull-right">限购时间：{{goods.beginTime}} 至 {{goods.endTime}}</span>
+  </div>  
+  
+  <form action="/order/create" method="post">
     <input type="hidden" name="goodsId" value="${(goods.goodsId)?string('#')}">
     <div class="row" style="margin:15px 1px;">
       <div class="row" style="margin:3px 15px 3px 15px;padding:3px 3px">
-        <label class="col-xs-3 control-label">购买数量<span style="color:red">*</span>:</label>
+        <label class="col-xs-12 control-label">购买数量(具体库存以付款提交时为准)<span style="color:red">*</span>:</label>
         <div class="col-xs-12" style="padding:0px 3px">
 	       <table class="table table-striped table-bordered table-condensed">
 	         <tr>
@@ -98,14 +103,16 @@
             <div class="col-xs-9" style="padding:0">
               <div class="row" style="margin:0">
 	              <div class="col-xs-6" style="padding:0">
+	                <input type="hidden" name="recvId" v-model="param.recvId">
 	                <input type="text" class="form-control" name="recvName" v-model="param.recvName" readonly style="width:100%;" placeholder="收货人姓名" required>
 	              </div>
 	              <div class="col-xs-6" style="padding:0">
-	                <input type="text" class="form-control" name="revPhone" v-model="param.recvPhone" readonly style="width:100%" placeholder="联系电话" required>
+	                <input type="text" class="form-control" name="recvPhone" v-model="param.recvPhone" readonly style="width:100%" placeholder="联系电话" required>
 	              </div>
               </div>
               <div class="row" style="margin:0">
               	<div class="col-xs-3" style="padding:0 ">
+              	 <input type="hidden" name="recvCountry" v-model="param.recvCountry">
                   <input type="text" class="form-control" name="recvProvince" v-model="param.recvProvince" readonly placeholder="省份" required>
                  </div>
               	<div class="col-xs-4" style="padding:0">
@@ -121,7 +128,7 @@
             </div>
           </div>
           <div class="row">
-            <input type="text" class="form-control" name="addr" v-model="param.recvAddr" readonly placeholder="收货人地址" required>
+            <input type="text" class="form-control" name="recvAddr" v-model="param.recvAddr" readonly placeholder="收货人地址" required>
           </div>
         </div>
 
@@ -130,8 +137,8 @@
         <label class="col-xs-3 control-label">配送方式<span style="color:red">*</span>:</label>
         <div class="col-sx-9">
           <select required v-model="param.postageIdAndMode" @change="changeDispatch">
-            <option v-for="item in dispatchMatchs" value="item.postageId + '-' + item.mode">
-              {{item.postageId + '-' + getDispatchMode(item.mode)}}
+            <option v-for="item in dispatchMatchs" v-bind:value="item.postageId + '-' + item.mode">
+              {{item.postageId + '#' + getDispatchMode(item.mode) + ' ¥' + item.carrage}} 
             </option>
           </select>
         </div>
@@ -148,16 +155,15 @@
        <div class="col-xs-7">
          共<span style="color:red">{{param.countAll}}</span>件，
          邮费¥<span style="color:red">{{param.carrage}}</span>，
-         总金额¥<span style="color:red">{{param.amount}}</span>
+         总金额¥<span style="color:red">{{(new Number(param.amount) + new Number(param.carrage)).toFixed(2)}}</span>
        </div>
        <div class="col-xs-5">
          <input type="hidden" name="goodsSpec" v-model="param.goodsSpec" required>
          <input type="hidden" name="dispatchMode" v-model="param.dispatchMode" required>
 	     <input type="hidden" name="postageId" v-model="param.postageId" required>
-         <input type="hidden" name="carrage" v-model="param.carrage" required>
-         <input type="hidden" name="total" required>
-         <button v-if="param.flag == 0" type="button" class="btn btn-sm btn-danger" @click="computeFee">数据检查/金额计算</button>
-         <button v-if="param.flag == 1" type="submit" class="btn btn-sm btn-danger">立即支付</button>
+         <button v-if="param.flag == 0" type="button" class="btn btn-sm btn-danger" @click="checkData">数据检查/金额计算</button>
+         <button v-if="param.flag == 1" type="button" class="btn btn-sm btn-danger" >请选择配送方式</button>
+         <button v-if="param.flag == 2" type="submit" class="btn btn-sm btn-danger" @click="getGoodsSpec">立即下单</button>
        </div>
     </div>
     </form>
@@ -169,12 +175,16 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		goods:{
+			limitedNum:${(goods.limitedNum)?string('#')},
+			beginTime:'${(goods.beginTime)!""}',
+			endTime:'${(goods.endTime)!""}',
 			courselImgPaths:'${(goods.carouselImgPaths)!""}'.split(','),
 			specDetailArr:JSON.parse('${(goods.specDetail)!"[]"}'),
 		},
 		dispatchMatchs:[],
 		param:{
-			flag:0,//计算标志
+			flag:0,//计算标志 0-待检查数据,1-待选择配送方式，2-提交支付
+			goodsId:${(goods.goodsId)?string('#')},
 			recvId:'',
 			recvName:'',
 			recvPhone:'',
@@ -183,9 +193,10 @@ var containerVue = new Vue({
 			recvProvince:'',
 			recvCity:'',
 			recvArea:'',
+			goodsSpec:'',
 			countAll:0,
 			carrage:0,
-			amount:0,
+			amount:0,//购买金额
 			dispatchMode:'',
 			postageId:'',
 			postageIdAndMode:''
@@ -222,11 +233,20 @@ var containerVue = new Vue({
 				var num =  sp.buyNum ? sp.buyNum : 0;
 				this.param.countAll = this.param.countAll + num;
 			}
+			this.param.flag = 0;//重新检查
 		},
 		changeDispatch:function(){
 			var arr = this.param.postageIdAndMode.split("-");
 			this.param.postageId = arr[0];
 			this.param.dispatchMode = arr[1];
+			for(var i=0;i<this.dispatchMatchs.length;i++){
+				var dm = this.dispatchMatchs[i];
+				if(dm.postageId == arr[0] && dm.mode == arr[1]){
+					this.param.carrage = dm.carrage;
+				}
+			}
+			this.param.goodsSpec = JSON.stringify(this.goods.specDetailArr);
+			this.param.flag = 2;//可提交
 		},
 		getDefaultReceiver:function(){
 			$.ajax({
@@ -238,6 +258,7 @@ var containerVue = new Vue({
 						containerVue.param.recvId = jsonRet.receiver.recvId;
 						containerVue.param.recvPhone = jsonRet.receiver.phone;
 						containerVue.param.recvName = jsonRet.receiver.receiver;
+						containerVue.param.recvCountry = jsonRet.receiver.country;
 						containerVue.param.recvProvince = jsonRet.receiver.province;
 						containerVue.param.recvCity =  jsonRet.receiver.city;
 						containerVue.param.recvArea = jsonRet.receiver.area;
@@ -256,24 +277,54 @@ var containerVue = new Vue({
 				containerVue.param.recvId = receiver.recvId;
 				containerVue.param.recvPhone = receiver.phone;
 				containerVue.param.recvName = receiver.receiver;
+				containerVue.param.recvCountry = receiver.country;
 				containerVue.param.recvProvince = receiver.province;
 				containerVue.param.recvCity =  receiver.city;
 				containerVue.param.recvArea = receiver.area;
 				containerVue.param.recvAddr = receiver.addr;
 				$('#selectReceiverModal').modal('hide');
+				containerVue.param.flag = 0;//重新检查
 			}
 		},
-		computeFee:function(){
+		checkData: function(){
 			this.param.countAll = 0;
+			this.param.amount = 0;
 			for(var i=0;i<this.goods.specDetailArr.length;i++){
 				var sp = this.goods.specDetailArr[i];
 				var num =  sp.buyNum ? sp.buyNum : 0;
 				this.param.countAll = this.param.countAll + num;
+				this.param.amount += sp.price * num;
 			}
-			if(this.param.countAll<=0){
+			if(this.param.countAll<=0 || !this.param.recvId){//购买数量为0或为选择收货信息
+				alert("请输入购买数量并选择收货人信息！");
 				return;
 			}
+			$.ajax({
+				url: '/order/checkData',
+				method:'post',
+				data: {'goodsId':this.param.goodsId,'recvId':this.param.recvId,'goodsSpec':JSON.stringify(this.goods.specDetailArr)},
+				success: function(jsonRet,status,xhr){
+					if(jsonRet){
+						if(jsonRet.match){
+							containerVue.dispatchMatchs = [];
+							for(var i=0;i<jsonRet.match.length;i++){
+								//{postageId:'',mode:'',carrage:''}
+								containerVue.dispatchMatchs.push(jsonRet.match[i]);
+								containerVue.param.flag = 1;
+							}
+						}else{//出现逻辑错误
+							alert(jsonRet.errmsg);
+						}
+					}else{
+						alert('系统数据访问失败！')
+					}
+				},
+				dataType: 'json'
+			});
+		},
+		getGoodsSpec:function(){
 			
+			return true;
 		}
 	}
 });
@@ -281,7 +332,7 @@ containerVue.getDefaultReceiver();
 </script>
 
 <!-- 图库显示Model -->
-<div class="modal fade " id="selectReceiverModal" tabindex="-1" role="dialog" aria-labelledby="selectReceiverModalLabel" aria-hidden="true" data-backdrop="static">
+<div class="modal fade " style="height:450px;overflow:scroll" id="selectReceiverModal" tabindex="-1" role="dialog" aria-labelledby="selectReceiverModalLabel" aria-hidden="true" data-backdrop="static">
    <div class="modal-dialog">
       <div class="modal-content">
          <div class="modal-header">
@@ -294,6 +345,31 @@ containerVue.getDefaultReceiver();
      </div>
    </div>
 </div><!-- end of modal -->
+
+
+<#if errmsg??>
+<!-- 错误提示模态框（Modal） -->
+<div class="modal fade " id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorTitle" aria-hidden="false" data-backdrop="static">
+	<div class="modal-dialog">
+  		<div class="modal-content">
+     		<div class="modal-header">
+        			<button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
+        			<h4 class="modal-title" id="errorTitle" style="color:red">错误提示</h4>
+     		</div>
+     		<div class="modal-body">
+       			<p> ${errmsg} </p><p/>
+     		</div>
+     		<div class="modal-footer">
+     			<div style="margin-left:50px">
+        			</div>
+     		</div>
+  		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+$("#errorModal").modal('show');
+</script>
+</#if>
 
 <footer>
   <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 

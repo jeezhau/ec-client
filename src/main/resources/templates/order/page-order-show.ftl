@@ -24,12 +24,26 @@
 <body class="light-gray-bg">
 <div class="container " style="oveflow:scroll">
   <div class="row" style="margin:5px 0;text-align:center" >
-    <a class="col-xs-2 <#if status='all'> active </#if>" href="#" style="padding:0px 1px;">全部</a>
-    <a class="col-xs-2 <#if status='forPay'> active </#if>" href="#" style="padding:0px 1px;" >待付款</a>
-    <a class="col-xs-2 <#if status='forDelivery'> active </#if>" href="#" style="padding:0px 1px;" >待发货</a>
-    <a class="col-xs-2 <#if status='forTake'> active </#if>" href="#" style="padding:0px 1px;" >待收货</a>
-    <a class="col-xs-2 <#if status='forAppraise'> active </#if>" href="#" style="padding:0px 1px;" >待评价</a>
-    <a class="col-xs-2 <#if status='forRefund'> active </#if>" href="#" style="padding:0px 1px;" >退换货</a>
+    <ul class="nav navbar-nav nav-tabs" style="padding:0 5px">
+        <li class="<#if status='all'> active </#if>" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');"> 
+          <a href="javascript:;" style="padding:2px 3px"> 全 部 </a> 
+        </li>  
+        <li class="<#if status='4pay'> active </#if>" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');"> 
+          <a href="javascript:;" style="padding:2px 3px"> 待付款 </a> 
+        </li> 
+        <li class="<#if status='4delivery'> active </#if>" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');"> 
+          <a href="javascript:;" style="padding:2px 3px"> 待发货 </a> 
+        </li> 
+        <li class="<#if status='4sign'> active </#if>" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');"> 
+          <a href="javascript:;" style="padding:2px 3px"> 待收货 </a> 
+        </li> 
+        <li class="<#if status='4appraise'> active </#if>" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');"> 
+          <a href="javascript:;" style="padding:2px 3px"> 待评价 </a> 
+        </li> 
+        <li class="<#if status='4refund'> active </#if>" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');"> 
+          <a href="javascript:;" style="padding:2px 3px"> 退换货 </a> 
+        </li>                                               
+     </ul>
   </div>
   <div class="row"><!-- 所有订单之容器 -->
 	  <div class="row goods-item" style="padding:0 0">

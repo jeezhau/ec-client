@@ -2,16 +2,12 @@ package com.mofangyouxuan.service;
 
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.mofangyouxuan.dto.Category;
-import com.mofangyouxuan.dto.Goods;
 import com.mofangyouxuan.dto.Order;
 import com.mofangyouxuan.wx.utils.HttpUtils;
 import com.mofangyouxuan.wx.utils.ObjectToMap;
@@ -27,8 +23,9 @@ public class OrderService {
 	private static String orderCreateUrl;
 	private static String orderUpdateUrl;
 	private static String orderGetUrl;
-	private static String orderGetAllNoUserUrl;
-	private static String orderGetAllWithUserUrl;
+	private static String orderCheckDataUrl;
+	private static String orderSearchUrl;
+	private static String orderCountPartiByStatus;
 
 	
 	@Value("${mfyx.mfyx-server-url}")
@@ -45,18 +42,30 @@ public class OrderService {
 		OrderService.orderUpdateUrl = url;
 	}
 	@Value("${mfyx.order-get-url}")
-	public void setOrderGetRrl(String url) {
+	public void setOrderGetUrl(String url) {
 		OrderService.orderGetUrl = url;
 	}
-	
+	@Value("${mfyx.order-checkdata-url}")
+	public void setOrderCehckDataUrl(String url) {
+		OrderService.orderCheckDataUrl = url;
+	}
+	@Value("${mfyx.order-search-url}")
+	public void setOrderSearchUrl(String url) {
+		OrderService.orderSearchUrl = url;
+	}
+	@Value("${mfyx.order-count-partiby-status-url}")
+	public void setOrderCountPartiByStatusUrl(String url) {
+		OrderService.orderCountPartiByStatus = url;
+	}
 	
 	/**
 	 * 根据ID获取订单信息
 	 * @param orderId
 	 * @return {"errcode":-1,"errmsg":"错误信息",order:{...}} 
 	 */
-	public static JSONObject getGoods(BigInteger orderId) {
-		String url = mfyxServerUrl + orderGetUrl + orderId ;
+	public static JSONObject getOrder(BigInteger orderId) {
+		String url = mfyxServerUrl + orderGetUrl;
+		url = url.replace("{orderId}", orderId+"") ;
 		String strRet = HttpUtils.doGet(url);
 		JSONObject jsonRet = null;
 		try {
@@ -72,14 +81,14 @@ public class OrderService {
 	 * @param order
 	 * @return {errcode:0,errmsg:'ok',orderId:111}
 	 */
-	public static JSONObject createGoods(Order order,Integer userId) {
+	public static JSONObject createOrder(Order order,Integer userId) {
 		String url = mfyxServerUrl + orderCreateUrl;
 		url = url.replace("{userId}", userId + "");
 		Map<String, Object> params = new HashMap<String,Object>();
 		String[] excludeFields = {"createTime","status",
-				"logistics_comp","logistics_no","send_time","sign_time","sign_user",
-				"score_logistics","score_goods","score_merchant","appraise_info","appraise_status",
-				"aftersales_reason","aftersales_result"};
+				"logisticsComp","logisticsNo","sendTime","signTime","signUser",
+				"scoreLogistics","scoreGoods","scoreMerchant","appraiseInfo","appraiseStatus",
+				"aftersalesReason","aftersalesResult","appraiseTime","aftersalesApplyTime","aftersalesDealTime"};
 		params = ObjectToMap.object2Map(order,excludeFields,false);
 		String strRet = HttpUtils.doPost(url, params);
 		try {
@@ -96,14 +105,14 @@ public class OrderService {
 	 * @param order
 	 * @return {errcode:0,errmsg:'ok',orderId:111}
 	 */
-	public static JSONObject updateGoods(Order order,Integer userId) {
+	public static JSONObject updateOrder(Order order,Integer userId) {
 		String url = mfyxServerUrl + orderUpdateUrl;
 		url = url.replace("{userId}", userId + "");
 		Map<String, Object> params = new HashMap<String,Object>();
 		String[] excludeFields = {"createTime","status",
-				"logistics_comp","logistics_no","send_time","sign_time","sign_user",
-				"score_logistics","score_goods","score_merchant","appraise_info","appraise_status",
-				"aftersales_reason","aftersales_result"};
+				"logisticsComp","logisticsNo","sendTime","signTime","signUser",
+				"scoreLogistics","scoreGoods","scoreMerchant","appraiseInfo","appraiseStatus",
+				"aftersalesReason","aftersalesResult","appraiseTime","aftersalesApplyTime","aftersalesDealTime"};
 		params = ObjectToMap.object2Map(order,excludeFields,false);
 		String strRet = HttpUtils.doPost(url, params);
 		try {
@@ -115,29 +124,79 @@ public class OrderService {
 		return null;
 	}
 	
+	/**
+	 * 订单数据检查并获取是否可配送客户所选收货地区
+	 * 1、如果不可配送则不可下单，并给出提示；
+	 * 2、如果可以配送，则给出所有的可选模式以及对应的费用；
+	 * @param recvId		收货信息ID
+	 * @param goodsId	商品ID
+	 * @param goodsSpec		商品数量
+	 * @return {"errcode":0,"errmsg":"ok",match:[{postageId:'',mode:'',carrage:''}...]}
+	 */
+	public static JSONObject checkOrderData(Integer userId, Long recvId, Long goodsId,String goodsSpec) {
+		String url = mfyxServerUrl + orderCheckDataUrl;
+		url = url.replace("{userId}", userId + "");
+		Map<String, Object> params = new HashMap<String,Object>();
+		params.put("userId", userId);
+		params.put("recvId", recvId);
+		params.put("goodsId", goodsId);
+		params.put("goodsSpec", goodsSpec);
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
-//	/**
-//	 * @param hasPartner 是否包含合作伙伴数据
-//	 * @param jsonSearchParams
-//	 * @param jsonSortParams
-//	 * @param jsonPageCond
-//	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
-//	 */
-//	public static JSONObject searchGoods(boolean hasPartner,String jsonSearchParams,String jsonSortParams,String jsonPageCond) {
-//		String url = mfyxServerUrl + (hasPartner==true?goodsGetallWithPartnerUrl:goodsGetallNopartnerUrl);
-//		Map<String,Object> params = new HashMap<String,Object>();
-//		params.put("jsonSearchParams", jsonSearchParams);
-//		params.put("jsonSortParams", jsonSortParams);
-//		params.put("jsonPageCond", jsonPageCond);
-//		String strRet = HttpUtils.doPost(url, params);
-//		try {
-//			JSONObject jsonRet = JSONObject.parseObject(strRet);
-//			return jsonRet;
-//		}catch(Exception e) {
-//			e.printStackTrace();
-//		}
-//		return null;
-//	}
+	
+	/**
+	 * @param jsonSearchParams
+	 * @param jsonSortParams
+	 * @param jsonPageCond
+	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
+	 */
+	public static JSONObject searchOrders(String jsonSearchParams,String jsonSortParams,String jsonPageCond) {
+		String url = mfyxServerUrl + orderSearchUrl;
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("jsonSearchParams", jsonSearchParams);
+		params.put("jsonSortParams", jsonSortParams);
+		params.put("jsonPageCond", jsonPageCond);
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 分状态统计用户或合作伙伴下的订单信息
+	 * @param userId
+	 * @param goodsId
+	 * @param partinerId
+	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
+	 */
+	public static JSONObject countPartiByStatus(Integer userId,Long goodsId,Integer partnerId) {
+		String url = mfyxServerUrl + orderCountPartiByStatus;
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("userId", userId);
+		params.put("goodsId", goodsId);
+		params.put("partnerId", partnerId);
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 //	
 //	/**
 //	 * 

@@ -2,7 +2,9 @@ package com.mofangyouxuan.wx.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.UserBasic;
+import com.mofangyouxuan.service.OrderService;
 import com.mofangyouxuan.service.UserVipService;
 
 /**
@@ -47,12 +50,16 @@ public class UserAction {
 	 */
 	@RequestMapping("/index/{mode}")
 	public String getIndex(@PathVariable("mode")String mode,ModelMap map){
+		UserBasic user = (UserBasic) map.get("userBasic");
 		if(!"basic".equals(mode) && !"vip".equals(mode)) {
 			mode = "basic";
 		}
+		
 		map.put("mode", mode);
 		map.put("sys_func", "user");
+		
 		return "user/page-user-index";
+		
 	}
 	
 	

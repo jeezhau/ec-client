@@ -81,33 +81,43 @@
       </div>
       <div class="form-group">
         <div class="col-xs-12" style="padding-left:1px">
-          <label class="col-xs-12 control-label" >规格明细与库存(名称唯一,为空则过滤该条记录)<span style="color:red">*</span></label>
+          <label class="col-xs-12 control-label" >规格明细与库存(名称唯一，所有字段必填)<span style="color:red">*</span></label>
         </div>
-        <div class="col-xs-12"  style="height:300px;overflow:scroll">
+        <div class="col-xs-12"  style="max-height:300px;overflow:scroll">
            <table class="table table-striped table-bordered table-condensed">
              <tr>
-               <th width="40%" style="padding:2px 2px">规格名称</th>
-               <th width="15%" style="padding:2px 2px">数量值</th>
-               <th width="15%" style="padding:2px 2px">单位</th>
+               <th width="30%" style="padding:2px 2px">规格名称</th>
+               <th width="13%" style="padding:2px 2px">数量值</th>
+               <th width="10%" style="padding:2px 2px">单位</th>
                <th width="15%" style="padding:2px 2px">售价(¥)</th>
+               <th width="15%" style="padding:2px 2px">带包装重量(kg)</th>
                <th width="15%" style="padding:2px 2px">库存件数</th>
+               <th width="8%" style="padding:2px 2px;vertical-align:center">
+                 <button type="button" class="btn btn-primary" style="padding:2px 2px" @click="addSpec">添加</button>
+               </th>
              </tr>
              <tr v-for="(item,index) in specDetailArr" >
-               <td style="padding:2px 2px">
+               <td style="padding:2px 0px">
                  <input type="text"  style="width:100%" maxlength="20" :value="item.name" @change="setSpecItem('name',index,$event)">
                </td>
-               <td style="padding:2px 2px">
+               <td style="padding:2px 0px">
                  <input type="number" style="width:100%" min=0 max=999999 :value="item.val" @change="setSpecItem('val',index,$event)">
                </td>
-               <td style="padding:2px 2px">
+               <td style="padding:2px 0px">
                  <input type="text" style="width:100%" :value="item.unit" maxlength=5 @change="setSpecItem('unit',index,$event)">
                </td>
-               <td style="padding:2px 2px">
+               <td style="padding:2px 0px">
                  <input type="number" style="width:100%" :value="item.price" min=0 max=99999999 @change="setSpecItem('price',index,$event)">
+               </td> 
+               <td style="padding:2px 0px">
+                 <input type="number" style="width:100%" :value="item.grossWeight" min=0 max=99999999 @change="setSpecItem('gross',index,$event)">
                </td>               
-               <td style="padding:2px 2px">
+               <td style="padding:2px 0px">
                  <input type="number" style="width:100%" min=0 max=999999 :value="item.stock" @change="setSpecItem('stock',index,$event)">
                </td>
+               <th width="8%" style="padding:2px 2px;vertical-align:center">
+                 <button type="button" class="btn btn-danger" style="padding:2px 2px" @click="delSpec(index)">删除</button>
+               </th>
              </tr>
            </table>
         </div>       
@@ -230,7 +240,7 @@ var goodsContainerVue = new Vue({
 			if(this.specDetailArr == null){
 				this.specDetailArr = [];
 			}
-			this.specDetailArr.push(new Object({name:'',val:'',unit:'',price:'',stock:''}));
+			this.specDetailArr.push(new Object({name:'',val:'',unit:'',price:'',grossWeight:'',stock:''}));
 		},
 		delSpec:function(index){
 			this.specDetailArr.splice(index,1);
@@ -288,6 +298,16 @@ var goodsContainerVue = new Vue({
 				}else{
 					this.param.priceLowest = val;
 				} */
+			}
+			if(field == 'gross' && value){
+				var val = parseInt(value);
+				if(isNaN(val) || val < 1 || val > 99999999){
+					alert("规格明细中的第 " + (index+1) + "条的带包装重量不合规，须为1-99999999的整数值！");
+					$(event.target).focus();
+					return false;
+				}
+				$(event.target).val(val);
+				spec.grossWeight = val;
 			}
 			if(field == 'stock' && value){
 				var val = parseInt(value);
@@ -391,7 +411,7 @@ var goodsContainerVue = new Vue({
 				}
 				var val = parseFloat(spec.price);
 				if(isNaN(val) || val < 0 || val > 99999999){
-					alert("规格明细中的第 " + (index+1) + "条的单价不合规，须为0-99999999的数值！");
+					alert("规格明细中的第 " + (index+1) + "条的单价不合规，须为0-99999999.99的数值！");
 					return false;
 				}else{
 					val = val.toFixed(2);
@@ -399,6 +419,13 @@ var goodsContainerVue = new Vue({
 					/* if(priceLowest > val){
 						priceLowest = val;
 					} */
+				}
+				var val = parseInt(spec.grossWeight);
+				if(isNaN(val) || val<1 || val>99999999){
+					alert("规格明细中的第 " + (i+1) + "条的带包装重量不合规，须为1-99999999的整数值！");
+					return false;
+				}else{
+					spec.grossWeight = val;
 				}
 				var val = parseInt(spec.stock);
 				if(isNaN(val) || val< 0 || val > 999999){
@@ -449,11 +476,8 @@ var goodsContainerVue = new Vue({
 
 goodsContainerVue.getCategories();
 goodsContainerVue.getPostages();
-if(goodsContainerVue.specDetailArr.length<30){
-	var len = 30-goodsContainerVue.specDetailArr.length;
-	for(var i=0;i<len;i++){
-		goodsContainerVue.addSpec();
-	}	
+if(goodsContainerVue.specDetailArr.length == 0){
+	goodsContainerVue.addSpec();	
 }
 goodsContainerVue.param.goodsDesc = $('#hiddenGoodsDesc').val();
 </script>
