@@ -49,13 +49,15 @@
     <a class="carousel-control right" href="#myCarousel" 
        data-slide="next">&rsaquo;</a>
   </div>
+  
   <!-- 商家信息 -->
   <div class="row" style="margin:3px 15px;background-color:white;padding:3px 8px;">
-    <a href="'/partner/mcht/${(goods.partnerId)?string('#')}">
+    <a href="/partner/mcht/${(goods.partnerId)?string('#')}">
      <img class="pull-left" alt="" src="/partner/cert/show/logo/${(goods.partnerId)?string('#')}" style="width:25px;height:25px;border-radius:30%">
     </a>
    <span class="pull-right">${(goods.partner.province)!''}-${(goods.partner.area)!''}-${(goods.partner.addr)!''}</span>
   </div> 
+  
   <!-- 限购信息 -->
   <div v-if="goods.limitedNum > 0" class="row" style="margin:3px 15px;background-color:white;color:red;padding:3px 8px;">
    <span class="pull-left">每人限购数量(包括已购)：{{goods.limitedNum}} 件</span>

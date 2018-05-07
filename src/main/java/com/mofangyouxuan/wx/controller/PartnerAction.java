@@ -120,10 +120,11 @@ public class PartnerAction {
 	public String getMcht(@PathVariable("partnerId")Integer partnerId,ModelMap map) {
 
 		PartnerBasic partner = PartnerMgrService.getPartnerById(partnerId);
-		if(partner == null) {
-			
+		if(partner == null || "S".equals(partner.getStatus())) {
+			map.put("errmsg", "系统中没有该商户信息！");
+		}else {
+			map.put("mcht", partner);
 		}
-
 		return "partner/page-partner-mcht";
 	}
 	

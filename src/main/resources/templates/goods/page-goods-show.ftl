@@ -23,6 +23,7 @@
 </head>
 <body class="light-gray-bg">
 <div class="container goods-container" id="container" style="oveflow:scroll">
+<#if (goods.goodsId)??>
   <!-- 商品名称 -->
   <div class="row" style="margin:5px 0px 3px 0px;background-color:white;padding:3px 8px;font-size:150%;font-weight:bold;">
     ${(goods.goodsName)!''}
@@ -55,7 +56,7 @@
   
   <!-- 商家信息 -->
   <div class="row" style="margin:5px 0px 3px 0px;background-color:white;padding:3px 8px;">
-    <a href="'/partner/mcht/${(goods.partnerId)?string('#')}">
+    <a href="/partner/mcht/${(goods.partnerId)?string('#')}">
      <img class="pull-left" alt="" src="/partner/cert/show/logo/${(goods.partnerId)?string('#')}" style="width:25px;height:25px;border-radius:30%">
     </a>
    <span class="pull-right">${(goods.partner.province)!''}-${(goods.partner.area)!''}-${(goods.partner.addr)!''}</span>
@@ -72,12 +73,15 @@
   <!--  ====== 前三条买家评价 ======= -->
   <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
     <div class="row" style="margin:1px 0px;background-color:white;">
-      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">买家评价(10)</span>
-      <span class="pull-right" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray"><a href="/appraise/index/goodsId">查看全部&gt;</a></span>
+      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">买家评价({{apprCnt}})</span>
+      <span class="pull-right" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">
+        <a v-if="apprCnt>0" href="/appraise/show/goods/${(goods.goodsId)?string('#')}">查看全部&gt;</a>
+        <a v-if="apprCnt<=0" href="javascript:;">查看全部&gt;</a>
+      </span>
     </div>
-    <div class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
+    <div v-for="appr in apprList" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
      <div class="row">
-       <span class="pull-left"><img alt="头像" src="/images/mfyx_logo.jpeg" width="20px" height="20px" style="border-radius:50%">用户昵称</span>
+       <span class="pull-left"><img alt="头像" :src="appr.headimgpath" width="20px" height="20px" style="border-radius:50%">{{appr.nickname}}</span>
        <span class="pull-right">2018-4-15</span>
      </div>
      <div class="row">
@@ -135,16 +139,49 @@
   <div class="row">
     
   </div> 
-
+</#if>
 </div><!-- end of container -->
 <script type="text/javascript">
 var containerVue = new Vue({
 	el:'#container',
 	data:{
 		courselImgPaths:'${(goods.carouselImgPaths)!""}'.split(','),
-		specDetailArr:JSON.parse('${(goods.specDetail)!"[]"}')
+		specDetailArr:JSON.parse('${(goods.specDetail)!"[]"}'),
+		apprList:[],
+		apprCnt:0
+	},
+	methods:{
+		getAllAppr: function(){
+			 containerVue.apprCnt = 0;
+			 containerVue.goodsList = [];
+			 $.ajax({
+					url: '/appraise/getall/goods/${(goods.goodsId)?string("#")}',
+					method:'post',
+					data: {'begin':0,'pageSize':3},
+					success: function(jsonRet,status,xhr){
+						if(jsonRet ){
+							if(jsonRet.errcode == 0){//
+								for(var i=0;i<jsonRet.datas.length;i++){
+									var appr = jsonRet.datas[i];
+									if(appr.appraiseInfo){
+										appr.appraiseInfo = JSON.parse(appr.appraiseInfo);
+									}
+									containerVue.apprList.push(jsonRet.datas[i]);
+								}
+								containerVue.apprCnt = jsonRet.pageCond.count;
+							}else{
+								//alert(jsonRet.errmsg);
+							}
+						}else{
+							alert('获取数据失败！')
+						}
+					},
+					dataType: 'json'
+				});			 
+		 }
 	}
 });
+containerVue.getAllAppr();
 </script>
 <footer >
   <div class="row" style="margin:50px 0"></div>

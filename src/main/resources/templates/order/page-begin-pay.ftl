@@ -46,7 +46,7 @@
   <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
     <div class="col-xs-12" style="text-align:center;">${goods.goodsName}</div>
     <div class="col-xs-12" style="text-align:center;">
-      <a href="'/goods/show/${(goods.goodsId)?string('#')}">
+      <a href="/goods/show/${(goods.goodsId)?string('#')}">
        <img alt="" src="/image/file/show/${(goods.mainImgPath)!''}" style="width:99%;height:150px;">
       </a>
     </div>

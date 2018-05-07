@@ -22,155 +22,156 @@
     <link href="/css/mfyx.css" rel="stylesheet">
 </head>
 <body class="light-gray-bg">
-<div class="container goods-container" id="container" style="oveflow:scroll">
-  <!-- 商品名称 -->
-  <div class="row" style="margin:5px 0px 3px 0px;background-color:white;padding:3px 8px;font-size:150%;font-weight:bold;">
-    ${(goods.goodsName)!''}
+<div class="container" id="container" style="padding:0;oveflow:scroll">
+<#if (mcht.partnerId)??>  
+  <!-- 商家基础信息 -->
+  <div class="row" style="margin:0 0px;padding:0;font-weight:bold;background-color:white;">
+   <div class="col-xs-12" style="padding:3px 0;">
+     <div class="col-xs-4" style="text-align:center;background-color:gray">
+      <img alt="" src="/partner/cert/show/logo/${(mcht.partnerId)?string('#')}" width="50px" height=50px style="border-radius:30%">
+      <br>
+      <span>${mcht.busiName}</span>
+     </div>
+     <div class="col-xs-4" style="text-align:center;">
+       <div style="">
+        <span>品质：10</span><br>
+        <span>物流：10</span><br>
+        <span>服务：10</span><br>
+       </div>
+     </div>
+     <div class="col-xs-4" style="text-align:center;background-color:green">
+      <img alt="" src="/partner/cert/show/logo/${(mcht.partnerId)?string('#')}" width="50px" height=50px style="border-radius:30%">
+      <br>
+      <span>${mcht.busiName}</span>
+     </div>    
+   </div>
+   <div class="col-xs-12">
+    <div class="row" style="padding:3px">
+      <span>商家名称：${mcht.compName}</span> <br>
+      <span>商家地址：${mcht.province} ${mcht.city} ${mcht.area} ${mcht.addr}</span><br>
+      <span>法人代表：${mcht.legalPername} &nbsp;&nbsp;&nbsp;&nbsp; 业务联系：${mcht.phone}</span><br>
+      <p>经营介绍：<br>&nbsp;&nbsp;&nbsp;&nbsp;${mcht.introduce}</p>
+    </div>
+   </div>
   </div> 
   
-  <div id="myCarousel" class="carousel slide">
-    <!-- 轮播（Carousel）指标 -->
-    <ol class="carousel-indicators">
-        <li v-for="item,index in courselImgPaths" data-target="#myCarousel" :data-slide-to="index" v-bind:class="{ active: index===0 }"></li>
-    </ol>   
-    <!-- 轮播（Carousel）项目 -->
-    <div class="carousel-inner">
-        <div  v-bind:class="[{active:(index===0)}, 'item']" v-for="imgpath,index in courselImgPaths" >
-            <img :src="'/image/file/show/' + imgpath" >
-        </div>
+  <!--  ====== 买家评价 ======= -->
+  <div class="row" style="margin:8px 0px 3px 0px;" >
+    <div class="row" style="margin:1px 0px;background-color:white;">
+      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">买家评价({{apprCnt}})</span>
+      <span class="pull-right" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">
+        <a v-if="apprCnt != 0 " href="/appraise/mcht/show/${mcht.partnerId}">查看全部&gt;</a>
+        <a v-if="apprCnt == 0 " href="javascript:;">查看全部&gt;</a>
+      </span>
     </div>
-    <!-- 轮播（Carousel）导航 -->
-    <a class="carousel-control left" href="#myCarousel" 
-       data-slide="prev"> <span _ngcontent-c3="" aria-hidden="true" class="glyphicon glyphicon-chevron-right"></span></a>
-    <a class="carousel-control right" href="#myCarousel" 
-       data-slide="next">&rsaquo;</a>
+    <div class="row" v-for="appr in apprList" style="margin:1px 0px;padding:0 20px;background-color:white;">
+     <div class="row">
+       <span class="pull-left">
+         <img alt="头像" :src="'/images/mfyx_logo.jpeg' + appr.headimgurl" width="20px" height="20px" style="border-radius:50%">{{appr.nickname}}
+       </span>
+       <span class="pull-right">{{appr.createTime}}</span>
+     </div>
+     <div class="row">
+       {{appr.appraiseInfo}}
+     </div>
+    </div>
   </div>
-  
-  <!-- 售卖信息 -->
+ 
+  <!-- 售卖货架 -->
   <div class="row" style="margin:5px 0px 3px 0px;background-color:white;color:red">
-    <div class="col-xs-4" style="padding-right:3px;">最低价(¥)：<span>${(goods.priceLowest)!''}</span></div>
-    <div class="col-xs-4" style="padding:0 3px;">总库存：<span>${(goods.stockSum)!''}</span></div>
-    <div class="col-xs-4" style="padding-left:3px;">已售：<span style="color:red">${(goods.saledCnt)!''}</span></div>
-  </div>
-  
-  <!-- 商家信息 -->
-  <div class="row" style="margin:5px 0px 3px 0px;background-color:white;padding:3px 8px;">
-    <a href="'/partner/mcht/${(goods.partnerId)?string('#')}">
-     <img class="pull-left" alt="" src="/partner/cert/show/logo/${(goods.partnerId)?string('#')}" style="width:25px;height:25px;border-radius:30%">
-    </a>
-   <span class="pull-right">${(goods.partner.province)!''}-${(goods.partner.city)!''}-${(goods.partner.area)!''}</span>
-  </div>
-
-  <!-- 服务特点 -->
-  <div class="row" style="margin:5px 0px 3px 0px;font-weight:lighter;font-size:80%">
-    <div class="col-xs-3" style="padding:0 3px"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">正品保证</span></div>
-    <div class="col-xs-3" style="padding:0 3px"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">同城急速</span></div>
-    <div class="col-xs-3" style="padding:0 3px"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">退货保障</span></div>
-    <div class="col-xs-3" style="padding:0 3px"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">极速发货</span></div>
-  </div>
-  
-  <!--  ====== 前三条买家评价 ======= -->
-  <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
-    <div class="row" style="margin:1px 0px;background-color:white;">
-      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">买家评价(10)</span>
-      <span class="pull-right" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray"><a href="/appraise/index/goodsId">查看全部&gt;</a></span>
+    <div class="col-xs-12">
+     <h3 style="text-align:center;padding:5px">所有热卖商品</h3>
     </div>
-    <div class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
-     <div class="row">
-       <span class="pull-left"><img alt="头像" src="/images/mfyx_logo.jpeg" width="20px" height="20px" style="border-radius:50%">用户昵称</span>
-       <span class="pull-right">2018-4-15</span>
-     </div>
-     <div class="row">
-       非常好，味道不错，水分充足，以后一定经常关注。
-     </div>
-    </div>    
-  </div>
-  
-  <!--  ====== 商品参数详细信息 =====   -->
-  <div class="row" style="margin:5px 0px 3px 0px;">
-    <div class="row" style="margin:1px 0px;background-color:white;">
-      <span style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">商品参数</span>
-    </div>
-    <div class="row" style="margin:1px 0px;padding:0 8px;background-color:white;">
-      <div class="row">
-        <div class="col-xs-12"> 产地：<span>${(goods.place)!''}</span></div>
-        <div class="col-xs-12"> 生产者：<span>${(goods.vender)!''}</span></div>
-      </div>
-       <table class="table table-striped table-bordered table-condensed">
-         <tr>
-           <th width="40%" style="padding:2px 2px">名称</th>
-           <th width="20%" style="padding:2px 2px">量值</th>
-           <th width="20%" style="padding:2px 2px">售价(¥)</th>
-           <th width="20%" style="padding:2px 2px">库存件数</th>
-         </tr>
-         <tr v-for="item in specDetailArr" >
-           <td style="padding:2px 2px">
-             <span style="width:100%" >{{item.name}}</span>
-           </td>
-           <td style="padding:2px 2px">
-              <span style="width:100%" >{{item.val}} {{item.unit}}</span>
-           </td>
-           <td style="padding:2px 2px">
-              <span style="width:100%" >{{item.price}}</span>
-           </td>               
-           <td style="padding:2px 2px">
-              <span style="width:100%" >{{item.stock}}</span>
-           </td>
-         </tr>
-       </table>
+    <div v-for="goods in goodsList" class="col-xs-6" style="padding:0px 0px;">
+	    <div style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
+	      <a v-bind:href="'/goods/show/' + goods.goodsId">
+	        <img alt="" :src="'/image/file/show/' + goods.mainImgPath" style="width:90%;height:150px">
+	      </a>
+	    </div>
+	    <div style="margin:1px 1px;" >
+	      <div style="margin:1px 0;padding:0 5px;background-color:white" >
+		        {{goods.goodsName}}
+	      </div>
+	      <div style="margin:1px 0px;padding:0 5px;background-color:white;color:red" >
+	      	<span class="pull-left ">惠¥: <span>{{goods.priceLowest}}</span>元</span>
+	      	<span class="pull-right ">库存: <span>{{goods.stockSum}}</span>件</span>
+	      </div>
+	      <div style="margin:1px 0px 2px 0;padding:0 5px 3px 5px;background-color:white;text-align:center" >
+	        <a class="btn btn-danger " style="padding:3px 12px" :href="'/order/place/'+ goods.goodsId"><span style="color:white">立即下单</span></a>
+	        <a class="btn btn-primary" style="padding:3px 12px" :href="'/order/order/begin/' + goods.goodsId"><span style="color:white">加入收藏</span></a>
+	      </div>
+	    </div>
     </div>
   </div>
   
-  <!--  ====== 商品详情 =====  -->
-  <div class="row" style="margin:5px 0px 3px 0px;">
-    <div class="row" style="margin:1px 0px;background-color:white;">
-      <span style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">宝贝详情</span>
-    </div>
-    <div class="row" style="width:100%;margin:1px 0px;padding:0 8px;background-color:white;">
-      ${(goods.goodsDesc)!''}
-    </div>
-  </div> 
-  
-  <!-- 同类推荐 -->
-  <div class="row">
-    
-  </div> 
-
+</#if>
 </div><!-- end of container -->
 <script type="text/javascript">
 var containerVue = new Vue({
 	el:'#container',
 	data:{
-		courselImgPaths:'${(goods.carouselImgPaths)!""}'.split(','),
-		specDetailArr:JSON.parse('${(goods.specDetail)!"[]"}')
+		apprCnt:0,
+		apprList:[],
+		goodsList:[],
+	},
+	methods:{
+		getAllGoods: function(){
+			 containerVue.goodsList = [];
+			 $.ajax({
+					url: '/shop/mcht/getall/${mcht.partnerId}',
+					method:'post',
+					data: {},
+					success: function(jsonRet,status,xhr){
+						if(jsonRet ){
+							if(jsonRet.errcode == 0){//
+								for(var i=0;i<jsonRet.datas.length;i++){
+									containerVue.goodsList.push(jsonRet.datas[i]);
+								}
+							}else{
+								//alert(jsonRet.errmsg);
+							}
+						}else{
+							alert('获取数据失败！')
+						}
+					},
+					dataType: 'json'
+				});			 
+		 },
+		 getAllAppr: function(){
+			 containerVue.goodsList = [];
+			 $.ajax({
+					url: '/appraise/getall/partner/${mcht.partnerId}',
+					method:'post',
+					data: {'begin':0,'pageSize':3},
+					success: function(jsonRet,status,xhr){
+						if(jsonRet ){
+							if(jsonRet.errcode == 0){//
+								for(var i=0;i<jsonRet.datas.length;i++){
+									var appr = jsonRet.datas[i];
+									if(appr.appraiseInfo){
+										appr.appraiseInfo = JSON.parse(appr.appraiseInfo);
+									}
+								}
+								containerVue.apprCnt = jsonRet.pageCond.count;
+							}else{
+								//alert(jsonRet.errmsg);
+							}
+						}else{
+							alert('获取数据失败！')
+						}
+					},
+					dataType: 'json'
+				});			 
+		 }
 	}
 });
+containerVue.getAllGoods();
+containerVue.getAllAppr();
 </script>
+
 <footer >
-  <div class="row" style="margin:50px 0"></div>
-  <div class="weui-tabbar" style="position:fixed;left:0px;bottom:0px">
-    	<a href="/shop/index" class="weui-tabbar__item " >
-	    <span style="display: inline-block;position: relative;">
-	        <img src="/icons/首页.png" alt="" class="weui-tabbar__icon">
-	    </span>
-	    <p class="weui-tabbar__label">商城首页</p>
-	</a>
-    <a href="#" class="weui-tabbar__item " >
-	    <span style="display: inline-block;position: relative;">
-	        <img src="/icons/收藏.png" alt="" class="weui-tabbar__icon">
-	    </span>
-	    <p class="weui-tabbar__label">加入收藏</p>
-     </a>
-     <a href="/partner/mcht/${(goods.partnerId)?string('#')}" class="weui-tabbar__item " >
-	    <span style="display: inline-block;position: relative;">
-	        <img src="/icons/商家.png" alt="" class="weui-tabbar__icon">
-	    </span>
-	    <p class="weui-tabbar__label">逛商家</p>
-     </a>    
-     <a href="/order/place/${(goods.goodsId)?string('#')}" class="weui-tabbar__item " style='background-color:red;text-align:center;vertical-align:center;'>
-	    <span class="weui-tabbar__label" style="font-size:20px;color:white">立即下单</span>
-     </a>     	
-  </div>
+  <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
 </footer>
+
 </body>
 </html>

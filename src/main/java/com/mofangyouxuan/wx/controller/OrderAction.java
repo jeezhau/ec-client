@@ -44,6 +44,7 @@ import com.mofangyouxuan.wx.utils.PageCond;
 @SessionAttributes("userBasic")
 public class OrderAction {
 	
+	private String[] statusArr = new String[]{"all","4pay","4delivery","4sign","4appraise","4refund"};
 	/**
 	 * 选中商品开始下单
 	 * @param goodsId
@@ -185,9 +186,8 @@ public class OrderAction {
 	 */
 	@RequestMapping("/user/show/{status}")
 	public String show4User(@PathVariable("status")String status,ModelMap map) {
-		String[] arr = new String[]{"all","4pay","4delivery","4sign","4appraise","4refund"};
 		boolean flag = false;
-		for(String s:arr) {
+		for(String s:statusArr) {
 			if(s.equals(status)) {
 				flag = true;
 				break;
@@ -197,7 +197,29 @@ public class OrderAction {
 			status = "all";
 		}
 		map.put("status", status);
-		return "order/page-order-show";
+		return "order/page-user-order-show";
+	}
+	
+	/**
+	 * 买家订单显示界面获取
+	 * @param status 订单状态:all(全部)、forPay（待付款）、forDlivery（待发货）、
+	 * 				forTake（待收货）、forAppraise（待评价）、forRefund（待退款）
+	 * @return
+	 */
+	@RequestMapping("/partner/show/{status}")
+	public String show4Partner(@PathVariable("status")String status,ModelMap map) {
+		boolean flag = false;
+		for(String s:statusArr) {
+			if(s.equals(status)) {
+				flag = true;
+				break;
+			}
+		}
+		if(!flag) {
+			status = "all";
+		}
+		map.put("status", status);
+		return "order/page-partner-order-show";
 	}
 	
 	/**
@@ -207,13 +229,38 @@ public class OrderAction {
 	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
 	 */
 	@RequestMapping("/user/getall")
+	@ResponseBody
 	public String getAll4User(@RequestParam(required=true)String status,PageCond pageCond,
 			ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		UserBasic user = (UserBasic) map.get("userBasic");
 		try {
-			JSONObject params = new JSONObject();
 			String statCode = "";
+			boolean flag = false;
+			for(String stat:statusArr) {
+				if(stat.equals(status)) {
+					flag = true;
+					if("all".equals(stat)) {
+						statCode = null;
+					}else if("4pay".equals(stat)) {
+						statCode = "10";
+					}else if("4delivery".equals(stat)) {
+						statCode = "20";
+					}else if("4sign".equals(stat)) {
+						statCode = "30";
+					}else if("4appraise".equals(stat)) {
+						statCode = "40";
+					}else if("4refund".equals(stat)) {
+						statCode = "50,51,52,53,54,55,60,61,62,63,64";
+					}
+					break;
+				}
+			}
+			if(!flag) {
+				statCode = null;
+			}
+			JSONObject params = new JSONObject();
+			
 			params.put("userId", user.getUserId());
 			params.put("status", statCode);
 			
@@ -235,6 +282,70 @@ public class OrderAction {
 		
 	}
 	
+	/**
+	 * 买家订单查询
+	 * @param status
+	 * @param map
+	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
+	 */
+	@RequestMapping("/partner/getall")
+	@ResponseBody
+	public String getAll4Partner(@RequestParam(required=true)String status,PageCond pageCond,
+			ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
+		if(partner == null ) {
+			jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
+			jsonRet.put("errmsg", "您还未开通合作伙伴功能！");
+			return jsonRet.toJSONString();
+		}
+		try {
+			String statCode = "";
+			boolean flag = false;
+			for(String stat:statusArr) {
+				if(stat.equals(status)) {
+					flag = true;
+					if("all".equals(stat)) {
+						statCode = null;
+					}else if("4pay".equals(stat)) {
+						statCode = "10";
+					}else if("4delivery".equals(stat)) {
+						statCode = "20";
+					}else if("4sign".equals(stat)) {
+						statCode = "30";
+					}else if("4appraise".equals(stat)) {
+						statCode = "40";
+					}else if("4refund".equals(stat)) {
+						statCode = "50,51,52,53,54,55,60,61,62,63,64";
+					}
+					break;
+				}
+			}
+			if(!flag) {
+				statCode = null;
+			}
+			JSONObject params = new JSONObject();
+			
+			params.put("partnerId", partner.getPartnerId());
+			params.put("status", statCode);
+			
+			JSONObject sortParams = new JSONObject();
+			sortParams.put("createTime", "1#1");
+			
+			jsonRet = OrderService.searchOrders(params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
+				jsonRet.put("errmsg", "获取订单信息失败！");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
+		
+	}
 	
 	/**
 	 * 查询订单
@@ -338,5 +449,6 @@ public class OrderAction {
 		}
 		return jsonRet.toString();
 	}
+	
 	
 }

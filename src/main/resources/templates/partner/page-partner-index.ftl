@@ -45,7 +45,7 @@
     </div>
     <div class="col-xs-6" style="padding-right:5px">
        <div style="background-color:white">
-	    <a href="/user/index/basic" >
+	    <a href="/order/partner/show/all" >
 		    <img src="/icons/销售订单.png" alt="" width="90px" height="90px">
 		    <p >销售订单</p>
 		</a>
