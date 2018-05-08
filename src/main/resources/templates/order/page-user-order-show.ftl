@@ -20,8 +20,12 @@
     <link href="/css/weui.css" rel="stylesheet">
     
     <link href="/css/mfyx.css" rel="stylesheet">
+    <script src="/script/common.js"></script>
 </head>
 <body class="light-gray-bg">
+
+<#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
+
 <div class="container " id="container" style="oveflow:scroll">
   <div class="row" style="margin:5px 0;text-align:center" >
     <ul class="nav navbar-nav nav-tabs" style="padding:0 5px">
@@ -53,7 +57,7 @@
 	        <img alt="头像" :src="'/partner/cert/show/logo/' + order.partnerId" width="20px" height="20px" style="border-radius:50%"> 
 	        {{order.partnerBusiName}}
 	      </a>
-		  <span class="pull-right"><a href="javascript:;">{{getStatus(order.status)}}</a></span>
+		  <span class="pull-right"><a :href="'/order/detail/' + order.orderId">{{getOrderStatus(order.status)}}</a></span>
 	    </div>
 	    <div class="row" style="margin:1px 0px;background-color:white;">
 		    <div class="col-xs-4" style="padding-left:1px;padding-right:0px">
@@ -90,8 +94,12 @@
 		  	<span class="pull-right">配送方式：{{getDispatchMode(order.dispatchMode)}}</span>
 		  </div>
 		  <div class="row" style="margin:3px 0;padding:3px 18px 3px 18px;background-color:white;">
-		    <a v-if="order.status ==='10'" class="btn btn-default pull-right" :href="'/order/pay/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >取消订单</span></a>
-		    <a v-if="order.status ==='10'" class="btn btn-danger pull-right" :href="'/order/pay/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即付款</span></a>
+		    <a v-if="startWith(order.status,'1') > 0 || order.status == '20'" class="btn btn-default pull-right" style="padding:0 3px;margin:0 3px" @click="cancelOrder(order)">
+		      <span >取消订单</span>
+		    </a>
+		    <a v-if="order.status ==='10' || order.status ==='12'" class="btn btn-danger pull-right" :href="'/order/pay/begin/' + order.orderId" style="padding:0 3px;margin:0 3px">
+		      <span >立即付款</span>
+		    </a>
 		    
 		    <a v-if="order.status==='30' " class="btn btn-default pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >查看物流</span></a>
 		    <a v-if="order.status==='30' " class="btn btn-default pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >延长收货</span></a>
@@ -114,43 +122,23 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		param:{
-			status:''
+			status:'',
+			begin:0,
+			pageSize:100
 		},
 		orders:[]
 	},
 	methods:{
-		getStatus:function(code){
-			if(code == '10'){
-				return '待付款';
-			}else if(code == '20'){
-				return '待发货';
-			}else if(code == '30'){
-				return '待签收';
-			}else if(code == '40'){
-				return '待评价';
-			}
-			
-		},
-		getDispatchMode:function(code){
-			if(code){
-				if('1' === code){
-					return '官方统一配送';
-				}else if('2' == code){
-					return '商家自行配送';
-				}else if('3' == code){
-					return '快递配送';
-				}else if('4' == code){
-					return '客户自取';
-				}
-			}
-		},
 		getOrders:function(stat,event){
+			$("#loadingData").show();
+			$("#nomoreData").hide();
 			if(event){
 				$(event.target).addClass('active');$(event.target.parentElement).addClass('active');
 				$(event.target).siblings().removeClass('active');$(event.target.parentElement).siblings().removeClass('active');
 			}
 			this.param.status = stat;
 			containerVue.orders = [];
+			
 			$.ajax({
 				url: '/order/user/getall',
 				method:'post',
@@ -162,19 +150,62 @@ var containerVue = new Vue({
 							item.goodsSpec = JSON.parse(item.goodsSpec);
 							containerVue.orders.push(item);
 						}
+						containerVue.begin = jsonRet.pageCond.begin;
+						containerVue.pageSize = jsonRet.pageCond.pageSize;
 					}else{
 						if(jsonRet && jsonRet.errmsg){
-							alert(jsonRet.errmsg);
+							//alert(jsonRet.errmsg);
+							$("#nomoreData").show();
 						}
 					}
+					$("#loadingData").hide();
+				},
+				failure:function(){
+					$("#loadingData").hide();
 				},
 				dataType: 'json'
 			});
+		},
+		cancelOrder:function(order){
+			$('#cancelOrderModal').modal('show');
+			cancelOrderVue.order = order;
 		}
 	}
 });
 containerVue.getOrders('${status!''}');
 </script>
+
+<!-- 买家取消订单（Modal） -->
+<div class="modal fade " id="cancelOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrderTitle" aria-hidden="false" data-backdrop="static" style="top:20%">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
+        <h4 class="modal-title" id="cancelOrderTitle" style="color:red;text-align:center">取消订单</h4>
+      </div>
+      <div class="modal-body">
+       			
+      </div>
+      <div class="modal-footer">
+        <div style="text-align:center">
+        
+        </div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script type="text/javascript">
+ var cancelOrderVue = new Vue({
+	 el:'#cancelOrderModal',
+	 data:{
+		 order:{},
+	 },
+	 methods:{
+		 
+	 }
+ });
+</script>
+
 
 <footer>
   <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 

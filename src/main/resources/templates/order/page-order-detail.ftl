@@ -20,19 +20,32 @@
     <link href="/css/weui.css" rel="stylesheet">
     
     <link href="/css/mfyx.css" rel="stylesheet">
-    <script src="/script/common.js" type="text/javascript"></script>
+    <script src="/script/common.js"></script>
 </head>
 <body class="light-gray-bg">
 
 <div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
  <#if (order.orderId)?? >
- <!-- 收货人信息 -->
+  <div class="row" style="margin:5px 1px ;padding:3px 5px;background-color:white" >
+    <span>订单ID：${(order.orderId)?string('#')}</span>
+    <span> 创建时间：${(order.createTime)?string('yyyy-MM-dd hh:mm:ss')}</span>
+  </div>
+  <!-- 收货人信息 -->
   <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
     <div class="col-xs-12">
+      <span>
+        <#if (order.headimgurl)?starts_with('http')>
+        <img alt="头像" src="${(order.headimgurl)!''}" width="20px" height="20px" style="border-radius:50%"> 
+        </#if>
+        <#if !(order.headimgurl)?starts_with('http')>
+        <img alt="头像" src="/user/headimg/show/${(order.userId)?string('#')}" width="20px" height="20px" style="border-radius:50%"> 
+	    </#if>
+	    <span>${order.nickname}</span>
+     </span><br>
      <span>${order.recvName} , ${(order.recvPhone)!''}</span>
     </div>
     <div class="col-xs-12">
-        <span>${order.recvProvince}</span> 
+        <span>${order.recvProvince}</span>
         <span>${order.recvCity}</span>
         <span>${order.recvArea}</span>
         <span>${order.recvAddr}</span>
@@ -44,7 +57,13 @@
 
   <!-- 商品信息 -->
   <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
-    <div class="col-xs-12" style="text-align:center;">${order.goodsName}</div>
+    <div class="col-xs-12" style="text-align:center;">
+      <a class="pull-left" href="/partner/mcht/${(order.partnerId)?string('#')}">
+	    <img alt="头像" src="/partner/cert/show/logo/${(order.partnerId)?string('#')}" width="20px" height="20px" style="border-radius:50%"> 
+	    <span>${(order.partnerBusiName)!''}</span>
+	  </a><br>
+      <span>${order.goodsName}</span>
+    </div>
     <div class="col-xs-12" style="text-align:center;">
       <a href="/goods/show/${(order.goodsId)?string('#')}">
        <img alt="" src="/image/file/show/${(order.goodsMainImgPath)!''}" style="width:99%;height:150px;">
@@ -74,36 +93,23 @@
          </tr>
        </table>    
      </div>
-  </div> 
-  
-  <!-- 官方信息 -->
-  <div class="row" style="margin:5px 1px ;padding:3px 3px;background-color:white" >
-   <img alt="" src="/images/mfyx_logo.jpeg" width=30px height=30px style="border-radius:50%"><span style="padding:0 10px;color:red">摩放优选</span>
+     <div class="row" style="margin:1px 1px;padding:3px 5px;background-color:white;">
+		<span class="pull-left"> 金额¥：${order.amount}</span> 
+		<span class="pull-right">{{getOrderStatus(${order.status})}}</span>
+	 </div>
   </div>  
   
-  <!-- 支付方式选择 -->
+  <!-- 物流信息 -->
   <div class="row" style="margin:5px 1px ;padding:3px 3px;background-color:white" >
-    <div class="col-xs-12 active">
-     <img alt="" src="/icons/微信支付.png" width="20px" height=20px>
-     <span>微信支付</span>
-     <span class="pull-right">
-       <img src="/icons/选择.png" style="widht:20px;height:20px;">
-     </span>
-    </div>
+    
   </div>
   
-  <!-- 支付 -->
-<footer >
-  <div class="row" style="margin:50px 0"></div>
-  <div class="weui-tabbar" style="position:fixed;left:0px;bottom:5px">
-    	<span class="weui-tabbar__item " >
-	    <span class="weui-tabbar__label" >实付(含运费) <span style="color:red;font-size:18px">¥ ${order.amount}</span></span>
-	</span>   
-     <a href="/order/place/${(order.goodsId)?string('#')}" class="weui-tabbar__item " style='background-color:red;text-align:center;vertical-align:center;'>
-	    <span class="weui-tabbar__label" style="font-size:20px;color:white">立即支付</span>
-     </a>     	
+  <!-- 推荐商品 -->
+  <div class="row" style="margin:5px 1px ;padding:3px 3px;background-color:white" >
+    
   </div>
-</footer>
+  
+
 </#if>
 </div><!-- end of container -->
 
@@ -126,76 +132,13 @@ var containerVue = new Vue({
 					return '客户自取';
 				}
 			}
-		},
-		
-		checkData: function(){
-			this.param.countAll = 0;
-			this.param.amount = 0;
-			for(var i=0;i<this.goods.specDetailArr.length;i++){
-				var sp = this.goods.specDetailArr[i];
-				var num =  sp.buyNum ? sp.buyNum : 0;
-				this.param.countAll = this.param.countAll + num;
-				this.param.amount += sp.price * num;
-			}
-			if(this.param.countAll<=0 || !this.param.recvId){//购买数量为0或为选择收货信息
-				alert("请输入购买数量并选择收货人信息！");
-				return;
-			}
-			$.ajax({
-				url: '/order/checkData',
-				method:'post',
-				data: {'goodsId':this.param.goodsId,'recvId':this.param.recvId,'goodsSpec':JSON.stringify(this.goods.specDetailArr)},
-				success: function(jsonRet,status,xhr){
-					if(jsonRet){
-						if(jsonRet.match){
-							containerVue.dispatchMatchs = [];
-							for(var i=0;i<jsonRet.match.length;i++){
-								//{postageId:'',mode:'',carrage:''}
-								containerVue.dispatchMatchs.push(jsonRet.match[i]);
-								containerVue.param.flag = 1;
-							}
-						}else{//出现逻辑错误
-							alert(jsonRet.errmsg);
-						}
-					}else{
-						alert('系统数据访问失败！')
-					}
-				},
-				dataType: 'json'
-			});
-		},
-		getGoodsSpec:function(){
-			
-			return true;
 		}
 	}
 });
 
 </script>
 
-<#if errmsg??>
-<!-- 错误提示模态框（Modal） -->
-<div class="modal fade " id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorTitle" aria-hidden="false" data-backdrop="static">
-	<div class="modal-dialog">
-  		<div class="modal-content">
-     		<div class="modal-header">
-        			<button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
-        			<h4 class="modal-title" id="errorTitle" style="color:red">错误提示</h4>
-     		</div>
-     		<div class="modal-body">
-       			<p> ${errmsg} </p><p/>
-     		</div>
-     		<div class="modal-footer">
-     			<div style="margin-left:50px">
-        			</div>
-     		</div>
-  		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-<script>
-$("#errorModal").modal('show');
-</script>
-</#if>
+<#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
 
 
 </body>

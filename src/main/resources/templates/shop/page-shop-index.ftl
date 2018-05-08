@@ -25,6 +25,9 @@
 <header >
   <#include "/menu/page-category-menu.ftl" encoding="utf8"> 
 </header>
+
+<#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
+
 <div class="container goods-container" id="container" style="padding:0 1px;overflow:scroll">
   <div class="row" style="margin:0 0;overflow:scroll">
     <div v-for="goods in goodsList" class="col-xs-6" style="padding:0px 0px;">
@@ -63,25 +66,28 @@
 	 },
 	 methods:{
 		 getAll: function(){
+			 $("#loadingData").show();
+			 $("#nomoreData").hide();
 			 containerVue.goodsList = [];
 			 $.ajax({
 					url: '/shop/getall',
 					method:'post',
 					data: this.param,
 					success: function(jsonRet,status,xhr){
-						if(jsonRet ){
-							if(jsonRet.errcode == 0){//
-								for(var i=0;i<jsonRet.datas.length;i++){
-									containerVue.goodsList.push(jsonRet.datas[i]);
-								}
-								containerVue.param.pageSize = jsonRet.pageCond.pageSize;
-								containerVue.param.begin = jsonRet.pageCond.begin;
-							}else{
-								//alert(jsonRet.errmsg);
+						if(jsonRet && jsonRet.errcode == 0){//
+							for(var i=0;i<jsonRet.datas.length;i++){
+								containerVue.goodsList.push(jsonRet.datas[i]);
 							}
+							containerVue.param.pageSize = jsonRet.pageCond.pageSize;
+							containerVue.param.begin = jsonRet.pageCond.begin;
 						}else{
-							alert('获取数据失败！')
+							//alert(jsonRet.errmsg);
+							$("#nomoreData").show();
 						}
+						$("#loadingData").hide();
+					},
+					failure:function(){
+						$("#loadingData").hide();
 					},
 					dataType: 'json'
 				});			 

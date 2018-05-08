@@ -1,10 +1,7 @@
 package com.mofangyouxuan.wx.controller;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -25,12 +22,9 @@ import com.mofangyouxuan.dto.Goods;
 import com.mofangyouxuan.dto.GoodsSpec;
 import com.mofangyouxuan.dto.Order;
 import com.mofangyouxuan.dto.PartnerBasic;
-import com.mofangyouxuan.dto.Postage;
-import com.mofangyouxuan.dto.Receiver;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.service.OrderService;
-import com.mofangyouxuan.service.ReceiverService;
 import com.mofangyouxuan.wx.utils.PageCond;
 
 /**
@@ -41,7 +35,7 @@ import com.mofangyouxuan.wx.utils.PageCond;
  */
 @Controller
 @RequestMapping("/order")
-@SessionAttributes("userBasic")
+@SessionAttributes({"userBasic","vipBasic","partnerBasic"})
 public class OrderAction {
 	
 	private String[] statusArr = new String[]{"all","4pay","4delivery","4sign","4appraise","4refund"};
@@ -139,18 +133,11 @@ public class OrderAction {
 	@RequestMapping("/pay/begin/{orderId}")
 	public String beiginPlay(@PathVariable("orderId")BigInteger orderId,ModelMap map) {
 		Order order = null;
-		Goods goods = null;
 		try {
 			JSONObject jsonRet = OrderService.getOrder(orderId);
 			
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
-				jsonRet = GoodsService.getGoods(false, order.getGoodsId());
-				if(jsonRet != null && jsonRet.containsKey("goods")) {
-					goods = JSONObject.toJavaObject(jsonRet.getJSONObject("goods"),Goods.class);
-				}else {
-					map.put("errmsg", "获取商品信息失败！");
-				}
 			}else {
 				map.put("errmsg", "获取订单信息失败！");
 			}
@@ -158,7 +145,6 @@ public class OrderAction {
 			e.printStackTrace();
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
-		map.put("goods", goods);
 		map.put("order", order);
 		return "order/page-begin-pay";
 	}
@@ -185,7 +171,7 @@ public class OrderAction {
 	 * @return
 	 */
 	@RequestMapping("/user/show/{status}")
-	public String show4User(@PathVariable("status")String status,ModelMap map) {
+	public String showAll4User(@PathVariable("status")String status,ModelMap map) {
 		boolean flag = false;
 		for(String s:statusArr) {
 			if(s.equals(status)) {
@@ -207,7 +193,7 @@ public class OrderAction {
 	 * @return
 	 */
 	@RequestMapping("/partner/show/{status}")
-	public String show4Partner(@PathVariable("status")String status,ModelMap map) {
+	public String showAll4Partner(@PathVariable("status")String status,ModelMap map) {
 		boolean flag = false;
 		for(String s:statusArr) {
 			if(s.equals(status)) {
@@ -219,6 +205,7 @@ public class OrderAction {
 			status = "all";
 		}
 		map.put("status", status);
+		map.put("sys_func", "partner-order");
 		return "order/page-partner-order-show";
 	}
 	
@@ -230,8 +217,7 @@ public class OrderAction {
 	 */
 	@RequestMapping("/user/getall")
 	@ResponseBody
-	public String getAll4User(@RequestParam(required=true)String status,PageCond pageCond,
-			ModelMap map) {
+	public String getAll4User(@RequestParam(required=true)String status,PageCond pageCond,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		UserBasic user = (UserBasic) map.get("userBasic");
 		try {
@@ -243,9 +229,9 @@ public class OrderAction {
 					if("all".equals(stat)) {
 						statCode = null;
 					}else if("4pay".equals(stat)) {
-						statCode = "10";
+						statCode = "10,12";
 					}else if("4delivery".equals(stat)) {
-						statCode = "20";
+						statCode = "20,21";
 					}else if("4sign".equals(stat)) {
 						statCode = "30";
 					}else if("4appraise".equals(stat)) {
@@ -279,7 +265,6 @@ public class OrderAction {
 			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
 		return jsonRet.toString();
-		
 	}
 	
 	/**
@@ -308,9 +293,9 @@ public class OrderAction {
 					if("all".equals(stat)) {
 						statCode = null;
 					}else if("4pay".equals(stat)) {
-						statCode = "10";
+						statCode = "10,12";
 					}else if("4delivery".equals(stat)) {
-						statCode = "20";
+						statCode = "20,21";
 					}else if("4sign".equals(stat)) {
 						statCode = "30";
 					}else if("4appraise".equals(stat)) {
@@ -450,5 +435,37 @@ public class OrderAction {
 		return jsonRet.toString();
 	}
 	
-	
+	/**
+	 * 显示订单详情：仅买卖双方可看到
+	 * @param orderId
+	 * @param map
+	 */
+	@RequestMapping("/detail/{orderId}")
+	public String showDetail(@PathVariable("orderId")BigInteger orderId,ModelMap map) {
+		
+		UserBasic user = (UserBasic) map.get("userBasic");
+		PartnerBasic partner= (PartnerBasic) map.get("partnerBasic");
+		try {
+			if(user == null && partner == null) {
+				map.put("errmsg", "您没有权限查询该订单信息！");
+			}else {
+				JSONObject jsonRet = OrderService.getOrder(orderId);
+				if(jsonRet == null || !jsonRet.containsKey("order")) {
+					map.put("errmsg", "系统中没有该订单信息！");
+				}else {
+					Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+					if(order.getUserId().equals(user.getUserId()) ||
+							(partner != null && partner.getPartnerId().equals(order.getPartnerId()))) {
+						map.put("order", order);
+					}else {
+						map.put("errmsg", "您没有权限查询该订单信息！");
+					}
+				}
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return "order/page-order-detail";
+	}
 }

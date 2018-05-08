@@ -17,7 +17,7 @@
 	    <img src="/icons/图库管理.png" alt="" class="weui-tabbar__icon">
 	    <p class="weui-tabbar__label">图库管理</p>
 	</a>
-	<a href="/image/index" class="weui-tabbar__item <#if sys_func=='partner-order'>weui-bar__item_on </#if>" >
+	<a href="/order/partner/show/all" class="weui-tabbar__item <#if sys_func=='partner-order'>weui-bar__item_on </#if>" >
 	    <img src="/icons/销售订单.png" alt="" class="weui-tabbar__icon">
 	    <p class="weui-tabbar__label">销售订单</p>
 	</a>	

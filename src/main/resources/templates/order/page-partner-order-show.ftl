@@ -20,8 +20,12 @@
     <link href="/css/weui.css" rel="stylesheet">
     
     <link href="/css/mfyx.css" rel="stylesheet">
+    <script src="/script/common.js"></script>
 </head>
 <body class="light-gray-bg">
+
+<#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
+
 <div class="container " id="container" style="oveflow:scroll">
   <div class="row" style="margin:5px">
     <h3 style="text-align:center">我的销售订单</h3>
@@ -48,55 +52,19 @@
         </li>                                               
      </ul>
   </div>
-  <div class="row"><!-- 所有订单之容器 -->
+  <div class="row"><!-- 所有订单之容器 --> 
   
-	  <div v-for="order in orders" class="row" style="margin:3px 0;padding:0 0">
-	    <div class="row" style="margin:0px 0px;padding:5px 10px;background-color:white">
-	      <a class="pull-left" :href="'/partner/mcht/' + order.partnerId">
-	        <img alt="头像" :src="'/partner/cert/show/logo/' + order.partnerId" width="20px" height="20px" style="border-radius:50%"> 
-	        {{order.partnerBusiName}}
-	      </a>
-		  <span class="pull-right"><a href="javascript:;">{{getStatus(order.status)}}</a></span>
-	    </div>
-	    <div class="row" style="margin:1px 0px;background-color:white;">
-		    <div class="col-xs-4" style="padding-left:1px;padding-right:0px">
-		      <a :href="'/goods/show/' + order.goodsId"><img alt="" :src="'/image/file/show/' + order.goodsMainImgPath" height=88px width=99%></a>
-		    </div>
-		    <div class="col-xs-8" style="overflow:scroll;padding:0 5px 1px 0">
-		       <div>{{order.goodsName}}</div>
-			   <table class="table table-striped table-bordered table-condensed">
-		         <tr>
-		           <th width="30%" style="padding:2px 2px;text-align:center">规格名称</th>
-		           <th width="15%" style="padding:2px 2px;text-align:center">量值</th>
-		           <th width="20%" style="padding:2px 2px;text-align:center">售价(¥)</th>
-		           <th width="20%" style="padding:2px 2px;text-align:center">购买数量</th>
-		         </tr>
-		         <tr v-for="item,index in order.goodsSpec" >
-		           <td style="padding:2px 2px;">
-		             <span style="width:100%" >{{item.name}}</span>
-		           </td>
-		           <td style="padding:2px 2px;text-align:right">
-		              <span style="width:100%" >{{item.val}} {{item.unit}}</span>
-		           </td>
-		           <td style="padding:2px 2px;text-align:right">
-		              <span style="width:100%" >{{item.price}}</span>
-		           </td> 
-		           <td style="padding:2px 2px;text-align:right">
-	                 <span  style="width:80%" > {{item.buyNum}}</span>
-		           </td>
-		         </tr>
-		       </table>
-		    </div>
-		  </div>
-		  <div class="row" style="margin:1px 0px;padding:1px 3px;background-color:white;">
-		  	<span class="pull-left">实付¥：{{order.amount}}</span> 
-		  	<span class="pull-right">配送方式：{{getDispatchMode(order.dispatchMode)}}</span>
-		  </div>
-		  <div class="row" style="margin:1px 0;padding:3px 18px 3px 18px;background-color:white;">
-		    <a v-if="order.status ==='10'" class="btn btn-default pull-right" :href="'/order/pay/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >协商取消</span></a>
-		    
-		    <a v-if="order.status ==='20'" class="btn btn-danger pull-right" :href="'/order/pay/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即发货</span></a>
-		    <a v-if="order.status ==='20'" class="btn btn-default pull-right" :href="'/order/pay/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >协商取消</span></a>
+    <div v-for="order in orders" class="row" style="margin:3px 0;padding:0 0">
+      <#include "/order/tpl-order-buy-user.ftl" encoding="utf8"> 
+      <#include "/order/tpl-order-buy-content.ftl" encoding="utf8"> 
+
+	  <div class="row" style="margin:1px 0;padding:3px 18px 3px 18px;background-color:white;">
+		    <a v-if="order.status ==='10' || order.status ==='12' || order.status ==='20'" class="btn btn-default pull-right" style="padding:0 3px;margin:0 3px" @click="cancelOrder(order)">
+		      <span >协商取消</span>
+		    </a>
+
+			<a v-if="order.status ==='20'" class="btn btn-info pull-right" :href="'/order/pay/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即备货</span></a>
+		    <a v-if="order.status ==='20' || order.status ==='21'" class="btn btn-danger pull-right" :href="'/order/pay/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即发货</span></a>
 		    
 		    <a v-if="order.status==='30' " class="btn btn-default pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >查看物流</span></a>
 		    <a v-if="order.status==='30' " class="btn btn-default pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >延长收货</span></a>
@@ -106,15 +74,13 @@
 		    
 		    <a v-if="order.status==='31' " class="btn btn-danger pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >申请换货</span></a>
 		    <a v-if="order.status==='31' " class="btn btn-danger pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >申请退货</span></a>
-		    
-		  </div>
-		  
-	  </div>
-	
+      </div>
+	</div>
   </div>
   
 </div><!-- end of container -->
 <script type="text/javascript">
+
 var containerVue = new Vue({
 	el:'#container',
 	data:{
@@ -124,32 +90,9 @@ var containerVue = new Vue({
 		orders:[]
 	},
 	methods:{
-		getStatus:function(code){
-			if(code == '10'){
-				return '待付款';
-			}else if(code == '20'){
-				return '待发货';
-			}else if(code == '30'){
-				return '待签收';
-			}else if(code == '40'){
-				return '待评价';
-			}
-			
-		},
-		getDispatchMode:function(code){
-			if(code){
-				if('1' === code){
-					return '官方统一配送';
-				}else if('2' == code){
-					return '商家自行配送';
-				}else if('3' == code){
-					return '快递配送';
-				}else if('4' == code){
-					return '客户自取';
-				}
-			}
-		},
 		getOrders:function(stat,event){
+			$("#loadingData").show();
+			$("#nomoreData").hide();
 			if(event){
 				$(event.target).addClass('active');$(event.target.parentElement).addClass('active');
 				$(event.target).siblings().removeClass('active');$(event.target.parentElement).siblings().removeClass('active');
@@ -157,7 +100,7 @@ var containerVue = new Vue({
 			this.param.status = stat;
 			containerVue.orders = [];
 			$.ajax({
-				url: '/order/user/getall',
+				url: '/order/partner/getall',
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
@@ -169,20 +112,65 @@ var containerVue = new Vue({
 						}
 					}else{
 						if(jsonRet && jsonRet.errmsg){
-							alert(jsonRet.errmsg);
+							//alert(jsonRet.errmsg);
+							$("#nomoreData").show();
 						}
 					}
+					$("#loadingData").hide();
+				},
+				failure:function(){
+					$("#loadingData").hide();
 				},
 				dataType: 'json'
 			});
+		},
+		cancelOrder : function(order){
+			$('#cancelOrderModal').modal('show');
+			cancelOrderVue.order = order;
 		}
 	}
 });
 containerVue.getOrders('${status!''}');
 </script>
+<!-- 卖家协商取消订单（Modal） -->
+<div class="modal fade " id="cancelOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrderTitle" aria-hidden="false" data-backdrop="static" style="top:20%">
+	<div class="modal-dialog">
+  		<div class="modal-content">
+     		<div class="modal-header">
+        			<button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
+        			<h4 class="modal-title" id="cancelOrderTitle" style="color:red">协商取消订单</h4>
+     		</div>
+     		<div class="modal-body">
+       			<#include "/order/tpl-order-buy-user.ftl" encoding="utf8"> 
+      			<#include "/order/tpl-order-buy-content.ftl" encoding="utf8"> 
+       			 <div class="row" style="margin:3px 0px;background-color:white; color:red">
+       			   <p/>
+       			   <p>订单状态: {{getOrderStatus(order.status)}}</p>
+       			   <span>&nbsp;&nbsp;&nbsp;&nbsp;如果您不能完成发货，请即时拨打该电话与买家协商，请求对方取消订单，结束本次交易！</span>
+       			   <span>下单联系人电话：{{order.userPhone}}</span>
+       			 </div>
+     		</div>
+     		<div class="modal-footer">
+     			<div style="margin-left:50px">
+        			</div>
+     		</div>
+  		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script type="text/javascript">
+ var cancelOrderVue = new Vue({
+	 el:'#cancelOrderModal',
+	 data:{
+		 order:{},
+	 },
+	 methods:{
+		 
+	 }
+ });
+</script>
 
 <footer>
-  <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
 </footer>
 
 </body>

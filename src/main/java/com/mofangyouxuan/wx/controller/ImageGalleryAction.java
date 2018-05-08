@@ -243,6 +243,9 @@ public class ImageGalleryAction {
 			if(vip == null || !"1".equals(vip.getStatus()) ) {
 				return;
 			}
+			if("undefined".equals(filename)) {
+				return;
+			}
 			String url = this.mfyxServerUrl + this.imageShowFileurl + vip.getVipId() + "/" + filename;
 			File file = HttpUtils.downloadFile(this.tmpFileDir,url);
 			BufferedImage image = ImageIO.read(file);
