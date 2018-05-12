@@ -134,10 +134,20 @@ public class OrderAction {
 	public String beiginPlay(@PathVariable("orderId")BigInteger orderId,ModelMap map) {
 		Order order = null;
 		try {
+			UserBasic user = (UserBasic)map.get("userBasic");
 			JSONObject jsonRet = OrderService.getOrder(orderId);
 			
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
+				if(!user.getUserId().equals(order.getUserId())) {
+					map.put("errmsg", "该订单不是您的宝贝订单！");
+				}else {
+					if( !"10".equals(order.getStatus()) && !"10".equals(order.getStatus())) {//可支付
+						map.put("order", order);
+					}else {
+						map.put("errmsg", "该订单当前不可再次支付！");
+					}
+				}
 			}else {
 				map.put("errmsg", "获取订单信息失败！");
 			}
@@ -145,7 +155,6 @@ public class OrderAction {
 			e.printStackTrace();
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
-		map.put("order", order);
 		return "order/page-begin-pay";
 	}
 	
@@ -468,4 +477,103 @@ public class OrderAction {
 		}
 		return "order/page-order-detail";
 	}
+	
+	/**
+	 * 取消自己的商家未备货的订单
+	 * @param orderId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/cancel/{orderId}")
+	public String cancelorder(@PathVariable("orderId")BigInteger orderId,ModelMap map) {
+		UserBasic user = (UserBasic) map.get("userBasic");
+		JSONObject jsonRet = new JSONObject();
+		try {
+			jsonRet = OrderService.getOrder(orderId);
+			if(jsonRet == null || !jsonRet.containsKey("order")) {
+				jsonRet.put("errmsg", "系统中没有该订单信息！");
+				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
+				return jsonRet.toString();
+			}
+			
+			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+			if(!order.getUserId().equals(user.getUserId())) {
+				jsonRet.put("errmsg", "您没有权限查询该订单信息！");
+				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
+				return jsonRet.toString();
+			}
+			if(!"10".equals(order.getStatus()) && !"11".equals(order.getStatus()) && !"12".equals(order.getStatus()) && 
+				!"20".equals(order.getStatus())) {
+				jsonRet.put("errmsg", "您当前不可取消订单！");
+				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
+				return jsonRet.toString();
+			}
+			//发送请求
+			jsonRet = OrderService.cancelOrder(order, user);
+			if(jsonRet == null || !jsonRet.containsKey("errocode")) {
+				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
+				jsonRet.put("errmsg", "出现系统错误！");
+				return jsonRet.toString();
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+			jsonRet.toString();
+		}
+		return jsonRet.toString();
+	}
+	
+	/**
+	 * 用户选择支付方式后，根据支付方式生成付款单
+	 * 1、如果是微信支付，则项微信支付发送预付单生成请求，成功返回后生成预付单；
+	 * 2、余额支付则直接生成预付单；
+	 * @param orderId
+	 * @param payType 支付方式：1-余额，2-微信
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/prepay/{orderId}/{payType}")
+	public String prepayOrder(@PathVariable("orderId")BigInteger orderId,
+			@PathVariable("payType")Integer payType,ModelMap map) {
+		UserBasic user = (UserBasic) map.get("userBasic");
+		JSONObject jsonRet = new JSONObject();
+		try {
+			jsonRet = OrderService.getOrder(orderId);
+			if(jsonRet == null || !jsonRet.containsKey("order")) {
+				jsonRet.put("errmsg", "系统中没有该订单信息！");
+				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
+				return jsonRet.toString();
+			}
+			
+			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+			if(!order.getUserId().equals(user.getUserId())) {
+				jsonRet.put("errmsg", "您没有权限查询该订单信息！");
+				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
+				return jsonRet.toString();
+			}
+			if(!"10".equals(order.getStatus()) && !"12".equals(order.getStatus())) {
+				jsonRet.put("errmsg", "您当前不可再次申请支付订单！");
+				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
+				return jsonRet.toString();
+			}
+			
+			//.jsonRet = OrderService.cancelOrder(orderId, user.getUserId(),boolean needBack);
+			
+			if(jsonRet == null || !jsonRet.containsKey("errocode")) {
+				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
+				jsonRet.put("errmsg", "出现系统错误！");
+				return jsonRet.toString();
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+			jsonRet.toString();
+		}
+		return jsonRet.toString();
+	}
+	
 }

@@ -385,6 +385,54 @@ public class HttpUtils {
     }
 
     /**
+     * 发送 SSL POST 请求（HTTPS）
+     * @param apiUrl API接口URL
+     * @param content 发送内容
+     * @return
+     * @throws IOException 
+     */
+    public static String doPostTextSSL(String apiUrl, String content) {
+        CloseableHttpClient httpClient = createSSLConnSocketFactory();
+        HttpPost httpPost = new HttpPost(apiUrl);
+        CloseableHttpResponse response = null;
+        String httpStr = null;
+
+        try {
+            httpPost.setConfig(requestConfig);
+            StringEntity stringEntity = new StringEntity(content,"UTF-8");//解决中文乱码问题
+            stringEntity.setContentEncoding("UTF-8");
+            stringEntity.setContentType("text/plain");
+            httpPost.setEntity(stringEntity);
+            response = httpClient.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode != HttpStatus.SC_OK) {
+                return null;
+            }
+            HttpEntity entity = response.getEntity();
+            if (entity == null) {
+                return null;
+            }
+            httpStr = EntityUtils.toString(entity, "utf-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (response != null) {
+                try {
+                    EntityUtils.consume(response.getEntity());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+				httpClient.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+        }
+        return httpStr;
+    }
+
+    /**
      * 创建SSL安全连接
      *
      * @return

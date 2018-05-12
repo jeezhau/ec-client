@@ -22,6 +22,7 @@
     <link href="/css/mfyx.css" rel="stylesheet">
 </head>
 <body class="light-gray-bg">
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <div class="container" id="container" style="padding:0;oveflow:scroll">
 <#if (mcht.partnerId)??>  
   <!-- 商家基础信息 -->
@@ -128,10 +129,10 @@ var containerVue = new Vue({
 									containerVue.goodsList.push(jsonRet.datas[i]);
 								}
 							}else{
-								//alert(jsonRet.errmsg);
+								alertMsg('错误提示',jsonRet.errmsg);
 							}
 						}else{
-							alert('获取数据失败！')
+							alertMsg('错误提示','获取数据失败！')
 						}
 					},
 					dataType: 'json'
@@ -154,10 +155,10 @@ var containerVue = new Vue({
 								}
 								containerVue.apprCnt = jsonRet.pageCond.count;
 							}else{
-								//alert(jsonRet.errmsg);
+								alertMsg('错误提示',jsonRet.errmsg);
 							}
 						}else{
-							alert('获取数据失败！')
+							alertMsg('错误提示','获取数据失败！')
 						}
 					},
 					dataType: 'json'

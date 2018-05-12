@@ -22,6 +22,7 @@
 
 </head>
 <body class="light-gray-bg">
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <header >
 	<ul class="nav nav-tabs " style="margin:3px 8px 3px 8px">
 	  <li  onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#postageNotice').show();$('#myAllPostages').hide()">
@@ -92,7 +93,7 @@ var containerVue = new Vue({
 							}
 						}
 					}else{
-						alert('获取数据失败！')
+						alertMsg('错误提示','获取数据失败！')
 					}
 				},
 				dataType: 'json'
@@ -107,7 +108,7 @@ var containerVue = new Vue({
 					success: function(jsonRet,status,xhr){
 						if(jsonRet ){
 							if(jsonRet.cnt > 0){
-								alert('该模版正在被 ' + jsonRet.cnt + " 个商品使用中，您不可删除！");
+								alertMsg('错误提示','该模版正在被 ' + jsonRet.cnt + " 个商品使用中，您不可删除！");
 							}else{
 								$.ajax({
 									url: '/postage/delete/' + postageId,
@@ -116,18 +117,18 @@ var containerVue = new Vue({
 									success: function(jsonRet,status,xhr){
 										if(jsonRet ){
 											if(jsonRet.errcode == 0){
-												alert('模版删除成功！');
+												alertMsg('系统提示','模版删除成功！');
 												window.location.reload();
 											}
 										}else{
-											alert('获取数据失败！')
+											alertMsg('错误提示','获取数据失败！')
 										}
 									},
 									dataType: 'json'
 								});
 							}
 						}else{
-							alert('获取数据失败！')
+							alertMsg('错误提示','获取数据失败！')
 						}
 					},
 					dataType: 'json'

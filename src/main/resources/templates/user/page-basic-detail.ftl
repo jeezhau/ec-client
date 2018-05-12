@@ -22,6 +22,7 @@
     <link href="/css/mfyx.css" rel="stylesheet">
 </head>
 <body class="light-gray-bg">
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <div class="container " style="padding:0px 0px;oveflow:scroll">
   <div class="row">
      <a class="col-xs-2" href="/user/index/basic" style="vertical-algin:center;text-align:center"><img width="15px" height="15px" alt="" src="/icons/返回.png"></a>
@@ -138,7 +139,7 @@ var editFormVue = new Vue({
 							getCities();
 						}
 					}else{
-						alert('获取城市数据(省份)失败！')
+						alertMsg('错误提示','获取城市数据(省份)失败！')
 					}
 				},
 				dataType: 'json'
@@ -158,12 +159,12 @@ var editFormVue = new Vue({
 				success: function(jsonRet,status,xhr){
 					if(jsonRet){
 						if(0 == jsonRet.errcode){
-							alert("基本信息修改成功！")
+							alertMsg('系统提示',"基本信息修改成功！")
 						}else{//出现逻辑错误
-							alert(jsonRet.errmsg);
+							alertMsg('错误提示',jsonRet.errmsg);
 						}
 					}else{
-						alert('系统数据访问失败！')
+						alertMsg('错误提示','系统数据访问失败！')
 					}
 				},
 				dataType: 'json'
@@ -196,10 +197,10 @@ function getBasic(){
 					
 					editFormVue.getAllProvinces();
 				}else{//出现逻辑错误
-					alert(jsonRet.errmsg);
+					alertMsg('错误提示',jsonRet.errmsg);
 				}
 			}else{
-				alert('系统数据访问失败！')
+				alertMsg('错误提示','系统数据访问失败！')
 			}
 		},
 		dataType: 'json'
@@ -226,7 +227,7 @@ function getCities(){
 					editFormVue.metadata.cities.push(jsonRet[i]);
 				}
 			}else{
-				alert('获取城市数据(地级市)失败！')
+				alertMsg('错误提示','获取城市数据(地级市)失败！')
 			}
 		},
 		dataType: 'json'

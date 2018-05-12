@@ -19,7 +19,7 @@ spring:
       max-file-size: 10Mb
       max-request-size: 10Mb
 ######微信参数############
-wxmp:
+wx:
 #userId 公众号
   PUBLIC-USER-ID: gh_ed70fd57008b
 #appId
@@ -28,14 +28,19 @@ wxmp:
   APPSECRET: c2c15a91c950e8a6fc106192b044adfb
 #token
   TOKEN: 1314
+#state
+  STATE: 'mfyxwx'
+  
  #微信管理平台访问 
-  wxmp-server-url: 'http://localhost:9000'
-  jsapi-sign-url: '/jsapi/sign'
+wxmp:
+  wxmp-server-url: 'http://192.168.0.102:9000'
+  jsapi-sign-url: '/jsapi/sign' 
   
 ######业务参数-摩放优选服务中心访问############
 mfyx:
   mfyx-server-url: 'http://192.168.0.102:8080'
   user-basic-get-url: '/user/get'
+  user-basic-create-url: '/user/create'
   user-basic-update-url: '/user/update'
   spread-qrcode-url: '/qrcode/spread'
   vip-basic-get-url: '/vip/get'
@@ -87,15 +92,15 @@ mfyx:
   order-checkdata-url: '/order/{userId}/checkData' 
   order-search-url: '/order/getall' 
   order-count-partiby-status-url: '/order/count/partibystatus'  
+  order-cancel-url: '/order/{userId}/cancel/{orderId}'
+  order-prepay-url: '/order/{userId}/prepay/{orderId}'
+  
   
 ######系统参数############  
 sys:
   local-server-url: 'http://192.168.0.102:8000'
-  tmp-file-dir: '/Users/jeekhan/wxmp/tmp/'
-  qrcode-file-dir: '/Users/jeekhan/wxmp/qrcode/'
-  material-file-dir: '/Users/jeekhan/wxmp/material/'
-  kf-headimg-dir: '/Users/jeekhan/wxmp/headimg/'
-  wxmenu-file-dir: '/Users/jeekhan/wxmp/wxmenu/'
+  tmp-file-dir: '/Users/jeekhan/mfyx-wx/tmp/'
+
   
   
   

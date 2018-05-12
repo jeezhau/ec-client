@@ -21,6 +21,7 @@
 </head>
 
 <body class="light-gray-bg">
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <header>
   <div class="weui-navbar">
     <div class="weui-navbar__item <#if mode='basic'>weui-bar__item_on</#if>" onclick="$(this).addClass('weui-bar__item_on');$(this).siblings().removeClass('weui-bar__item_on');$('#userBasic').show();$('#userVip').hide();">
@@ -212,7 +213,7 @@ var containerVue = new Vue({
 							}
 						}
 					}else{
-						alert('获取城市数据(地级市)失败！')
+						alertMsg('错误提示','获取城市数据(地级市)失败！')
 					}
 				},
 				dataType: 'json'

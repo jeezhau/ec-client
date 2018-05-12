@@ -22,6 +22,7 @@
     <link href="/css/mfyx.css" rel="stylesheet">
 </head>
 <body class="light-gray-bg" >
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <header >
 	<ul class="nav nav-tabs" style="margin:3px 8px 3px 8px">
 	  <li onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#manageNotice').show();$('#goodsListShow').hide()">
@@ -142,10 +143,10 @@
 								containerVue.param.pageSize = jsonRet.pageCond.pageSize;
 								containerVue.param.begin = jsonRet.pageCond.begin;
 							}else{
-								//alert(jsonRet.errmsg);
+								alertMsg('错误提示',jsonRet.errmsg);
 							}
 						}else{
-							alert('获取数据失败！')
+							alertMsg('错误提示','获取数据失败！')
 						}
 					},
 					dataType: 'json'
@@ -153,7 +154,7 @@
 		 },
 		 changeStatus: function(newStat){
 			 if(this.selectedArr.length<1){
-				 alert("请选择要批量" + (newStat==='1'?'上架':'下架')+ "的商品！");
+				 alertMsg('错误提示',"请选择要批量" + (newStat==='1'?'上架':'下架')+ "的商品！");
 				 return
 			 }
 			 $.ajax({
@@ -166,11 +167,11 @@
 								containerVue.getAll();
 								containerVue.selectedArr = [];
 							}else if(jsonRet.errmsg && jsonRet.errmsg != 'ok'){
-								alert(jsonRet.errmsg);
+								alertMsg('错误提示',jsonRet.errmsg);
 								
 							}
 						}else{
-							alert('获取数据失败！')
+							alertMsg('错误提示','获取数据失败！')
 						}
 					},
 					dataType: 'json'
@@ -181,11 +182,6 @@
 			 editSpecDetailVue.goodsId = goodsId;
 			 editSpecDetailVue.goodsName = goodsName;
 			 editSpecDetailVue.specDetailArr = JSON.parse(specDetail);
-			 if(editSpecDetailVue.specDetailArr.length<30){
-				 for(var i=0;i<(30-editSpecDetailVue.specDetailArr.length);i++){
-					 editSpecDetailVue.specDetailArr.push(new Object({name:'',val:'',unit:'',price:'',stock:''}));
-				 }
-			 }
 		 }
 	 }
  });
@@ -230,31 +226,41 @@
 		        <div class="col-xs-12" style="padding-left:1px">
 		          <label class="col-xs-12 control-label" >规格明细与库存(名称唯一,为空则过滤该条记录)<span style="color:red">*</span></label>
 		        </div>
-		        <div class="col-xs-12"  style="height:300px;overflow:scroll">
+		        <div class="col-xs-12"  style="max-height:300px;overflow:scroll">
 		           <table class="table table-striped table-bordered table-condensed">
 		             <tr>
-		               <th width="40%" style="padding:2px 2px">规格名称</th>
-		               <th width="15%" style="padding:2px 2px">数量值</th>
-		               <th width="15%" style="padding:2px 2px">单位</th>
+		               <th width="30%" style="padding:2px 2px">规格名称</th>
+		               <th width="13%" style="padding:2px 2px">数量值</th>
+		               <th width="10%" style="padding:2px 2px">单位</th>
 		               <th width="15%" style="padding:2px 2px">售价(¥)</th>
+		               <th width="15%" style="padding:2px 2px">带包装重量(kg)</th>
 		               <th width="15%" style="padding:2px 2px">库存件数</th>
+		               <th width="8%" style="padding:2px 2px;vertical-align:center">
+		                 <button type="button" class="btn btn-primary" style="padding:2px 2px" @click="addSpec">添加</button>
+		               </th>
 		             </tr>
 		             <tr v-for="(item,index) in specDetailArr" >
-		               <td style="padding:2px 2px">
+		               <td style="padding:2px 0px">
 		                 <input type="text"  style="width:100%" maxlength="20" :value="item.name" @change="setSpecItem('name',index,$event)">
 		               </td>
-		               <td style="padding:2px 2px">
+		               <td style="padding:2px 0px">
 		                 <input type="number" style="width:100%" min=0 max=999999 :value="item.val" @change="setSpecItem('val',index,$event)">
 		               </td>
-		               <td style="padding:2px 2px">
+		               <td style="padding:2px 0px">
 		                 <input type="text" style="width:100%" :value="item.unit" maxlength=5 @change="setSpecItem('unit',index,$event)">
 		               </td>
-		               <td style="padding:2px 2px">
+		               <td style="padding:2px 0px">
 		                 <input type="number" style="width:100%" :value="item.price" min=0 max=99999999 @change="setSpecItem('price',index,$event)">
+		               </td> 
+		               <td style="padding:2px 0px">
+		                 <input type="number" style="width:100%" :value="item.grossWeight" min=0 max=99999999 @change="setSpecItem('gross',index,$event)">
 		               </td>               
-		               <td style="padding:2px 2px">
+		               <td style="padding:2px 0px">
 		                 <input type="number" style="width:100%" min=0 max=999999 :value="item.stock" @change="setSpecItem('stock',index,$event)">
 		               </td>
+		               <th width="8%" style="padding:2px 2px;vertical-align:center">
+		                 <button type="button" class="btn btn-danger" style="padding:2px 2px" @click="delSpec(index)">删除</button>
+		               </th>
 		             </tr>
 		           </table>
 		        </div>       
@@ -277,6 +283,15 @@ var editSpecDetailVue = new Vue({
 		specDetailArr: []
 	},
 	methods:{
+		addSpec:function(){
+			if(this.specDetailArr == null){
+				this.specDetailArr = [];
+			}
+			this.specDetailArr.push(new Object({name:'',val:'',unit:'',price:'',grossWeight:'',stock:''}));
+		},
+		delSpec:function(index){
+			this.specDetailArr.splice(index,1);
+		},
 		setSpecItem:function(field,index,event){
 			var spec = this.specDetailArr[index];
 			var value = $(event.target).val();
@@ -286,7 +301,7 @@ var editSpecDetailVue = new Vue({
 				}
 				value = value.trim();
 				if(value.length>20){
-					alert('规格明细中第 ' + (index+1) + " 条数据的'规格名称'不合规，长度须为1-20字符！");
+					alertMsg('错误提示','规格明细中第 ' + (index+1) + " 条数据的'规格名称'不合规，长度须为1-20字符！");
 					$(event.target).focus();
 					return false;
 				}
@@ -296,7 +311,7 @@ var editSpecDetailVue = new Vue({
 			if(field == 'val' && value){
 				var val = parseInt(value);
 				if(isNaN(val) || val < 1 || val > 999999){
-					alert("规格明细中的第 " + (index+1) + "条的数量值不合规，须为1-999999的整数值！");
+					alertMsg('错误提示',"规格明细中的第 " + (index+1) + "条的数量值不合规，须为1-999999的整数值！");
 					$(event.target).focus();
 					return false;
 				}
@@ -306,7 +321,7 @@ var editSpecDetailVue = new Vue({
 			if(field == 'unit' && value){
 				value = value.trim();
 				if(value.length < 1 || value.length > 5){
-					alert("规格明细中的第 " + (index+1) + "条的单位不合规，长度须为1-5字符！");
+					alertMsg('错误提示',"规格明细中的第 " + (index+1) + "条的单位不合规，长度须为1-5字符！");
 					$(event.target).focus();
 					return false;
 				}
@@ -316,7 +331,7 @@ var editSpecDetailVue = new Vue({
 			if(field == 'price' && value){
 				var val = parseFloat(value);
 				if(isNaN(val) || val < 0 || val > 99999999.99){
-					alert("规格明细中的第 " + (index+1) + "条的单价不合规，须为0-99999999.99的数值！");
+					alertMsg('错误提示',"规格明细中的第 " + (index+1) + "条的单价不合规，须为0-99999999.99的数值！");
 					$(event.target).focus();
 					return false;
 				}
@@ -324,10 +339,20 @@ var editSpecDetailVue = new Vue({
 				$(event.target).val(val);
 				spec.price = val;
 			}
+			if(field == 'gross' && value){
+				var val = parseInt(value);
+				if(isNaN(val) || val < 1 || val > 99999999){
+					alertMsg('错误提示',"规格明细中的第 " + (index+1) + "条的带包装重量不合规，须为1-99999999的整数值！");
+					$(event.target).focus();
+					return false;
+				}
+				$(event.target).val(val);
+				spec.grossWeight = val;
+			}
 			if(field == 'stock' && value){
 				var val = parseInt(value);
 				if(isNaN(val) || val < 0 || val > 999999){
-					alert("规格明细中的第 " + (index+1) + "条的库存不合规，须为0-999999的整数值！");
+					alertMsg('错误提示',"规格明细中的第 " + (index+1) + "条的库存不合规，须为0-999999的整数值！");
 					$(event.target).focus();
 					return false;
 				}
@@ -346,33 +371,40 @@ var editSpecDetailVue = new Vue({
 					spec.name = spec.name.trim();
 				}
 				if(spec.name.length > 20){
-					alert("规格明细中的第 " + (i+1) + "条的规格名称不合规，长度范围：2-20字符！");
+					alertMsg('错误提示',"规格明细中的第 " + (i+1) + "条的规格名称不合规，长度范围：2-20字符！");
 					return;
 				}
 				if(!spec.unit || spec.unit.trim().length > 5){
-					alert("规格明细中的第 " + (index+1) + "条的单位不合规，长度须为1-5字符！");
+					alertMsg('错误提示',"规格明细中的第 " + (index+1) + "条的单位不合规，长度须为1-5字符！");
 					return false;
 				}else{
 					spec.unit = spec.unit.trim();
 				}
 				var val = parseInt(spec.val);
 				if(isNaN(val) || val<1 || val>999999){
-					alert("规格明细中的第 " + (i+1) + "条的数量值不合规，须为1-999999的整数值！");
+					alertMsg('错误提示',"规格明细中的第 " + (i+1) + "条的数量值不合规，须为1-999999的整数值！");
 					return false;
 				}else{
 					spec.val = val;
 				}
 				var val = parseFloat(spec.price);
 				if(isNaN(val) || val < 0 || val > 99999999){
-					alert("规格明细中的第 " + (index+1) + "条的单价不合规，须为0-99999999的数值！");
+					alertMsg('错误提示',"规格明细中的第 " + (index+1) + "条的单价不合规，须为0-99999999的数值！");
 					return false;
 				}else{
 					val = val.toFixed(2);
 					spec.price = val;
 				}
+				var val = parseInt(spec.grossWeight);
+				if(isNaN(val) || val<1 || val>99999999){
+					alertMsg('错误提示',"规格明细中的第 " + (i+1) + "条的带包装重量不合规，须为1-99999999的整数值！");
+					return false;
+				}else{
+					spec.grossWeight = val;
+				}
 				var val = parseInt(spec.stock);
 				if(isNaN(val) || val< 0 || val > 999999){
-					alert("规格明细中的第 " + (i+1) + "条的库存不合规，须为0-999999的整数值！");
+					alertMsg('错误提示',"规格明细中的第 " + (i+1) + "条的库存不合规，须为0-999999的整数值！");
 					return false;
 				}else{
 					spec.stock = val;
@@ -380,13 +412,13 @@ var editSpecDetailVue = new Vue({
 				okSpecArr.push(spec);
 			}
 			if(okSpecArr.length<1){
-				alert("规格明细数据不可为空，至少要有一条数据！");
+				alertMsg('错误提示',"规格明细数据不可为空，至少要有一条数据！");
 				return ;
 			}
 			for(var i=0;i<okSpecArr.length;i++){
 				for(var j=i+1;j<okSpecArr.length;j++){
 					if(okSpecArr[i].name == okSpecArr[j].name){
-						alert("规格明细不可出现同规格名称的记录！");
+						alertMsg('错误提示',"规格明细不可出现同规格名称的记录！");
 						return false;
 					}
 				}
@@ -401,10 +433,10 @@ var editSpecDetailVue = new Vue({
 							$('#editSpecDetailModal').modal('hide');
 							containerVue.getAll();
 						}else{//出现逻辑错误
-							alert(jsonRet.errmsg);
+							alertMsg('错误提示',jsonRet.errmsg);
 						}
 					}else{
-						alert('系统数据访问失败！')
+						alertMsg('错误提示','系统数据访问失败！')
 					}
 				},
 				dataType: 'json'

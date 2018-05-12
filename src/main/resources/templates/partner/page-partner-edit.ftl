@@ -24,27 +24,11 @@
     <link href="/css/fileinput.min.css" rel="stylesheet">
     
     <link href="/css/mfyx.css" rel="stylesheet">
-    <script>
-  wx.config({
-      debug: false,
-      appId: '${APP_ID}',
-      timestamp: ${timestamp},
-      nonceStr: '${nonceStr}',
-      signature: '${signature}',
-      jsApiList: [
-        'checkJsApi',
-        'chooseImage',
-        'previewImage',
-        'uploadImage',
-        'downloadImage',
-        'getNetworkType',
-        'openLocation',
-        'getLocation'
-      ]
-  });
-</script>
+    <script src="/script/common.js" type="text/javascript"></script>
+
 </head>
 <body class="light-gray-bg">
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <div class="container" id="partnerContainer" style="padding:0px 0px;oveflow:scroll">
   <div class="row">
      <ul class="nav nav-tabs" style="margin:0 15%">
@@ -146,7 +130,7 @@
       </div>        
       <div class="form-group">
         <div style="text-align:center">
-          <button type="button" class="btn btn-info" style="margin:20px" @click="getLocation"><span style="color:red">*</span>获取当前经营地址</button>
+          <button type="button" class="btn btn-info" style="margin:20px;display:none" @click="getLocation"><span style="color:red">*</span>获取当前经营地址</button>
         </div>
       </div> 
       <div class="form-group">
@@ -268,7 +252,7 @@ var partnerContainerVue = new Vue({
 							getCities();
 						}
 					}else{
-						alert('获取城市数据(省份)失败！')
+						alertMsg('错误提示','获取城市数据(省份)失败！')
 					}
 				},
 				dataType: 'json'
@@ -286,9 +270,9 @@ var partnerContainerVue = new Vue({
 			partnerContainerVue.metadata.areas = [];
 			getAreas();
 		},
-		getLocation:function(){
-			this.param.locationX = 12.2345;
-			this.param.locationY = 25.8765;
+		getLocation:function(locX,locY){
+			this.param.locationX = locX;
+			this.param.locationY = locY;
 		},
 		submit: function(){
 			$.ajax({
@@ -298,14 +282,14 @@ var partnerContainerVue = new Vue({
 				success: function(jsonRet,status,xhr){
 					if(jsonRet){
 						if(0 == jsonRet.errcode){
-							alert("合作伙伴基本信息修改成功！");
+							alertMsg('系统提示',"合作伙伴基本信息保存成功！");
 							$.extend(partnerContainerVue.initData,partnerContainerVue.param); 
-							window.location.reload();
+							//window.location.reload();
 						}else{//出现逻辑错误
-							alert(jsonRet.errmsg);
+							alertMsg('错误提示',jsonRet.errmsg);
 						}
 					}else{
-						alert('系统数据访问失败！')
+						alertMsg('错误提示','系统数据访问失败！')
 					}
 				},
 				dataType: 'json'
@@ -341,7 +325,7 @@ function getCities(){
 					getAreas();
 				}
 			}else{
-				alert('获取城市数据(地级市)失败！')
+				alertMsg('错误提示','获取城市数据(地级市)失败！')
 			}
 		},
 		dataType: 'json'
@@ -367,7 +351,7 @@ function getAreas(){
 					partnerContainerVue.metadata.areas.push(jsonRet[i]);
 				}
 			}else{
-				alert('获取城市数据(县)失败！')
+				alertMsg('错误提示','获取城市数据(县)失败！')
 			}
 		},
 		dataType: 'json'
@@ -407,7 +391,7 @@ $(document).on('ready', function() {
     });
     //异步上传错误结果处理
     $('#logoImg').on('fileerror', function(event, data, msg) {
-		alert("营业执照照片文件上传失败！");
+		alertMsg('系统提示',"营业执照照片文件上传失败！");
 		$('#logoImg').fileinput('clear');
     });
     //异步上传成功结果处理
@@ -415,13 +399,13 @@ $(document).on('ready', function() {
     		var jsonRet = data.response;
     		if(jsonRet){
 			if(0 == jsonRet.errcode){
-				alert("企业LOGO文件上传成功！！");
+				alertMsg('系统提示',"企业LOGO文件上传成功！！");
 			}else{//出现逻辑错误
-				alert(jsonRet.errmsg);
+				alertMsg('错误提示',jsonRet.errmsg);
 				$('#logoImg').fileinput('clear');
 			}
 		}else{
-			alert('系统数据访问失败！')
+			alertMsg('错误提示','系统数据访问失败！')
 			$('#logoImg').fileinput('clear');
 		}
     });
@@ -456,7 +440,7 @@ $(document).on('ready', function() {
     });
     //异步上传错误结果处理
     $('#certFile_1').on('fileerror', function(event, data, msg) {
-		alert("身份证照片文件正面上传失败！");
+		alertMsg('错误提示',"身份证照片文件正面上传失败！");
 		$('#certFile_1').fileinput('clear');
     });
     //异步上传成功结果处理
@@ -464,13 +448,13 @@ $(document).on('ready', function() {
     		var jsonRet = data.response;
     		if(jsonRet){
 			if(0 == jsonRet.errcode){
-				alert("身份证照片文件正面上传成功！！");
+				alertMsg('系统提示',"身份证照片文件正面上传成功！！");
 			}else{//出现逻辑错误
-				alert(jsonRet.errmsg);
+				alertMsg('错误提示',jsonRet.errmsg);
 				$('#certFile_1').fileinput('clear');
 			}
 		}else{
-			alert('系统数据访问失败！')
+			alertMsg('错误提示','系统数据访问失败！')
 			$('#certFile_1').fileinput('clear');
 		}
     });
@@ -505,7 +489,7 @@ $(document).on('ready', function() {
     });
     //异步上传错误结果处理
     $('#certFile_2').on('fileerror', function(event, data, msg) {
-		alert("身份证照片文件反面上传失败！");
+		alertMsg('错误提示',"身份证照片文件反面上传失败！");
 		$('#certFile_2').fileinput('clear');
     });
     //异步上传成功结果处理
@@ -513,13 +497,13 @@ $(document).on('ready', function() {
     		var jsonRet = data.response;
     		if(jsonRet){
 			if(0 == jsonRet.errcode){
-				alert("身份证照片文件反面上传成功！！");
+				alertMsg('系统提示',"身份证照片文件反面上传成功！！");
 			}else{//出现逻辑错误
-				alert(jsonRet.errmsg);
+				alertMsg('错误提示',jsonRet.errmsg);
 				$('#certFile_2').fileinput('clear');
 			}
 		}else{
-			alert('系统数据访问失败！')
+			alertMsg('错误提示','系统数据访问失败！')
 			$('#certFile_2').fileinput('clear');
 		}
     });
@@ -554,7 +538,7 @@ $(document).on('ready', function() {
     });
     //异步上传错误结果处理
     $('#licenceImg').on('fileerror', function(event, data, msg) {
-		alert("营业执照照片文件上传失败！");
+		alertMsg('错误提示',"营业执照照片文件上传失败！");
 		$('#licenceImg').fileinput('clear');
     });
     //异步上传成功结果处理
@@ -562,13 +546,13 @@ $(document).on('ready', function() {
     		var jsonRet = data.response;
     		if(jsonRet){
 			if(0 == jsonRet.errcode){
-				alert("营业执照照片文件上传成功！！");
+				alertMsg('系统提示',"营业执照照片文件上传成功！！");
 			}else{//出现逻辑错误
-				alert(jsonRet.errmsg);
+				alertMsg('错误提示',jsonRet.errmsg);
 				$('#licenceImg').fileinput('clear');
 			}
 		}else{
-			alert('系统数据访问失败！')
+			alertMsg('错误提示','系统数据访问失败！')
 			$('#licenceImg').fileinput('clear');
 		}
     });
@@ -599,6 +583,41 @@ $(document).on('ready', function() {
 $("#errorModal").modal('show');
 </script>
 </#if>
+<script>
+  wx.config({
+      debug: false,
+      appId: '${APP_ID}',
+      timestamp: ${timestamp},
+      nonceStr: '${nonceStr}',
+      signature: '${signature}',
+      jsApiList: [
+        'checkJsApi',
+        'chooseImage',
+        'previewImage',
+        'uploadImage',
+        'downloadImage',
+        'getNetworkType',
+        'openLocation',
+        'getLocation'
+      ]
+ });
+ wx.ready(function(){
+	wx.getLocation({
+		  type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+		  success: function (res) {
+		  var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+		  var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+		  var speed = res.speed; // 速度，以米/每秒计
+		  var accuracy = res.accuracy; // 位置精度
+		  partnerContainerVue.getLocation(longitude,latitude);
+		}
+	});
+});
+wx.error(function(res){
+	  alertMsg(res);
+	  // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+});
+</script>
 
 <footer>
   <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 

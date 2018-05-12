@@ -23,5 +23,15 @@ public class ErrorAction {
 		
 		return "error/page-no-user";
 	}
-
+	
+	/**
+	 * 微信访问错误页面
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/fromwx")
+	public String fromwx(ModelMap map) {
+		
+		return "error/page-fromwx-error";
+	}
 }

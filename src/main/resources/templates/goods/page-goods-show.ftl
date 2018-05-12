@@ -22,6 +22,7 @@
     <link href="/css/mfyx.css" rel="stylesheet">
 </head>
 <body class="light-gray-bg">
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <div class="container goods-container" id="container" style="oveflow:scroll">
 <#if (goods.goodsId)??>
   <!-- 商品名称 -->
@@ -170,10 +171,10 @@ var containerVue = new Vue({
 								}
 								containerVue.apprCnt = jsonRet.pageCond.count;
 							}else{
-								//alert(jsonRet.errmsg);
+								alertMsg('错误提示',jsonRet.errmsg);
 							}
 						}else{
-							alert('获取数据失败！')
+							alertMsg('错误提示','获取数据失败！')
 						}
 					},
 					dataType: 'json'

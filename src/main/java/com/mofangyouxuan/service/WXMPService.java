@@ -33,7 +33,7 @@ public class WXMPService {
 	/**
 	 * 获取指定url对应的签名
 	 * @param url
-	 * @return
+	 * @return {"errcode":0,"errmsg",:"ok","signature":""}
 	 */
 	public static JSONObject getSignature(String url ,Long timestamp,String nonceStr) {
 		Map<String,Object> params = new HashMap<String,Object>();

@@ -23,6 +23,7 @@ public class UserVipService {
 	
 	private static String mfyxServerUrl;
 	private static String userBasicGetUrl;
+	private static String userBasicCreateUrl;
 	private static String userBasicUpdateUrl;
 	private static String spreadQrCodeUrl;
 	private static String vipBasicGetUrl;
@@ -40,6 +41,11 @@ public class UserVipService {
 	@Value("${mfyx.user-basic-update-url}")
 	public void setUserBasicUpdateUrl(String url) {
 		userBasicUpdateUrl = url;
+	}
+	
+	@Value("${mfyx.user-basic-create-url}")
+	public void setUserBasicCreateUrl(String url) {
+		userBasicCreateUrl = url;
 	}
 	
 	@Value("${mfyx.spread-qrcode-url}")
@@ -118,6 +124,30 @@ public class UserVipService {
 		params.put("introduce", basic.getIntroduce());
 		String strRet = HttpUtils.doPost(mfyxServerUrl + userBasicUpdateUrl, params);
 		return strRet;
+	}
+
+	/**
+	 * 更新用户基本信息
+	 * @param userBasic
+	 * @return
+	 */
+	public static JSONObject createUserBasic(UserBasic basic) {
+		String registType = "2";
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("registType", registType);
+		params.put("openId", basic.getOpenId());
+		params.put("nickname", basic.getNickname());
+		params.put("birthday", basic.getBirthday());
+		params.put("phone", basic.getPhone());
+		params.put("sex", basic.getSex());
+		params.put("province", basic.getProvince());
+		params.put("city", basic.getCity());
+		params.put("favourite", basic.getFavourite());
+		params.put("profession", basic.getProfession());
+		params.put("introduce", basic.getIntroduce());
+		String strRet = HttpUtils.doPost(mfyxServerUrl + userBasicCreateUrl, params);
+		JSONObject jsonRet = JSONObject.parseObject(strRet);
+		return jsonRet;
 	}
 	
 	/**

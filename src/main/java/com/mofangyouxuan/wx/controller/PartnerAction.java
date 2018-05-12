@@ -29,11 +29,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
-import com.mofangyouxuan.common.SysConfigParam;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.PartnerMgrService;
 import com.mofangyouxuan.service.WXMPService;
+import com.mofangyouxuan.wx.api.JSAPITicket;
+import com.mofangyouxuan.wx.api.WebAuth;
 
 /**
  * 合作伙伴管理
@@ -42,7 +43,7 @@ import com.mofangyouxuan.service.WXMPService;
  */
 @Controller
 @RequestMapping("/partner")
-@SessionAttributes({"openId","vipBasic","userBasic","partnerBasic"})
+@SessionAttributes({"vipBasic","userBasic","partnerBasic","webAuth","jsapiTicket"})
 public class PartnerAction {
 	@Value("${sys.local-server-url}")
 	private String localServerUrl;
@@ -92,20 +93,22 @@ public class PartnerAction {
 		String url = localServerUrl + "/partner/edit";
 		String signature = "";
 		try {
-			JSONObject json = WXMPService.getSignature(url, timestamp, nonceStr);
-			if(json.containsKey("signature")) {
-				signature = json.getString("signature");
+			signature = JSAPITicket.signature(url, timestamp, nonceStr);
+			if(signature == null) {
+				map.put("errmsg", "获取微信JSAPI ticket 失败！");
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
 		
 		map.put("partner", map.get("partnerBasic"));
-		map.put("APP_ID", SysConfigParam.APP_ID);
+		map.put("APP_ID", WebAuth.APPID);
 		map.put("nonceStr", nonceStr);
 		map.put("timestamp", timestamp + "");
 		map.put("signature", signature);
 		map.put("sys_func", "partner-index");
+		
 		return "partner/page-partner-edit";
 	}
 	

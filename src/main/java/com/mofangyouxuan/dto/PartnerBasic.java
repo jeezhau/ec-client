@@ -58,7 +58,6 @@ public class PartnerBasic {
     @Size(min=2,max=100,message=" 营业执照号/身份证号：长度范围5-50字符 ！")
     private String licenceNo;
 
-    @Null
     private String certDir;
 
     @NotNull(message=" 联系电话：不可为空！")
@@ -75,10 +74,8 @@ public class PartnerBasic {
     @Size(min=10,max=600,message=" 经营描述：长度范围10-600字符 ！")
     private String introduce;
     
-    @Null
     private String status;
 
-    @Null
     private Date updateTime;
 
     private String reviewLog;
@@ -87,7 +84,6 @@ public class PartnerBasic {
 
     private Integer distance;
     
-    @Null
     private Date reviewTime;
 
     public Integer getPartnerId() {

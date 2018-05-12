@@ -23,7 +23,7 @@
     <script src="/script/common.js"></script>
 </head>
 <body class="light-gray-bg">
-
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
 
 <div class="container " id="container" style="oveflow:scroll">
@@ -151,8 +151,7 @@ containerVue.getOrders('${status!''}');
        			 </div>
      		</div>
      		<div class="modal-footer">
-     			<div style="margin-left:50px">
-        			</div>
+     			
      		</div>
   		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->

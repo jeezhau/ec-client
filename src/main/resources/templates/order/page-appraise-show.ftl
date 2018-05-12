@@ -24,7 +24,7 @@
 <body class="light-gray-bg">
 
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
-
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <div class="container " style="oveflow:scroll">
    <div class="row">
      <a class="col-xs-2" href="/goods/detail/goodsIs" style="vertical-algin:center;text-align:center"><img width="15px" height="15px" alt="" src="/icons/返回.png"></a>

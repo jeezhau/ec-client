@@ -25,6 +25,7 @@
 <body class="light-gray-bg">
 
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8"> 
 
 <div class="container " id="container" style="oveflow:scroll">
   <div class="row" style="margin:5px 0;text-align:center" >
@@ -52,48 +53,9 @@
   <div class="row"><!-- 所有订单之容器 -->
   
 	  <div v-for="order in orders" class="row" style="margin:3px 0;padding:0 0">
-	    <div class="row" style="margin:0px 0px;padding:5px 10px;background-color:white">
-	      <a class="pull-left" :href="'/partner/mcht/' + order.partnerId">
-	        <img alt="头像" :src="'/partner/cert/show/logo/' + order.partnerId" width="20px" height="20px" style="border-radius:50%"> 
-	        {{order.partnerBusiName}}
-	      </a>
-		  <span class="pull-right"><a :href="'/order/detail/' + order.orderId">{{getOrderStatus(order.status)}}</a></span>
-	    </div>
-	    <div class="row" style="margin:1px 0px;background-color:white;">
-		    <div class="col-xs-4" style="padding-left:1px;padding-right:0px">
-		      <a :href="'/goods/show/' + order.goodsId"><img alt="" :src="'/image/file/show/' + order.goodsMainImgPath" height=88px width=99%></a>
-		    </div>
-		    <div class="col-xs-8" style="overflow:scroll;padding:0 5px 1px 0">
-		       <div>{{order.goodsName}}</div>
-			   <table class="table table-striped table-bordered table-condensed">
-		         <tr>
-		           <th width="30%" style="padding:2px 2px;text-align:center">规格名称</th>
-		           <th width="15%" style="padding:2px 2px;text-align:center">量值</th>
-		           <th width="20%" style="padding:2px 2px;text-align:center">售价(¥)</th>
-		           <th width="20%" style="padding:2px 2px;text-align:center">购买数量</th>
-		         </tr>
-		         <tr v-for="item,index in order.goodsSpec" >
-		           <td style="padding:2px 2px;">
-		             <span style="width:100%" >{{item.name}}</span>
-		           </td>
-		           <td style="padding:2px 2px;text-align:right">
-		              <span style="width:100%" >{{item.val}} {{item.unit}}</span>
-		           </td>
-		           <td style="padding:2px 2px;text-align:right">
-		              <span style="width:100%" >{{item.price}}</span>
-		           </td> 
-		           <td style="padding:2px 2px;text-align:right">
-	                 <span  style="width:80%" > {{item.buyNum}}</span>
-		           </td>
-		         </tr>
-		       </table>
-		    </div>
-		  </div>
-		  <div class="row" style="margin:1px 0px;padding:1px 3px;background-color:white;">
-		  	<span class="pull-left">实付¥：{{order.amount}}</span> 
-		  	<span class="pull-right">配送方式：{{getDispatchMode(order.dispatchMode)}}</span>
-		  </div>
-		  <div class="row" style="margin:3px 0;padding:3px 18px 3px 18px;background-color:white;">
+	    <#include "/order/tpl-order-partner.ftl" encoding="utf8">
+	    <#include "/order/tpl-order-buy-content.ftl" encoding="utf8">
+		<div class="row" style="margin:3px 0;padding:3px 18px 3px 18px;background-color:white;">
 		    <a v-if="startWith(order.status,'1') > 0 || order.status == '20'" class="btn btn-default pull-right" style="padding:0 3px;margin:0 3px" @click="cancelOrder(order)">
 		      <span >取消订单</span>
 		    </a>
@@ -110,10 +72,8 @@
 		    <a v-if="order.status==='31' " class="btn btn-danger pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >申请换货</span></a>
 		    <a v-if="order.status==='31' " class="btn btn-danger pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >申请退货</span></a>
 		    
-		  </div>
-		  
+		</div>
 	  </div>
-	
   </div>
   
 </div><!-- end of container -->
@@ -181,14 +141,20 @@ containerVue.getOrders('${status!''}');
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
-        <h4 class="modal-title" id="cancelOrderTitle" style="color:red;text-align:center">取消订单</h4>
+        <h4 class="modal-title" id="cancelOrderTitle" style="color:red;">取消订单</h4>
       </div>
       <div class="modal-body">
-       			
+         <#include "/order/tpl-order-partner.ftl" encoding="utf8"> 
+    	     <#include "/order/tpl-order-buy-content.ftl" encoding="utf8"> 
+     	 <div class="row" style="margin:3px 0px;background-color:white; color:red">
+     		<p/>
+     	    <span>&nbsp;&nbsp;&nbsp;&nbsp;如果您已付款，取消后您的付款金额将返回至您的付款账户！</span>
+       	</div>    			
       </div>
       <div class="modal-footer">
         <div style="text-align:center">
-        
+       	  <button class="btn btn-danger" @click="submit">提交</button>
+       	  <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
         </div>
       </div>
     </div><!-- /.modal-content -->
@@ -201,7 +167,25 @@ containerVue.getOrders('${status!''}');
 		 order:{},
 	 },
 	 methods:{
-		 
+		 submit:function(){
+			 $.ajax({
+				url: '/order/user/cancel/' + this.order.orderId,
+				method:'post',
+				data: {},
+				success: function(jsonRet,status,xhr){
+					if(jsonRet && jsonRet.errcode == 0){
+						cancelOrderVue.order.status = 'DS';
+					}else{
+						if(jsonRet && jsonRet.errmsg){
+							alertMsg('错误提示',jsonRet.errmsg);
+						}else{
+							alertMsg('错误提示','系统错误！');
+						}
+					}
+				},
+				dataType: 'json'
+			});
+		 }
 	 }
  });
 </script>

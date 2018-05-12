@@ -22,7 +22,7 @@
     <link href="/css/mfyx.css" rel="stylesheet">
 </head>
 <body class="light-gray-bg">
-
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <div class="container goods-container" id="container" style="margin:0 0;overflow:scroll">
 
  <div class="row" style="margin:5px 1px 1px ;" >
@@ -266,7 +266,7 @@ var containerVue = new Vue({
 						containerVue.param.recvArea = jsonRet.receiver.area;
 						containerVue.param.recvAddr = jsonRet.receiver.addr;
 					}else{
-						//alert('获取商品分类数据失败！')
+						alertMsg('错误提示','获取默认收货人信息失败！')
 					}
 				},
 				dataType: 'json'
@@ -298,7 +298,7 @@ var containerVue = new Vue({
 				this.param.amount += sp.price * num;
 			}
 			if(this.param.countAll<=0 || !this.param.recvId){//购买数量为0或为选择收货信息
-				alert("请输入购买数量并选择收货人信息！");
+				alertMsg('错误提示',"请输入购买数量并选择收货人信息！");
 				return;
 			}
 			$.ajax({
@@ -315,10 +315,10 @@ var containerVue = new Vue({
 								containerVue.param.flag = 1;
 							}
 						}else{//出现逻辑错误
-							alert(jsonRet.errmsg);
+							alertMsg('错误提示',jsonRet.errmsg);
 						}
 					}else{
-						alert('系统数据访问失败！')
+						alertMsg('错误提示','系统数据访问失败！')
 					}
 				},
 				dataType: 'json'

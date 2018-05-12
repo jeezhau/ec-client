@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.dto.Category;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.UserBasic;
@@ -17,6 +18,7 @@ import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.service.PartnerMgrService;
 import com.mofangyouxuan.service.UserVipService;
+import com.mofangyouxuan.wx.api.WebAuth;
 
 
 
@@ -41,13 +43,23 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 		//String contextPath = request.getContextPath();  
 		HttpSession session = request.getSession();
 		
-		String openId = (String) session.getAttribute("openId");
-		if(openId == null) {
-			openId = request.getParameter("openid");
-			openId = "ofvDZv893-8LL8qax8dyXGp2u23g";
-//			response.sendRedirect(contextPath + "/error/page-no-user.html");
-//			return false;
+		String openId = null;
+		openId	= "ofvDZv893-8LL8qax8dyXGp2u23g";
+		
+		String code = request.getParameter("code");
+		String state = request.getParameter("state"); 
+		if(code != null && code.length()>0 && state != null && WebAuth.STATE.equals(state)) {//从微信访问
+			JSONObject auth = this.accessFromWX(code);
+			if(auth == null) {
+				response.sendRedirect("/error/fromwx");
+				return false;
+			}
+			openId = auth.getString("openid");
+			session.setAttribute("webAuth", auth);
+		}else { //使用其他方式访问
+			
 		}
+		session.setAttribute("openId", openId);
 		
 		String isDayFresh = (String) request.getSession().getAttribute("isDayFresh");
 		String sysFunc = (String) request.getSession().getAttribute("sys_func");
@@ -58,7 +70,6 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 			session.setAttribute("sys_func", "");
 		}
 		
-		session.setAttribute("openId", openId);
 		UserBasic userBasic = (UserBasic) session.getAttribute("userBasic");
 		VipBasic vipBasic = (VipBasic) session.getAttribute("vipBasic");
 		PartnerBasic partnerBasic = (PartnerBasic) session.getAttribute("partnerBasic");
@@ -84,7 +95,39 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 			categories = GoodsService.getCategories();
 			session.setAttribute("categories", categories);
 		}
+		
+		//保存访问日志
+		
         return true; 
+	}
+	
+	private JSONObject accessFromWX(String code) {
+		//获取授权信息
+		JSONObject auth = WebAuth.getAccessToken(code, true, null);
+		if(auth == null) {
+			//response.sendRedirect("/error/fromwx");
+			return null;
+		}
+		String openId = auth.getString("openid");
+		//检查用户是否已经存在
+		UserBasic userBasic = UserVipService.getUserBasic(openId);
+		if(userBasic == null) {//发起注册
+			userBasic = WebAuth.getUserInfo(auth);
+			if(userBasic != null) {
+				JSONObject ret = UserVipService.createUserBasic(userBasic);
+				if(ret != null && ret.containsKey("errcode") && ret.getIntValue("errcode") ==0) {
+					//用户信息注册成功
+					;
+				}else {//用户注册失败
+					//response.sendRedirect("/error/fromwx");
+					return null;
+				}
+			}else {//从微信获取用户失败
+				//response.sendRedirect("/error/fromwx");
+				return null;
+			}
+		}
+		return auth;
 	}
 		
 }

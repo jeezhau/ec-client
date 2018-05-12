@@ -101,7 +101,7 @@ var imageGalleryShowVue = new Vue({
 							}
 						}
 					}else{
-						alert('获取数据失败！')
+						alertMsg('错误提示','获取数据失败！')
 					}
 				},
 				dataType: 'json'
@@ -116,11 +116,11 @@ var imageGalleryShowVue = new Vue({
 		},
 		confirm : function(){
 			if(this.selectCntLimit == 1 && this.selectedImages.length != 1){
-				alert("您必须且仅可选择一张图片！");
+				alertMsg('错误提示',"您必须且仅可选择一张图片！");
 				return ;
 			}
 			if(this.selectCntLimit > 1 && (this.selectedImages.length < 1 || this.selectedImages.length > this.selectCntLimit)){
-				alert("您必须选择[1-" + this.selectCntLimit + "]张图片！");
+				alertMsg('错误提示',"您必须选择[1-" + this.selectCntLimit + "]张图片！");
 				return ;
 			}
 			if(this.callbackFun){

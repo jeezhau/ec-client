@@ -19,7 +19,7 @@ spring:
       max-file-size: 10Mb
       max-request-size: 10Mb
 ######微信参数############
-wxmp:
+wx:
 #userId 公众号
   PUBLIC-USER-ID: gh_ed70fd57008b
 #appId
@@ -28,37 +28,77 @@ wxmp:
   APPSECRET: c2c15a91c950e8a6fc106192b044adfb
 #token
   TOKEN: 1314
+#state
+  STATE: 'mfyxwx'
+  
  #微信管理平台访问 
+wxmp:
   wxmp-server-url: 'http://172.18.235.107:9000'
-  jsapi-sign-url: '/jsapi/sign'
+  jsapi-sign-url: '/jsapi/sign' 
   
 ######业务参数-摩放优选服务中心访问############
 mfyx:
   mfyx-server-url: 'http://172.18.235.107:8080'
   user-basic-get-url: '/user/get'
+  user-basic-create-url: '/user/create'
   user-basic-update-url: '/user/update'
   spread-qrcode-url: '/qrcode/spread'
   vip-basic-get-url: '/vip/get'
   
-  partner-get-url: '/partner/get/byuser/'
+  partner-get-byvip-url: '/partner/get/byvip/'
+  partner-get-byid-url: '/partner/get/byid/'
   partner-create-url: '/partner/create'
   partner-update-url: '/partner/update'
   partner-change-status-url: '/partner//changeStatus'
   partner-review-url: '/partner/review'
+  partner-cert-upload-url: '/partner/cert/upload'
+  partner-cert-show-url: '/partner/cert/show/'
+  
   
   city-get-provinces-url: '/city/province/getall'
   city-get-cities-url: '/city/city/getbyprov/'
   city-get-areas-url: '/city/area/getbycity/'
 
+  goods-add-url: '/goods/add'
+  goods-update-url: '/goods/update'
+  goods-get-url: '/goods/get/'
+  goods-getall-nopartner-url: '/goods/getallnopartner'
+  goods-getall-withpartner-url: '/goods/getallwithpartner'
+  goods-change-status-url: '/goods/changeStatus'
+  goods-change-spec-url: '/goods/changeSpec'
+  goods-category-url: '/goods/category'
+  
+  image-file-upload-url: '/image/file/upload'
+  image-file-show-url: '/image/file/show/'
+  image-folder-create-url: '/image/folder/create'
+  image-folder-list-url: '/image/folder/list'
+  
+  postage-get-url: '/postage/get/'
+  postage-getbypartner-url: '/postage/getbypartner/'
+  postage-getusingcnt-url: '/postage/getusingcnt/'
+  postage-add-url: '/postage/add'
+  postage-update-url: '/postage/update'
+  postage-delete-url: '/postage/delete'
+  
+  receiver-getdefault-url: '/receiver/{userId}/getdefault'
+  receiver-getbyuser-url: '/receiver/{userId}/getbyuser'
+  receiver-save-url: '/receiver/{userId}/save'
+  receiver-delete-url: '/receiver/{userId}/delete/{recvId}'
+  receiver-setdefault-url: '/receiver/{userId}/setdefault/{recvId}'
+  
+  order-get-url: '/order/get/{orderId}'
+  order-create-url: '/order/{userId}/create'
+  order-update-url: '/order/{userId}/update'
+  order-checkdata-url: '/order/{userId}/checkData' 
+  order-search-url: '/order/getall' 
+  order-count-partiby-status-url: '/order/count/partibystatus'  
+  order-cancel-url: '/order/{userId}/cancel/{orderId}'
+  order-prepay-url: '/order/{userId}/prepay/{orderId}'
+  
   
 ######系统参数############  
 sys:
-  local-server-url: 'http://172.18.235.107:8000'
-  tmp-file-dir: '/tmp/wxmp/'
-  qrcode-file-dir: '/var/wxmp/qrcode/'
-  material-file-dir: '/var/wxmp/material/'
-  kf-headimg-dir: '/var/wxmp/headimg/'
-  wxmenu-file-dir: '/var/wxmp/wxmenu/'
-  
-  
+  local-server-url: 'http://wx.mofangyouxuan.com'
+  tmp-file-dir: '/var/mfyx-wx/tmp/'
+
   

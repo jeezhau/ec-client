@@ -25,6 +25,7 @@
     <link href="/css/fileinput.min.css" rel="stylesheet">
 </head>
 <body class="light-gray-bg">
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <div class="container" id="container" style="oveflow:scroll">
   <div class="row">
      <h3 style="margin:10px 0;text-align:center" >我的图库</h3>
@@ -117,7 +118,7 @@ var containerVue = new Vue({
 							}
 						}
 					}else{
-						alert('获取数据失败！')
+						alertMsg('错误提示','获取数据失败！')
 					}
 				},
 				dataType: 'json'
@@ -190,7 +191,7 @@ var createDirVue = new Vue({
 		submit:function(){
 			var patt = new RegExp('^[a-zA-Z0-9_\u4e00-\u9fa5]{2,10}$');
 			if(!patt.test(this.folderName)){
-				alert("新建文件夹名为(2-10字母数字汉字)！");
+				alertMsg('错误提示',"新建文件夹名为(2-10字母数字汉字)！");
 				return false;
 			}
 			$.ajax({
@@ -206,10 +207,10 @@ var createDirVue = new Vue({
 							var cache = containerVue.cacheFiles[createDirVue.params.upFolderPath];
 							cache.push(createDirVue.params.folderName);
 						}else{//出现逻辑错误
-							alert(jsonRet.errmsg);
+							alertMsg('错误提示',jsonRet.errmsg);
 						}
 					}else{
-						alert('系统数据访问失败！');
+						alertMsg('错误提示','系统数据访问失败！');
 					}
 					$("#createDirModal").modal('hide');
 				},
@@ -280,7 +281,7 @@ function initFileUpload(folderPath){
 	});
 	//异步上传错误结果处理
 	$('#upFile').on('fileerror', function(event, data, msg) {
-		alert("照片文件上传失败！");
+		alertMsg('错误提示',"照片文件上传失败！");
 		$('#upFile').fileinput('clear');
 		$("#uploadImgModal").modal('hide');
 	});
@@ -303,11 +304,11 @@ function initFileUpload(folderPath){
 				}
 				$("#uploadImgModal").modal('hide');
 			}else{//出现逻辑错误
-				alert(jsonRet.errmsg);
+				alertMsg('错误提示',jsonRet.errmsg);
 				$("#uploadImgModal").modal('hide');
 			}
 		}else{
-			alert('系统数据访问失败！')
+			alertMsg('错误提示','系统数据访问失败！')
 			$("#uploadImgModal").modal('hide');
 		}
 	});

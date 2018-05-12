@@ -23,9 +23,10 @@
     <script src="/script/common.js" type="text/javascript"></script>
 </head>
 <body class="light-gray-bg">
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 
-<div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
  <#if (order.orderId)?? >
+<div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
  <!-- 收货人信息 -->
   <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
     <div class="col-xs-12">
@@ -82,13 +83,19 @@
   </div>  
   
   <!-- 支付方式选择 -->
-  <div class="row" style="margin:5px 1px ;padding:3px 3px;background-color:white" >
-    <div class="col-xs-12 active">
+  <div class="row" style="">
+    <div class="col-xs-12 " style="margin:1px 5px ;padding:10px 25px;background-color:white" @click="choosePay(2)">
      <img alt="" src="/icons/微信支付.png" width="20px" height=20px>
      <span>微信支付</span>
-     <span class="pull-right">
-       <img src="/icons/选择.png" style="widht:20px;height:20px;">
-     </span>
+     <span v-if="param.payType == 2 " class="pull-right"><img src="/icons/选择.png" style="widht:20px;height:20px;"></span>
+    </div>
+    <div class="col-xs-12" style="margin:1px 5px;padding:10px 25px;background-color:white" @click="choosePay(1)">
+     <img alt="" src="/icons/余额.png" width="20px" height=20px>
+     <span>会员余额</span>
+     <span v-if="param.payType == 1 " class="pull-right"><img src="/icons/选择.png" style="widht:20px;height:20px;"></span>
+    </div>
+    <div class="col-xs-12" style="margin:1px 5px;padding:10px 25px;">
+      <p>注意：使用 [会员余额] 之外的第三方支付将收取下述交易额<span style="color:red"> 0.6% </span>的手续费，该手续费付给第三方支付平台！下述实付金额不包含手续费，手续费将额外收取！</p>
     </div>
   </div>
   
@@ -99,12 +106,11 @@
     	<span class="weui-tabbar__item " >
 	    <span class="weui-tabbar__label" >实付(含运费) <span style="color:red;font-size:18px">¥ ${order.amount}</span></span>
 	</span>   
-     <a href="/order/place/${(order.goodsId)?string('#')}" class="weui-tabbar__item " style='background-color:red;text-align:center;vertical-align:center;'>
+     <a href="javascript:;" class="weui-tabbar__item " style='background-color:red;text-align:center;vertical-align:center;'>
 	    <span class="weui-tabbar__label" style="font-size:20px;color:white">立即支付</span>
      </a>     	
   </div>
 </footer>
-</#if>
 </div><!-- end of container -->
 
 <script type="text/javascript">
@@ -112,37 +118,18 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		goodsSpecArr:JSON.parse('${(order.goodsSpec)!"[]"}'),
+		param:{
+			orderId:${(order.orderId)
+			payType:0 //支付方式:1-会员余额,2-微信
+		}
 	},
 	methods:{
-		getDispatchMode:function(code){
-			if(code){
-				if('1' === code){
-					return '官方统一配送';
-				}else if('2' == code){
-					return '商家自行配送';
-				}else if('3' == code){
-					return '快递配送';
-				}else if('4' == code){
-					return '客户自取';
-				}
-			}
+		choosePay:function(tp){
+			this.param.payType = tp;
 		},
-		
-		checkData: function(){
-			this.param.countAll = 0;
-			this.param.amount = 0;
-			for(var i=0;i<this.goods.specDetailArr.length;i++){
-				var sp = this.goods.specDetailArr[i];
-				var num =  sp.buyNum ? sp.buyNum : 0;
-				this.param.countAll = this.param.countAll + num;
-				this.param.amount += sp.price * num;
-			}
-			if(this.param.countAll<=0 || !this.param.recvId){//购买数量为0或为选择收货信息
-				alert("请输入购买数量并选择收货人信息！");
-				return;
-			}
+		prepay: function(){
 			$.ajax({
-				url: '/order/checkData',
+				url: '/order/prepay',
 				method:'post',
 				data: {'goodsId':this.param.goodsId,'recvId':this.param.recvId,'goodsSpec':JSON.stringify(this.goods.specDetailArr)},
 				success: function(jsonRet,status,xhr){
@@ -155,10 +142,10 @@ var containerVue = new Vue({
 								containerVue.param.flag = 1;
 							}
 						}else{//出现逻辑错误
-							alert(jsonRet.errmsg);
+							alertMsg('错误提示',jsonRet.errmsg);
 						}
 					}else{
-						alert('系统数据访问失败！')
+						alertMsg('错误提示','系统数据访问失败！')
 					}
 				},
 				dataType: 'json'
@@ -172,6 +159,7 @@ var containerVue = new Vue({
 });
 
 </script>
+</#if>
 
 <#if errmsg??>
 <!-- 错误提示模态框（Modal） -->

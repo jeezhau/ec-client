@@ -22,6 +22,7 @@
     
 </head>
 <body class="light-gray-bg">
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <div class="container" id="postageContainer" style="padding:0px 0px;oveflow-y:scroll">
   <div class="row" id="editpostage" style="background-color:white;margin:0 0;padding:0 5px">
     <h5 style="text-align:center;margin:15px 0">运费模版信息编辑</h5>
@@ -250,7 +251,7 @@ var postageContainerVue = new Vue({
 							postageContainerVue.metadata.provinces.push(jsonRet[i]);
 						}
 					}else{
-						alert('获取城市数据(省份)失败！')
+						alertMsg('错误提示','获取城市数据(省份)失败！')
 					}
 				},
 				dataType: 'json'
@@ -291,10 +292,10 @@ var postageContainerVue = new Vue({
 						if(0 == jsonRet.errcode){
 							window.location.href='/postage/index';
 						}else{//出现逻辑错误
-							alert(jsonRet.errmsg);
+							alertMsg('错误提示',jsonRet.errmsg);
 						}
 					}else{
-						alert('系统数据访问失败！')
+						alertMsg('错误提示','系统数据访问失败！')
 					}
 				},
 				dataType: 'json'

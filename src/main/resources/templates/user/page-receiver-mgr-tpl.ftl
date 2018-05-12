@@ -59,10 +59,10 @@ var receiverManageVue = new Vue({
 								receiverManageVue.receiverList.push(jsonRet.datas[i]);
 							}
 						}else{//出现逻辑错误
-							alert(jsonRet.errmsg);
+							alertMsg('错误提示',jsonRet.errmsg);
 						}
 					}else{
-						alert('系统数据访问失败！')
+						alertMsg('错误提示','系统数据访问失败！')
 					}
 				},
 				dataType: 'json'
@@ -78,10 +78,10 @@ var receiverManageVue = new Vue({
 						if(0 == jsonRet.errcode){
 							receiverManageVue.getAll();
 						}else{//出现逻辑错误
-							alert(jsonRet.errmsg);
+							alertMsg('错误提示',jsonRet.errmsg);
 						}
 					}else{
-						alert('系统数据访问失败！')
+						alertMsg('错误提示','系统数据访问失败！')
 					}
 				},
 				dataType: 'json'
@@ -100,10 +100,10 @@ var receiverManageVue = new Vue({
 						if(0 == jsonRet.errcode){
 							receiverManageVue.getAll();
 						}else{//出现逻辑错误
-							alert(jsonRet.errmsg);
+							alertMsg('错误提示',jsonRet.errmsg);
 						}
 					}else{
-						alert('系统数据访问失败！')
+						alertMsg('错误提示','系统数据访问失败！')
 					}
 				},
 				dataType: 'json'
@@ -232,7 +232,7 @@ var editReceiverVue = new Vue({
 							getCities();
 						}
 					}else{
-						alert('获取城市数据(省份)失败！')
+						alertMsg('错误提示','获取城市数据(省份)失败！')
 					}
 				},
 				dataType: 'json'
@@ -252,7 +252,7 @@ var editReceiverVue = new Vue({
 		},
 		submit:function(){
 			if(!this.param.area || !this.param.addr || !this.param.phone || !this.param.receiver){
-				alert("数据有误，所有项都需正确填写！");
+				alertMsg('错误提示',"数据有误，所有项都需正确填写！");
 				return;
 			}
 			$.ajax({
@@ -265,10 +265,10 @@ var editReceiverVue = new Vue({
 							receiverManageVue.getAll();
 							$('#editReceiverModal').modal('hide');
 						}else{//出现逻辑错误
-							alert(jsonRet.errmsg);
+							alertMsg('错误提示',jsonRet.errmsg);
 						}
 					}else{
-						alert('系统数据访问失败！')
+						alertMsg('错误提示','系统数据访问失败！')
 					}
 				},
 				dataType: 'json'
@@ -302,7 +302,7 @@ function getCities(){
 					getAreas();
 				}
 			}else{
-				alert('获取城市数据(地级市)失败！')
+				alertMsg('错误提示','获取城市数据(地级市)失败！')
 			}
 		},
 		dataType: 'json'
@@ -328,7 +328,7 @@ function getAreas(){
 					editReceiverVue.metadata.areas.push(jsonRet[i]);
 				}
 			}else{
-				alert('获取城市数据(县)失败！')
+				alertMsg('错误提示','获取城市数据(县)失败！')
 			}
 		},
 		dataType: 'json'
