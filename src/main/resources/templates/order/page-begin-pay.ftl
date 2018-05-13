@@ -84,18 +84,20 @@
   
   <!-- 支付方式选择 -->
   <div class="row" style="">
+  <#if wxPay!''=='1' >
     <div class="col-xs-12 " style="margin:1px 5px ;padding:10px 25px;background-color:white" @click="choosePay(2)">
      <img alt="" src="/icons/微信支付.png" width="20px" height=20px>
      <span>微信支付</span>
      <span v-if="param.payType == 2 " class="pull-right"><img src="/icons/选择.png" style="widht:20px;height:20px;"></span>
     </div>
+   </#if>
     <div class="col-xs-12" style="margin:1px 5px;padding:10px 25px;background-color:white" @click="choosePay(1)">
      <img alt="" src="/icons/余额.png" width="20px" height=20px>
      <span>会员余额</span>
      <span v-if="param.payType == 1 " class="pull-right"><img src="/icons/选择.png" style="widht:20px;height:20px;"></span>
     </div>
     <div class="col-xs-12" style="margin:1px 5px;padding:10px 25px;">
-      <p>注意：使用 [会员余额] 之外的第三方支付将收取下述交易额<span style="color:red"> 0.6% </span>的手续费，该手续费付给第三方支付平台！下述实付金额不包含手续费，手续费将额外收取！</p>
+      <p>注意：使用 [会员余额] 之外的第三方支付将收取下述交易额<span style="color:red"> 0.6%至0.9% </span>的手续费，该手续费付给第三方支付平台！下述实付金额不包含手续费，手续费将额外收取！</p>
     </div>
   </div>
   
@@ -107,7 +109,7 @@
 	    <span class="weui-tabbar__label" >实付(含运费) <span style="color:red;font-size:18px">¥ ${order.amount}</span></span>
 	</span>   
      <a href="javascript:;" class="weui-tabbar__item " style='background-color:red;text-align:center;vertical-align:center;'>
-	    <span class="weui-tabbar__label" style="font-size:20px;color:white">立即支付</span>
+	    <span class="weui-tabbar__label" style="font-size:20px;color:white" @click="prepay">立即支付</span>
      </a>     	
   </div>
 </footer>
@@ -129,35 +131,62 @@ var containerVue = new Vue({
 		},
 		prepay: function(){
 			$.ajax({
-				url: '/order/prepay',
+				url: '/order/prepay/' + this.param.orderId + '/' + this.param.payType
 				method:'post',
-				data: {'goodsId':this.param.goodsId,'recvId':this.param.recvId,'goodsSpec':JSON.stringify(this.goods.specDetailArr)},
+				data: {},
 				success: function(jsonRet,status,xhr){
 					if(jsonRet){
-						if(jsonRet.match){
-							containerVue.dispatchMatchs = [];
-							for(var i=0;i<jsonRet.match.length;i++){
-								//{postageId:'',mode:'',carrage:''}
-								containerVue.dispatchMatchs.push(jsonRet.match[i]);
-								containerVue.param.flag = 1;
+						if(jsonRet.errcode === 0){//创建支付成功
+							if(jsonRet.payType == '1'){//余额支付成功
+								window.location.href = "/order/pay/finish/" + containerVue.param.orderId;
+							}else if(jsonRet.payType == '2'{//微信支付
+								<#if wxPay!''=='1' >
+								if (typeof WeixinJSBridge == "undefined"){
+									if( document.addEventListener ){
+										document.addEventListener('WeixinJSBridgeReady', onBridgeReady(jsonRet.appId,jsonRet.timeStamp,jsonRet.nonceStr,jsonRet.prepay_id,jsonRet.paySign), false);
+									}else if (document.attachEvent){
+										document.attachEvent('WeixinJSBridgeReady', onBridgeReady(jsonRet.appId,jsonRet.timeStamp,jsonRet.nonceStr,jsonRet.prepay_id,jsonRet.paySign)); 
+										document.attachEvent('onWeixinJSBridgeReady', onBridgeReady(jsonRet.appId,jsonRet.timeStamp,jsonRet.nonceStr,jsonRet.prepay_id,jsonRet.paySign));
+									}
+								}else{
+									 onBridgeReady(jsonRet.appId,jsonRet.timeStamp,jsonRet.nonceStr,jsonRet.prepay_id,jsonRet.paySign);
+								}
+								</#if>
 							}
 						}else{//出现逻辑错误
 							alertMsg('错误提示',jsonRet.errmsg);
 						}
 					}else{
-						alertMsg('错误提示','系统数据访问失败！')
+						alertMsg('错误提示','系统数据访问失败！');
 					}
 				},
 				dataType: 'json'
 			});
-		},
-		getGoodsSpec:function(){
-			
-			return true;
 		}
 	}
 });
-
+<#if wxPay!''=='1' >
+function onBridgeReady(appId,timeStamp,nonceStr,prepay_id,paySign){
+   WeixinJSBridge.invoke(
+       'getBrandWCPayRequest', {
+           "appId":appId,     //公众号名称，由商户传入     
+           "timeStamp":timeStamp,         //时间戳，自1970年以来的秒数     
+           "nonceStr":nonceStr, //随机串     
+           "package":"prepay_id=" + prepay_id,     
+           "signType":"MD5",         //微信签名方式：     
+           "paySign":paySign //微信签名 
+       },
+       function(res){     
+           if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+        	        // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回  ok，但并不保证它绝对可靠。 
+        	  	   window.location.href = "/order/pay/finish/" + containerVue.param.orderId;
+           }else{
+        	   	   alertMsg('错误提示','微信支付失败！')
+           }
+       }
+   );
+}
+</#if>
 </script>
 </#if>
 

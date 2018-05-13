@@ -93,7 +93,7 @@ mfyx:
   order-search-url: '/order/getall' 
   order-count-partiby-status-url: '/order/count/partibystatus'  
   order-cancel-url: '/order/{userId}/cancel/{orderId}'
-  order-prepay-url: '/order/{userId}/prepay/{orderId}'
+  order-prepay-url: '/order/{userId}/createpay/{orderId}'
   
   
 ######系统参数############  

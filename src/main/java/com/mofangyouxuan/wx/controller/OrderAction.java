@@ -3,6 +3,7 @@ package com.mofangyouxuan.wx.controller;
 import java.math.BigInteger;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -131,7 +132,7 @@ public class OrderAction {
 	 * @return
 	 */
 	@RequestMapping("/pay/begin/{orderId}")
-	public String beiginPlay(@PathVariable("orderId")BigInteger orderId,ModelMap map) {
+	public String beiginPlay(@PathVariable("orderId")String orderId,HttpServletRequest request,ModelMap map) {
 		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
@@ -150,6 +151,20 @@ public class OrderAction {
 				}
 			}else {
 				map.put("errmsg", "获取订单信息失败！");
+			}
+			//判断客户端是否支持微信支付
+			String agent= request.getHeader("user-agent").toLowerCase();
+			int index = agent.indexOf("micromessenger/");
+			if(index >=0) {
+				String sub = agent.substring(index + "micromessenger/".length());
+				try {
+					Double bb = Double.parseDouble(sub);
+					if(bb > 5.0) {
+						map.put("wxPay", "1");
+					}
+				}catch(Exception e) {
+					
+				}
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -450,7 +465,7 @@ public class OrderAction {
 	 * @param map
 	 */
 	@RequestMapping("/detail/{orderId}")
-	public String showDetail(@PathVariable("orderId")BigInteger orderId,ModelMap map) {
+	public String showDetail(@PathVariable("orderId")String orderId,ModelMap map) {
 		
 		UserBasic user = (UserBasic) map.get("userBasic");
 		PartnerBasic partner= (PartnerBasic) map.get("partnerBasic");
@@ -485,7 +500,7 @@ public class OrderAction {
 	 * @return
 	 */
 	@RequestMapping("/cancel/{orderId}")
-	public String cancelorder(@PathVariable("orderId")BigInteger orderId,ModelMap map) {
+	public String cancelorder(@PathVariable("orderId")String orderId,ModelMap map) {
 		UserBasic user = (UserBasic) map.get("userBasic");
 		JSONObject jsonRet = new JSONObject();
 		try {
@@ -532,11 +547,12 @@ public class OrderAction {
 	 * @param orderId
 	 * @param payType 支付方式：1-余额，2-微信
 	 * @param map
-	 * @return
+	 * @return {errcode,errmsg,payType,appId,timeStamp,nonceStr,prepay_id,paySign}
 	 */
 	@RequestMapping("/prepay/{orderId}/{payType}")
-	public String prepayOrder(@PathVariable("orderId")BigInteger orderId,
-			@PathVariable("payType")Integer payType,ModelMap map) {
+	public String prepayOrder(@PathVariable("orderId")String orderId,
+			@PathVariable("payType")Integer payType,HttpServletRequest request,
+			ModelMap map) {
 		UserBasic user = (UserBasic) map.get("userBasic");
 		JSONObject jsonRet = new JSONObject();
 		try {
@@ -546,7 +562,6 @@ public class OrderAction {
 				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
 				return jsonRet.toString();
 			}
-			
 			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
 			if(!order.getUserId().equals(user.getUserId())) {
 				jsonRet.put("errmsg", "您没有权限查询该订单信息！");
@@ -558,15 +573,18 @@ public class OrderAction {
 				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
 				return jsonRet.toString();
 			}
-			
-			//.jsonRet = OrderService.cancelOrder(orderId, user.getUserId(),boolean needBack);
-			
+			if(1 != payType && 2!= payType) {
+				jsonRet.put("errcode", ErrCodes.ORDER_PARAM_ERROR);
+				jsonRet.put("errmsg", "支付方式取值不正确！");
+				return jsonRet.toJSONString();
+			}
+			String ip = request.getRemoteHost();
+			jsonRet = OrderService.prepayOrder(payType, order, user, ip);
 			if(jsonRet == null || !jsonRet.containsKey("errocode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");
 				return jsonRet.toString();
 			}
-			
 		}catch(Exception e) {
 			e.printStackTrace();
 			jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);

@@ -1,7 +1,6 @@
 package com.mofangyouxuan.dto;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
@@ -9,7 +8,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 public class Order {
-    private BigInteger orderId;
+    private String orderId;
 
     private Integer userId;
 
@@ -114,11 +113,11 @@ public class Order {
     
     private String nickname;
 
-    public BigInteger getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(BigInteger orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 
