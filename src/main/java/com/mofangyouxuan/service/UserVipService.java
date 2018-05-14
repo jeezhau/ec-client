@@ -27,6 +27,7 @@ public class UserVipService {
 	private static String userBasicUpdateUrl;
 	private static String spreadQrCodeUrl;
 	private static String vipBasicGetUrl;
+	private static String changeFlowGetAllUrl;
 	
 	@Value("${mfyx.mfyx-server-url}")
 	public void setMfyxServerUrl(String url) {
@@ -56,6 +57,10 @@ public class UserVipService {
 	@Value("${mfyx.vip-basic-get-url}")
 	public void setVipBasicGetUrl(String url) {
 		vipBasicGetUrl = url;
+	}
+	@Value("${mfyx.change-flow-getall-url}")
+	public void setChangeFlowGetAllUrl(String url) {
+		changeFlowGetAllUrl = url;
 	}
 	
 	/**
@@ -170,4 +175,25 @@ public class UserVipService {
 		return jsonRet;
 	}
 
+	/**
+	 * 查询会员资金流水信息
+	 * @param jsonSearchParams
+	 * @param jsonPageCond
+	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
+	 */
+	public static JSONObject searchFlows(String jsonSearchParams,String jsonPageCond) {
+		String url = mfyxServerUrl + changeFlowGetAllUrl;
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("jsonSearchParams", jsonSearchParams);
+		params.put("jsonPageCond", jsonPageCond);
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 }

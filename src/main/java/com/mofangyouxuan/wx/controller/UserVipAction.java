@@ -23,7 +23,9 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.UserBasic;
+import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.UserVipService;
+import com.mofangyouxuan.wx.utils.PageCond;
 
 /**
  * 个人中心管理
@@ -33,7 +35,7 @@ import com.mofangyouxuan.service.UserVipService;
 @Controller
 @RequestMapping("/user")
 @SessionAttributes({"openId","vipBasic","userBasic","isDayFresh","sys_func"})
-public class UserAction {
+public class UserVipAction {
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
@@ -52,7 +54,16 @@ public class UserAction {
 		if(!"basic".equals(mode) && !"vip".equals(mode)) {
 			mode = "basic";
 		}
-		
+		//重新获取用户基本信息，会员信息
+		String openId = (String)map.get("openId");
+		UserBasic userBasic = UserVipService.getUserBasic(openId);
+		if(userBasic != null) {
+			map.put("userBasic", userBasic);
+		}
+		VipBasic vipBasic = UserVipService.getVipBasic(openId);
+		if(vipBasic != null) {
+			map.put("vipBasic", vipBasic);
+		}
 		map.put("mode", mode);
 		map.put("sys_func", "user");
 		
@@ -160,6 +171,57 @@ public class UserAction {
 			map.put("errmsg", ret.getString("errmsg"));
 		}
 		return "user/page-spread-qrcode";
+	}
+	
+	/**
+	 * 获取资金流水显示页面
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/flow/show")
+	public String showFlow(ModelMap map) {
+		VipBasic vip = (VipBasic) map.get("vipBasic");
+		if(vip == null || !"1".equals(vip.getStatus())) {
+			map.put("errmsg", "您当前还未开通会员账户！");
+		}
+		
+		return "user/page-show-change-flow";
+	}
+	
+	
+	/**
+	 * 会员资金流水查询
+	 * @param jsonParams  查询条件：{vipId,changeType, amountDown,amountUp,beginCrtTime,endCrtTime,beginSumTime,endSumTime,sumFlag,reason,createOpr}
+	 * @param map
+	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
+	 */
+	@RequestMapping("/flow/getall")
+	@ResponseBody
+	public String getAllFlow(String jsonParams,PageCond pageCond,ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		VipBasic vip = (VipBasic) map.get("vipBasic");
+		try {
+			if(vip == null || !"1".equals(vip.getStatus())) {
+				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
+				jsonRet.put("errmsg", "您当前还未开通会员账户！");
+				return jsonRet.toJSONString();
+			}
+			
+			JSONObject params = JSONObject.parseObject(jsonParams);
+			params.put("vipId", vip.getVipId());
+
+			jsonRet = UserVipService.searchFlows(JSONObject.toJSONString(params), JSONObject.toJSONString(pageCond));
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
+				jsonRet.put("errmsg", "获取资金流水信息失败！");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
 	}
 	
 }

@@ -23,8 +23,8 @@
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#if goods??>
 <div class="container goods-container" id="container" style="margin:0 0;overflow:scroll">
-
  <div class="row" style="margin:5px 1px 1px ;" >
      <div style="margin:1px 0;padding:0 5px;background-color:white;font-size:130%;text-align:center" >
       <a href="/goods/show/${(goods.goodsId)?string('#')}">  ${(goods.goodsName)!''} </a>
@@ -347,7 +347,7 @@ containerVue.getDefaultReceiver();
      </div>
    </div>
 </div><!-- end of modal -->
-
+</#if>
 
 <#if errmsg??>
 <!-- 错误提示模态框（Modal） -->

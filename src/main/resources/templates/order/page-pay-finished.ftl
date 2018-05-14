@@ -20,50 +20,53 @@
     <link href="/css/weui.css" rel="stylesheet">
     
     <link href="/css/mfyx.css" rel="stylesheet">
-    <script src="/script/common.js"></script>
+    <script src="/script/common.js" type="text/javascript"></script>
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+
+
 <div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
- <#if (order.orderId)?? >
-  <div class="row" style="margin:5px 1px ;padding:3px 5px;background-color:white" >
-    <span>订单ID：${order.orderId}</span><br>
-    <span>创建时间：${(order.createTime)?string('yyyy-MM-dd hh:mm:ss')}</span>
-  </div>
-  <!-- 收货人信息 -->
-  <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
-    <div class="col-xs-12">
-      <span>
-        <#if (order.headimgurl)?starts_with('http')>
-        <img alt="头像" src="${(order.headimgurl)!''}" width="20px" height="20px" style="border-radius:50%"> 
-        </#if>
-        <#if !(order.headimgurl)?starts_with('http')>
-        <img alt="头像" src="/user/headimg/show/${(order.userId)?string('#')}" width="20px" height="20px" style="border-radius:50%"> 
-	    </#if>
-	    <span>${order.nickname}</span>
-     </span><br>
-     <span>${order.recvName} , ${(order.recvPhone)!''}</span>
+ <#if payRetCode?? >
+ <!-- 支付结果信息 -->
+  <div class="row" style="margin:5px 1px ;padding:3px 0;height:80px;background-color:#6699FF;" >
+    <div class="col-xs-12" style="text-align:center;vertical-align:center;font-size:20px;font-weight:bold;padding-top:20px">
+     <#if (payRetCode >= 0) > <img alt="" src="/icons/支付成功.png" width=30px height=30px > </#if>
+     <span style="padding:5px">${payRetMsg}</span>
     </div>
-    <div class="col-xs-12">
-        <span>${order.recvProvince}</span>
-        <span>${order.recvCity}</span>
-        <span>${order.recvArea}</span>
-        <span>${order.recvAddr}</span>
-     </div>
-     <div class="col-xs-12">
-       {{getDispatchMode(${order.dispatchMode})}}
-     </div>
   </div>
+  <!-- 支付明细 -->
+  <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
+    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
+       <label class="col-xs-2" style="padding:0">订单号：</label>
+       <span class="col-xs-10" style="padding:0">${order.orderId!''}</span>
+    </div>
+    <div class="col-xs-12" style="text-align:cneter;padding:0">
+      <div class="col-xs-6" style="padding:0 3px">
+        <label class="col-xs-4" style="padding:0">支付方式：</label>
+        <span class="col-xs-8"  style="padding:0">{{getPayType('${payType!''}')}}</span>
+      </div>
+      <div class="col-xs-6" style="padding:0 3px">
+        <label class="col-xs-4"  style="padding:0">支付时间：</label>
+        <span class="col-xs-8"  style="padding:0">${payTime!''}</span>
+      </div>     
+    </div>
+    <div class="col-xs-12" style="text-align:cneter;padding:0">
+      <div class="col-xs-6" style="padding:0 3px">
+        <label class="col-xs-4" style="padding:0">订单额¥：</label>
+        <span class="col-xs-8"  style="padding:0">${amount!''}</span>
+      </div>
+      <div class="col-xs-6" style="padding:0 3px">
+        <label class="col-xs-4"  style="padding:0">手续费¥：</label>
+        <span class="col-xs-8"  style="padding:0">${fee!''}</span>
+      </div>     
+    </div>
+  </div> 
+
 
   <!-- 商品信息 -->
   <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
-    <div class="col-xs-12" style="text-align:center;">
-      <a class="pull-left" href="/partner/mcht/${(order.partnerId)?string('#')}">
-	    <img alt="头像" src="/partner/cert/show/logo/${(order.partnerId)?string('#')}" width="20px" height="20px" style="border-radius:50%"> 
-	    <span>${(order.partnerBusiName)!''}</span>
-	  </a><br>
-      <span>${order.goodsName}</span>
-    </div>
+    <div class="col-xs-12" style="text-align:center;">${order.goodsName}</div>
     <div class="col-xs-12" style="text-align:center;">
       <a href="/goods/show/${(order.goodsId)?string('#')}">
        <img alt="" src="/image/file/show/${(order.goodsMainImgPath)!''}" style="width:99%;height:150px;">
@@ -93,52 +96,31 @@
          </tr>
        </table>    
      </div>
-     <div class="row" style="margin:1px 1px;padding:3px 5px;background-color:white;">
-		<span class="pull-left"> 金额¥：${order.amount}</span> 
-		<span class="pull-right">{{getOrderStatus(${order.status})}}</span>
-	 </div>
-  </div>  
-  
-  <!-- 物流信息 -->
-  <div class="row" style="margin:5px 1px ;padding:3px 3px;background-color:white" >
-    
-  </div>
-  
-  <!-- 推荐商品 -->
-  <div class="row" style="margin:5px 1px ;padding:3px 3px;background-color:white" >
-    
-  </div>
-  
-
-</#if>
+  </div> 
+</#if>    
 </div><!-- end of container -->
 
 <script type="text/javascript">
 var containerVue = new Vue({
 	el:'#container',
 	data:{
-		goodsSpecArr:JSON.parse('${(order.goodsSpec)!"[]"}'),
+		goodsSpecArr:JSON.parse('${(order.goodsSpec)!"[]"}')
 	},
 	methods:{
-		getDispatchMode:function(code){
-			if(code){
-				if('1' === code){
-					return '官方统一配送';
-				}else if('2' == code){
-					return '商家自行配送';
-				}else if('3' == code){
-					return '快递配送';
-				}else if('4' == code){
-					return '客户自取';
-				}
+		getPayType:function(tp){
+			if('1' == tp){
+				return '余额支付';
+			}else if('2' == tp){
+				return '微信支付';
 			}
 		}
 	}
 });
-
 </script>
 
-<#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
+<#if errmsg??>
+ <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
+</#if>
 
 <#include "/menu/page-bottom-menu.ftl" encoding="utf8">
 

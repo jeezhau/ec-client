@@ -78,7 +78,7 @@
   </div> 
   
   <!-- 官方信息 -->
-  <div class="row" style="margin:5px 1px ;padding:3px 3px;background-color:white" >
+  <div class="row" style="margin:5px 1px ;padding:3px 3px;" >
    <img alt="" src="/images/mfyx_logo.jpeg" width=30px height=30px style="border-radius:50%"><span style="padding:0 10px;color:red">摩放优选</span>
   </div>  
   
@@ -121,7 +121,7 @@ var containerVue = new Vue({
 	data:{
 		goodsSpecArr:JSON.parse('${(order.goodsSpec)!"[]"}'),
 		param:{
-			orderId:${(order.orderId)
+			orderId:'${(order.orderId)}',
 			payType:0 //支付方式:1-会员余额,2-微信
 		}
 	},
@@ -130,17 +130,22 @@ var containerVue = new Vue({
 			this.param.payType = tp;
 		},
 		prepay: function(){
+			if(!this.param.payType){
+				alertMsg('系统提示','请先选择支付方式！');
+				return;
+			}
 			$.ajax({
-				url: '/order/prepay/' + this.param.orderId + '/' + this.param.payType
+				url: '/order/prepay/' + this.param.orderId + '/' + this.param.payType,
 				method:'post',
 				data: {},
 				success: function(jsonRet,status,xhr){
 					if(jsonRet){
 						if(jsonRet.errcode === 0){//创建支付成功
 							if(jsonRet.payType == '1'){//余额支付成功
-								window.location.href = "/order/pay/finish/" + containerVue.param.orderId;
-							}else if(jsonRet.payType == '2'{//微信支付
-								<#if wxPay!''=='1' >
+								 window.location.href = "/order/pay/finish/" + containerVue.param.orderId + '/success';
+							}
+							<#if wxPay!''=='1' >
+							else if(jsonRet.payType == '2'{//微信支付
 								if (typeof WeixinJSBridge == "undefined"){
 									if( document.addEventListener ){
 										document.addEventListener('WeixinJSBridgeReady', onBridgeReady(jsonRet.appId,jsonRet.timeStamp,jsonRet.nonceStr,jsonRet.prepay_id,jsonRet.paySign), false);
@@ -151,8 +156,8 @@ var containerVue = new Vue({
 								}else{
 									 onBridgeReady(jsonRet.appId,jsonRet.timeStamp,jsonRet.nonceStr,jsonRet.prepay_id,jsonRet.paySign);
 								}
-								</#if>
 							}
+							</#if>
 						}else{//出现逻辑错误
 							alertMsg('错误提示',jsonRet.errmsg);
 						}
@@ -179,9 +184,9 @@ function onBridgeReady(appId,timeStamp,nonceStr,prepay_id,paySign){
        function(res){     
            if(res.err_msg == "get_brand_wcpay_request:ok" ) {
         	        // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回  ok，但并不保证它绝对可靠。 
-        	  	   window.location.href = "/order/pay/finish/" + containerVue.param.orderId;
+        	  	   window.location.href = "/order/pay/finish/" + containerVue.param.orderId + '/success';
            }else{
-        	   	   alertMsg('错误提示','微信支付失败！')
+        	   	   window.location.href = "/order/pay/finish/" + containerVue.param.orderId + '/fail';
            }
        }
    );
@@ -191,27 +196,7 @@ function onBridgeReady(appId,timeStamp,nonceStr,prepay_id,paySign){
 </#if>
 
 <#if errmsg??>
-<!-- 错误提示模态框（Modal） -->
-<div class="modal fade " id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorTitle" aria-hidden="false" data-backdrop="static">
-	<div class="modal-dialog">
-  		<div class="modal-content">
-     		<div class="modal-header">
-        			<button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
-        			<h4 class="modal-title" id="errorTitle" style="color:red">错误提示</h4>
-     		</div>
-     		<div class="modal-body">
-       			<p> ${errmsg} </p><p/>
-     		</div>
-     		<div class="modal-footer">
-     			<div style="margin-left:50px">
-        			</div>
-     		</div>
-  		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-<script>
-$("#errorModal").modal('show');
-</script>
+ <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
 </#if>
 
 

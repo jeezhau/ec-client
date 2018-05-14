@@ -44,6 +44,7 @@ mfyx:
   user-basic-update-url: '/user/update'
   spread-qrcode-url: '/qrcode/spread'
   vip-basic-get-url: '/vip/get'
+  change-flow-getall-url: '/vip/flow/getall'
   
   partner-get-byvip-url: '/partner/get/byvip/'
   partner-get-byid-url: '/partner/get/byid/'
@@ -94,7 +95,7 @@ mfyx:
   order-count-partiby-status-url: '/order/count/partibystatus'  
   order-cancel-url: '/order/{userId}/cancel/{orderId}'
   order-prepay-url: '/order/{userId}/createpay/{orderId}'
-  
+  order-pay-finish-url: '/order/{userId}/payfinish/{orderId}/{status}'
   
 ######系统参数############  
 sys:

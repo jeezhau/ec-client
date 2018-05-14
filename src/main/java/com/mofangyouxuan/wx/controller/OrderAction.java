@@ -1,6 +1,5 @@
 package com.mofangyouxuan.wx.controller;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,8 +23,10 @@ import com.mofangyouxuan.dto.GoodsSpec;
 import com.mofangyouxuan.dto.Order;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.UserBasic;
+import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.service.OrderService;
+import com.mofangyouxuan.service.UserVipService;
 import com.mofangyouxuan.wx.utils.PageCond;
 
 /**
@@ -115,7 +116,7 @@ public class OrderAction {
 			order.setUserId(user.getUserId());
 			JSONObject jsonRet = OrderService.createOrder(order, user.getUserId());
 			if(jsonRet != null && jsonRet.containsKey("orderId"));{
-				BigInteger orderId = jsonRet.getBigInteger("orderId");
+				String orderId = jsonRet.getString("orderId");
 				return "forward:/order/pay/begin/" + orderId; //跳转到支付页面
 			}
 		}catch(Exception e) {
@@ -143,7 +144,7 @@ public class OrderAction {
 				if(!user.getUserId().equals(order.getUserId())) {
 					map.put("errmsg", "该订单不是您的宝贝订单！");
 				}else {
-					if( !"10".equals(order.getStatus()) && !"10".equals(order.getStatus())) {//可支付
+					if( "10".equals(order.getStatus()) || "12".equals(order.getStatus())) {//可支付
 						map.put("order", order);
 					}else {
 						map.put("errmsg", "该订单当前不可再次支付！");
@@ -170,7 +171,7 @@ public class OrderAction {
 			e.printStackTrace();
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
-		return "order/page-begin-pay";
+		return "order/page-pay-begin";
 	}
 	
 	
@@ -178,12 +179,43 @@ public class OrderAction {
 	 * 买家选择支付渠道完成支付
 	 * 修改订单状态，然后跳转至订单支付成功页面
 	 * @param orderId
+	 * @param status 支付结果 succees-成功，fail-失败
 	 * @return
 	 */
-	@RequestMapping("/pay/finish/{orderId}")
-	public String finishPay(@PathVariable("orderId")BigInteger orderId,ModelMap map) {
-		
-		
+	@RequestMapping("/pay/finish/{orderId}/{status}")
+	public String finishPay(@PathVariable("orderId")String orderId,
+			@PathVariable("status")String status,ModelMap map) {
+		Order order = null;
+		try {
+			UserBasic user = (UserBasic)map.get("userBasic");
+			JSONObject jsonRet = OrderService.getOrder(orderId);
+			
+			if(jsonRet != null && jsonRet.containsKey("order")) {
+				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
+				if(!user.getUserId().equals(order.getUserId())) {
+					map.put("errmsg", "该订单不是您的宝贝订单！");
+				}else {//判断系统是否已经支付成功
+					jsonRet = OrderService.payFinish(order, user, status);
+					if(jsonRet != null && jsonRet.containsKey("errcode")) {
+						map.put("payRetCode", jsonRet.getIntValue("errcode"));
+						map.put("payRetMsg", jsonRet.getString("errmsg"));
+						map.put("payType", jsonRet.getString("payType"));
+						map.put("payTime", jsonRet.getString("payTime"));
+						map.put("amount", jsonRet.getDouble("amount"));
+						map.put("fee", jsonRet.getDouble("fee"));
+						map.put("order", order);
+					}else {
+						map.put("errmsg", "获取支付结果信息失败！");
+					}
+				}
+			}else {
+				map.put("errmsg", "获取订单信息失败！");
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
 		return "order/page-pay-finished";
 	}
 	
@@ -207,7 +239,7 @@ public class OrderAction {
 			status = "all";
 		}
 		map.put("status", status);
-		return "order/page-user-order-show";
+		return "order/page-orders-show-user";
 	}
 	
 	/**
@@ -230,7 +262,7 @@ public class OrderAction {
 		}
 		map.put("status", status);
 		map.put("sys_func", "partner-order");
-		return "order/page-partner-order-show";
+		return "order/page-orders-show-partner";
 	}
 	
 	/**
@@ -500,6 +532,7 @@ public class OrderAction {
 	 * @return
 	 */
 	@RequestMapping("/cancel/{orderId}")
+	@ResponseBody
 	public String cancelorder(@PathVariable("orderId")String orderId,ModelMap map) {
 		UserBasic user = (UserBasic) map.get("userBasic");
 		JSONObject jsonRet = new JSONObject();
@@ -550,6 +583,7 @@ public class OrderAction {
 	 * @return {errcode,errmsg,payType,appId,timeStamp,nonceStr,prepay_id,paySign}
 	 */
 	@RequestMapping("/prepay/{orderId}/{payType}")
+	@ResponseBody
 	public String prepayOrder(@PathVariable("orderId")String orderId,
 			@PathVariable("payType")Integer payType,HttpServletRequest request,
 			ModelMap map) {
@@ -578,9 +612,15 @@ public class OrderAction {
 				jsonRet.put("errmsg", "支付方式取值不正确！");
 				return jsonRet.toJSONString();
 			}
+			if(1 == payType) {//更新会员余额信息
+				VipBasic vipBasic = UserVipService.getVipBasic(user.getOpenId());
+				if(vipBasic != null) {
+					map.put("vipBasic", vipBasic);
+				}
+			}
 			String ip = request.getRemoteHost();
 			jsonRet = OrderService.prepayOrder(payType, order, user, ip);
-			if(jsonRet == null || !jsonRet.containsKey("errocode")) {
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");
 				return jsonRet.toString();

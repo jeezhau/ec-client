@@ -68,7 +68,9 @@
 		 getAll: function(){
 			 $("#loadingData").show();
 			 $("#nomoreData").hide();
-			 containerVue.goodsList = [];
+			 if(containerVue.goodsList.length>100){
+			 	containerVue.goodsList = [];
+			 }
 			 $.ajax({
 					url: '/shop/getall',
 					method:'post',
@@ -115,11 +117,14 @@
      var scrollHeight = $(window).scrollTop(); //滚动条top   
      var r = (pageHieght - winHeight - scrollHeight) / winHeight;
      if (r < 0.5) {//上拉翻页 
-    	 	containerVue.begin = containerVue.begin + containerVue.pageSize;
+    	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
     	 	containerVue.getAll();
      }
-     if(scrollHeight<0){//下拉刷新
-    	 	containerVue.param.begin = 0;
+     if(scrollHeight<0){ //下拉翻页
+    	 	containerVue.param.begin = containerVue.param.begin - containerVue.param.pageSize;
+     	if(containerVue.param.begin < 0){
+     		containerVue.param.begin = 0;
+     	}
     	 	containerVue.getAll();
      }
  }  

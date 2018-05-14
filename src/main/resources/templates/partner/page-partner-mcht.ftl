@@ -145,20 +145,14 @@ var containerVue = new Vue({
 					method:'post',
 					data: {'begin':0,'pageSize':3},
 					success: function(jsonRet,status,xhr){
-						if(jsonRet ){
-							if(jsonRet.errcode == 0){//
-								for(var i=0;i<jsonRet.datas.length;i++){
-									var appr = jsonRet.datas[i];
-									if(appr.appraiseInfo){
-										appr.appraiseInfo = JSON.parse(appr.appraiseInfo);
-									}
+						if(jsonRet && jsonRet.errcode == 0){//
+							for(var i=0;i<jsonRet.datas.length;i++){
+								var appr = jsonRet.datas[i];
+								if(appr.appraiseInfo){
+									appr.appraiseInfo = JSON.parse(appr.appraiseInfo);
 								}
-								containerVue.apprCnt = jsonRet.pageCond.count;
-							}else{
-								alertMsg('错误提示',jsonRet.errmsg);
 							}
-						}else{
-							alertMsg('错误提示','获取数据失败！')
+							containerVue.apprCnt = jsonRet.pageCond.count;
 						}
 					},
 					dataType: 'json'
