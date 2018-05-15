@@ -88,14 +88,23 @@ mfyx:
   receiver-setdefault-url: '/receiver/{userId}/setdefault/{recvId}'
   
   order-get-url: '/order/get/{orderId}'
+  order-logistics-url: '/order/logistics/{orderId}'
+  order-count-partiby-status-url: '/order/count/partibystatus' 
+  order-search-url: '/order/getall' 
   order-create-url: '/order/{userId}/create'
   order-update-url: '/order/{userId}/update'
   order-checkdata-url: '/order/{userId}/checkData' 
-  order-search-url: '/order/getall' 
-  order-count-partiby-status-url: '/order/count/partibystatus'  
   order-cancel-url: '/order/{userId}/cancel/{orderId}'
   order-prepay-url: '/order/{userId}/createpay/{orderId}'
   order-pay-finish-url: '/order/{userId}/payfinish/{orderId}/{status}'
+  order-refund-url: '/order/{userId}/refund/{orderId}'
+  order-exchange-url: '/order/{userId}/exchange/{orderId}'
+  order-appr2mcht-url: '/order/{userId}/appr2mcht/{orderId}'
+  order-appr2user-url: '/order/{partnerId}/appr2user/{orderId}'
+  order-ready-url: '/order/{partnerId}/ready/{orderId}'
+  order-delivery-url: '/order/{partnerId}/delivery/{orderId}'
+  order-updaftersales-url: '/order/{partnerId}/aftersales/{orderId}'
+  
   
 ######系统参数############  
 sys:

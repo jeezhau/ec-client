@@ -634,4 +634,42 @@ public class OrderAction {
 		return jsonRet.toString();
 	}
 	
+	/**
+	 * 
+	 * @param orderId
+	 * @return
+	 */
+	@RequestMapping("/partner/ready/{orderId}")
+	public String readyOrUnGoods(@PathVariable(value="orderId")String orderId,ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
+		if(partner == null ) {
+			jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
+			jsonRet.put("errmsg", "您还未开通合作伙伴功能！");
+			return jsonRet.toJSONString();
+		}
+		try {
+			jsonRet = OrderService.getOrder(orderId);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
+				jsonRet.put("errmsg", "获取订单信息失败！");
+			}
+			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+			if(!"20".equals(order.getStatus()) && !"21".equals(order.getStatus())) {
+				jsonRet.put("errcode", ErrCodes.ORDER_PARAM_ERROR);
+				jsonRet.put("errmsg", "该订单当前不可进行备货管理！");
+				return jsonRet.toJSONString();
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
+	}
+	
+	
 }
+

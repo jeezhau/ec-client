@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.dto.Order;
+import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.wx.utils.HttpUtils;
 import com.mofangyouxuan.wx.utils.ObjectToMap;
@@ -30,6 +31,7 @@ public class OrderService {
 	private static String orderCancelUrl;
 	private static String orderPrepayUrl;
 	private static String orderPayFinishUrl;
+	private static String orderReadyUrl;
 	
 	@Value("${mfyx.mfyx-server-url}")
 	public void setMfyxServerUrl(String mfyxServerUrl) {
@@ -72,6 +74,12 @@ public class OrderService {
 	public void setOrderPayFinishUrl(String url) {
 		OrderService.orderPayFinishUrl = url;
 	}
+	
+	@Value("${mfyx.order-ready-url}")
+	public void setOrderReadyUrl(String url) {
+		OrderService.orderReadyUrl = url;
+	}
+	
 	/**
 	 * 根据ID获取订单信息
 	 * @param orderId
@@ -302,5 +310,28 @@ public class OrderService {
 		
 	}
 	
-	
+	/**
+	 * 卖家准备发货或取消备货
+	 * @param order
+	 * @param user
+	 * @param status 客户端发送的支付状态
+	 * @return
+	 */
+	public static JSONObject readyGoods(Order order,PartnerBasic partner) {
+		JSONObject jsonRet = new JSONObject();
+		Map<String,Object> params = new HashMap<String,Object>();
+		//向服务中心发送申请
+		String url = mfyxServerUrl + orderReadyUrl;
+		url = url.replace("{partnerId}", partner.getPartnerId() + "");
+		url = url.replace("{orderId}", order.getOrderId() + "");
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
 }

@@ -59,11 +59,11 @@
       <#include "/order/tpl-order-buy-content.ftl" encoding="utf8"> 
 
 	  <div class="row" style="margin:1px 0;padding:3px 18px 3px 18px;background-color:white;">
-		    <a v-if="order.status ==='10' || order.status ==='12' || order.status ==='20'" class="btn btn-default pull-right" style="padding:0 3px;margin:0 3px" @click="cancelOrder(order)">
+		    <a v-if="order.status ==='10' || order.status ==='11' || order.status ==='12' || order.status ==='20'" class="btn btn-default pull-right" style="padding:0 3px;margin:0 3px" @click="cancelOrder(order)">
 		      <span >协商取消</span>
 		    </a>
 
-			<a v-if="order.status ==='20'" class="btn btn-info pull-right" :href="'/order/pay/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即备货</span></a>
+			<a v-if="order.status ==='20'" class="btn btn-info pull-right" style="padding:0 3px;margin:0 3px" @click="readyGoods(order)"><span >接单备货</span></a>
 		    <a v-if="order.status ==='20' || order.status ==='21'" class="btn btn-danger pull-right" :href="'/order/pay/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即发货</span></a>
 		    
 		    <a v-if="order.status==='30' " class="btn btn-default pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >查看物流</span></a>
@@ -127,6 +127,10 @@ var containerVue = new Vue({
 		cancelOrder : function(order){
 			$('#cancelOrderModal').modal('show');
 			cancelOrderVue.order = order;
+		},
+		readyGoods: function(order){
+			$('#readyGoodsModal').modal('show');
+			readyGoodsVue.order = order;
 		}
 	}
 });
@@ -164,6 +168,68 @@ containerVue.getOrders('${status!''}');
 	 },
 	 methods:{
 		 
+	 }
+ });
+</script>
+
+<!-- 买家备货订单（Modal） -->
+<div class="modal fade " id="readyGoodsModal" tabindex="-1" role="dialog" aria-labelledby="readyGoodsModalTitle" aria-hidden="false" data-backdrop="static" style="top:20%">
+	<div class="modal-dialog">
+  		<div class="modal-content">
+     		<div class="modal-header">
+        			<button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
+        			<h4 class="modal-title" id="readyGoodsModalTitle" style="color:red">接单备货</h4>
+     		</div>
+     		<div class="modal-body">
+       			<#include "/order/tpl-order-buy-user.ftl" encoding="utf8"> 
+      			<#include "/order/tpl-order-buy-content.ftl" encoding="utf8"> 
+       			 <div class="row" style="margin:3px 0px;background-color:white; color:red">
+       			   <p/>
+       			   <p>订单状态: {{getOrderStatus(order.status)}}</p>
+       			   <span>&nbsp;&nbsp;&nbsp;&nbsp;如果您能保证尽快发货，但是目前库存不足，可以电联告知买家，然后执行此操作！务必注意：如果长时间未发货，可能遭到买家投诉！</span>
+       			   <span>下单联系人电话：{{order.userPhone}}</span>
+       			 </div>
+     		</div>
+     		<div class="modal-footer" style="text-align:certer">
+     			<button class="btn btn-info" @click="submit"> 备 货 </button>
+     			<button class="btn btn-default" data-dismiss="modal"> 关 闭 </button>
+     		</div>
+  		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script type="text/javascript">
+ var readyGoodsVue = new Vue({
+	 el:'#readyGoodsModal',
+	 data:{
+		 order:{},
+	 },
+	 methods:{
+		 submit: function(){
+			 $.ajax({
+				url: '/order/partner/getall',
+				method:'post',
+				data: this.param,
+				success: function(jsonRet,status,xhr){
+					if(jsonRet && jsonRet.datas){
+						for(var i=0;i<jsonRet.datas.length;i++){
+							var item = jsonRet.datas[i];
+							item.goodsSpec = JSON.parse(item.goodsSpec);
+							containerVue.orders.push(item);
+						}
+					}else{
+						if(jsonRet && jsonRet.errmsg){
+							//alert(jsonRet.errmsg);
+							$("#nomoreData").show();
+						}
+					}
+					$("#loadingData").hide();
+				},
+				failure:function(){
+					$("#loadingData").hide();
+				},
+				dataType: 'json'
+			});
+		 }
 	 }
  });
 </script>
