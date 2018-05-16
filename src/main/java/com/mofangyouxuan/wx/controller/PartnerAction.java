@@ -32,7 +32,6 @@ import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.PartnerMgrService;
-import com.mofangyouxuan.service.WXMPService;
 import com.mofangyouxuan.wx.api.JSAPITicket;
 import com.mofangyouxuan.wx.api.WebAuth;
 
@@ -378,6 +377,4 @@ public class PartnerAction {
 			e.printStackTrace();
 		}
 	}
-
-	
 }

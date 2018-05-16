@@ -39,12 +39,17 @@ wxmp:
 ######业务参数-摩放优选服务中心访问############
 mfyx:
   mfyx-server-url: 'http://192.168.0.102:8080'
+  
   user-basic-get-url: '/user/get'
   user-basic-create-url: '/user/create'
   user-basic-update-url: '/user/update'
   spread-qrcode-url: '/qrcode/spread'
   vip-basic-get-url: '/vip/get'
   change-flow-getall-url: '/vip/flow/getall'
+  vip-upd-pwd-url: '/vip/updpwd'
+  vip-upd-act-url: '/vip/updact'
+  user-headimg-upload-url: '/user/headimg/upload/{userId}'
+  user-headimg-show-url: '/user/headimg/show/{userId}'
   
   partner-get-byvip-url: '/partner/get/byvip/'
   partner-get-byid-url: '/partner/get/byid/'

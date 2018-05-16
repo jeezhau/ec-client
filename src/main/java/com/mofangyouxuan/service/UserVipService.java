@@ -1,5 +1,6 @@
 package com.mofangyouxuan.service;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ import com.mofangyouxuan.wx.utils.HttpUtils;
 @Component 
 public class UserVipService {
 	
-	
+	private static String tmpFileDir;
 	private static String mfyxServerUrl;
 	private static String userBasicGetUrl;
 	private static String userBasicCreateUrl;
@@ -28,6 +29,15 @@ public class UserVipService {
 	private static String spreadQrCodeUrl;
 	private static String vipBasicGetUrl;
 	private static String changeFlowGetAllUrl;
+	private static String vipUpdPwdUrl;
+	private static String vipUpdActUrl;
+	private static String userHeadimgUploadUrl;
+	private static String userHeadimgShowUrl;
+	
+	@Value("${sys.tmp-file-dir}")
+	public void setTmpFileDir(String url) {
+		tmpFileDir = url;
+	}
 	
 	@Value("${mfyx.mfyx-server-url}")
 	public void setMfyxServerUrl(String url) {
@@ -62,7 +72,22 @@ public class UserVipService {
 	public void setChangeFlowGetAllUrl(String url) {
 		changeFlowGetAllUrl = url;
 	}
-	
+	@Value("${mfyx.vip-upd-pwd-url}")
+	public void setVipUpdPwdUrl(String url) {
+		vipUpdPwdUrl = url;
+	}
+	@Value("${mfyx.vip-upd-act-url}")
+	public void setVipUpdActUrl(String url) {
+		vipUpdActUrl = url;
+	}
+	@Value("${mfyx.user-headimg-upload-url}")
+	public void setUserHeadimgUploadUrl(String url) {
+		userHeadimgUploadUrl = url;
+	}
+	@Value("${mfyx.user-headimg-show-url}")
+	public void setUserHeadimgShowUrl(String url) {
+		userHeadimgShowUrl = url;
+	}	
 	/**
 	 * 获取用户基本信息
 	 * @param openId
@@ -196,4 +221,81 @@ public class UserVipService {
 		return null;
 	}
 	
+	/**
+	 * 更新会员资金操作密码
+	 * @param vipId
+	 * @param passwd		资金操作密码
+	 * @return {errcode:0,errmsg:"ok"} 
+	 */
+	public static JSONObject updPayPwd(Integer vipId ,String passwd) {
+		String url = mfyxServerUrl + vipUpdPwdUrl;
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("vipId", vipId);
+		params.put("passwd", passwd);
+		String strRet = HttpUtils.doPostSSL(url, params);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 更新会员提现账户信息
+	 * @param vipId
+	 * @param actNm
+	 * @param actNo
+	 * @param actBlk
+	 * @return
+	 */
+	public static JSONObject updAccount(Integer vipId,String actNm,String actNo,String actBlk) {
+		String url = mfyxServerUrl + vipUpdActUrl;
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("vipId", vipId);
+		params.put("actNm", actNm);
+		params.put("actNo", actNo);
+		params.put("actBlk", actBlk);
+		String strRet = HttpUtils.doPostSSL(url, params);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 头像照片上传
+	 * @param imageFile
+	 * @param userId
+	 * @return {errcode:0,errmsg:""}
+	 */
+	public static JSONObject uploadHeadImg(File imageFile,Integer userId) {
+		String url = mfyxServerUrl + userHeadimgUploadUrl;
+		url = url.replace("{userId}", userId + "");
+		Map<String,String> paramPairs = new HashMap<String,String>();
+		String strRet = HttpUtils.uploadFile(url, imageFile, "image", paramPairs);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 获取头像照片
+	 * @param userId
+	 * @return
+	 */
+	public static File showHeadimg(Integer userId) {
+		String url = mfyxServerUrl + userHeadimgShowUrl;
+		url = url.replace("{userId}", userId + "");
+		File file = HttpUtils.downloadFile(tmpFileDir,url);
+		return file;
+	}
 }

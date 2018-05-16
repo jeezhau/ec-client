@@ -48,7 +48,7 @@ public class AppraiseAction {
 	 */
 	@RequestMapping("/getall/goods/{goodsId}")
 	@ResponseBody
-	public Object getAllByGoods(@PathVariable("goodsId")Long goodsId,PageCond pageCond,ModelMap map) {
+	public Object getAllApprByGoods(@PathVariable("goodsId")Long goodsId,PageCond pageCond,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
 			JSONObject params = new JSONObject();
@@ -59,7 +59,15 @@ public class AppraiseAction {
 			JSONObject sortParams = new JSONObject();
 			sortParams.put("createTime", "1#1");
 			
-			jsonRet = OrderService.searchOrders(params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
+			JSONObject showGroups = new JSONObject();
+			//needReceiver,needLogistics,needAppr,needAfterSales,needGoodsAndUser
+			//showGroups.put("needReceiver", true);
+			//showGroups.put("needLogistics", true);
+			showGroups.put("needAppr", true);
+			//showGroups.put("needAfterSales", true);
+			showGroups.put("needGoodsAndUser", true);
+			
+			jsonRet = OrderService.searchOrders(showGroups.toJSONString(),params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
@@ -83,7 +91,7 @@ public class AppraiseAction {
 	 */
 	@RequestMapping("/getall/partner/{partnerId}")
 	@ResponseBody
-	public Object getAllByPartner(@PathVariable("partnerId")Integer partnerId,PageCond pageCond,ModelMap map) {
+	public Object getAllApprByPartner(@PathVariable("partnerId")Integer partnerId,PageCond pageCond,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
 			JSONObject params = new JSONObject();
@@ -94,7 +102,15 @@ public class AppraiseAction {
 			JSONObject sortParams = new JSONObject();
 			sortParams.put("createTime", "1#1");
 			
-			jsonRet = OrderService.searchOrders(params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
+			JSONObject showGroups = new JSONObject();
+			//needReceiver,needLogistics,needAppr,needAfterSales,needGoodsAndUser
+			//showGroups.put("needReceiver", true);
+			//showGroups.put("needLogistics", true);
+			showGroups.put("needAppr", true);
+			//showGroups.put("needAfterSales", true);
+			showGroups.put("needGoodsAndUser", true);
+			
+			jsonRet = OrderService.searchOrders(showGroups.toJSONString(),params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
@@ -119,7 +135,7 @@ public class AppraiseAction {
 	 */
 	@RequestMapping("/getall/user/{userId}")
 	@ResponseBody
-	public Object getAllByUser(@PathVariable("userId")Integer userId,PageCond pageCond,ModelMap map) {
+	public Object getAllApprByUser(@PathVariable("userId")Integer userId,PageCond pageCond,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
 			JSONObject params = new JSONObject();
@@ -130,7 +146,15 @@ public class AppraiseAction {
 			JSONObject sortParams = new JSONObject();
 			sortParams.put("createTime", "1#1");
 			
-			jsonRet = OrderService.searchOrders(params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
+			JSONObject showGroups = new JSONObject();
+			//needReceiver,needLogistics,needAppr,needAfterSales,needGoodsAndUser
+			//showGroups.put("needReceiver", true);
+			//showGroups.put("needLogistics", true);
+			showGroups.put("needAppr", true);
+			//showGroups.put("needAfterSales", true);
+			showGroups.put("needGoodsAndUser", true);
+			
+			jsonRet = OrderService.searchOrders(showGroups.toJSONString(),params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);

@@ -38,7 +38,11 @@
     <div class="row" id="userBasic" style="display:<#if mode='basic'>block<#else>none</#if>"> 
       <div class="row" style="padding:10px 10px;background-color:#880000">
         <div class="row" style="margin:10px 25%;vertical-algin:center;text-align:center">
-          <img alt="" src="${(userBasic.headimgurl)!''}" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" > 
+          <#if ((userBasic.headimgurl)!'')?starts_with('http')>
+             <img alt="" src="${userBasic.headimg}" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" > 
+            <#else>
+             <img alt="" src="/user/headimg/show/${(userBasic.userId)?string('#')}"width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" >
+          </#if>
         </div>
         <div class="row" style="width:60%;margin:10px 20%;color:gray">
           <span class="pull-left"><img alt="" src="<#if userBasic.sex='1'>/icons/性别-男.png<#elseif userBasic.sex='2'>/icons/性别-女.png<#else>/icons/性别-未知.png</#if>" width="20px" height="20px"> ${userBasic.nickname} </span >
@@ -142,7 +146,11 @@
           <#if vipBasic.status != '1'>
            <img alt="" src="/icons/无效对象.png" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" >
           <#else>
-          <img alt="" src="${userBasic.headimgurl!''}" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" > 
+            <#if ((userBasic.headimgurl)!'')?starts_with('http')>
+             <img alt="" src="${userBasic.headimg}" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" > 
+            <#else>
+             <img alt="" src="/user/headimg/show/${(userBasic.userId)?string('#')}"width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" >
+            </#if>
           </#if>
         </div>
         <div class="row" style="margin:10px 5px;color:gray">
@@ -181,6 +189,14 @@
 		   <a href="<#if vipBasic.status = '1'>/partner/index<#else>javascript:;</#if>">
 			    <img alt="" src="/icons/合作伙伴.png" width="90px" height="90px"> 
 			    <p >合作伙伴 </p>
+			</a>
+	       </div>
+	    </div>
+	    	<div class="col-xs-6" style="padding-left:5px">
+	       <div style="background-color:white">
+		   <a href="<#if vipBasic.status = '1'>/user/vipset<#else>javascript:;</#if>">
+			    <img alt="" src="/icons/账户设置.png" width="90px" height="90px"> 
+			    <p >账户设置 </p>
 			</a>
 	       </div>
 	    </div>	

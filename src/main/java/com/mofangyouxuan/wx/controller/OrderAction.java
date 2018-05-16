@@ -137,7 +137,7 @@ public class OrderAction {
 		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
-			JSONObject jsonRet = OrderService.getOrder(orderId);
+			JSONObject jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
 			
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
@@ -188,7 +188,7 @@ public class OrderAction {
 		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
-			JSONObject jsonRet = OrderService.getOrder(orderId);
+			JSONObject jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
 			
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
@@ -309,7 +309,14 @@ public class OrderAction {
 			JSONObject sortParams = new JSONObject();
 			sortParams.put("createTime", "1#1");
 			
-			jsonRet = OrderService.searchOrders(params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
+			JSONObject showGroups = new JSONObject();
+			//needReceiver,needLogistics,needAppr,needAfterSales,needGoodsAndUser
+			showGroups.put("needReceiver", true);
+			showGroups.put("needLogistics", true);
+			showGroups.put("needAppr", true);
+			showGroups.put("needAfterSales", true);
+			showGroups.put("needGoodsAndUser", true);
+			jsonRet = OrderService.searchOrders(showGroups.toJSONString(),params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
@@ -372,8 +379,14 @@ public class OrderAction {
 			
 			JSONObject sortParams = new JSONObject();
 			sortParams.put("createTime", "1#1");
-			
-			jsonRet = OrderService.searchOrders(params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
+			JSONObject showGroups = new JSONObject();
+			//needReceiver,needLogistics,needAppr,needAfterSales,needGoodsAndUser
+			showGroups.put("needReceiver", true);
+			showGroups.put("needLogistics", true);
+			showGroups.put("needAppr", true);
+			showGroups.put("needAfterSales", true);
+			showGroups.put("needGoodsAndUser", true);
+			jsonRet = OrderService.searchOrders(showGroups.toJSONString(),params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
@@ -505,7 +518,7 @@ public class OrderAction {
 			if(user == null && partner == null) {
 				map.put("errmsg", "您没有权限查询该订单信息！");
 			}else {
-				JSONObject jsonRet = OrderService.getOrder(orderId);
+				JSONObject jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
 				if(jsonRet == null || !jsonRet.containsKey("order")) {
 					map.put("errmsg", "系统中没有该订单信息！");
 				}else {
@@ -537,7 +550,7 @@ public class OrderAction {
 		UserBasic user = (UserBasic) map.get("userBasic");
 		JSONObject jsonRet = new JSONObject();
 		try {
-			jsonRet = OrderService.getOrder(orderId);
+			jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
 				jsonRet.put("errmsg", "系统中没有该订单信息！");
 				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
@@ -590,7 +603,7 @@ public class OrderAction {
 		UserBasic user = (UserBasic) map.get("userBasic");
 		JSONObject jsonRet = new JSONObject();
 		try {
-			jsonRet = OrderService.getOrder(orderId);
+			jsonRet = OrderService.getOrder(true, null, null, false, true, orderId);
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
 				jsonRet.put("errmsg", "系统中没有该订单信息！");
 				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
@@ -649,7 +662,7 @@ public class OrderAction {
 			return jsonRet.toJSONString();
 		}
 		try {
-			jsonRet = OrderService.getOrder(orderId);
+			jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);

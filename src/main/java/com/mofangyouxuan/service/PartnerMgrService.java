@@ -27,7 +27,7 @@ public class PartnerMgrService {
 	private static String partnerBasicCreateUrl;
 	private static String partnerBasicUpdateUrl;
 	private static String partnerChangeStatusUrl;
-	private static String partnerReviewUrl;
+	//private static String partnerReviewUrl;
 	private static String partnerCertUploadUrl;
 	private static String partnerCertShowUrl;
 	
@@ -60,10 +60,10 @@ public class PartnerMgrService {
 	public  void setPartnerChangeStatusUrl(String url) {
 		PartnerMgrService.partnerChangeStatusUrl = url;
 	}
-	@Value("${mfyx.partner-review-url}")
-	public void setPartnerReviewUrl(String url) {
-		PartnerMgrService.partnerReviewUrl = url;
-	}
+//	@Value("${mfyx.partner-review-url}")
+//	public void setPartnerReviewUrl(String url) {
+//		PartnerMgrService.partnerReviewUrl = url;
+//	}
 	@Value("${mfyx.partner-cert-upload-url}")
 	public void setPartnerCertUploadUrl(String url) {
 		PartnerMgrService.partnerCertUploadUrl = url;

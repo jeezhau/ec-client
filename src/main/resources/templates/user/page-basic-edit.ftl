@@ -16,19 +16,30 @@
     <link href="/css/templatemo-style.css" rel="stylesheet">
     
     <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-    
     <link href="/css/weui.css" rel="stylesheet">
     
+    <!-- 文件上传 -->
+    <script src="/script/fileinput.min.js" type="text/javascript"></script>
+    <script src="/script/zh.js" type="text/javascript"></script>
+    <link href="/css/fileinput.min.css" rel="stylesheet">
+    
     <link href="/css/mfyx.css" rel="stylesheet">
+    <script src="/script/common.js" type="text/javascript"></script>
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <div class="container " style="padding:0px 0px;oveflow:scroll">
   <div class="row">
-     <a class="col-xs-2" href="/user/index/basic" style="vertical-algin:center;text-align:center"><img width="15px" height="15px" alt="" src="/icons/返回.png"></a>
-     <h3 class="col-xs-9" style="margin:5px 0;text-align:center" >基本信息修改</h3>
+     <ul class="nav nav-tabs" style="margin:0 15%">
+	  <li style="width:50%" class="active" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#editBasic').show();$('#updHeadImg').hide();">
+	    <a href="javascript:;">基本信息编辑</a>
+	  </li>
+	  <li style="width:50%" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#editBasic').hide();$('#updHeadImg').show();">
+	    <a href="javascript:;">头像变更</a>
+	  </li>
+	</ul>
   </div>
-  <div class="row" style="width:100%;margin:0px 0px 0px 0px;padding:5px 8px;background-color:white">
+  <div class="row" style="width:100%;margin:0px 0px 0px 0px;padding:5px 8px;background-color:white" id="editBasic">
 	<form class="form-horizontal" id="editForm" action="" method ="post" autocomplete="on" enctype="multipart/form-data" role="form" >
 	  <div class="form-group">
 	    <label class="col-xs-3 control-label">昵称<span style="color:red">*</span></label>
@@ -65,7 +76,7 @@
             <option v-for="item in metadata.provinces" v-bind:value="item.provName">{{item.provName}}</option>
           </select>
         </div>
-      </div>         
+      </div>        
       <div class="form-group">
         <label for="city" class="col-xs-3 control-label">所在城市</label>
         <div class="col-xs-8">
@@ -100,7 +111,15 @@
       </div>
 	</form>	
   </div>
-
+  <div class="row" style="width:100%;margin:0px 0px 0px 0px;padding:5px 8px;background-color:white;display:none" id="updHeadImg">
+    	<form class="form-horizontal" method ="post" autocomplete="on" enctype="multipart/form-data" role="form" >  
+    	  <div class="form-group">
+	    <div class="col-xs-12">
+	        <input class="form-control" id=headimg  type="file" name="image" type="file" accept="image/jpg" class="file-loading">
+	    </div>
+	  </div>
+	</form>
+  </div>
 </div><!-- end of container -->
 <script type="text/javascript">
 var editFormVue = new Vue({
@@ -120,7 +139,7 @@ var editFormVue = new Vue({
 			city:'',
 			favourite:'',
 			profession:'',
-			introduce:''
+			introduce:'',
 		}
 	},
 	methods:{
@@ -192,7 +211,6 @@ function getBasic(){
 					editFormVue.param.profession = jsonRet.datas.profession;
 					editFormVue.param.favourite = jsonRet.datas.favourite;
 					editFormVue.param.introduce = jsonRet.datas.introduce;
-					
 					$.extend(editFormVue.initData,editFormVue.param); 
 					
 					editFormVue.getAllProvinces();
@@ -233,6 +251,57 @@ function getCities(){
 		dataType: 'json'
 	});
 }
+//头像上传
+$("#headimg").fileinput({
+	language: 'zh', //设置语言
+    uploadUrl: '/user/headimg/upload', //上传的地址
+    deleteUrl:'',
+    uploadAsync:true,
+    showUpload: true, //是否显示上传按钮
+    uploadExtraData:{'certType':'idcard1'},
+    deleteExtraData:{},
+    dropZoneEnabled:false,
+    allowedFileExtensions : ['jpg', 'png','jpeg'],//接收的文件后缀
+    previewFileType: "image",
+    browseClass: "btn btn-success",
+    browseLabel: "Pick Image",
+    browseIcon: "<i class=\"glyphicon glyphicon-picture\"></i> ",
+    removeClass: "btn btn-danger",
+    removeLabel: "Delete",
+    removeIcon: "<i class=\"glyphicon glyphicon-trash\"></i> ",
+    uploadClass: "btn btn-info",
+    uploadLabel: "Upload",
+    uploadIcon: "<i class=\"glyphicon glyphicon-upload\"></i> ",
+    maxFileSize: 2024,//单位为kb，如果为0表示不限制文件大小
+    previewSettings: {
+        image: {width: "100px", height: "100px"},
+    },
+    initialPreview: [ //预览图片的设置
+    		<#if ((userBasic.headimgurl)!'')?starts_with('http')>'<img alt="头像" src="${userBasic.headimg}" class="file-preview-image" style="width:96px"> '</#if>
+    		<#if !((userBasic.headimgurl)!'')?starts_with('http')>'<img alt="头像" src="/user/headimg/show/${(userBasic.userId)?string('#')}" class="file-preview-image" style="width:96px"> '</#if>
+    ]
+});
+//异步上传错误结果处理
+$('#headimg').on('fileerror', function(event, data, msg) {
+	alertMsg('错误提示',"头像上传失败！");
+	$('#headimg').fileinput('clear');
+});
+//异步上传成功结果处理
+$("#headimg").on("fileuploaded", function (event, data, previewId, index) {
+		var jsonRet = data.response;
+		if(jsonRet){
+		if(0 == jsonRet.errcode){
+			alertMsg('系统提示',"头像上传成功！！");
+		}else{//出现逻辑错误
+			alertMsg('错误提示',jsonRet.errmsg);
+			$('#headimg').fileinput('clear');
+		}
+	}else{
+		alertMsg('错误提示','系统数据访问失败！')
+		$('#headimg').fileinput('clear');
+	}
+});
+
 </script>
 
 <#if errmsg??>

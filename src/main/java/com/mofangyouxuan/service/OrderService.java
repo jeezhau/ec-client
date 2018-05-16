@@ -32,6 +32,43 @@ public class OrderService {
 	private static String orderPrepayUrl;
 	private static String orderPayFinishUrl;
 	private static String orderReadyUrl;
+	private static String orderDeliveryUrl;
+	private static String orderApplyRefundUrl;
+	private static String orderExchangeUrl;
+	private static String orderAppr2MchtUrl;
+	private static String orderAppr2UserUrl;
+	private static String orderAfterSalesUrl;
+	private static String orderGetLogisticsUrl;
+	
+	@Value("${mfyx.order-delivery-url}")
+	public void setOrderDeliveryUrl(String orderDeliveryUrl) {
+		OrderService.orderDeliveryUrl = orderDeliveryUrl;
+	}
+	@Value("${mfyx.order-refund-url}")
+	public void setOrderApplyRefundUrl(String orderApplyRefundUrl) {
+		OrderService.orderApplyRefundUrl = orderApplyRefundUrl;
+	}
+	@Value("${mfyx.order-exchange-url}")
+	public void setOrderExchangeUrl(String orderExchangeUrl) {
+		OrderService.orderExchangeUrl = orderExchangeUrl;
+	}
+	@Value("${mfyx.order-appr2mcht-url}")
+	public void setOrderAppr2MchtUrl(String orderAppr2MchtUrl) {
+		OrderService.orderAppr2MchtUrl = orderAppr2MchtUrl;
+	}
+	@Value("${mfyx.order-appr2user-url}")
+	public void setOrderAppr2UserUrl(String orderAppr2UserUrl) {
+		OrderService.orderAppr2UserUrl = orderAppr2UserUrl;
+	}
+	@Value("${mfyx.order-updaftersales-url}")
+	public void setOrderAfterSalesUrl(String orderAfterSalesUrl) {
+		OrderService.orderAfterSalesUrl = orderAfterSalesUrl;
+	}
+	@Value("${mfyx.order-logistics-url}")
+	public void setOrderGetLogisticsUrl(String orderGetLogisticsUrl) {
+		OrderService.orderGetLogisticsUrl = orderGetLogisticsUrl;
+	}
+
 	
 	@Value("${mfyx.mfyx-server-url}")
 	public void setMfyxServerUrl(String mfyxServerUrl) {
@@ -80,15 +117,29 @@ public class OrderService {
 		OrderService.orderReadyUrl = url;
 	}
 	
+	
 	/**
 	 * 根据ID获取订单信息
+	 * 
+	 * @param needReceiver
+	 * @param needLogistics
+	 * @param needAppr
+	 * @param needAfterSales
+	 * @param needGoodsAndUser
 	 * @param orderId
 	 * @return {"errcode":-1,"errmsg":"错误信息",order:{...}} 
 	 */
-	public static JSONObject getOrder(String orderId) {
+	public static JSONObject getOrder(Boolean needReceiver,Boolean needLogistics,Boolean needAppr,
+			Boolean needAfterSales,Boolean needGoodsAndUser,String orderId) {
 		String url = mfyxServerUrl + orderGetUrl;
 		url = url.replace("{orderId}", orderId+"") ;
-		String strRet = HttpUtils.doGet(url);
+		Map<String,Boolean> params = new HashMap<String,Boolean>();
+		params.put("needReceiver", needReceiver);
+		params.put("needLogistics", needLogistics);
+		params.put("needAppr", needAppr);
+		params.put("needAfterSales", needAfterSales);
+		params.put("needGoodsAndUser", needGoodsAndUser);
+		String strRet = HttpUtils.doPost(url);
 		JSONObject jsonRet = null;
 		try {
 			jsonRet = JSONObject.parseObject(strRet);
@@ -175,14 +226,17 @@ public class OrderService {
 	
 	
 	/**
+	 * 
+	 * @param jsonShowGroups	需要显示的字段分组:needReceiver,needLogistics,needAppr,needAfterSales,needGoodsAndUser
 	 * @param jsonSearchParams
 	 * @param jsonSortParams
 	 * @param jsonPageCond
 	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
 	 */
-	public static JSONObject searchOrders(String jsonSearchParams,String jsonSortParams,String jsonPageCond) {
+	public static JSONObject searchOrders(String jsonShowGroups,String jsonSearchParams,String jsonSortParams,String jsonPageCond) {
 		String url = mfyxServerUrl + orderSearchUrl;
 		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("jsonShowGroups", jsonShowGroups);
 		params.put("jsonSearchParams", jsonSearchParams);
 		params.put("jsonSortParams", jsonSortParams);
 		params.put("jsonPageCond", jsonPageCond);
@@ -315,7 +369,7 @@ public class OrderService {
 	 * @param order
 	 * @param user
 	 * @param status 客户端发送的支付状态
-	 * @return
+	 * @return {errcode,errmsg}
 	 */
 	public static JSONObject readyGoods(Order order,PartnerBasic partner) {
 		JSONObject jsonRet = new JSONObject();
@@ -333,5 +387,197 @@ public class OrderService {
 		}
 		return null;
 		
+	}
+	
+	/**
+	 * 卖家发货设置物流信息：快递公司、单号
+	 * @param partner
+	 * @param order
+	 * @param logisticsComp
+	 * @param logisticsNo
+	 * @return
+	 */
+	public static JSONObject deliveryGoods(PartnerBasic partner,Order order,
+			String logisticsComp,String logisticsNo) {
+		JSONObject jsonRet = new JSONObject();
+		Map<String,Object> params = new HashMap<String,Object>();
+		//向服务中心发送申请
+		String url = mfyxServerUrl + orderDeliveryUrl;
+		url = url.replace("{partnerId}", partner.getPartnerId() + "");
+		url = url.replace("{orderId}", order.getOrderId() + "");
+		params.put("logisticsComp", logisticsComp);
+		params.put("logisticsNo", logisticsNo);
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 买家申请退款，并退货
+	 * @param user
+	 * @param order
+	 * @param type		退款类型(1-未收到货，3-签收退款：品质与描述问题或无理由退货)
+	 * @param reason		退款理由，签收退货包含快递信息{reason,dispatchMode,logisticsComp,logisticsNo}
+	 * @param passwd		会员操作密码
+	 * @return
+	 */
+	public static JSONObject applyRefund(UserBasic user,Order order,
+			String type,String reason,String passwd) {
+		JSONObject jsonRet = new JSONObject();
+		Map<String,Object> params = new HashMap<String,Object>();
+		//向服务中心发送申请
+		String url = mfyxServerUrl + orderApplyRefundUrl;
+		url = url.replace("{userId}", user.getUserId() + "");
+		url = url.replace("{orderId}", order.getOrderId() + "");
+		params.put("type", type);
+		params.put("reason", reason);
+		params.put("passwd", passwd);
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 查询订单的物流信息
+	 * @param order
+	 * @return {errcode,errmsg,order:{}}
+	 */
+	public static JSONObject getLogistics(Order order) {
+		JSONObject jsonRet = new JSONObject();
+		Map<String,Object> params = new HashMap<String,Object>();
+		//向服务中心发送申请
+		String url = mfyxServerUrl + orderGetLogisticsUrl;
+		url = url.replace("{orderId}", order.getOrderId() + "");
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 买家申请换货，并退货
+	 * @param user
+	 * @param order
+	 * @param reason		换货理由，包含快递信息{reason,dispatchMode,logisticsComp,logisticsNo}
+	 * @return {errcode,errmsg}
+	 */
+	public static JSONObject exchange(UserBasic user,Order order,String reason) {
+		JSONObject jsonRet = new JSONObject();
+		Map<String,Object> params = new HashMap<String,Object>();
+		//向服务中心发送申请
+		String url = mfyxServerUrl + orderExchangeUrl;
+		url = url.replace("{userId}", user.getUserId() + "");
+		url = url.replace("{orderId}", order.getOrderId() + "");
+		params.put("reason", reason);
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 买家评价商家
+	 * @param user
+	 * @param order
+	 * @param scoreLogistics		物流评分
+	 * @param scoreMerchangt		商家服务评分
+	 * @param scoreGoods		商品描述评分
+	 * @param content	评价内容
+	 * @return {errcode,errmsg}
+	 */
+	public static JSONObject appr2Mcht(UserBasic user,Order order,
+			Integer scoreLogistics,Integer scoreMerchant,Integer scoreGoods,String content) {
+		JSONObject jsonRet = new JSONObject();
+		Map<String,Object> params = new HashMap<String,Object>();
+		//向服务中心发送申请
+		String url = mfyxServerUrl + orderAppr2MchtUrl;
+		url = url.replace("{userId}", user.getUserId() + "");
+		url = url.replace("{orderId}", order.getOrderId() + "");
+		params.put("scoreLogistics", scoreLogistics);
+		params.put("scoreMerchant", scoreMerchant);
+		params.put("scoreGoods", scoreGoods);
+		params.put("content", content);
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 卖家对买家评价
+	 * @param partner
+	 * @param order
+	 * @param score		评分
+	 * @param content	评价内容
+	 * @return {errcode,errmsg}
+	 */
+	public static JSONObject appr2User(PartnerBasic partner,Order order,Integer score,String content) {
+		JSONObject jsonRet = new JSONObject();
+		Map<String,Object> params = new HashMap<String,Object>();
+		//向服务中心发送申请
+		String url = mfyxServerUrl + orderAppr2UserUrl;
+		url = url.replace("{partnerId}", partner.getPartnerId() + "");
+		url = url.replace("{orderId}", order.getOrderId() + "");
+		params.put("score", score);
+		params.put("content", content);
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+
+	/**
+	 * 卖家更新售后信息
+	 * @param partner
+	 * @param order
+	 * @param nextStat	下一个状态／处理结果（52:已收到退货、核验中，53:核验不通过、协商解决，54:已重新发货、待收货，62：已收到退货、核验中，63:核验不通过、协商解决，64:同意退款，申请资金回退）
+	 * @param content	评价内容
+	 * @return {errcode,errmsg}
+	 */
+	public static JSONObject updAfterSales(PartnerBasic partner,Order order,
+			String nextStat,String content) {
+		JSONObject jsonRet = new JSONObject();
+		Map<String,Object> params = new HashMap<String,Object>();
+		//向服务中心发送申请
+		String url = mfyxServerUrl + orderAfterSalesUrl;
+		url = url.replace("{partnerId}", partner.getPartnerId() + "");
+		url = url.replace("{orderId}", order.getOrderId() + "");
+		params.put("nextStat", nextStat);
+		params.put("content", content);
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
