@@ -34,8 +34,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
-import com.mofangyouxuan.service.UserVipService;
-import com.mofangyouxuan.wx.utils.PageCond;
+import com.mofangyouxuan.service.UserService;
+import com.mofangyouxuan.service.VipService;
 
 /**
  * 个人中心管理
@@ -45,7 +45,7 @@ import com.mofangyouxuan.wx.utils.PageCond;
 @Controller
 @RequestMapping("/user")
 @SessionAttributes({"openId","vipBasic","userBasic","isDayFresh","sys_func"})
-public class UserVipAction {
+public class UserAction {
 	
 	@Value("${sys.tmp-file-dir}")
 	private String tmpFileDir;
@@ -66,17 +66,17 @@ public class UserVipAction {
 	 */
 	@RequestMapping("/index/{mode}")
 	public String getIndex(@PathVariable("mode")String mode,ModelMap map){
-		//UserBasic user = (UserBasic) map.get("userBasic");
+		UserBasic user = (UserBasic) map.get("userBasic");
 		if(!"basic".equals(mode) && !"vip".equals(mode)) {
 			mode = "basic";
 		}
 		//重新获取用户基本信息，会员信息
 		String openId = (String)map.get("openId");
-		UserBasic userBasic = UserVipService.getUserBasic(openId);
+		UserBasic userBasic = UserService.getUserBasic(openId);
 		if(userBasic != null) {
 			map.put("userBasic", userBasic);
 		}
-		VipBasic vipBasic = UserVipService.getVipBasic(openId);
+		VipBasic vipBasic = VipService.getVipBasic(user.getUserId());
 		if(vipBasic != null) {
 			map.put("vipBasic", vipBasic);
 		}
@@ -99,7 +99,7 @@ public class UserVipAction {
 	public Object getUserBasci(ModelMap map)   {
 		String openId = (String) map.get("openId");
 		JSONObject jsonRet = new JSONObject();
-		UserBasic basic = UserVipService.getUserBasic(openId);
+		UserBasic basic = UserService.getUserBasic(openId);
 		if(basic != null) {//成功
 			jsonRet.put("errcode", 0);
 			jsonRet.put("errmsg", "ok");
@@ -152,7 +152,7 @@ public class UserVipAction {
 //				jsonRet.put("errmsg", " openid: not null and length range is 6-100. ");
 //				return jsonRet.toString();
 //			}
-			return UserVipService.updateUserBasic(basic);
+			return UserService.updateUserBasic(basic);
 		}catch(Exception e) {
 			//数据处理
 			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
@@ -179,7 +179,7 @@ public class UserVipAction {
 		}else {
 			create = "0";
 		}
-		JSONObject ret = UserVipService.getSpreadQrCode(openId,create);
+		JSONObject ret = UserService.getSpreadQrCode(openId,create);
 		if(ret.containsKey("errcode") && ret.getIntValue("errcode") == 0) {
 			map.put("showurl", ret.getString("showurl"));
 			map.put("count", ret.getIntValue("count"));
@@ -189,155 +189,7 @@ public class UserVipAction {
 		return "user/page-spread-qrcode";
 	}
 	
-	/**
-	 * 获取资金流水显示页面
-	 * @param map
-	 * @return
-	 */
-	@RequestMapping("/flow/show")
-	public String showFlow(ModelMap map) {
-		VipBasic vip = (VipBasic) map.get("vipBasic");
-		if(vip == null || !"1".equals(vip.getStatus())) {
-			map.put("errmsg", "您当前还未开通会员账户！");
-		}
-		
-		return "user/page-show-change-flow";
-	}
 	
-	
-	/**
-	 * 会员资金流水查询
-	 * @param jsonParams  查询条件：{vipId,changeType, amountDown,amountUp,beginCrtTime,endCrtTime,beginSumTime,endSumTime,sumFlag,reason,createOpr}
-	 * @param map
-	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
-	 */
-	@RequestMapping("/flow/getall")
-	@ResponseBody
-	public String getAllFlow(String jsonParams,PageCond pageCond,ModelMap map) {
-		JSONObject jsonRet = new JSONObject();
-		VipBasic vip = (VipBasic) map.get("vipBasic");
-		try {
-			if(vip == null || !"1".equals(vip.getStatus())) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "您当前还未开通会员账户！");
-				return jsonRet.toJSONString();
-			}
-			
-			JSONObject params = JSONObject.parseObject(jsonParams);
-			params.put("vipId", vip.getVipId());
-
-			jsonRet = UserVipService.searchFlows(JSONObject.toJSONString(params), JSONObject.toJSONString(pageCond));
-			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
-				jsonRet = new JSONObject();
-				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
-				jsonRet.put("errmsg", "获取资金流水信息失败！");
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
-			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
-		}
-		return jsonRet.toString();
-	}
-	
-	/**
-	 * 获取账户设置首页
-	 * @param map
-	 * @return
-	 */
-	@RequestMapping("/vipset")
-	public String setActIndex(ModelMap map) {
-		VipBasic vip = (VipBasic) map.get("vipBasic");
-		if(vip == null || !"1".equals(vip.getStatus())) {
-			map.put("errmsg", "您当前还未开通会员账户！");
-		}
-		
-		return "user/page-vip-setting";
-	}
-	
-	/**
-	 * 更新资金操作密码
-	 * @param pwd
-	 * @param map
-	 * @return
-	 */
-	@RequestMapping(value="/vipset/updpwd",method=RequestMethod.POST)
-	@ResponseBody
-	public String updPwd(@RequestParam(value="pwd",required=true)String pwd,ModelMap map) {
-		JSONObject jsonRet = new JSONObject();
-		VipBasic vip = (VipBasic) map.get("vipBasic");
-		try {
-			if(vip == null || !"1".equals(vip.getStatus())) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "您当前还未开通会员账户！");
-				return jsonRet.toJSONString();
-			}
-			pwd = pwd.trim();
-			if(pwd.length()<6 || pwd.length()>20) {
-				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-				jsonRet.put("errmsg", "密码长度为6-20位字符！");
-				return jsonRet.toString();
-			}
-			jsonRet = UserVipService.updPayPwd(vip.getVipId(), pwd);
-			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
-				jsonRet = new JSONObject();
-				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
-				jsonRet.put("errmsg", "获取资金流水信息失败！");
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
-			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
-		}
-		return jsonRet.toString();
-	}
-	
-	/**
-	 * 更新会员资金操作密码
-	 * @param vipId
-	 * @param passwd
-	 * @return
-	 */
-	@RequestMapping(value="/vipset/updact",method=RequestMethod.POST)
-	@ResponseBody
-	public Object updAccount(@RequestParam(value="vipId",required=true)Integer vipId,
-			@RequestParam(value="actNm",required=true)String accountName,
-			@RequestParam(value="actNo",required=true)String accountNo,
-			@RequestParam(value="actBlk",required=true)String accountBank) {
-		JSONObject jsonRet = new JSONObject();
-		try {
-			accountName = accountName.trim();
-			accountNo = accountNo.trim();
-			accountBank = accountBank.trim();
-			if(accountName.length()<2 || accountName.length()>100) {
-				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-				jsonRet.put("errmsg", "账户名长度为2-100位字符！");
-				return jsonRet.toString();
-			}
-			if(accountNo.length()<3 || accountNo.length()>30) {
-				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-				jsonRet.put("errmsg", "账户号长度为3-30位字符！");
-				return jsonRet.toString();
-			}
-			if(accountBank.length()<2 || accountBank.length()>100) {
-				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-				jsonRet.put("errmsg", "开户行名称长度为2-100位字符！");
-				return jsonRet.toString();
-			}
-			jsonRet = UserVipService.updAccount(vipId, accountName, accountNo, accountBank);
-			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
-				jsonRet = new JSONObject();
-				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
-				jsonRet.put("errmsg", "获取资金流水信息失败！");
-			}
-		}catch(Exception e) {
-			//数据处理
-			e.printStackTrace();
-			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
-			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
-		}
-		return jsonRet.toString();
-	}
 	
 	/**
 	 * 头像上传
@@ -377,7 +229,7 @@ public class UserVipAction {
 			tmpImg = new File(dir,image.getOriginalFilename()); //生成临时文件
 			FileUtils.copyInputStreamToFile(image.getInputStream(), tmpImg);
 			
-			jsonRet = UserVipService.uploadHeadImg(tmpImg, user.getUserId());
+			jsonRet = UserService.uploadHeadImg(tmpImg, user.getUserId());
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
@@ -409,7 +261,7 @@ public class UserVipAction {
 	public void showCert(@PathVariable(value="userId",required=true)Integer userId,
 			OutputStream out,HttpServletRequest request,HttpServletResponse response,ModelMap map) {
 		try {
-			File file = UserVipService.showHeadimg(userId);
+			File file = UserService.showHeadimg(userId);
 			if(file == null || !file.exists()) {
 				return;
 			}

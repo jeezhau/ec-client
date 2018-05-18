@@ -17,7 +17,8 @@ import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.service.PartnerMgrService;
-import com.mofangyouxuan.service.UserVipService;
+import com.mofangyouxuan.service.UserService;
+import com.mofangyouxuan.service.VipService;
 import com.mofangyouxuan.wx.api.WebAuth;
 
 
@@ -74,7 +75,7 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 		VipBasic vipBasic = (VipBasic) session.getAttribute("vipBasic");
 		PartnerBasic partnerBasic = (PartnerBasic) session.getAttribute("partnerBasic");
 		if(userBasic == null || userBasic.getUserId() == null) {
-			userBasic = UserVipService.getUserBasic(openId);
+			userBasic = UserService.getUserBasic(openId);
 			if(userBasic == null) {
 				response.sendRedirect("/error/nouser");
 				return false;
@@ -83,7 +84,7 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 		}
 		
 		if(vipBasic == null || vipBasic.getVipId() == null) {
-			vipBasic = UserVipService.getVipBasic(openId);
+			vipBasic = VipService.getVipBasic(userBasic.getUserId());
 			session.setAttribute("vipBasic", vipBasic);
 		}
 		if(partnerBasic == null) {
@@ -110,11 +111,11 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 		}
 		String openId = auth.getString("openid");
 		//检查用户是否已经存在
-		UserBasic userBasic = UserVipService.getUserBasic(openId);
+		UserBasic userBasic = UserService.getUserBasic(openId);
 		if(userBasic == null) {//发起注册
 			userBasic = WebAuth.getUserInfo(auth);
 			if(userBasic != null) {
-				JSONObject ret = UserVipService.createUserBasic(userBasic);
+				JSONObject ret = UserService.createUserBasic(userBasic);
 				if(ret != null && ret.containsKey("errcode") && ret.getIntValue("errcode") ==0) {
 					//用户信息注册成功
 					;

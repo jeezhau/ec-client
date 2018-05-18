@@ -170,7 +170,7 @@
 	    </div>
 	    <div class="col-xs-6" style="padding-left:5px">
 	       <div style="background-color:white">
-		    <a href="<#if vipBasic.status = '1'>/user/flow/show<#else>javascript:;</#if>">
+		    <a href="<#if vipBasic.status = '1'>/vip/flow/show<#else>javascript:;</#if>">
 			    <img alt="" src="/icons/查看明细.png" width="90px" height="90px"> 
 			    <p >资金变动明细</p>
 			</a>
@@ -194,7 +194,7 @@
 	    </div>
 	    	<div class="col-xs-6" style="padding-left:5px">
 	       <div style="background-color:white">
-		   <a href="<#if vipBasic.status = '1'>/user/vipset<#else>javascript:;</#if>">
+		   <a href="<#if vipBasic.status = '1'>/vip/vipset<#else>javascript:;</#if>">
 			    <img alt="" src="/icons/账户设置.png" width="90px" height="90px"> 
 			    <p >账户设置 </p>
 			</a>

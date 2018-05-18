@@ -26,7 +26,7 @@ import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.service.OrderService;
-import com.mofangyouxuan.service.UserVipService;
+import com.mofangyouxuan.service.VipService;
 import com.mofangyouxuan.wx.utils.PageCond;
 
 /**
@@ -626,7 +626,7 @@ public class OrderAction {
 				return jsonRet.toJSONString();
 			}
 			if(1 == payType) {//更新会员余额信息
-				VipBasic vipBasic = UserVipService.getVipBasic(user.getOpenId());
+				VipBasic vipBasic = VipService.getVipBasic(user.getUserId());
 				if(vipBasic != null) {
 					map.put("vipBasic", vipBasic);
 				}

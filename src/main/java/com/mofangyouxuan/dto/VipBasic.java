@@ -13,6 +13,10 @@ public class VipBasic {
     private BigDecimal freeze;
 
     private Date createTime;
+    
+    private String phone;
+    
+    private String email;
 
     private String status;
 
@@ -63,4 +67,21 @@ public class VipBasic {
     public void setStatus(String status) {
         this.status = status == null ? null : status.trim();
     }
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+    
 }

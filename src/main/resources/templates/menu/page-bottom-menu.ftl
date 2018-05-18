@@ -9,7 +9,7 @@
 	</a>
    	<a href="/dayfresh/index/today" class="weui-tabbar__item <#if sys_func=='dayfresh'>weui-bar__item_on </#if>" >
       <span style="display: inline-block;position: relative;">
-        <img src="/images/mfyx_logo.jpeg" alt="" class="weui-tabbar__icon">
+        <img src="/img/mfyx_logo.jpeg" alt="" class="weui-tabbar__icon">
       </span>
       <p class="weui-tabbar__label">每日鲜推</p>
     </a>	

@@ -26,6 +26,7 @@ public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter{
     		//registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/**");
     	    registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/shop/**");
         registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/user/**");
+        registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/vip/**");
         registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/partner/**");
         registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/goods/**");
         registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/order/**");

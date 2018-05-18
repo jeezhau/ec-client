@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.dto.UserBasic;
-import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.wx.utils.HttpUtils;
 
 /**
@@ -19,7 +18,7 @@ import com.mofangyouxuan.wx.utils.HttpUtils;
  *
  */
 @Component 
-public class UserVipService {
+public class UserService {
 	
 	private static String tmpFileDir;
 	private static String mfyxServerUrl;
@@ -27,10 +26,6 @@ public class UserVipService {
 	private static String userBasicCreateUrl;
 	private static String userBasicUpdateUrl;
 	private static String spreadQrCodeUrl;
-	private static String vipBasicGetUrl;
-	private static String changeFlowGetAllUrl;
-	private static String vipUpdPwdUrl;
-	private static String vipUpdActUrl;
 	private static String userHeadimgUploadUrl;
 	private static String userHeadimgShowUrl;
 	
@@ -64,22 +59,7 @@ public class UserVipService {
 		spreadQrCodeUrl = url;
 	}
 	
-	@Value("${mfyx.vip-basic-get-url}")
-	public void setVipBasicGetUrl(String url) {
-		vipBasicGetUrl = url;
-	}
-	@Value("${mfyx.change-flow-getall-url}")
-	public void setChangeFlowGetAllUrl(String url) {
-		changeFlowGetAllUrl = url;
-	}
-	@Value("${mfyx.vip-upd-pwd-url}")
-	public void setVipUpdPwdUrl(String url) {
-		vipUpdPwdUrl = url;
-	}
-	@Value("${mfyx.vip-upd-act-url}")
-	public void setVipUpdActUrl(String url) {
-		vipUpdActUrl = url;
-	}
+	
 	@Value("${mfyx.user-headimg-upload-url}")
 	public void setUserHeadimgUploadUrl(String url) {
 		userHeadimgUploadUrl = url;
@@ -109,28 +89,6 @@ public class UserVipService {
 		}
 		
 		return userBasic;
-	}
-	
-	/**
-	 * 获取会员基本信息
-	 * @param openId
-	 * @return
-	 */
-	public static VipBasic getVipBasic(String openId) {
-		VipBasic vipBasic = null;
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("openId", openId);
-		String strRetVip = HttpUtils.doPost(mfyxServerUrl + vipBasicGetUrl, params);
-		try {
-			JSONObject ret = JSONObject.parseObject(strRetVip);
-			if(ret.containsKey("vipId")) {//成功
-				vipBasic = JSONObject.toJavaObject(ret, VipBasic.class);
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-			vipBasic = null;
-		}
-		return vipBasic;
 	}
 	
 	/**
@@ -200,72 +158,6 @@ public class UserVipService {
 		return jsonRet;
 	}
 
-	/**
-	 * 查询会员资金流水信息
-	 * @param jsonSearchParams
-	 * @param jsonPageCond
-	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
-	 */
-	public static JSONObject searchFlows(String jsonSearchParams,String jsonPageCond) {
-		String url = mfyxServerUrl + changeFlowGetAllUrl;
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("jsonSearchParams", jsonSearchParams);
-		params.put("jsonPageCond", jsonPageCond);
-		String strRet = HttpUtils.doPost(url, params);
-		try {
-			JSONObject jsonRet = JSONObject.parseObject(strRet);
-			return jsonRet;
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	/**
-	 * 更新会员资金操作密码
-	 * @param vipId
-	 * @param passwd		资金操作密码
-	 * @return {errcode:0,errmsg:"ok"} 
-	 */
-	public static JSONObject updPayPwd(Integer vipId ,String passwd) {
-		String url = mfyxServerUrl + vipUpdPwdUrl;
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("vipId", vipId);
-		params.put("passwd", passwd);
-		String strRet = HttpUtils.doPostSSL(url, params);
-		try {
-			JSONObject jsonRet = JSONObject.parseObject(strRet);
-			return jsonRet;
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	/**
-	 * 更新会员提现账户信息
-	 * @param vipId
-	 * @param actNm
-	 * @param actNo
-	 * @param actBlk
-	 * @return
-	 */
-	public static JSONObject updAccount(Integer vipId,String actNm,String actNo,String actBlk) {
-		String url = mfyxServerUrl + vipUpdActUrl;
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("vipId", vipId);
-		params.put("actNm", actNm);
-		params.put("actNo", actNo);
-		params.put("actBlk", actBlk);
-		String strRet = HttpUtils.doPostSSL(url, params);
-		try {
-			JSONObject jsonRet = JSONObject.parseObject(strRet);
-			return jsonRet;
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 	
 	/**
 	 * 头像照片上传
