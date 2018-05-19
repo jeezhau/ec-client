@@ -25,7 +25,7 @@ public class UserService {
 	private static String userBasicGetUrl;
 	private static String userBasicCreateUrl;
 	private static String userBasicUpdateUrl;
-	private static String spreadQrCodeUrl;
+	private static String userSpreadQrCodeUrl;
 	private static String userHeadimgUploadUrl;
 	private static String userHeadimgShowUrl;
 	
@@ -54,9 +54,9 @@ public class UserService {
 		userBasicCreateUrl = url;
 	}
 	
-	@Value("${mfyx.spread-qrcode-url}")
+	@Value("${mfyx.user-spread-qrcode-url}")
 	public void setSpreadQrCodeUrl(String url) {
-		spreadQrCodeUrl = url;
+		userSpreadQrCodeUrl = url;
 	}
 	
 	
@@ -153,7 +153,7 @@ public class UserService {
 		if(create != null && "1".equals(create.trim())){
 			params.put("create", "1");
 		}
-		String strRet = HttpUtils.doPost(mfyxServerUrl + spreadQrCodeUrl, params);
+		String strRet = HttpUtils.doPost(mfyxServerUrl + userSpreadQrCodeUrl, params);
 		JSONObject jsonRet = JSONObject.parseObject(strRet);
 		return jsonRet;
 	}

@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
+import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
-import com.mofangyouxuan.service.UserService;
 import com.mofangyouxuan.service.VipService;
 import com.mofangyouxuan.wx.utils.PageCond;
 
@@ -40,7 +40,7 @@ public class VipMgrAction {
 			map.put("errmsg", "您当前还未开通会员账户！");
 		}
 		
-		return "user/page-show-change-flow";
+		return "vip/page-show-change-flow";
 	}
 	
 	
@@ -86,12 +86,16 @@ public class VipMgrAction {
 	 */
 	@RequestMapping("/vipset")
 	public String getVipSetIndex(ModelMap map) {
-		VipBasic vip = (VipBasic) map.get("vipBasic");
-		if(vip == null || !"1".equals(vip.getStatus())) {
+		UserBasic user = (UserBasic) map.get("userBasic");
+		VipBasic vipBasic = VipService.getVipBasic(user.getUserId());
+		if(vipBasic != null) {
+			map.put("vipBasic", vipBasic);
+		}
+		if(vipBasic == null || !"1".equals(vipBasic.getStatus())) {
 			map.put("errmsg", "您当前还未开通会员账户！");
 		}
 		map.put("sys_func", "user");
-		return "user/page-vipset-index";
+		return "vip/page-vipset-index";
 	}
 	
 	/**
@@ -106,7 +110,7 @@ public class VipMgrAction {
 			map.put("errmsg", "您当前还未开通会员账户！");
 		}
 		
-		return "user/page-vipset-phone";
+		return "vip/page-vipset-phone";
 	}
 
 	
@@ -122,7 +126,7 @@ public class VipMgrAction {
 			map.put("errmsg", "您当前还未开通会员账户！");
 		}
 		
-		return "user/page-vipset-email";
+		return "vip/page-vipset-email";
 	}
 	
 	
@@ -138,7 +142,7 @@ public class VipMgrAction {
 			map.put("errmsg", "您当前还未开通会员账户！");
 		}
 		
-		return "user/page-vipset-account";
+		return "vip/page-vipset-account";
 	}
 	
 	
@@ -154,7 +158,7 @@ public class VipMgrAction {
 			map.put("errmsg", "您当前还未开通会员账户！");
 		}
 		
-		return "user/page-vipset-passwd";
+		return "vip/page-vipset-passwd";
 	}
 	
 	/**
@@ -186,7 +190,7 @@ public class VipMgrAction {
 				oldVeriCode = oldVeriCode.trim();
 				if(oldVeriCode.length() != 6 ) {
 					jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-					jsonRet.put("errmsg", "旧手机号短信验证码为6位字符！");
+					jsonRet.put("errmsg", "原手机号短信验证码为6位字符！");
 					return jsonRet.toString();
 				}
 			}
@@ -238,14 +242,14 @@ public class VipMgrAction {
 				return jsonRet.toJSONString();
 			}
 			//数据格式验证
-			if(vip.getPhone() != null && vip.getPhone().length()>=11) {
+			if(vip.getEmail() != null && vip.getEmail().length()>=3) {
 				if(oldVeriCode == null) {
 					oldVeriCode = "";
 				}
 				oldVeriCode = oldVeriCode.trim();
 				if(oldVeriCode.length() != 6 ) {
 					jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-					jsonRet.put("errmsg", "旧邮箱证码为6位字符！");
+					jsonRet.put("errmsg", "原邮箱验证码为6位字符！");
 					return jsonRet.toString();
 				}
 			}
@@ -296,7 +300,7 @@ public class VipMgrAction {
 			oldPwd = oldPwd.trim();
 			if(oldPwd.length()<6 || oldPwd.length()>20) {
 				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-				jsonRet.put("errmsg", "旧密码长度为6-20位字符！");
+				jsonRet.put("errmsg", "原密码长度为6-20位字符！");
 				return jsonRet.toString();
 			}
 			newPwd = newPwd.trim();
@@ -320,22 +324,72 @@ public class VipMgrAction {
 	}
 	
 	/**
+	 * 重置会员密码
+	 * @param pwd
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping(value="/vipset/resetpwd",method=RequestMethod.POST)
+	@ResponseBody
+	public String resetPwd(@RequestParam(value="type",required=true)String type,ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		VipBasic vip = (VipBasic) map.get("vipBasic");
+		try {
+			//数据验证
+			type = type.trim();
+			if(!type.matches("[12]")) {
+				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+				jsonRet.put("errmsg", "密码的重置媒介类型不正确（1-手机，2-邮箱）！");
+				return jsonRet.toString();
+			}
+			if(vip == null) {
+				jsonRet.put("errcode", ErrCodes.USER_NO_EXISTS);
+				jsonRet.put("errmsg", "系统中没有该会员用户！");
+				return jsonRet.toString();
+			}
+			if("1".equals(type) && (vip.getPhone() == null || vip.getPhone().length()<11)){
+				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+				jsonRet.put("errmsg", "您还未绑定手机号，请先完成手机号的绑定！");
+				return jsonRet.toString();
+			}
+			if("2".equals(type) && (vip.getEmail() == null || vip.getEmail().length()<3)){
+				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+				jsonRet.put("errmsg", "您还未绑定邮箱，请先完成邮箱的绑定！");
+				return jsonRet.toString();
+			}
+			jsonRet = VipService.resetPwd(vip.getVipId(), type);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
+				jsonRet.put("errmsg", "更新会员密码信息失败！");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
+	}
+	
+	/**
 	 * 更新会员提现信息
 	 * 
 	 * @param vipId
 	 * @param idNo
-	 * @param accountName
-	 * @param accountNo
-	 * @param accountBank
+	 * @param actNm
+	 * @param actNo
+	 * @param actBlk
 	 * @param pwd
 	 * @return
 	 */
 	@RequestMapping(value="/vipset/updact",method=RequestMethod.POST)
 	@ResponseBody
-	public Object updAccount(@RequestParam(value="idNo",required=true)String idNo,
-			@RequestParam(value="actNm",required=true)String accountName,
-			@RequestParam(value="actNo",required=true)String accountNo,
-			@RequestParam(value="actBlk",required=true)String accountBank,
+	public Object updAccount(@RequestParam(value="cashTp",required=true)String cashTp,
+			@RequestParam(value="actTp",required=true)String actTp,
+			@RequestParam(value="idNo",required=true)String idNo,
+			@RequestParam(value="actNm",required=true)String actNm,
+			@RequestParam(value="actNo",required=true)String actNo,
+			@RequestParam(value="actBlk",required=true)String actBlk,
 			@RequestParam(value="pwd",required=true)String pwd,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		VipBasic vip = (VipBasic) map.get("vipBasic");
@@ -345,26 +399,39 @@ public class VipMgrAction {
 				jsonRet.put("errmsg", "您当前还未开通会员账户！");
 				return jsonRet.toJSONString();
 			}
+			//数据格式验证
+			cashTp = cashTp.trim();
+			actTp =actTp.trim();
 			idNo = idNo.trim();
-			accountName = accountName.trim();
-			accountNo = accountNo.trim();
-			accountBank = accountBank.trim();
-			if(idNo.length() != 18) {
+			actNm = actNm.trim();
+			actNo = actNo.trim();
+			actBlk = actBlk.trim();
+			if(!cashTp.matches("[123]")) {
 				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-				jsonRet.put("errmsg", "身份证号码为18位字符！");
+				jsonRet.put("errmsg", "提现方式格式不正确！");
 				return jsonRet.toString();
 			}
-			if(accountName.length()<2 || accountName.length()>100) {
+			if(!actTp.matches("[12]")) {
+				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+				jsonRet.put("errmsg", "账户类型格式不正确！");
+				return jsonRet.toString();
+			}
+			if(!idNo.matches("[1-9]\\d{16}[0-9Xx]")) {
+				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+				jsonRet.put("errmsg", "身份证号码格式不正确！");
+				return jsonRet.toString();
+			}
+			if(actNm.length()<2 || actNm.length()>100) {
 				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
 				jsonRet.put("errmsg", "账户名长度为2-100位字符！");
 				return jsonRet.toString();
 			}
-			if(accountNo.length()<3 || accountNo.length()>30) {
+			if(actNo.length()<3 || actNo.length()>30) {
 				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
 				jsonRet.put("errmsg", "账户号长度为3-30位字符！");
 				return jsonRet.toString();
 			}
-			if(accountBank.length()<2 || accountBank.length()>100) {
+			if(actBlk.length()<2 || actBlk.length()>100) {
 				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
 				jsonRet.put("errmsg", "开户行名称长度为2-100位字符！");
 				return jsonRet.toString();
@@ -375,11 +442,11 @@ public class VipMgrAction {
 				jsonRet.put("errmsg", "密码长度为6-20位字符！");
 				return jsonRet.toString();
 			}
-			jsonRet = VipService.updAccount(vip.getVipId(), idNo, accountName, accountNo, accountBank, pwd);
+			jsonRet = VipService.updAccount(vip.getVipId(), cashTp, actTp, idNo, actNm, actNo, actBlk, pwd);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
-				jsonRet.put("errmsg", "获取资金流水信息失败！");
+				jsonRet.put("errmsg", "更新账户信息失败！");
 			}
 		}catch(Exception e) {
 			//数据处理
@@ -432,7 +499,7 @@ public class VipMgrAction {
 	 * @param email
 	 * @return
 	 */
-	@RequestMapping(value="/vericode/phone/apply",method=RequestMethod.POST)
+	@RequestMapping(value="/vericode/email/apply",method=RequestMethod.POST)
 	@ResponseBody
 	public Object applyEmailVeriCode(@RequestParam(value="email",required=true)String email,
 			ModelMap map) {

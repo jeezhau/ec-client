@@ -22,6 +22,7 @@ import com.mofangyouxuan.dto.Goods;
 import com.mofangyouxuan.dto.GoodsSpec;
 import com.mofangyouxuan.dto.Order;
 import com.mofangyouxuan.dto.PartnerBasic;
+import com.mofangyouxuan.dto.PayFlow;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.GoodsService;
@@ -115,25 +116,29 @@ public class OrderAction {
 			//数据处理
 			order.setUserId(user.getUserId());
 			JSONObject jsonRet = OrderService.createOrder(order, user.getUserId());
-			if(jsonRet != null && jsonRet.containsKey("orderId"));{
+			if(jsonRet != null && jsonRet.containsKey("orderId")){
 				String orderId = jsonRet.getString("orderId");
-				return "forward:/order/pay/begin/" + orderId; //跳转到支付页面
+				return "redirect:/order/pay/choose/" + orderId; //跳转到支付页面
+			}else if(!jsonRet.containsKey("errcode")){
+				map.put("errmsg", "订单生成失败，出现系统错误！");
+			}else {
+				map.put("errmsg", jsonRet.getString("errmsg"));
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
-			return "order/page-place-order";
 		}
+		return "order/page-place-order";
 	}
 	
 	/**
-	 * 获取支付页面
+	 * 获取支付工具选择页面
 	 * @param orderId
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/pay/begin/{orderId}")
-	public String beiginPlay(@PathVariable("orderId")String orderId,HttpServletRequest request,ModelMap map) {
+	@RequestMapping("/pay/choose/{orderId}")
+	public String choosePlay(@PathVariable("orderId")String orderId,HttpServletRequest request,ModelMap map) {
 		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
@@ -171,7 +176,91 @@ public class OrderAction {
 			e.printStackTrace();
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
-		return "order/page-pay-begin";
+		return "order/page-pay-choose";
+	}
+	
+	/**
+	 * 使用余额进行支付
+	 * @param orderId
+	 * @return
+	 */
+	@RequestMapping("/pay/use/bal/{orderId}")
+	public String useBalPay(@PathVariable(value="orderId",required=true)String orderId,ModelMap map) {
+		Order order = null;
+		try {
+			UserBasic user = (UserBasic)map.get("userBasic");
+			VipBasic vip = (VipBasic) map.get("vipBasic");
+			if(vip == null || !"1".equals(vip.getStatus())) {
+				map.put("errmsg", "您还未开通会员，不可使用余额支付！");
+			}else if(vip.getPasswd() == null || vip.getPasswd().length()<10) {
+				map.put("errmsg", "您还未设置会员操作密码，不可使用余额支付！");
+			}else {
+				JSONObject jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
+				if(jsonRet != null && jsonRet.containsKey("order")) {
+					order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
+					if(!user.getUserId().equals(order.getUserId())) {
+						map.put("errmsg", "该订单不是您的订单！");
+						return "order/page-pay-usebal";
+					}
+					if( "10".equals(order.getStatus()) || "12".equals(order.getStatus())) {//可支付
+						map.put("order", order);
+						jsonRet = OrderService.getPayFlow(order, user, "1");
+						if(jsonRet == null || !jsonRet.containsKey("payFlow")) {
+							map.put("errmsg", "该订单的支付待支付流水获取失败！");
+							return "order/page-pay-usebal";
+						}
+						PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
+						map.put("payFlow", payFlow);
+					}else {
+						map.put("errmsg", "该订单当前不可再次支付！");
+					}
+					return "order/page-pay-usebal";
+				}
+				map.put("errmsg", "获取订单信息失败！");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return "order/page-pay-usebal";
+	}
+	
+	/**
+	 * 提交余额支付
+	 * @param orderId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/pay/submit/bal/{orderId}")
+	@ResponseBody
+	public String submitBalPay(@PathVariable(value="orderId",required=true)String orderId,
+			@RequestParam(value="passwd",required=true)String passwd,
+			ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		try {
+			VipBasic vip = (VipBasic) map.get("vipBasic");
+			if(vip == null || !"1".equals(vip.getStatus())) {
+				jsonRet.put("errcode", -1);
+				jsonRet.put("errmsg", "您还未开通会员，不可使用余额支付！");
+				return jsonRet.toJSONString();
+			}else if(vip.getPasswd() == null || vip.getPasswd().length()<10) {
+				jsonRet.put("errcode", -1);
+				jsonRet.put("errmsg", "您还未设置会员操作密码，不可使用余额支付！");
+				return jsonRet.toJSONString();
+			}
+			
+			jsonRet = OrderService.submitBalPay(orderId, vip.getVipId(), passwd);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
+				jsonRet.put("errmsg", "支付提交失败！");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
 	}
 	
 	
@@ -632,7 +721,7 @@ public class OrderAction {
 				}
 			}
 			String ip = request.getRemoteHost();
-			jsonRet = OrderService.prepayOrder(payType, order, user, ip);
+			jsonRet = OrderService.createPay(payType, order, user, ip);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");

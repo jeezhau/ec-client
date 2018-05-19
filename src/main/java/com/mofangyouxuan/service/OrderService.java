@@ -39,6 +39,8 @@ public class OrderService {
 	private static String orderAppr2UserUrl;
 	private static String orderAfterSalesUrl;
 	private static String orderGetLogisticsUrl;
+	private static String orderBalPaySubmitUrl;
+	private static String orderGetPayFlowUrl;
 	
 	@Value("${mfyx.order-delivery-url}")
 	public void setOrderDeliveryUrl(String orderDeliveryUrl) {
@@ -116,8 +118,14 @@ public class OrderService {
 	public void setOrderReadyUrl(String url) {
 		OrderService.orderReadyUrl = url;
 	}
-	
-	
+	@Value("${mfyx.order-balpay-submit-url}")
+	public void setBalPaySubmitUrl(String url) {
+		OrderService.orderBalPaySubmitUrl = url;
+	}
+	@Value("${mfyx.order-payflow-get-url}")
+	public void setGetPayFlowUrl(String url) {
+		OrderService.orderGetPayFlowUrl = url;
+	}
 	/**
 	 * 根据ID获取订单信息
 	 * 
@@ -133,13 +141,13 @@ public class OrderService {
 			Boolean needAfterSales,Boolean needGoodsAndUser,String orderId) {
 		String url = mfyxServerUrl + orderGetUrl;
 		url = url.replace("{orderId}", orderId+"") ;
-		Map<String,Boolean> params = new HashMap<String,Boolean>();
+		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("needReceiver", needReceiver);
 		params.put("needLogistics", needLogistics);
 		params.put("needAppr", needAppr);
 		params.put("needAfterSales", needAfterSales);
 		params.put("needGoodsAndUser", needGoodsAndUser);
-		String strRet = HttpUtils.doPost(url);
+		String strRet = HttpUtils.doPost(url,params);
 		JSONObject jsonRet = null;
 		try {
 			jsonRet = JSONObject.parseObject(strRet);
@@ -274,18 +282,6 @@ public class OrderService {
 	}
 	
 	/**
-	 * 用户查询自己的消费流水
-	 * @param order
-	 * @param user
-	 * @param flowType
-	 * @return
-	 */
-	public static JSONObject getPayFlow(Order order,UserBasic user,String flowType) {
-		
-		return null;
-	}
-	
-	/**
 	 * 取消订单
 	 * @param orderId
 	 * @param userId
@@ -316,7 +312,7 @@ public class OrderService {
 	 * @param userId
 	 * @return {errcode,errmsg,payType,appId,timeStamp,nonceStr,prepay_id,paySign}
 	 */
-	public static JSONObject prepayOrder(Integer payType,Order order,UserBasic user,String ip) {
+	public static JSONObject createPay(Integer payType,Order order,UserBasic user,String ip) {
 		JSONObject jsonRet = new JSONObject();
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("payType", payType);
@@ -335,6 +331,59 @@ public class OrderService {
 		}
 		return null;
 	}
+
+	/**
+	 * 获取已经创建的支付流水
+	 * @param order
+	 * @param user
+	 * @return {errcode,errmsg,payflow:{}}
+	 */
+	public static JSONObject getPayFlow(Order order,UserBasic user,String type) {
+		JSONObject jsonRet = new JSONObject();
+		Map<String,Object> params = new HashMap<String,Object>();
+		
+		//向服务中心发送申请
+		String url = mfyxServerUrl + orderGetPayFlowUrl;
+		url = url.replace("{userId}", user.getUserId() + "");
+		url = url.replace("{orderId}", order.getOrderId() + "");
+		url = url.replace("{type}", type);
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 发送余额支付请求
+	 * @param orderId
+	 * @param userId
+	 * @param pwd 会员密码
+	 * @return
+	 */
+	public static JSONObject submitBalPay(String orderId,Integer userId,String pwd) {
+		JSONObject jsonRet = new JSONObject();
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("passwd",pwd);
+		
+		//向服务中心发送申请
+		String url = mfyxServerUrl + orderBalPaySubmitUrl;
+		url = url.replace("{userId}", userId + "");
+		url = url.replace("{orderId}", orderId + "");
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
 	
 	/**
 	 * 发送支付完成请求

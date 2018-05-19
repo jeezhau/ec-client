@@ -30,7 +30,7 @@
  <!-- 收货人信息 -->
   <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
     <div class="col-xs-12">
-     <span>${order.recvName} , ${(order.recvPhone)!''}</span>
+     <span>${(order.recvName)!''} , ${(order.recvPhone)!''}</span>
     </div>
     <div class="col-xs-12">
         <span>${order.recvProvince}</span> 
@@ -79,7 +79,7 @@
   
   <!-- 官方信息 -->
   <div class="row" style="margin:5px 1px ;padding:3px 3px;" >
-   <img alt="" src="/images/mfyx_logo.jpeg" width=30px height=30px style="border-radius:50%"><span style="padding:0 10px;color:red">摩放优选</span>
+   <img alt="" src="/img/mfyx_logo.jpeg" width=30px height=30px style="border-radius:50%"><span style="padding:0 10px;color:red">摩放优选</span>
   </div>  
   
   <!-- 支付方式选择 -->
@@ -139,10 +139,10 @@ var containerVue = new Vue({
 				method:'post',
 				data: {},
 				success: function(jsonRet,status,xhr){
-					if(jsonRet){
+					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//创建支付成功
-							if(jsonRet.payType == '1'){//余额支付成功
-								 window.location.href = "/order/pay/finish/" + containerVue.param.orderId + '/success';
+							if(jsonRet.payType == '1'){ //使用余额支付
+								 window.location.href = "/order/pay/use/bal/" + containerVue.param.orderId;
 							}
 							<#if wxPay!''=='1' >
 							else if(jsonRet.payType == '2'{//微信支付

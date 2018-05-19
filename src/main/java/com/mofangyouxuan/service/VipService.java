@@ -18,13 +18,14 @@ import com.mofangyouxuan.wx.utils.HttpUtils;
 @Component 
 public class VipService {
 	
-	private static String tmpFileDir;
+	//private static String tmpFileDir;
 	private static String mfyxServerUrl;
 
 	private static String vipBasicGetUrl;
 	private static String vipCashFlowGetAllUrl;
 	private static String vipUpdPhoneUrl;
 	private static String vipUpdEmailUrl;
+	private static String vipResetPwdUrl;
 	private static String vipUpdPwdUrl;
 	private static String vipUpdActUrl;
 	
@@ -34,10 +35,10 @@ public class VipService {
 	private static String vipEmailVeriCodeGetUrl;
 
 	
-	@Value("${sys.tmp-file-dir}")
-	public void setTmpFileDir(String url) {
-		tmpFileDir = url;
-	}
+//	@Value("${sys.tmp-file-dir}")
+//	public void setTmpFileDir(String url) {
+//		tmpFileDir = url;
+//	}
 	
 	@Value("${mfyx.mfyx-server-url}")
 	public void setMfyxServerUrl(String url) {
@@ -48,9 +49,13 @@ public class VipService {
 	public void setVipBasicGetUrl(String url) {
 		vipBasicGetUrl = url;
 	}
-	@Value("${mfyx.cash-flow-getall-url}")
+	@Value("${mfyx.vip-cash-flow-getall-url}")
 	public void setChangeFlowGetAllUrl(String url) {
 		vipCashFlowGetAllUrl = url;
+	}
+	@Value("${mfyx.vip-reset-pwd-url}")
+	public void setVipResetPwdUrl(String url) {
+		vipResetPwdUrl = url;
 	}
 	@Value("${mfyx.vip-upd-pwd-url}")
 	public void setVipUpdPwdUrl(String url) {
@@ -128,6 +133,27 @@ public class VipService {
 		}
 		return null;
 	}
+
+	/**
+	 * 重设资金操作密码（忘记或新设）
+	 * @param vipId
+	 * @param type	重置媒介
+	 * @return {errcode:0,errmsg:"ok"} 
+	 */
+	public static JSONObject resetPwd(Integer vipId ,String type) {
+		String url = mfyxServerUrl + vipResetPwdUrl;
+		url = url.replace("{vipId}", vipId +"");
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("type", type);
+		String strRet = HttpUtils.doPostSSL(url, params);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 	/**
 	 * 更新会员资金操作密码
@@ -140,7 +166,6 @@ public class VipService {
 		String url = mfyxServerUrl + vipUpdPwdUrl;
 		url = url.replace("{vipId}", vipId +"");
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("vipId", vipId);
 		params.put("oldPwd", oldPwd);
 		params.put("newPwd", newPwd);
 		String strRet = HttpUtils.doPostSSL(url, params);
@@ -164,10 +189,12 @@ public class VipService {
 	 * @param pwd
 	 * @return
 	 */
-	public static JSONObject updAccount(Integer vipId,String idNo,String actNm,String actNo,String actBlk,String pwd) {
+	public static JSONObject updAccount(Integer vipId,String cashTp,String actTp,String idNo,String actNm,String actNo,String actBlk,String pwd) {
 		String url = mfyxServerUrl + vipUpdActUrl;
 		url = url.replace("{vipId}", vipId +"");
 		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("cashTp",cashTp);
+		params.put("actTp",actTp);
 		params.put("idNo", idNo);
 		params.put("actNm", actNm);
 		params.put("actNo", actNo);
@@ -196,7 +223,6 @@ public class VipService {
 		String url = mfyxServerUrl + vipUpdPhoneUrl;
 		url = url.replace("{vipId}", vipId +"");
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("vipId", vipId);
 		params.put("oldVeriCode", oldVeriCode);
 		params.put("newPhone", newPhone);
 		params.put("newVeriCode", newVeriCode);
@@ -223,9 +249,8 @@ public class VipService {
 		String url = mfyxServerUrl + vipUpdEmailUrl;
 		url = url.replace("{vipId}", vipId +"");
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("vipId", vipId);
 		params.put("oldVeriCode", oldVeriCode);
-		params.put("newPhone", newEmail);
+		params.put("newEmail", newEmail);
 		params.put("newVeriCode", newVeriCode);
 		String strRet = HttpUtils.doPostSSL(url, params);
 		try {

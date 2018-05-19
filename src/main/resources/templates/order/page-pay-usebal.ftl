@@ -25,48 +25,10 @@
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 
-
+<#if (payFlow.flowId)?? >
 <div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
- <#if payRetCode?? >
- <!-- 支付结果信息 -->
-  <div class="row" style="margin:5px 1px ;padding:3px 0;height:80px;background-color:#6699FF;" >
-    <div class="col-xs-12" style="text-align:center;vertical-align:center;font-size:20px;font-weight:bold;padding-top:20px">
-     <#if (payRetCode >= 0) > <img alt="" src="/icons/支付成功.png" width=30px height=30px > </#if>
-     <span style="padding:5px">${payRetMsg}</span>
-    </div>
-  </div>
-  <!-- 支付明细 -->
-  <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
-    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
-       <label class="col-xs-3" style="padding:0">订单号：</label>
-       <span class="col-xs-8" style="padding:0">${order.orderId!''}</span>
-    </div>
-    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
-        <label class="col-xs-3" style="padding:0">支付方式：</label>
-        <span class="col-xs-8"  style="padding:0">{{getPayType('${payType!''}')}}</span>    
-    </div>
-    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
-        <label class="col-xs-3"  style="padding:0">支付时间：</label>
-        <span class="col-xs-8"  style="padding:0">${payTime!''}</span>
-    </div>   
-    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
-        <label class="col-xs-3" style="padding:0">订单额¥：</label>
-        <span class="col-xs-8"  style="padding:0">${amount!''}</span>
-    </div>
-    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
-        <label class="col-xs-3"  style="padding:0">手续费¥：</label>
-        <span class="col-xs-8"  style="padding:0">${fee!''}</span>
-    </div>    
-  </div> 
-  <!-- 商家 -->
-  <div class="row" style="margin:0px 0px;padding:5px 10px;background-color:white">
-      <a class="pull-left" href="/partner/mcht/${order.partnerId}">
-        <img alt="头像" src="/partner/cert/show/logo/${order.partnerId}" width="20px" height="20px" style="border-radius:50%"> 
-        ${order.partnerBusiName}
-      </a>
-  </div>
   <!-- 商品信息 -->
-  <div class="row" style="margin:3px 1px ;padding:3px 0;background-color:white" >
+  <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
     <div class="col-xs-12" style="text-align:center;">${order.goodsName}</div>
     <div class="col-xs-12" style="text-align:center;">
       <a href="/goods/show/${(order.goodsId)?string('#')}">
@@ -98,26 +60,80 @@
        </table>    
      </div>
   </div> 
-</#if>    
+  <!-- 支付明细 -->
+  <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
+    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
+       <label class="col-xs-3" style="padding:0">订单号：</label>
+       <span class="col-xs-8" style="padding:0">${order.orderId!''}</span>
+    </div>
+    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
+       <label class="col-xs-3" style="padding:0">支付方式：</label>
+       <span class="col-xs-8"  style="padding:0">{{getPayType('${(payFlow.payType)!''}')}}</span>
+    </div>
+    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
+        <label class="col-xs-3"  style="padding:0">创建时间：</label>
+        <span class="col-xs-8"  style="padding:0">${(payFlow.createTime)?string('yyyy-MM-dd hh:mm:ss')}</span>
+    </div>   
+    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
+        <label class="col-xs-3" style="padding:0">订单额¥：</label>
+        <span class="col-xs-8"  style="padding:0">${(payFlow.payAmount/100)}</span>     
+    </div>
+    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
+        <label class="col-xs-3"  style="padding:0">手续费¥：</label>
+        <span class="col-xs-8"  style="padding:0">${payFlow.feeAmount/100}</span>
+    </div>   
+  </div>  
+  <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
+    <div class="row">
+      <label class="col-xs-3 control-label" style="padding-right:0">支付密码<span style="color:red">*</span></label>
+      <div class="col-xs-8">
+        <input type="password" class="form-control" v-model="param.passwd" required>
+      </div>
+    </div>
+    <div class="row" style="margin:5px 0;text-align:center">
+      <button type="submit" class="btn btn-danger" @click="submit">提交支付</button>
+    </div>
+  </div>
 </div><!-- end of container -->
 
 <script type="text/javascript">
 var containerVue = new Vue({
 	el:'#container',
 	data:{
-		goodsSpecArr:JSON.parse('${(order.goodsSpec)!"[]"}')
+		goodsSpecArr:JSON.parse('${(order.goodsSpec)!"[]"}'),
+		param:{
+			orderId:'${order.orderId}',
+			passwd:''
+		}
 	},
 	methods:{
-		getPayType:function(tp){
-			if('1' == tp){
-				return '余额支付';
-			}else if('2' == tp){
-				return '微信支付';
+		submit:function(){
+			if(!this.param.passwd || this.param.passwd.length<6){
+				alertMsg('错误提示','支付密码不可为空！');
+				return;
 			}
+			$.ajax({
+				url: '/order/pay/submit/bal/' + this.param.orderId ,
+				method:'post',
+				data: this.param,
+				success: function(jsonRet,status,xhr){
+					if(jsonRet && jsonRet.errmsg){
+						if(jsonRet.errcode === 0){//创建支付成功
+							window.location.href = "/order/pay/finish/" + containerVue.param.orderId + '/success';
+						}else{//出现逻辑错误
+							alertMsg('错误提示',jsonRet.errmsg);
+						}
+					}else{
+						alertMsg('错误提示','系统数据访问失败！');
+					}
+				},
+				dataType: 'json'
+			});
 		}
 	}
 });
 </script>
+</#if> 
 
 <#if errmsg??>
  <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">

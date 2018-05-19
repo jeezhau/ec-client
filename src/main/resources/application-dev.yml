@@ -52,6 +52,7 @@ mfyx:
   vip-cash-flow-getall-url: '/vip/flow/getall'
   vip-upd-phone-url: '/vip/{vipId}/updphone'
   vip-upd-email-url: '/vip/{vipId}/updemail'
+  vip-reset-pwd-url: '/vip/{vipId}/resetpwd'
   vip-upd-pwd-url: '/vip/{vipId}/updpwd'
   vip-upd-act-url: '/vip/{vipId}/updact'  
   vip-phone-vericode-get-url: '/sms/vericode/send'
@@ -116,7 +117,8 @@ mfyx:
   order-ready-url: '/order/{partnerId}/ready/{orderId}'
   order-delivery-url: '/order/{partnerId}/delivery/{orderId}'
   order-updaftersales-url: '/order/{partnerId}/aftersales/{orderId}'
-  
+  order-balpay-submit-url: '/order/{userId}/balpay/submit/{orderId}'
+  order-payflow-get-url: '/order/{userId}/payflow/{orderId}/{type}'
   
 ######系统参数############  
 sys:

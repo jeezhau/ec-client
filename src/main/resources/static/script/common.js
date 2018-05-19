@@ -77,4 +77,14 @@ function getChangeFlowType(code){
 	}
 }
 
-
+/**
+ * 获取支付方式
+ * @returns
+ */
+function getPayType(tp){
+	if('1' == tp){
+		return '余额支付';
+	}else if('2' == tp){
+		return '微信支付';
+	}
+}
