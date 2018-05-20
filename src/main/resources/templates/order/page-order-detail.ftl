@@ -30,85 +30,86 @@
     <span>订单ID：${order.orderId}</span><br>
     <span>创建时间：${(order.createTime)?string('yyyy-MM-dd hh:mm:ss')}</span>
   </div>
-  <!-- 收货人信息 -->
-  <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
-    <div class="col-xs-12">
-      <span>
-        <#if (order.headimgurl)?starts_with('http')>
-        <img alt="头像" src="${(order.headimgurl)!''}" width="20px" height="20px" style="border-radius:50%"> 
-        </#if>
-        <#if !(order.headimgurl)?starts_with('http')>
-        <img alt="头像" src="/user/headimg/show/${(order.userId)?string('#')}" width="20px" height="20px" style="border-radius:50%"> 
-	    </#if>
-	    <span>${order.nickname}</span>
-     </span><br>
-     <span>${order.recvName} , ${(order.recvPhone)!''}</span>
-    </div>
-    <div class="col-xs-12">
-        <span>${order.recvProvince}</span>
-        <span>${order.recvCity}</span>
-        <span>${order.recvArea}</span>
-        <span>${order.recvAddr}</span>
-     </div>
-     <div class="col-xs-12">
-       {{getDispatchMode(${order.dispatchMode})}}
-     </div>
-  </div>
+  
+  <#include "/order/tpl-order-buy-receiver-4fm.ftl" encoding="utf-8">
 
-  <!-- 商品信息 -->
-  <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
-    <div class="col-xs-12" style="text-align:center;">
-      <a class="pull-left" href="/partner/mcht/${(order.partnerId)?string('#')}">
-	    <img alt="头像" src="/partner/cert/show/logo/${(order.partnerId)?string('#')}" width="20px" height="20px" style="border-radius:50%"> 
-	    <span>${(order.partnerBusiName)!''}</span>
-	  </a><br>
-      <span>${order.goodsName}</span>
+  <#include "/order/tpl-order-buy-content-bigimg-4fm.ftl" encoding="utf-8">  
+  
+  <#if (payFlow.flowId)??>
+  <!-- 支付明细 -->
+  <#include "/order/tpl-order-pay-flow-4fm.ftl" encoding="utf8"> 
+  </#if>
+  
+  <#if (order.aftersalesReason)??>
+  <!-- 买家售后申请信息 -->
+  <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
+    <div class="row" style="margin:1px 0px;background-color:white;">
+      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">买家售后</span>
     </div>
-    <div class="col-xs-12" style="text-align:center;">
-      <a href="/goods/show/${(order.goodsId)?string('#')}">
-       <img alt="" src="/image/file/show/${(order.goodsMainImgPath)!''}" style="width:99%;height:150px;">
-      </a>
-    </div>
-    <div class="col-xs-12" style="padding:0px 3px">
-       <table class="table table-striped table-bordered table-condensed">
-         <tr>
-           <th width="30%" style="padding:2px 2px">规格名称</th>
-           <th width="15%" style="padding:2px 2px">量值</th>
-           <th width="15%" style="padding:2px 2px">售价(¥)</th>
-           <th width="20%" style="padding:2px 2px">购买数量</th>
-         </tr>
-         <tr v-for="item,index in goodsSpecArr" >
-           <td style="padding:2px 2px">
-             <span style="width:100%" >{{item.name}}</span>
-           </td>
-           <td style="padding:2px 2px">
-              <span style="width:100%" >{{item.val}} {{item.unit}}</span>
-           </td>
-           <td style="padding:2px 2px">
-              <span style="width:100%" >{{item.price}}</span>
-           </td> 	                         
-           <td style="padding:2px 2px;text-align:center">
-              <span style="width:100%" >{{item.buyNum}}</span>
-           </td>
-         </tr>
-       </table>    
+    <div v-for="reason in aftersalesReason" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
+     <div class="row">
+       <span class="pull-right">{{reason.type}}</span>
+       <span class="pull-left">{{reason.time}}</span>
      </div>
-     <div class="row" style="margin:1px 1px;padding:3px 5px;background-color:white;">
-		<span class="pull-left"> 金额¥：${order.amount}</span> 
-		<span class="pull-right">{{getOrderStatus(${order.status})}}</span>
-	 </div>
-  </div>  
-  
-  <!-- 物流信息 -->
-  <div class="row" style="margin:5px 1px ;padding:3px 3px;background-color:white" >
-    
+     <div class="row">
+       {{reason.content}}
+     </div>
+    </div>
   </div>
+  </#if>
+  <#if (order.aftersalesResult)??>
+  <!-- 卖家售后回复信息 -->
+  <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
+    <div class="row" style="margin:1px 0px;background-color:white;">
+      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">卖家售后</span>
+    </div>
+    <div v-for="reason in aftersalesReason" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
+     <div class="row">
+       <span class="pull-right">{{reason.type}}</span>
+       <span class="pull-left">{{reason.time}}</span>
+     </div>
+     <div class="row">
+       {{reason.content}}
+     </div>
+    </div>
+  </div> 
+  </#if> 
+  <#if (order.appraiseTime)?? && (order.apprUserTime)??>
+  <!-- 买家评价信息 -->
+  <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
+    <div class="row" style="margin:1px 0px;background-color:white;">
+      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">买家评价</span>
+    </div>
+    <div v-for="appr in appraiseInfo" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
+     <div class="row">
+       <span class="pull-left">{{appr.time}}</span>
+     </div>
+     <div class="row">
+       {{appr.content}}
+     </div>
+    </div>
+  </div> 
+  <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
+    <div class="row" style="margin:1px 0px;background-color:white;">
+      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">卖家评价</span>
+    </div>
+    <div v-for="appr in apprUser" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
+     <div class="row">
+       <span class="pull-left">{{appr.time}}</span>
+     </div>
+     <div class="row">
+       {{appr.content}}
+     </div>
+    </div>
+  </div>
+  </#if> 
   
+  <!-- 查看物流 -->
+  <div class="row" style="margin:5px 1px ;padding:3px 3px;background-color:white" >
+    <a href="/order/logistics/${order.orderId}">查看物流</a>
+  </div>
   <!-- 推荐商品 -->
-  <div class="row" style="margin:5px 1px ;padding:3px 3px;background-color:white" >
-    
-  </div>
-  
+  <#include "/goods/tpl-goods-recommend.ftl" encoding="utf-8">
 
 </#if>
 </div><!-- end of container -->
@@ -117,22 +118,14 @@
 var containerVue = new Vue({
 	el:'#container',
 	data:{
-		goodsSpecArr:JSON.parse('${(order.goodsSpec)!"[]"}'),
+		goodsSpecArr: JSON.parse('${(order.goodsSpec)!"[]"}'),
+		aftersalesReason: JSON.parse('${(order.aftersalesReason)!"[]"}'),
+		aftersalesResult: JSON.parse('${(order.aftersalesResult)!"[]"}'),
+		appraiseInfo: JSON.parse('${(order.appraiseInfo)!"[]"}'),
+		apprUser: JSON.parse('${(order.apprUser)!"[]"}'),
 	},
 	methods:{
-		getDispatchMode:function(code){
-			if(code){
-				if('1' === code){
-					return '官方统一配送';
-				}else if('2' == code){
-					return '商家自行配送';
-				}else if('3' == code){
-					return '快递配送';
-				}else if('4' == code){
-					return '客户自取';
-				}
-			}
-		}
+		
 	}
 });
 

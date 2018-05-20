@@ -54,26 +54,24 @@
   </div>
   <div class="row"><!-- 所有订单之容器 --> 
   
-    <div v-for="order in orders" class="row" style="margin:3px 0;padding:0 0">
-      <#include "/order/tpl-order-buy-user.ftl" encoding="utf8"> 
-      <#include "/order/tpl-order-buy-content.ftl" encoding="utf8"> 
+    <div v-for="order in orders" class="row" style="margin:8px 0;padding:0 0">
+      <#include "/order/tpl-order-buy-user-4vue.ftl" encoding="utf8"> 
+      <#include "/order/tpl-order-buy-content-4vue.ftl" encoding="utf8"> 
 
-	  <div class="row" style="margin:1px 0;padding:3px 18px 3px 18px;background-color:white;">
+	  <div class="row" style="margin:0px 0;padding:0px 18px 0px 18px;background-color:white;">
 		    <a v-if="order.status ==='10' || order.status ==='11' || order.status ==='12' || order.status ==='20'" class="btn btn-default pull-right" style="padding:0 3px;margin:0 3px" @click="cancelOrder(order)">
 		      <span >协商取消</span>
 		    </a>
 
 			<a v-if="order.status ==='20'" class="btn btn-info pull-right" style="padding:0 3px;margin:0 3px" @click="readyGoods(order)"><span >接单备货</span></a>
-		    <a v-if="order.status ==='20' || order.status ==='21'" class="btn btn-danger pull-right" :href="'/order/pay/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即发货</span></a>
+			<a v-if="order.status ==='21'" class="btn btn-info pull-right" style="padding:0 3px;margin:0 3px" @click="readyGoods(order)"><span >取消备货</span></a>
+		    <a v-if="order.status ==='20' || order.status ==='21'" class="btn btn-danger pull-right" :href="'/order/partner/delivery/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即发货</span></a>
 		    
-		    <a v-if="order.status==='30' " class="btn btn-default pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >查看物流</span></a>
-		    <a v-if="order.status==='30' " class="btn btn-default pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >延长收货</span></a>
-		    <a v-if="order.status==='30' " class="btn btn-danger pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >确认收货</span></a>
+		    <a v-if="order.status==='30' " class="btn btn-default pull-right" :href="'/order/logistics/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >查看物流</span></a>
 		    
-		    <a v-if="order.status==='40' " class="btn btn-primary pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >立即评价</span></a>
+		    <a v-if="order.status==='41' || order.status==='56'" class="btn btn-primary pull-right" :href="'/order/partner/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即评价</span></a>
 		    
-		    <a v-if="order.status==='31' " class="btn btn-danger pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >申请换货</span></a>
-		    <a v-if="order.status==='31' " class="btn btn-danger pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >申请退货</span></a>
+		    <a v-if="order.status==='31' " class="btn btn-danger pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >售后处理</span></a>
       </div>
 	</div>
   </div>
@@ -145,8 +143,8 @@ containerVue.getOrders('${status!''}');
         			<h4 class="modal-title" id="cancelOrderTitle" style="color:red">协商取消订单</h4>
      		</div>
      		<div class="modal-body">
-       			<#include "/order/tpl-order-buy-user.ftl" encoding="utf8"> 
-      			<#include "/order/tpl-order-buy-content.ftl" encoding="utf8"> 
+       			<#include "/order/tpl-order-buy-user-4vue.ftl" encoding="utf8"> 
+      			<#include "/order/tpl-order-buy-content-4vue.ftl" encoding="utf8"> 
        			 <div class="row" style="margin:3px 0px;background-color:white; color:red">
        			   <p/>
        			   <p>订单状态: {{getOrderStatus(order.status)}}</p>
@@ -181,8 +179,8 @@ containerVue.getOrders('${status!''}');
         			<h4 class="modal-title" id="readyGoodsModalTitle" style="color:red">接单备货</h4>
      		</div>
      		<div class="modal-body">
-       			<#include "/order/tpl-order-buy-user.ftl" encoding="utf8"> 
-      			<#include "/order/tpl-order-buy-content.ftl" encoding="utf8"> 
+       			<#include "/order/tpl-order-buy-user-4vue.ftl" encoding="utf8"> 
+      			<#include "/order/tpl-order-buy-content-4vue.ftl" encoding="utf8"> 
        			 <div class="row" style="margin:3px 0px;background-color:white; color:red">
        			   <p/>
        			   <p>订单状态: {{getOrderStatus(order.status)}}</p>
@@ -191,7 +189,10 @@ containerVue.getOrders('${status!''}');
        			 </div>
      		</div>
      		<div class="modal-footer" style="text-align:certer">
-     			<button class="btn btn-info" @click="submit"> 备 货 </button>
+     			<button class="btn btn-info" @click="submit"> 
+     			  <span v-if="order.status=='20'">开始备货 </span>
+     			  <span v-if="order.status=='21'">取消备货 </span>
+     			</button>
      			<button class="btn btn-default" data-dismiss="modal"> 关 闭 </button>
      		</div>
   		</div><!-- /.modal-content -->
@@ -206,26 +207,19 @@ containerVue.getOrders('${status!''}');
 	 methods:{
 		 submit: function(){
 			 $.ajax({
-				url: '/order/partner/getall',
+				url: '/order/partner/ready/' + this.order.orderId,
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
-					if(jsonRet && jsonRet.datas){
-						for(var i=0;i<jsonRet.datas.length;i++){
-							var item = jsonRet.datas[i];
-							item.goodsSpec = JSON.parse(item.goodsSpec);
-							containerVue.orders.push(item);
+					if(jsonRet && jsonRet.errmsg){
+						if(jsonRet.errcode === 0){//成功
+							window.location.href = "/order/partner/show/all";
+						}else{//出现逻辑错误
+							alertMsg('错误提示',jsonRet.errmsg);
 						}
 					}else{
-						if(jsonRet && jsonRet.errmsg){
-							//alert(jsonRet.errmsg);
-							$("#nomoreData").show();
-						}
+						alertMsg('错误提示','系统数据访问失败！');
 					}
-					$("#loadingData").hide();
-				},
-				failure:function(){
-					$("#loadingData").hide();
 				},
 				dataType: 'json'
 			});

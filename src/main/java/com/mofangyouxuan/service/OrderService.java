@@ -287,11 +287,13 @@ public class OrderService {
 	 * @param userId
 	 * @return {errcode:0,errmsg:"ok"}
 	 */
-	public static JSONObject cancelOrder(Order order,UserBasic user) {
+	public static JSONObject cancelOrder(Order order,UserBasic user,String reason,String passwd) {
 		String url = mfyxServerUrl + orderCancelUrl;
 		url = url.replace("{userId}", order.getUserId() + "");
 		url = url.replace("{orderId}", order.getOrderId() + "");
 		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("reason", reason);
+		params.put("passwd", passwd);
 		String strRet = HttpUtils.doPost(url, params);
 		try {
 			JSONObject jsonRet = JSONObject.parseObject(strRet);
@@ -336,17 +338,18 @@ public class OrderService {
 	 * 获取已经创建的支付流水
 	 * @param order
 	 * @param user
+	 * @param type 1-消费，2-退款，为空则最新
 	 * @return {errcode,errmsg,payflow:{}}
 	 */
-	public static JSONObject getPayFlow(Order order,UserBasic user,String type) {
+	public static JSONObject getPayFlow(Order order,Integer userId,String type) {
 		JSONObject jsonRet = new JSONObject();
 		Map<String,Object> params = new HashMap<String,Object>();
-		
+		params.put("type", type);
 		//向服务中心发送申请
 		String url = mfyxServerUrl + orderGetPayFlowUrl;
-		url = url.replace("{userId}", user.getUserId() + "");
+		url = url.replace("{userId}", userId + "");
 		url = url.replace("{orderId}", order.getOrderId() + "");
-		url = url.replace("{type}", type);
+		
 		String strRet = HttpUtils.doPost(url, params);
 		try {
 			jsonRet = JSONObject.parseObject(strRet);
@@ -501,12 +504,12 @@ public class OrderService {
 	 * @param order
 	 * @return {errcode,errmsg,order:{}}
 	 */
-	public static JSONObject getLogistics(Order order) {
+	public static JSONObject getLogistics(String orderId) {
 		JSONObject jsonRet = new JSONObject();
 		Map<String,Object> params = new HashMap<String,Object>();
 		//向服务中心发送申请
 		String url = mfyxServerUrl + orderGetLogisticsUrl;
-		url = url.replace("{orderId}", order.getOrderId() + "");
+		url = url.replace("{orderId}", orderId);
 		String strRet = HttpUtils.doPost(url, params);
 		try {
 			jsonRet = JSONObject.parseObject(strRet);

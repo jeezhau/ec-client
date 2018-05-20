@@ -98,6 +98,14 @@ public class Order {
 
     private String aftersalesResult;
     
+    private Integer scoreUser;
+    
+    private String apprUser;
+    
+    private Date apprUserTime;
+    
+    private String logistics;
+    
     //补充字段，仅方便商品显示
     private String goodsName;
     
@@ -440,6 +448,38 @@ public class Order {
 
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
+	}
+
+	public Integer getScoreUser() {
+		return scoreUser;
+	}
+
+	public void setScoreUser(Integer scoreUser) {
+		this.scoreUser = scoreUser;
+	}
+
+	public String getApprUser() {
+		return apprUser;
+	}
+
+	public void setApprUser(String apprUser) {
+		this.apprUser = apprUser;
+	}
+
+	public Date getApprUserTime() {
+		return apprUserTime;
+	}
+
+	public void setApprUserTime(Date apprUserTime) {
+		this.apprUserTime = apprUserTime;
+	}
+
+	public String getLogistics() {
+		return logistics;
+	}
+
+	public void setLogistics(String logistics) {
+		this.logistics = logistics;
 	}
     
     

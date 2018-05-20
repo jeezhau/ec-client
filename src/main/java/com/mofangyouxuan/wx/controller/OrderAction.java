@@ -204,7 +204,7 @@ public class OrderAction {
 					}
 					if( "10".equals(order.getStatus()) || "12".equals(order.getStatus())) {//可支付
 						map.put("order", order);
-						jsonRet = OrderService.getPayFlow(order, user, "1");
+						jsonRet = OrderService.getPayFlow(order, user.getUserId(), "1");
 						if(jsonRet == null || !jsonRet.containsKey("payFlow")) {
 							map.put("errmsg", "该订单的支付待支付流水获取失败！");
 							return "order/page-pay-usebal";
@@ -380,7 +380,7 @@ public class OrderAction {
 					}else if("4sign".equals(stat)) {
 						statCode = "30";
 					}else if("4appraise".equals(stat)) {
-						statCode = "40";
+						statCode = "40,55";
 					}else if("4refund".equals(stat)) {
 						statCode = "50,51,52,53,54,55,60,61,62,63,64";
 					}
@@ -451,7 +451,7 @@ public class OrderAction {
 					}else if("4sign".equals(stat)) {
 						statCode = "30";
 					}else if("4appraise".equals(stat)) {
-						statCode = "40";
+						statCode = "41,56";
 					}else if("4refund".equals(stat)) {
 						statCode = "50,51,52,53,54,55,60,61,62,63,64";
 					}
@@ -541,9 +541,11 @@ public class OrderAction {
 				GoodsSpec spec = specList.get(i);
 				if(spec.getName() == null || spec.getName().trim().length()<1) {
 					specList.remove(i);
+					i--;
 				}
 				if(spec.getBuyNum() == null || spec.getBuyNum()<1) {
 					specList.remove(i);
+					i--;
 				}
 			}
 			if(specList == null || specList.size()<1) {
@@ -606,20 +608,25 @@ public class OrderAction {
 		try {
 			if(user == null && partner == null) {
 				map.put("errmsg", "您没有权限查询该订单信息！");
-			}else {
-				JSONObject jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
-				if(jsonRet == null || !jsonRet.containsKey("order")) {
-					map.put("errmsg", "系统中没有该订单信息！");
-				}else {
-					Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
-					if(order.getUserId().equals(user.getUserId()) ||
-							(partner != null && partner.getPartnerId().equals(order.getPartnerId()))) {
-						map.put("order", order);
-					}else {
-						map.put("errmsg", "您没有权限查询该订单信息！");
-					}
-				}
+				return "";
 			}
+			JSONObject jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+			if(jsonRet == null || !jsonRet.containsKey("order")) {
+				map.put("errmsg", "系统中没有该订单信息！");
+				return "";
+			}
+			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+			if(order.getUserId().equals(user.getUserId()) ||
+					(partner != null && partner.getPartnerId().equals(order.getPartnerId()))) {
+				jsonRet = OrderService.getPayFlow(order, user.getUserId(), null);
+				if(jsonRet != null && jsonRet.containsKey("payFlow")) {
+					PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
+					map.put("payFlow", payFlow);
+				}
+				map.put("order", order);
+			}else {
+				map.put("errmsg", "您没有权限查询该订单信息！");
+			}			
 		}catch(Exception e) {
 			e.printStackTrace();
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
@@ -628,14 +635,58 @@ public class OrderAction {
 	}
 	
 	/**
+	 * 获取订单取消页面
+	 * @param orderId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/user/cancel/begin/{orderId}")
+	public String beginCancel(@PathVariable("orderId")String orderId,ModelMap map) {
+		Order order = null;
+		try {
+			UserBasic user = (UserBasic)map.get("userBasic");
+			JSONObject jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
+			
+			if(jsonRet != null && jsonRet.containsKey("order")) {
+				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
+				if(!user.getUserId().equals(order.getUserId())) {
+					map.put("errmsg", "该订单不是您的宝贝订单！");
+				}else {
+					if(!"10".equals(order.getStatus()) && !"11".equals(order.getStatus()) && !"12".equals(order.getStatus()) && 
+						!"20".equals(order.getStatus())) {
+						map.put("errmsg", "您当前不可取消订单！");
+					}else {
+						jsonRet = OrderService.getPayFlow(order, user.getUserId(), "1");
+						if(jsonRet != null && jsonRet.containsKey("payFlow")) {
+							PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
+							map.put("payFlow", payFlow);
+						}
+						map.put("order", order);
+					}
+				}
+			}else {
+				map.put("errmsg", "获取订单信息失败！");
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return "order/page-order-cancel";
+	}
+	
+	/**
 	 * 取消自己的商家未备货的订单
 	 * @param orderId
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/cancel/{orderId}")
+	@RequestMapping("/user/cancel/submit/{orderId}")
 	@ResponseBody
-	public String cancelorder(@PathVariable("orderId")String orderId,ModelMap map) {
+	public String submitCancel(@PathVariable("orderId")String orderId,
+			@RequestParam(value="reason",required=true)String reason,
+			String passwd,
+			ModelMap map) {
 		UserBasic user = (UserBasic) map.get("userBasic");
 		JSONObject jsonRet = new JSONObject();
 		try {
@@ -659,8 +710,8 @@ public class OrderAction {
 				return jsonRet.toString();
 			}
 			//发送请求
-			jsonRet = OrderService.cancelOrder(order, user);
-			if(jsonRet == null || !jsonRet.containsKey("errocode")) {
+			jsonRet = OrderService.cancelOrder(order, user,reason,passwd);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");
 				return jsonRet.toString();
@@ -737,11 +788,12 @@ public class OrderAction {
 	}
 	
 	/**
-	 * 
+	 * 备货与取消备货
 	 * @param orderId
 	 * @return
 	 */
 	@RequestMapping("/partner/ready/{orderId}")
+	@ResponseBody
 	public String readyOrUnGoods(@PathVariable(value="orderId")String orderId,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
@@ -763,7 +815,12 @@ public class OrderAction {
 				jsonRet.put("errmsg", "该订单当前不可进行备货管理！");
 				return jsonRet.toJSONString();
 			}
-			
+			jsonRet = OrderService.readyGoods(order, partner);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
+				jsonRet.put("errmsg", "出现系统错误！");
+				return jsonRet.toString();
+			}
 		}catch(Exception e) {
 			e.printStackTrace();
 			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
@@ -772,6 +829,302 @@ public class OrderAction {
 		return jsonRet.toString();
 	}
 	
+	/**
+	 * 获取订单发货页面
+	 * @param orderId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/partner/delivery/begin/{orderId}")
+	public String beginDelivery(@PathVariable("orderId")String orderId,ModelMap map) {
+		Order order = null;
+		try {
+			PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
+			if(partner == null ) {
+				map.put("errmsg", "您还未开通合作伙伴功能！");
+				return "order/page-order-delivery";
+			}
+			JSONObject jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
+			
+			if(jsonRet != null && jsonRet.containsKey("order")) {
+				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
+				if(!partner.getPartnerId().equals(order.getPartnerId())) {
+					map.put("errmsg", "该订单不是您的销售订单！");
+				}else {
+					if(!"20".equals(order.getStatus()) && !"21".equals(order.getStatus())) {
+						map.put("errmsg", "您当前不可对该订单进行发货管理！");
+					}else {
+						map.put("order", order);
+					}
+				}
+			}else {
+				map.put("errmsg", "获取订单信息失败！");
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return "order/page-order-delivery";
+	}
 	
+	/**
+	 * 立即提交发货信息
+	 * 
+	 * @param orderId
+	 * @param logisticsComp	配送方名称
+	 * @param logisticsNo	物流单号(快递单号)
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/partner/delivery/submit/{orderId}")
+	@ResponseBody
+	public String submitDelivery(@PathVariable(value="orderId")String orderId,
+			@RequestParam(value="logisticsComp",required=true)String logisticsComp,
+			@RequestParam(value="logisticsNo",required=true)String logisticsNo,
+			ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
+		if(partner == null ) {
+			jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
+			jsonRet.put("errmsg", "您还未开通合作伙伴功能！");
+			return jsonRet.toJSONString();
+		}
+		try {
+			jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
+				jsonRet.put("errmsg", "获取订单信息失败！");
+			}
+			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+			if(!"20".equals(order.getStatus()) && !"21".equals(order.getStatus())) {
+				jsonRet.put("errcode", ErrCodes.ORDER_PARAM_ERROR);
+				jsonRet.put("errmsg", "该订单当前不可进行发货管理！");
+				return jsonRet.toJSONString();
+			}
+			jsonRet = OrderService.deliveryGoods(partner, order, logisticsComp, logisticsNo);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
+				jsonRet.put("errmsg", "出现系统错误！");
+				return jsonRet.toString();
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
+	}
+	
+	/**
+	 * 显示物流详情：仅买卖双方可看到
+	 * @param orderId
+	 * @param map
+	 */
+	@RequestMapping("/logistics/{orderId}")
+	public String showLogistics(@PathVariable("orderId")String orderId,ModelMap map) {
+		UserBasic user = (UserBasic) map.get("userBasic");
+		PartnerBasic partner= (PartnerBasic) map.get("partnerBasic");
+		try {
+			if(user == null && partner == null) {
+				map.put("errmsg", "您没有权限查询该订单信息！");
+				return "";
+			}
+			JSONObject jsonRet = OrderService.getLogistics(orderId);
+			if(jsonRet == null || !jsonRet.containsKey("order")) {
+				map.put("errmsg", "系统中没有该订单信息！");
+				return "";
+			}
+			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+			if(order.getUserId().equals(user.getUserId()) ||
+					(partner != null && partner.getPartnerId().equals(order.getPartnerId()))) {
+				map.put("order", order);
+			}else {
+				map.put("errmsg", "您没有权限查询该订单信息！");
+			}			
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return "order/page-order-logistics";
+	}
+	
+	/**
+	 * 获取订单评价页面
+	 * @param orderId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/user/appraise/begin/{orderId}")
+	public String beginAppraise(@PathVariable("orderId")String orderId,ModelMap map) {
+		Order order = null;
+		try {
+			UserBasic user = (UserBasic)map.get("userBasic");
+			JSONObject jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+			
+			if(jsonRet != null && jsonRet.containsKey("order")) {
+				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
+				if(!user.getUserId().equals(order.getUserId())) {
+					map.put("errmsg", "该订单不是您的宝贝订单！");
+				}else {
+					if(!"30".equals(order.getStatus()) && !"31".equals(order.getStatus()) && 
+							!"40".equals(order.getStatus()) && !"41".equals(order.getStatus()) && 
+							!"54".equals(order.getStatus()) && !"55".equals(order.getStatus()) && !"56".equals(order.getStatus())) {
+						map.put("errmsg", "您当前不可对订单进行评价！");
+					}else {
+//						jsonRet = OrderService.getPayFlow(order, user.getUserId(), "1");
+//						if(jsonRet != null && jsonRet.containsKey("payFlow")) {
+//							PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
+//							map.put("payFlow", payFlow);
+//						}
+						map.put("order", order);
+					}
+				}
+			}else {
+				map.put("errmsg", "获取订单信息失败！");
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return "order/page-order-appraise";
+	}
+	
+	/**
+	 * 买家提交订单评价
+	 * @param orderId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/user/appraise/submit/{orderId}")
+	@ResponseBody
+	public String submitAppraise(@PathVariable("orderId")String orderId,
+			Integer scoreLogistics,Integer scoreMerchant,Integer scoreGoods, 
+			String content,ModelMap map) {
+		UserBasic user = (UserBasic) map.get("userBasic");
+		JSONObject jsonRet = new JSONObject();
+		try {
+			jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+			if(jsonRet == null || !jsonRet.containsKey("order")) {
+				jsonRet.put("errmsg", "系统中没有该订单信息！");
+				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
+				return jsonRet.toString();
+			}
+			
+			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+			if(!order.getUserId().equals(user.getUserId())) {
+				jsonRet.put("errmsg", "您没有权限查询该订单信息！");
+				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
+				return jsonRet.toString();
+			}
+			if(!"30".equals(order.getStatus()) && !"31".equals(order.getStatus()) && 
+					!"40".equals(order.getStatus()) && !"41".equals(order.getStatus()) && 
+					!"54".equals(order.getStatus()) && !"55".equals(order.getStatus()) && !"56".equals(order.getStatus())) {
+				jsonRet.put("errmsg", "您当前不可对该订单进行评价！");
+				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
+				return jsonRet.toString();
+			}
+			//发送请求
+			jsonRet = OrderService.appr2Mcht(user, order, scoreLogistics, scoreMerchant, scoreGoods, content);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
+				jsonRet.put("errmsg", "出现系统错误！");
+				return jsonRet.toString();
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+			jsonRet.toString();
+		}
+		return jsonRet.toString();
+	}
+	
+	/**
+	 * 卖家获取订单评价页面
+	 * @param orderId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/partner/appraise/begin/{orderId}")
+	public String beginAppr4User(@PathVariable("orderId")String orderId,ModelMap map) {
+		Order order = null;
+		try {
+			PartnerBasic partner = (PartnerBasic)map.get("partnerBasic");
+			JSONObject jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+			
+			if(jsonRet != null && jsonRet.containsKey("order")) {
+				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
+				if(!partner.getPartnerId().equals(order.getPartnerId())) {
+					map.put("errmsg", "该订单不是您的销售订单！");
+				}else {
+					if(!"30".equals(order.getStatus()) && !"31".equals(order.getStatus()) && 
+							!"40".equals(order.getStatus()) && !"41".equals(order.getStatus()) && 
+							!"54".equals(order.getStatus()) && !"55".equals(order.getStatus()) && !"56".equals(order.getStatus())) {
+						map.put("errmsg", "您当前不可对订单进行评价！");
+					}else {
+						map.put("order", order);
+					}
+				}
+			}else {
+				map.put("errmsg", "获取订单信息失败！");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return "order/page-order-appraise-4user";
+	}
+	
+	/**
+	 * 卖家提交订单评价
+	 * @param orderId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/partner/appraise/submit/{orderId}")
+	@ResponseBody
+	public String submitAppr4User(@PathVariable("orderId")String orderId,
+			Integer score, String content,ModelMap map) {
+		PartnerBasic partner = (PartnerBasic)map.get("partnerBasic");
+		JSONObject jsonRet = new JSONObject();
+		try {
+			jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+			if(jsonRet == null || !jsonRet.containsKey("order")) {
+				jsonRet.put("errmsg", "系统中没有该订单信息！");
+				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
+				return jsonRet.toString();
+			}
+			
+			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+			if(!partner.getPartnerId().equals(order.getPartnerId())) {
+				jsonRet.put("errmsg", "您没有权限查询该订单信息！");
+				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
+				return jsonRet.toString();
+			}
+			if(!"30".equals(order.getStatus()) && !"31".equals(order.getStatus()) && 
+					!"40".equals(order.getStatus()) && !"41".equals(order.getStatus()) && 
+					!"54".equals(order.getStatus()) && !"55".equals(order.getStatus()) && !"56".equals(order.getStatus())) {
+				jsonRet.put("errmsg", "您当前不可对该订单进行评价！");
+				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
+				return jsonRet.toString();
+			}
+			//发送请求
+			jsonRet = OrderService.appr2User(partner, order, score, content);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
+				jsonRet.put("errmsg", "出现系统错误！");
+				return jsonRet.toString();
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+			jsonRet.toString();
+		}
+		return jsonRet.toString();
+	}
 }
 

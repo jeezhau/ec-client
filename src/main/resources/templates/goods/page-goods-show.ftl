@@ -20,6 +20,7 @@
     <link href="/css/weui.css" rel="stylesheet">
     
     <link href="/css/mfyx.css" rel="stylesheet">
+    <script src="/script/common.js" type="text/javascript"></script>
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
@@ -82,11 +83,13 @@
     </div>
     <div v-for="appr in apprList" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
      <div class="row">
-       <span class="pull-left"><img alt="头像" :src="appr.headimgpath" width="20px" height="20px" style="border-radius:50%">{{appr.nickname}}</span>
-       <span class="pull-right">2018-4-15</span>
+       <span class="pull-left">
+         <img alt="头像" :src="appr.headimgurl" width="20px" height="20px" style="border-radius:50%">{{appr.nickname}}
+       </span>
+       <span class="pull-right">{{appr.appraiseInfo[0].time}}</span>
      </div>
      <div class="row">
-       非常好，味道不错，水分充足，以后一定经常关注。
+       {{appr.appraiseInfo[0].content}}
      </div>
     </div>    
   </div>
@@ -163,10 +166,11 @@ var containerVue = new Vue({
 						if(jsonRet && jsonRet.errcode == 0){//
 							for(var i=0;i<jsonRet.datas.length;i++){
 								var appr = jsonRet.datas[i];
-								if(appr.appraiseInfo){
+								if(appr.appraiseInfo){//有评价内容
 									appr.appraiseInfo = JSON.parse(appr.appraiseInfo);
+									appr.headimgurl = startWith(appr.headimgurl,'http')?appr.headimgurl:('/user/headimg/show/'+appr.userId)
+									containerVue.apprList.push(appr);
 								}
-								containerVue.apprList.push(jsonRet.datas[i]);
 							}
 							containerVue.apprCnt = jsonRet.pageCond.count;
 						}

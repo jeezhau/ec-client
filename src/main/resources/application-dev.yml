@@ -118,7 +118,7 @@ mfyx:
   order-delivery-url: '/order/{partnerId}/delivery/{orderId}'
   order-updaftersales-url: '/order/{partnerId}/aftersales/{orderId}'
   order-balpay-submit-url: '/order/{userId}/balpay/submit/{orderId}'
-  order-payflow-get-url: '/order/{userId}/payflow/{orderId}/{type}'
+  order-payflow-get-url: '/order/{userId}/payflow/{orderId}'
   
 ######系统参数############  
 sys:
