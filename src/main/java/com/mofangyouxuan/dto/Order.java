@@ -120,6 +120,8 @@ public class Order {
     private String headimgurl;
     
     private String nickname;
+    
+    private Integer mchtUId;
 
     public String getOrderId() {
         return orderId;
@@ -481,6 +483,15 @@ public class Order {
 	public void setLogistics(String logistics) {
 		this.logistics = logistics;
 	}
+
+	public Integer getMchtUId() {
+		return mchtUId;
+	}
+
+	public void setMchtUId(Integer mchtUId) {
+		this.mchtUId = mchtUId;
+	}
     
+	
     
 }

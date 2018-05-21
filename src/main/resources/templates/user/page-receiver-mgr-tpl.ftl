@@ -1,5 +1,5 @@
 <!-- 收货人管理子模块 -->
-<div class="container " id="receiverManage" style="padding:0px 0px;oveflow:scroll">
+<div class="container " id="receiverManage" style="min-height:300px;padding:0px 0px;oveflow:scroll">
   <div class="row" style="margin:5px 0;text-align:center">
      <h3>我的收货信息</h3>
   </div>

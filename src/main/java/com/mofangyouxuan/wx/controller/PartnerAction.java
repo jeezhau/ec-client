@@ -86,7 +86,10 @@ public class PartnerAction {
 			map.put("errmsg", "您尚未激活会员账户功能！")	;
 			return "forward:/user/index/vip" ;
 		}
-		
+		PartnerBasic partner = PartnerMgrService.getPartnerByVip(vipBasic.getVipId());
+		if(partner != null) {
+			map.put("partnerBasic", partner);
+		}
 		String nonceStr = "wddgwefw";
 		Long timestamp = System.currentTimeMillis()/1000;
 		String url = localServerUrl + "/partner/edit";
@@ -101,7 +104,6 @@ public class PartnerAction {
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
 		
-		map.put("partner", map.get("partnerBasic"));
 		map.put("APP_ID", WebAuth.APPID);
 		map.put("nonceStr", nonceStr);
 		map.put("timestamp", timestamp + "");
@@ -122,7 +124,7 @@ public class PartnerAction {
 	public String getMcht(@PathVariable("partnerId")Integer partnerId,ModelMap map) {
 
 		PartnerBasic partner = PartnerMgrService.getPartnerById(partnerId);
-		if(partner == null || "S".equals(partner.getStatus())) {
+		if(partner == null || !"S".equals(partner.getStatus())) {
 			map.put("errmsg", "系统中没有该商户信息！");
 		}else {
 			map.put("mcht", partner);

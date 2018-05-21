@@ -277,7 +277,7 @@ $("#headimg").fileinput({
         image: {width: "100px", height: "100px"},
     },
     initialPreview: [ //预览图片的设置
-    		<#if ((userBasic.headimgurl)!'')?starts_with('http')>'<img alt="头像" src="${userBasic.headimg}" class="file-preview-image" style="width:96px"> '</#if>
+    		<#if ((userBasic.headimgurl)!'')?starts_with('http')>'<img alt="头像" src="${userBasic.headimgurl}" class="file-preview-image" style="width:96px"> '</#if>
     		<#if !((userBasic.headimgurl)!'')?starts_with('http')>'<img alt="头像" src="/user/headimg/show/${(userBasic.userId)?string('#')}" class="file-preview-image" style="width:96px"> '</#if>
     ]
 });

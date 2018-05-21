@@ -75,7 +75,7 @@
         </div>       
       </div>
       <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">生产者<span style="color:red">*</span></label>
+        <label class="col-xs-4 control-label" style="padding-right:1px">生产企业<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
            <input type="text" class="form-control" v-model="param.vender"  max=100 >
         </div>       
@@ -487,26 +487,8 @@ goodsContainerVue.param.goodsDesc = $('#hiddenGoodsDesc').val();
 
 <#if errmsg??>
 <!-- 错误提示模态框（Modal） -->
-<div class="modal fade " id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorTitle" aria-hidden="false" data-backdrop="static">
-	<div class="modal-dialog">
-  		<div class="modal-content">
-     		<div class="modal-header">
-        			<button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
-        			<h4 class="modal-title" id="errorTitle" style="color:red">错误提示</h4>
-     		</div>
-     		<div class="modal-body">
-       			<p> ${errmsg} </p><p/>
-     		</div>
-     		<div class="modal-footer">
-     			<div style="margin-left:50px">
-        			</div>
-     		</div>
-  		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-<script>
-$("#errorModal").modal('show');
-</script>
+<#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
 </#if>
+
 </body>
 </html>

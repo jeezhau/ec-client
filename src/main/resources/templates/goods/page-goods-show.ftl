@@ -24,8 +24,9 @@
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
-<div class="container goods-container" id="container" style="oveflow:scroll">
 <#if (goods.goodsId)??>
+<div class="container goods-container" id="container" style="oveflow:scroll">
+
   <!-- 商品名称 -->
   <div class="row" style="margin:5px 0px 3px 0px;background-color:white;padding:3px 8px;font-size:150%;font-weight:bold;">
     ${(goods.goodsName)!''}
@@ -39,7 +40,7 @@
     <!-- 轮播（Carousel）项目 -->
     <div class="carousel-inner">
         <div  v-bind:class="[{active:(index===0)}, 'item']" v-for="imgpath,index in courselImgPaths" >
-            <img :src="'/image/file/show/' + imgpath" >
+            <img :src="'/image/file/show/${((goods.partner.vipId)!'')?string('#')}/' + imgpath" >
         </div>
     </div>
     <!-- 轮播（Carousel）导航 -->
@@ -143,7 +144,7 @@
   <div class="row">
     
   </div> 
-</#if>
+
 </div><!-- end of container -->
 <script type="text/javascript">
 var containerVue = new Vue({
@@ -168,9 +169,11 @@ var containerVue = new Vue({
 								var appr = jsonRet.datas[i];
 								if(appr.appraiseInfo){//有评价内容
 									appr.appraiseInfo = JSON.parse(appr.appraiseInfo);
-									appr.headimgurl = startWith(appr.headimgurl,'http')?appr.headimgurl:('/user/headimg/show/'+appr.userId)
-									containerVue.apprList.push(appr);
+								}else{
+									appr.appraiseInfo = {'time':appr.appraiseTime,'content':"卖家太懒，啥也没留下！！！"}
 								}
+								appr.headimgurl = startWith(appr.headimgurl,'http')?appr.headimgurl:('/user/headimg/show/'+appr.userId)
+								containerVue.apprList.push(appr);
 							}
 							containerVue.apprCnt = jsonRet.pageCond.count;
 						}
@@ -182,6 +185,7 @@ var containerVue = new Vue({
 });
 containerVue.getAllAppr();
 </script>
+
 <footer >
   <div class="row" style="margin:50px 0"></div>
   <div class="weui-tabbar" style="position:fixed;left:0px;bottom:0px">
@@ -208,5 +212,12 @@ containerVue.getAllAppr();
      </a>     	
   </div>
 </footer>
+</#if>
+
+<#if errmsg??>
+<!-- 错误提示模态框（Modal） -->
+<#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
+</#if>
+
 </body>
 </html>

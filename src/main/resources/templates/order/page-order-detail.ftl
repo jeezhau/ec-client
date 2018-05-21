@@ -105,9 +105,11 @@
   </#if> 
   
   <!-- 查看物流 -->
+  <#if (order.sendTime)??>
   <div class="row" style="margin:5px 1px ;padding:3px 3px;background-color:white" >
     <a href="/order/logistics/${order.orderId}">查看物流</a>
   </div>
+  </#if>
   <!-- 推荐商品 -->
   <#include "/goods/tpl-goods-recommend.ftl" encoding="utf-8">
 

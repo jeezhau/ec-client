@@ -112,29 +112,29 @@
       <div class="form-group" v-if="param.isFree !== '1'">
         <label class="col-xs-4 control-label" style="padding-right:1px">首重(kg)与价格(元)<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <div class="col-xs-6" style="padding-right:1px"><input type="number" class="form-control" v-model="param.firstWeight"  min=1  max=999999 placeholder="起步重量"></div>
-          <div class="col-xs-6" style="padding-left:1px"><input type="text" class="form-control" v-model="param.firstWPrice"  maxLength=5  required placeholder="起步重量价格"></div>
+          <div class="col-xs-6" style="padding-right:1px"><input type="number" class="form-control" v-model="param.firstWeight"  min=1  max=999999 placeholder="起步重量(kg)"></div>
+          <div class="col-xs-6" style="padding-left:1px"><input type="text" class="form-control" v-model="param.firstWPrice"  maxLength=5  required placeholder="起步重量价格(元)"></div>
         </div>
       </div>
       <div class="form-group" v-if="param.isFree !== '1'">
         <label class="col-xs-4 control-label" style="padding-right:1px">续重(kg)与价格(元)<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <div class="col-xs-6" style="padding-right:1px"><input type="number" class="form-control" v-model="param.additionWeight"  min=1  max=999999 placeholder="续重"></div>
-          <div class="col-xs-6" style="padding-left:1px"><input type="text" class="form-control" v-model="param.additionWPrice"  maxLength=5  required placeholder="续重价格"></div>
+          <div class="col-xs-6" style="padding-right:1px"><input type="number" class="form-control" v-model="param.additionWeight"  min=1  max=999999 placeholder="续重(kg)"></div>
+          <div class="col-xs-6" style="padding-left:1px"><input type="text" class="form-control" v-model="param.additionWPrice"  maxLength=5  required placeholder="续重价格(元)"></div>
         </div>
       </div>  
       <div class="form-group" v-if="param.isFree !== '1' && param.isCityWide === '1'">
         <label class="col-xs-4 control-label" style="padding-right:1px">首距(km)与价格(元)<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <div class="col-xs-6" style="padding-right:1px"><input type="number" class="form-control" v-model="param.firstDist"  min=1  max=999999 placeholder="起步距离"></div>
-          <div class="col-xs-6" style="padding-left:1px"><input type="text" class="form-control" v-model="param.firstDPrice"  maxLength=5  required placeholder="起步距离价格"></div>
+          <div class="col-xs-6" style="padding-right:1px"><input type="number" class="form-control" v-model="param.firstDist"  min=1  max=999999 placeholder="起步距离(km)"></div>
+          <div class="col-xs-6" style="padding-left:1px"><input type="text" class="form-control" v-model="param.firstDPrice"  maxLength=5  required placeholder="起步距离价格(元)"></div>
         </div>
       </div>            
       <div class="form-group" v-if="param.isFree !== '1' && param.isCityWide === '1'">
         <label class="col-xs-4 control-label" style="padding-right:1px">续距(km)与价格(元)<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <div class="col-xs-6" style="padding-right:1px"><input type="number" class="form-control" v-model="param.additionDist"  min=1  max=999999 placeholder="续距"></div>
-          <div class="col-xs-6" style="padding-left:1px"><input type="text" class="form-control" v-model="param.additionDPrice"  maxLength=5  required placeholder="续距价格"></div>
+          <div class="col-xs-6" style="padding-right:1px"><input type="number" class="form-control" v-model="param.additionDist"  min=1  max=999999 placeholder="续距(km)"></div>
+          <div class="col-xs-6" style="padding-left:1px"><input type="text" class="form-control" v-model="param.additionDPrice"  maxLength=5  required placeholder="续距价格(元)"></div>
         </div>
       </div>       
            

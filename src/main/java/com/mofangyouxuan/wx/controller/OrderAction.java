@@ -52,7 +52,7 @@ public class OrderAction {
 	public String placeOrder(@PathVariable("goodsId")Long goodsId,ModelMap map) {
 		//UserBasic user = (UserBasic) map.get("userBasic");
 		Goods goods = null;
-		JSONObject jsonRet = GoodsService.getGoods(true,goodsId);
+		JSONObject jsonRet = GoodsService.getGoods(true,goodsId,false);
 		if(jsonRet == null || !jsonRet.containsKey("goods")) {
 			map.put("errmsg", "获取商户信息失败！");
 		}else {
@@ -76,7 +76,7 @@ public class OrderAction {
 			UserBasic user = (UserBasic) map.get("userBasic");
 			
 			Goods goods = null;
-			JSONObject ret = GoodsService.getGoods(true,order.getGoodsId());
+			JSONObject ret = GoodsService.getGoods(true,order.getGoodsId(),false);
 			if(ret == null || !ret.containsKey("goods")) {
 				map.put("errmsg", "系统中没有该商户信息！");
 				return "order/page-place-order";
@@ -929,12 +929,16 @@ public class OrderAction {
 		try {
 			if(user == null && partner == null) {
 				map.put("errmsg", "您没有权限查询该订单信息！");
-				return "";
+				return "order/page-order-logistics";
 			}
 			JSONObject jsonRet = OrderService.getLogistics(orderId);
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
-				map.put("errmsg", "系统中没有该订单信息！");
-				return "";
+				if(jsonRet.containsKey("errmsg")) {
+					map.put("errmsg", jsonRet.getString("errmsg"));
+				}else {
+					map.put("errmsg", "系统中没有该订单信息！");
+				}
+				return "order/page-order-logistics";
 			}
 			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
 			if(order.getUserId().equals(user.getUserId()) ||

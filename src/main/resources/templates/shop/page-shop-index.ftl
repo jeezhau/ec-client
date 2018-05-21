@@ -30,10 +30,10 @@
 
 <div class="container goods-container" id="container" style="padding:0 1px;overflow:scroll">
   <div class="row" style="margin:0 0;overflow:scroll">
-    <div v-for="goods in goodsList" class="col-xs-6" style="padding:0px 0px;">
+    <div v-for="goods in goodsList" class="col-xs-6" style="padding:3px 2px;">
 	    <div style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
 	      <a v-bind:href="'/goods/show/' + goods.goodsId">
-	        <img alt="" :src="'/image/file/show/' + goods.mainImgPath" style="width:90%;height:150px">
+	        <img alt="" :src="'/image/file/show/' + goods.partner.vipId + '/' + goods.mainImgPath" style="width:90%;height:150px">
 	      </a>
 	    </div>
 	    <div style="margin:1px 1px;" >
@@ -99,12 +99,14 @@
  containerVue.getAll();
  //分类查询
  function getGoodsByCat(categoryId){
+	 containerVue.goodsList = [];
 	 containerVue.param.categoryId = categoryId;
 	 containerVue.param.begin = 0;
 	 containerVue.getAll();
  }
  function getGoodsByKey(keywords){
 	 if(keywords){
+		 containerVue.goodsList = [];
 		 containerVue.param.keywords = keywords;
 		 containerVue.param.begin = 0;
 		 containerVue.getAll();

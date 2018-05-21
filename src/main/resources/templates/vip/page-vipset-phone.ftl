@@ -153,9 +153,23 @@
 						if(jsonRet && jsonRet.errmsg){
 							if(jsonRet.errcode !== 0){
 								alertMsg('错误提示',jsonRet.errmsg)
+								if(flag ==='new' && containerVue.time.newTimer){
+									clearTimeout(containerVue.time.newTimer);
+									containerVue.time.newTime = 120;
+								}else if(containerVue.time.oldTimer){
+									clearTimeout(containerVue.time.oldTimer);
+									containerVue.time.oldTime = 120;
+								}
 							}
 						}else{
 							alertMsg('错误提示','获取验证码失败！')
+							if(flag ==='new' && containerVue.time.newTimer){
+								clearTimeout(containerVue.time.newTimer);
+								containerVue.time.newTime = 120;
+							}else if(containerVue.time.oldTimer){
+								clearTimeout(containerVue.time.oldTimer);
+								containerVue.time.oldTime = 120;
+							}
 						}
 					},
 					dataType: 'json'

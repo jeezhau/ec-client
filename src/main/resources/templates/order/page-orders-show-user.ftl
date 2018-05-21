@@ -105,6 +105,7 @@ var containerVue = new Vue({
 						for(var i=0;i<jsonRet.datas.length;i++){
 							var item = jsonRet.datas[i];
 							item.goodsSpec = JSON.parse(item.goodsSpec);
+							item.headimgurl = startWith(item.headimgurl,'http')? item.headimgurl: ('/user/headimg/show/'+item.userId);
 							containerVue.orders.push(item);
 						}
 						containerVue.begin = jsonRet.pageCond.begin;

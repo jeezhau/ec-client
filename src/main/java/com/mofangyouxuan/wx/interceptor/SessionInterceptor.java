@@ -45,7 +45,7 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 		HttpSession session = request.getSession();
 		
 		String openId = null;
-		openId	= "ofvDZv893-8LL8qax8dyXGp2u23g";
+		openId	= "ofvDZv5xWrIKuPrNbw3yDTvQY9Pg";
 		
 		String code = request.getParameter("code");
 		String state = request.getParameter("state"); 

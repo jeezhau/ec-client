@@ -20,29 +20,91 @@
     <link href="/css/weui.css" rel="stylesheet">
     
     <link href="/css/mfyx.css" rel="stylesheet">
+    <script src="/script/common.js"></script>
 </head>
 <body class="light-gray-bg">
 
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
-<div class="container " style="oveflow:scroll">
+<div class="container" id="container" style="padding:0;oveflow:scroll">
    <div class="row">
-     <a class="col-xs-2" href="/goods/detail/goodsIs" style="vertical-algin:center;text-align:center"><img width="15px" height="15px" alt="" src="/icons/返回.png"></a>
-     <h3 class="col-xs-9" style="margin:5px 0;text-align:center" >商品评价</h3>
+     <h3 class="row" style="margin:5px 0;text-align:center" >商品评价({{appr.apprCnt}})</h3>
    </div>
-   <div class="row" >
-    <div class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
-     <div class="row">
-       <span class="pull-left"><img alt="头像" src="/images/mfyx_logo.jpeg" width="20px" height="20px" style="border-radius:50%">用户昵称</span>
-       <span class="pull-right">2018-4-15</span>
+   <div class="row" style="margin:1px 0px;">
+     <div class="row" v-for="order in appr.apprList" style="margin:1px 0;background-color:white;">
+       <div class="row" style="margin:1px 2px;padding:3px 10px">
+         <span class="pull-left"><img alt="头像" :src="order.headimgurl" width="20px" height="20px" style="border-radius:50%">{{order.nickname}}</span>
+         <span class="pull-right">{{order.appraiseTime}}</span>
+       </div>
+       <#include "/order/tpl-order-buy-content-4vue.ftl" encoding="utf8">
+       <div class="row" style="margin:1px 0">
+         <div class="col-xs-12" v-for="sub in order.appraiseInfo">
+         {{sub.time}} &nbsp;&nbsp;&nbsp;&nbsp;{{sub.content}}
+         </div>
+       </div>
      </div>
-     <div class="row">
-       非常好，味道不错，水分充足，以后一定经常关注。
-     </div>
-    </div>
-  </div>
+   </div>
   
 </div><!-- end of container -->
+<script type="text/javascript">
+var containerVue = new Vue({
+	el:'#container',
+	data:{
+		appr:{
+			apprList:[],
+			apprCnt:0,
+		},
+		param:{
+			objNm: '${objNm}',
+			objId: '${objId?string("#")}',
+			begin:0,
+			pageSize:100,
+		}
+	},
+	methods:{
+		getAllAppr: function(){
+			 containerVue.appr.apprCnt = 0;
+			 containerVue.appr.apprList = [];
+			 var url = '';
+			 if(this.param.objNm == 'goods'){
+				 url = '/appraise/getall/goods/' + this.param.objId;
+			 }else if(this.param.objNm == 'partner'){
+				 url = '/appraise/getall/partner/' + this.param.objId;
+			 }else{
+				 return;
+			 }
+			 $.ajax({
+					url: url,
+					method:'post',
+					data: this.param,
+					success: function(jsonRet,status,xhr){
+						if(jsonRet && jsonRet.errcode == 0){//
+							for(var i=0;i<jsonRet.datas.length;i++){
+								var appr = jsonRet.datas[i];
+								if(appr.appraiseInfo){//有评价内容
+									appr.appraiseInfo = JSON.parse(appr.appraiseInfo);
+								}else{
+									appr.appraiseInfo = {'time':appr.appraiseTime,'content':"卖家太懒，啥也没留下！！！"}
+								}
+								appr.goodsSpec = JSON.parse(appr.goodsSpec);
+								appr.headimgurl = startWith(appr.headimgurl,'http')?appr.headimgurl:('/user/headimg/show/'+appr.userId)
+								containerVue.appr.apprList.push(appr);
+							}
+							containerVue.param.begin = jsonRet.pageCond.begin;
+							containerVue.appr.apprCnt = jsonRet.pageCond.count;
+						}
+					},
+					dataType: 'json'
+				});			 
+		 }
+	}
+});
+containerVue.getAllAppr();
+</script>
+
+<footer>
+  <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
+</footer>
 
 </body>
 </html>

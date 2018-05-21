@@ -69,7 +69,8 @@
 		    
 		    <a v-if="order.status==='30' " class="btn btn-default pull-right" :href="'/order/logistics/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >查看物流</span></a>
 		    
-		    <a v-if="order.status==='41' || order.status==='56'" class="btn btn-primary pull-right" :href="'/order/partner/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即评价</span></a>
+		    <a v-if="!order.apprUserTime && (order.status==='31' || startWith(order.status,'4') || order.status==='55' || order.status==='56')" class="btn btn-primary pull-right" :href="'/order/partner/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即评价</span></a>
+		    <a v-if="order.apprUserTime" class="btn btn-primary pull-right" :href="'/order/partner/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >追加评价</span></a>
 		    
 		    <a v-if="order.status==='31' " class="btn btn-danger pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >售后处理</span></a>
       </div>
@@ -106,6 +107,7 @@ var containerVue = new Vue({
 						for(var i=0;i<jsonRet.datas.length;i++){
 							var item = jsonRet.datas[i];
 							item.goodsSpec = JSON.parse(item.goodsSpec);
+							item.headimgurl = startWith(item.headimgurl,'http')? item.headimgurl: ('/user/headimg/show/'+item.userId);
 							containerVue.orders.push(item);
 						}
 					}else{

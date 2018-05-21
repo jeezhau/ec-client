@@ -39,7 +39,7 @@
       <div class="row" style="padding:10px 10px;background-color:#880000">
         <div class="row" style="margin:10px 25%;vertical-algin:center;text-align:center">
           <#if ((userBasic.headimgurl)!'')?starts_with('http')>
-             <img alt="" src="${userBasic.headimg}" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" > 
+             <img alt="" src="${userBasic.headimgurl}" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" > 
             <#else>
              <img alt="" src="/user/headimg/show/${(userBasic.userId)?string('#')}"width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" >
           </#if>
@@ -57,7 +57,7 @@
              <img alt="" src="/icons/订单.png" width="20px" height="20px"> 我的订单
            </a>
            <span class="row">
-             <span class="col-xs-2"  style="padding:0 3px">
+             <span class="col-xs-3"  style="padding:0 3px">
                 <a href="/order/user/show/4pay" class="weui-tabbar__item ">
                     <span style="display: inline-block;position: relative;">
                         <img src="/icons/等待付款.png" alt="" class="weui-tabbar__icon">
@@ -66,7 +66,7 @@
                     <p class="weui-tabbar__label">待付款</p>
                 </a>
               </span>
-              <span class="col-xs-2"  style="padding:0 3px">
+              <span class="col-xs-3"  style="padding:0 3px">
                 <a href="/order/user/show/4delivery" class="weui-tabbar__item " >
                     <span style="display: inline-block;position: relative;">
                         <img src="/icons/待发货.png" alt="" class="weui-tabbar__icon">
@@ -75,7 +75,7 @@
                     <p class="weui-tabbar__label">待发货</p>
                 </a>
               </span>
-              <span class="col-xs-2" style="padding:0 3px">
+              <span class="col-xs-3" style="padding:0 3px">
                 <a href="/order/user/show/4sign" class="weui-tabbar__item ">
                     <span style="display: inline-block;position: relative;">
                         <img src="/icons/待收货.png" alt="" class="weui-tabbar__icon">
@@ -85,7 +85,7 @@
                 </a>
                 </a>
               </span>
-              <span class="col-xs-2" style="padding:0 3px">
+              <span class="col-xs-3" style="padding:0 3px">
                 <a href="/order/user/show/4appraise" class="weui-tabbar__item ">
                     <span style="display: inline-block;position: relative;">
                         <img src="/icons/待评价.png" alt="" class="weui-tabbar__icon">
@@ -94,16 +94,14 @@
                     <p class="weui-tabbar__label">待评价</p>
                 </a>
               </span>
-              <span class="col-xs-3" style="padding:0 3px">
-                <a href="/order/user/show/4refund" class="weui-tabbar__item ">
-                    <span style="display: inline-block;position: relative;">
-                        <img src="/icons/无忧售后.png" alt="" class="weui-tabbar__icon">
-                        <span v-if="counts['AS']>0" class="weui-badge" style="position: absolute;top: -2px;right: -13px;">{{counts['AS']}}</span>
-                    </span>
-                    <p class="weui-tabbar__label">退换货</p>
-                </a>
-              </span>
+
             </span>
+         </li>
+         <li style="background-color:white" >
+           <a href="#">
+             <span class="pull-right" > 退款换货 &gt; </span>
+             <img alt="" src="/icons/无忧售后.png" width="20px" height="20px"> 无忧售后
+           </a>
          </li>
          <li style="background-color:white" >
            <a href="#">
@@ -139,6 +137,7 @@
        </ul>
       </div>
     </div>
+    
     <!-- 会员信息管理-->
     <div class="row" id="userVip" style="display:<#if mode='vip'>block<#else>none</#if>"> 
       <div class="row" style="padding:10px 10px;background-color:#880000">
@@ -147,7 +146,7 @@
            <img alt="" src="/icons/无效对象.png" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" >
           <#else>
             <#if ((userBasic.headimgurl)!'')?starts_with('http')>
-             <img alt="" src="${userBasic.headimg}" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" > 
+             <img alt="" src="${userBasic.headimgurl}" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" > 
             <#else>
              <img alt="" src="/user/headimg/show/${(userBasic.userId)?string('#')}"width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" >
             </#if>
@@ -160,7 +159,15 @@
         </div>
       </div>
       <div class="row" style="margin:30px 1px 15px 1px;text-align:center;vertical-align:center">
-	    <div class="col-xs-6" style="padding-right:5px;">
+      	<div class="col-xs-4" style="padding:3px;">
+	       <div style="background-color:white">
+		   <a href="<#if vipBasic.status = '1'>/vip/vipset<#else>javascript:;</#if>">
+			    <img alt="" src="/icons/账户设置.png" width="90px" height="90px"> 
+			    <p >账户设置 </p>
+			</a>
+	       </div>
+	    </div>
+	    <div class="col-xs-4" style="padding:3px;">
 	      <div style="background-color:white;">
 		    <a href="<#if vipBasic.status = '1'><#else>javascript:;</#if>" >
 			    <img alt="" src="/icons/提现.png" width="90px" height="90px">
@@ -168,7 +175,7 @@
 			</a>
 	      </div>
 	    </div>
-	    <div class="col-xs-6" style="padding-left:5px">
+	    <div class="col-xs-4" style="padding:3px;">
 	       <div style="background-color:white">
 		    <a href="<#if vipBasic.status = '1'>/vip/flow/show<#else>javascript:;</#if>">
 			    <img alt="" src="/icons/查看明细.png" width="90px" height="90px"> 
@@ -176,7 +183,7 @@
 			</a>
 		  </div>
 	    </div>
-	    <div class="col-xs-6" style="padding-right:5px">
+	    <div class="col-xs-4" style="padding:3px;">
 	       <div style="background-color:white">
 		    <a href="<#if vipBasic.status = '1'><#else>javascript:;</#if>">
 			    <img alt="" src="/icons/客服.png" width="90px" height="90px"> 
@@ -184,7 +191,7 @@
 			</a>
 	       </div>
 	    </div>
-	    <div class="col-xs-6" style="padding-left:5px">
+	    <div class="col-xs-4" style="padding:3px;">
 	       <div style="background-color:white">
 		   <a href="<#if vipBasic.status = '1'>/partner/index<#else>javascript:;</#if>">
 			    <img alt="" src="/icons/合作伙伴.png" width="90px" height="90px"> 
@@ -192,20 +199,12 @@
 			</a>
 	       </div>
 	    </div>
-	    	<div class="col-xs-6" style="padding-left:5px">
-	       <div style="background-color:white">
-		   <a href="<#if vipBasic.status = '1'>/vip/vipset<#else>javascript:;</#if>">
-			    <img alt="" src="/icons/账户设置.png" width="90px" height="90px"> 
-			    <p >账户设置 </p>
-			</a>
-	       </div>
-	    </div>	
       </div>
     </div>    
 	<#if vipBasic.status != '1'>
   			<p style="margin:5px 5px;font-size:18px;color:red">您尚未激活会员账户，所有会员功能将不可用！激活方式见：个人心中／我-基本／我要推广！</p>
   	</#if>
-</div>
+</div> <!-- end of container -->
 <script>
 var containerVue = new Vue({
 	el:'#container',
@@ -245,27 +244,7 @@ containerVue.getOrderCounts();
 </footer>
 
 <#if errmsg??>
-<!-- 错误提示模态框（Modal） -->
-<div class="modal fade " id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorTitle" aria-hidden="false" data-backdrop="static">
-	<div class="modal-dialog">
-  		<div class="modal-content">
-     		<div class="modal-header">
-        			<button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
-        			<h4 class="modal-title" id="errorTitle" style="color:red">错误提示</h4>
-     		</div>
-     		<div class="modal-body">
-       			<p> ${errmsg} </p><p/>
-     		</div>
-     		<div class="modal-footer">
-     			<div style="margin-left:50px">
-        			</div>
-     		</div>
-  		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-<script>
-$("#errorModal").modal('show');
-</script>
+ <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
 </#if>
 
 </body>

@@ -104,7 +104,7 @@ public class GoodsAction {
 		try {
 			if(goodsId != 0) {
 				//获取已有指定商品
-				JSONObject ret = GoodsService.getGoods(false,goodsId);
+				JSONObject ret = GoodsService.getGoods(false,goodsId,true);
 				if(ret == null || !ret.containsKey("goods")) {
 					map.put("errmsg", "没有获取到该指定商品信息！");
 					return "forward:/goods/manage";
@@ -256,7 +256,7 @@ public class GoodsAction {
 	
 	
 	/**
-	 * 获取合作伙伴的所有商品
+	 * 合作伙伴自己获取所有商品
 	 * @param jsonParams
 	 * @param map
 	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
@@ -301,26 +301,52 @@ public class GoodsAction {
 	
 	
 	/**
-	 * 获取商品详细信息
+	 * 商家自己获取商品详细信息
 	 * @param goodsId
 	 * @return {"errcode":-1,"errmsg":"错误信息",goods:{...}} 
 	 */
 	@RequestMapping("/getown/{goodsId}")
 	@ResponseBody
-	public String getById(@PathVariable("goodsId")Long goodsId,ModelMap map) {
+	public String getOwnById(@PathVariable("goodsId")Long goodsId,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
-		jsonRet = GoodsService.getGoods(false,goodsId);
-		if(jsonRet == null) {
-			jsonRet = new JSONObject();
+		try {
+			VipBasic vip = (VipBasic) map.get("vipBasic");
+			if(vip == null || !"1".equals(vip.getStatus()) ) {
+				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
+				jsonRet.put("errmsg", "系统中没有该会员或未激活！");
+				return jsonRet.toString();
+			}
+			PartnerBasic partner = (PartnerBasic)map.get("partnerBasic");
+			if(partner == null) {
+				jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
+				jsonRet.put("errmsg", "系统中没有该合作伙伴信息！");
+				return jsonRet.toString();
+			}
+			jsonRet = GoodsService.getGoods(false,goodsId,true);
+			if(jsonRet == null) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+				jsonRet.put("errmsg", "获取商品详情失败！");
+			}
+			if(jsonRet.containsKey("goods")) {
+				Goods goods = JSONObject.toJavaObject(jsonRet.getJSONObject("goods"),Goods.class);
+				if(!partner.getPartnerId().equals(goods.getPartnerId())) {//不是自己
+					jsonRet = new JSONObject();
+					jsonRet.put("errcode", ErrCodes.GOODS_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "您没有权限查询该商品信息！");
+				}
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
 			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
-			jsonRet.put("errmsg", "获取商品详情失败！");
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
 		return jsonRet.toString();
 	}
 	
 	
 	/**
-	 * 获取商品详细信息
+	 * 任何人获取商品详细信息
 	 * @param goodsId
 	 * @return {"errcode":-1,"errmsg":"错误信息",goods:{...}} 
 	 */
@@ -328,37 +354,58 @@ public class GoodsAction {
 	@ResponseBody
 	public String getByIdWithPartner(@PathVariable("goodsId")Long goodsId,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
-		jsonRet = GoodsService.getGoods(true,goodsId);
-		if(jsonRet == null) {
-			jsonRet = new JSONObject();
+		try {
+			jsonRet = GoodsService.getGoods(true,goodsId,false);
+			if(jsonRet == null) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+				jsonRet.put("errmsg", "获取商品详情失败！");
+			}
+			Goods goods = JSONObject.toJavaObject(jsonRet.getJSONObject("goods"),Goods.class);
+			if("1".equals(goods.getStatus()) && "1".equals(goods.getReviewResult())) {
+				jsonRet.put("errcode", ErrCodes.GOODS_STATUS_ERROR);
+				jsonRet.put("errmsg", "该商品当前不可查询详情！");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
 			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
-			jsonRet.put("errmsg", "获取商品详情失败！");
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
 		return jsonRet.toString();
 	}
 	
 	
 	/**
-	 * 获取指定商品的详细信息并展示，包含展示部分合作伙伴信息
+	 * 任何人获取指定商品的详细信息并展示，包含展示部分合作伙伴信息
 	 * @param goodsId
 	 * @param map
 	 * @return
 	 */
 	@RequestMapping("/show/{goodsId}")
-	public String show(@PathVariable("goodsId")Long goodsId,ModelMap map) {
-		JSONObject obj = GoodsService.getGoods(true,goodsId);
+	public String showGoods(@PathVariable("goodsId")Long goodsId,ModelMap map) {
+		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
 		Goods goods = null;
 		try {
+			JSONObject obj = GoodsService.getGoods(true,goodsId,true);
 			if(obj == null || !obj.containsKey("goods")) {
 				map.put("errmsg", "获取商品详情失败！");
 			}else {
 				goods = JSONObject.toJavaObject(obj.getJSONObject("goods"),Goods.class);
+				if(partner.getPartnerId().equals(goods.getPartnerId())) {//自己
+					map.put("goods", goods);
+				}else { //其他人
+					if("S".equals(goods.getPartner().getStatus()) && 
+							"1".equals(goods.getStatus()) && "1".equals(goods.getReviewResult())) {
+						map.put("goods", goods);
+					}else {
+						map.put("errmsg", "该商品当前不可访问！");
+					}
+				}
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
-		map.put("goods", goods);
 		return "goods/page-goods-show";
 	}
 	

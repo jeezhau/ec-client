@@ -9,7 +9,7 @@
     </div>
     <div class="col-xs-12" style="text-align:center;">
       <a href="/goods/show/${(order.goodsId)?string('#')}">
-       <img alt="" src="/image/file/show/${(order.goodsMainImgPath)!''}" style="width:99%;height:150px;">
+       <img alt="" src="/image/file/show/${(order.mchtUId)?string('#')}/${(order.goodsMainImgPath)!''}" style="width:99%;height:150px;">
       </a>
     </div>
     <div class="col-xs-12" style="padding:0px 3px">

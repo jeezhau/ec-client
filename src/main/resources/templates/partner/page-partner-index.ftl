@@ -31,10 +31,26 @@
       <div style="background-color:white">
 	    <a href="/partner/edit" >
 		    <img src="/icons/合作伙伴-申请开通.png" alt="" width="90px" height="90px">
-		    <p >基本信息维护</p>
+		    <p >我要开店</p>
 		</a>
       </div>
     </div>
+    <div class="col-xs-6" style="padding-left:5px">
+       <div style="background-color:white">
+	    <a href="/image/index" >
+		    <img src="/icons/图库管理.png" alt="" width="90px" height="90px">
+		    <p>图库管理</p>
+		</a>
+	  </div>
+    </div> 
+    <div class="col-xs-6" style="padding-right:5px">
+       <div style="background-color:white">
+	    <a href="/postage/index" >
+		    <img src="/icons/运费模板管理.png" alt="" width="90px" height="90px">
+		    <p>运费模版管理</p>
+		</a>
+	  </div>
+    </div>    
     <div class="col-xs-6" style="padding-left:5px">
        <div style="background-color:white">
 	    <a href="/goods/manage" >
@@ -51,22 +67,6 @@
 		</a>
        </div>
     </div>
-    <div class="col-xs-6" style="padding-left:5px">
-       <div style="background-color:white">
-	    <a href="/postage/index" >
-		    <img src="/icons/运费模板管理.png" alt="" width="90px" height="90px">
-		    <p>运费模版管理</p>
-		</a>
-	  </div>
-    </div>
-    <div class="col-xs-6" style="padding-right:5px">
-       <div style="background-color:white">
-	    <a href="/image/index" >
-		    <img src="/icons/图库管理.png" alt="" width="90px" height="90px">
-		    <p>图库管理</p>
-		</a>
-	  </div>
-    </div>    
   </div>
   <div class="row" style="margin-top:3px;vertical-align:center">
     <div class="col-xs-12">

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
-import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.service.OrderService;
 import com.mofangyouxuan.wx.utils.PageCond;
 
@@ -55,6 +54,7 @@ public class AppraiseAction {
 			
 			params.put("goodsId", goodsId);
 			params.put("status", "41,56");
+			params.put("appraiseStatus", "1");
 			
 			JSONObject sortParams = new JSONObject();
 			sortParams.put("createTime", "1#1");
@@ -98,6 +98,7 @@ public class AppraiseAction {
 			
 			params.put("partnerId", partnerId);
 			params.put("status", "41,56");
+			params.put("appraiseStatus", "1");
 			
 			JSONObject sortParams = new JSONObject();
 			sortParams.put("createTime", "1#1");
@@ -142,6 +143,7 @@ public class AppraiseAction {
 			
 			params.put("userId", userId);
 			params.put("status", "41,56");
+			params.put("appraiseStatus", "1");
 			
 			JSONObject sortParams = new JSONObject();
 			sortParams.put("createTime", "1#1");

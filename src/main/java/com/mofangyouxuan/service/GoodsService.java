@@ -71,13 +71,14 @@ public class GoodsService {
 	
 	/**
 	 * 
-	 * @param hasPartner 是否包含合作伙伴数据
+	 * @param needPartner 是否包含合作伙伴数据
 	 * @param goodsId
 	 * @return {"errcode":-1,"errmsg":"错误信息",goods:{...}} 
 	 */
-	public static JSONObject getGoods(boolean hasPartner,Long goodsId) {
-		String flag = hasPartner ? "1" : "0";
-		String url = mfyxServerUrl + goodsGetUrl + goodsId + "/" + flag;
+	public static JSONObject getGoods(boolean needPartner,Long goodsId,boolean isSelf) {
+		String np = needPartner ? "1" : "0";
+		String self = isSelf ? "1" : "0";;
+		String url = mfyxServerUrl + goodsGetUrl + goodsId + "/" + self + "/" + np;
 		String strRet = HttpUtils.doGet(url);
 		JSONObject jsonRet = null;
 		try {
@@ -89,14 +90,14 @@ public class GoodsService {
 	}
 	
 	/**
-	 * @param hasPartner 是否包含合作伙伴数据
+	 * @param needPartner 是否包含合作伙伴数据
 	 * @param jsonSearchParams
 	 * @param jsonSortParams
 	 * @param jsonPageCond
 	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
 	 */
-	public static JSONObject searchGoods(boolean hasPartner,String jsonSearchParams,String jsonSortParams,String jsonPageCond) {
-		String url = mfyxServerUrl + (hasPartner==true?goodsGetallWithPartnerUrl:goodsGetallNopartnerUrl);
+	public static JSONObject searchGoods(boolean needPartner,String jsonSearchParams,String jsonSortParams,String jsonPageCond) {
+		String url = mfyxServerUrl + (needPartner==true?goodsGetallWithPartnerUrl:goodsGetallNopartnerUrl);
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("jsonSearchParams", jsonSearchParams);
 		params.put("jsonSortParams", jsonSortParams);

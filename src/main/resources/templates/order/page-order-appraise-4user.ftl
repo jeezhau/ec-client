@@ -40,7 +40,7 @@
   </div>
   <div class="row" style="margin:3px 0px;background-color:white; color:red">
     <p/>
-  	<span>&nbsp;&nbsp;&nbsp;&nbsp;填写说明：如果您已经收到购买的商品，请即时提交您的签收评价！</span>
+  	<span>&nbsp;&nbsp;&nbsp;&nbsp;填写说明：如果客户已经签收评价，请您也完成对客户的评价！</span>
   </div>
   <div class="row" style="margin:3px 0; background-color:white">
     <#if !(order.apprUserTime)??>
@@ -66,7 +66,7 @@
     <div class="row" style="margin:1px 0px;background-color:white;">
       <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">历史评价</span>
     </div>
-    <div v-for="item in order.appraiseInfo" class="row" style="margin:1px 1px ;padding:3px 0;background-color:white" >
+    <div v-for="item in order.apprUser" class="row" style="margin:1px 1px ;padding:3px 0;background-color:white" >
       <div class="col-xs-12">
        <span class="pull-left">{{item.time}}</span>
       </div>

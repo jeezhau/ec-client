@@ -20,6 +20,7 @@
     <link href="/css/weui.css" rel="stylesheet">
     
     <link href="/css/mfyx.css" rel="stylesheet">
+    <script src="/script/common.js" type="text/javascript"></script>
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
@@ -40,7 +41,7 @@
     <!-- 轮播（Carousel）项目 -->
     <div class="carousel-inner">
         <div  v-bind:class="[{active:(index===0)}, 'item']" v-for="imgpath,index in goods.courselImgPaths" >
-            <img :src="'/image/file/show/' + imgpath" >
+            <img :src="'/image/file/show/${(goods.partner.vipId)?string('#')}/' + imgpath" >
         </div>
     </div>
     <!-- 轮播（Carousel）导航 -->
@@ -70,13 +71,12 @@
       <div class="row" style="margin:3px 15px 3px 15px;padding:3px 3px">
         <label class="col-xs-12 control-label">购买数量(具体库存以付款提交时为准)<span style="color:red">*</span>:</label>
         <div class="col-xs-12" style="padding:0px 3px">
-	       <table class="table table-striped table-bordered table-condensed">
-	         <tr>
+	       <table class="table table-striped table-bordered table-condensed" style="font-size:15px">
+	         <tr >
 	           <th width="30%" style="padding:2px 2px">规格名称</th>
-	           <th width="15%" style="padding:2px 2px">量值</th>
+	           <th width="20%" style="padding:2px 2px">销售单位</th>
 	           <th width="15%" style="padding:2px 2px">售价(¥)</th>
-	           <th width="20%" style="padding:2px 2px">库存件数</th>
-	           <th width="20%" style="padding:2px 2px">购买数量</th>
+	           <th width="35%" style="padding:2px 2px;color:red;text-align:center">购买数量</th>
 	         </tr>
 	         <tr v-for="item,index in goods.specDetailArr" >
 	           <td style="padding:2px 2px">
@@ -87,12 +87,11 @@
 	           </td>
 	           <td style="padding:2px 2px">
 	              <span style="width:100%" >{{item.price}}</span>
-	           </td> 
-	           <td style="padding:2px 2px">
-	              <span style="width:100%" >{{item.stock}}</span>
-	           </td> 	                         
+	           </td>  	                         
 	           <td style="padding:2px 2px;text-align:center">
-                 <input type="number" style="width:80%" min=0 :max="item.stock" value=0 @change="changeBuyNum(index,$event)">
+	             <button type="button" class="btn btn-danger btn-xs" style="margin:0" @click="addBuyNum(index,'sub')">-</button>
+                 <input type="number" :id="'buyNum_'+index" style="width:50%" min=0 :max="item.stock" value=0 @change="changeBuyNum(index)">
+                 <button type="button" class="btn btn-danger btn-xs" style="margin:0" @click="addBuyNum(index,'add')">+</button>
 	           </td>
 	         </tr>
 	       </table>    
@@ -126,7 +125,10 @@
               </div>
             </div>
             <div class="col-xs-3" style="vertical-algin:center;">
-              <a class="btn btn-default" href="javascript:;" @click="selectReceiver"><img alt="" src="/icons/地址管理.png" width="100%" height="100%"></a>
+              <a class="btn btn-default" href="javascript:;" @click="selectReceiver">
+               <img alt="" src="/icons/收货地址.png" width="100%" height="100%"><br>
+               <span style="font-size:5px">收货地址</span>
+              </a>
             </div>
           </div>
           <div class="row">
@@ -139,6 +141,7 @@
         <label class="col-xs-3 control-label">配送方式<span style="color:red">*</span>:</label>
         <div class="col-sx-9">
           <select required v-model="param.postageIdAndMode" @change="changeDispatch">
+            <option value="" disabled>请选择(须先完成数据检查计算)...</option>
             <option v-for="item in dispatchMatchs" v-bind:value="item.postageId + '-' + item.mode">
               {{item.postageId + '#' + getDispatchMode(item.mode) + ' ¥' + item.carrage}} 
             </option>
@@ -153,10 +156,10 @@
        </div> 
      </div>
      
-     <div class="row" style="margin:15px 25px;padding:3px 3px;width:100%">
+     <div class="row" style="margin:15px 25px;padding:3px 3px;">
        <div class="col-xs-7">
          共<span style="color:red">{{param.countAll}}</span>件，
-         邮费¥<span style="color:red">{{param.carrage}}</span>，
+         邮费¥<span style="color:red">{{param.carrage}}</span><br>
          总金额¥<span style="color:red">{{(new Number(param.amount) + new Number(param.carrage)).toFixed(2)}}</span>
        </div>
        <div class="col-xs-5">
@@ -205,30 +208,39 @@ var containerVue = new Vue({
 		}
 	},
 	methods:{
-		getDispatchMode:function(code){
-			if(code){
-				if('1' === code){
-					return '官方统一配送';
-				}else if('2' == code){
-					return '商家自行配送';
-				}else if('3' == code){
-					return '快递配送';
-				}else if('4' == code){
-					return '客户自取';
-				}
-			}
-		},
-		changeBuyNum:function(index,event){
+		changeBuyNum:function(index){
 			var spec = this.goods.specDetailArr[index];
-			var value = $(event.target).val();
+			var value = $('#buyNum_' + index).val();
 			var val = parseInt(value);
 			if(isNaN(val) || val < 0 || val > spec.stock){
 				$(event.target).focus();
 				return false;
 			}
-			$(event.target).val(val);
+			$('#buyNum_' + index).val(val);
 			spec.buyNum = val;
 			
+			this.param.countAll = 0;
+			for(var i=0;i<this.goods.specDetailArr.length;i++){
+				var sp = this.goods.specDetailArr[i];
+				var num =  sp.buyNum ? sp.buyNum : 0;
+				this.param.countAll = this.param.countAll + num;
+			}
+			this.param.flag = 0;//重新检查
+		},
+		addBuyNum:function(index,type){
+			var spec = this.goods.specDetailArr[index];
+			if(!spec.buyNum){
+				spec.buyNum = 0;
+			}
+			if(type == 'add'){
+				spec.buyNum = spec.buyNum + 1;
+			}else{
+				if(spec.buyNum == 0){
+					return;
+				}
+				spec.buyNum = spec.buyNum - 1;
+			}
+			$('#buyNum_' + index).val(spec.buyNum);
 			this.param.countAll = 0;
 			for(var i=0;i<this.goods.specDetailArr.length;i++){
 				var sp = this.goods.specDetailArr[i];
@@ -266,7 +278,7 @@ var containerVue = new Vue({
 						containerVue.param.recvArea = jsonRet.receiver.area;
 						containerVue.param.recvAddr = jsonRet.receiver.addr;
 					}else{
-						alertMsg('错误提示','获取默认收货人信息失败！')
+						//alertMsg('错误提示','获取默认收货人信息失败！')
 					}
 				},
 				dataType: 'json'
@@ -350,27 +362,7 @@ containerVue.getDefaultReceiver();
 </#if>
 
 <#if errmsg??>
-<!-- 错误提示模态框（Modal） -->
-<div class="modal fade " id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorTitle" aria-hidden="false" data-backdrop="static">
-	<div class="modal-dialog">
-  		<div class="modal-content">
-     		<div class="modal-header">
-        			<button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
-        			<h4 class="modal-title" id="errorTitle" style="color:red">错误提示</h4>
-     		</div>
-     		<div class="modal-body">
-       			<p> ${errmsg} </p><p/>
-     		</div>
-     		<div class="modal-footer">
-     			<div style="margin-left:50px">
-        			</div>
-     		</div>
-  		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-<script>
-$("#errorModal").modal('show');
-</script>
+ <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
 </#if>
 
 <footer>

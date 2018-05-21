@@ -95,7 +95,7 @@ var containerVue = new Vue({
 			 	containerVue.flowList = [];
 			 }
 			$.ajax({
-				url: '/user/flow/getall',
+				url: '/vip/flow/getall',
 				method:'post',
 				data: {'jsonParams':JSON.stringify(this.param),'begin':this.pageCond.begin,'pageSize':this.pageCond.pageSize},
 				success: function(jsonRet,status,xhr){

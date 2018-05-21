@@ -36,7 +36,7 @@
 	    <a href="javascript:;">基本信息编辑</a>
 	  </li>
 	  <li style="width:50%" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#editPartner').hide();$('#reviewInfo').show();">
-	    <a href="javascript:;">审批反馈</a>
+	    <a href="javascript:;">审批进度</a>
 	  </li>
 	</ul>
   </div>
@@ -179,20 +179,20 @@ var partnerContainerVue = new Vue({
 	data:{
 		initData:{
 			country:'中国',
-			province:'${(partner.province)!''}',
-			city:'${(partner.city)!''}',
-			area:'${(partner.area)!''}',
-			addr:'${(partner.addr)!''}',
-			busiName:'${(partner.busiName)!''}',
-			legalPername:'${(partner.legalPername)!''}',
-			legalPeridno:'${(partner.legalPeridno)!''}',
-			compType:'${(partner.compType)!''}',
-			compName:'${(partner.compName)!''}',
-			licenceNo:'${(partner.licenceNo)!''}',
-			phone:'${(partner.phone)!''}',
-			introduce:'${(partner.introduce)!''}',
-			locationX:'${(partner.locationX)!''}',
-			locationY:'${(partner.locationY)!''}'
+			province:'${(partnerBasic.province)!''}',
+			city:'${(partnerBasic.city)!''}',
+			area:'${(partnerBasic.area)!''}',
+			addr:'${(partnerBasic.addr)!''}',
+			busiName:'${(partnerBasic.busiName)!''}',
+			legalPername:'${(partnerBasic.legalPername)!''}',
+			legalPeridno:'${(partnerBasic.legalPeridno)!''}',
+			compType:'${(partnerBasic.compType)!''}',
+			compName:'${(partnerBasic.compName)!''}',
+			licenceNo:'${(partnerBasic.licenceNo)!''}',
+			phone:'${(partnerBasic.phone)!''}',
+			introduce:'${(partnerBasic.introduce)!''}',
+			locationX:'${(partnerBasic.locationX)!''}',
+			locationY:'${(partnerBasic.locationY)!''}'
 		},	//初始化的数据
 		metadata:{
 			provinces:[],
@@ -200,26 +200,26 @@ var partnerContainerVue = new Vue({
 			areas:[]
 		},
 		review:{
-			status:'${(partner.status)!"0"}',
-			reviewTime:'${(partner.reviewTime)!''}' ,
-			reviewLog:"${(partner.reviewLog)!''}"
+			status:'${(partnerBasic.status)!"0"}',
+			reviewTime:'${(partnerBasic.reviewTime)!''}' ,
+			reviewLog:"${(partnerBasic.reviewLog)!''}"
 		},
 		param:{
 			country:'中国',
-			province:'${(partner.province)!''}',
-			city:'${(partner.city)!''}',
-			area:'${(partner.area)!''}',
-			addr:'${(partner.addr)!''}',
-			busiName:'${(partner.busiName)!''}',
-			legalPername:'${(partner.legalPername)!''}',
-			legalPeridno:'${(partner.legalPeridno)!''}',
-			compType:'${(partner.compType)!''}',
-			compName:'${(partner.compName)!''}',
-			licenceNo:'${(partner.licenceNo)!''}',
-			phone:'${(partner.phone)!''}',
-			introduce:'${(partner.introduce)!''}',
-			locationX:'${(partner.locationX)!''}',
-			locationY:'${(partner.locationY)!''}'
+			province:'${(partnerBasic.province)!''}',
+			city:'${(partnerBasic.city)!''}',
+			area:'${(partnerBasic.area)!''}',
+			addr:'${(partnerBasic.addr)!''}',
+			busiName:'${(partnerBasic.busiName)!''}',
+			legalPername:'${(partnerBasic.legalPername)!''}',
+			legalPeridno:'${(partnerBasic.legalPeridno)!''}',
+			compType:'${(partnerBasic.compType)!''}',
+			compName:'${(partnerBasic.compName)!''}',
+			licenceNo:'${(partnerBasic.licenceNo)!''}',
+			phone:'${(partnerBasic.phone)!''}',
+			introduce:'${(partnerBasic.introduce)!''}',
+			locationX:'${(partnerBasic.locationX)!''}',
+			locationY:'${(partnerBasic.locationY)!''}'
 		}
 	},
 	methods:{
@@ -386,7 +386,7 @@ $(document).on('ready', function() {
             image: {width: "100px", height: "100px"},
         },
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/logo/${(partner.partnerId)!''}" alt="LOGO照片" class="file-preview-image" style="width:96px">'
+            '<img src="/partner/cert/show/logo/${(partnerBasic.partnerId)!''}" alt="LOGO照片" class="file-preview-image" style="width:96px">'
         ]
     });
     //异步上传错误结果处理
@@ -435,7 +435,7 @@ $(document).on('ready', function() {
             image: {width: "100px", height: "100px"},
         },
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/idcard1/${(partner.partnerId)!''}" alt="法人身份证正面" class="file-preview-image" style="width:96px">'
+            '<img src="/partner/cert/show/idcard1/${(partnerBasic.partnerId)!''}" alt="法人身份证正面" class="file-preview-image" style="width:96px">'
         ]
     });
     //异步上传错误结果处理
@@ -484,7 +484,7 @@ $(document).on('ready', function() {
             image: {width: "100px", height: "100px"},
         },
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/idcard2/${(partner.partnerId)!''}" alt="法人身份证反面" class="file-preview-image" style="width:100px;height:100px">'
+            '<img src="/partner/cert/show/idcard2/${(partnerBasic.partnerId)!''}" alt="法人身份证反面" class="file-preview-image" style="width:100px;height:100px">'
         ]
     });
     //异步上传错误结果处理
@@ -533,7 +533,7 @@ $(document).on('ready', function() {
             image: {width: "100px", height: "100px"},
         },
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/licence/${(partner.partnerId)!''}" alt="营业执照照片" class="file-preview-image" style="width:96px">'
+            '<img src="/partner/cert/show/licence/${(partnerBasic.partnerId)!''}" alt="营业执照照片" class="file-preview-image" style="width:96px">'
         ]
     });
     //异步上传错误结果处理
@@ -560,29 +560,6 @@ $(document).on('ready', function() {
 });
 </script>
 
-<#if errmsg??>
-<!-- 错误提示模态框（Modal） -->
-<div class="modal fade " id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorTitle" aria-hidden="false" data-backdrop="static">
-	<div class="modal-dialog">
-  		<div class="modal-content">
-     		<div class="modal-header">
-        			<button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
-        			<h4 class="modal-title" id="errorTitle" style="color:red">错误提示</h4>
-     		</div>
-     		<div class="modal-body">
-       			<p> ${errmsg} </p><p/>
-     		</div>
-     		<div class="modal-footer">
-     			<div style="margin-left:50px">
-        			</div>
-     		</div>
-  		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-<script>
-$("#errorModal").modal('show');
-</script>
-</#if>
 <script>
   wx.config({
       debug: false,
@@ -614,10 +591,14 @@ $("#errorModal").modal('show');
 	});
 });
 wx.error(function(res){
-	  alertMsg(res);
+	  alertMsg('错误提示','config信息验证失败！');
 	  // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
 });
 </script>
+
+<#if errmsg??>
+ <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
+</#if>
 
 <footer>
   <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 

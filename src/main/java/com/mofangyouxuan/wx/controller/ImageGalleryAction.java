@@ -234,19 +234,19 @@ public class ImageGalleryAction {
 	 * @param filename
 	 * @return
 	 */
-	@RequestMapping("/file/show/{filename}")
-	public void showFile(@PathVariable(value="filename",required=true)String filename,
+	@RequestMapping("/file/show/{vipId}/{filename}")
+	public void showFile(@PathVariable(value="vipId",required=true)Integer vipId,
+			@PathVariable(value="filename",required=true)String filename,
 			OutputStream out,HttpServletRequest request,HttpServletResponse response,ModelMap map) {
 		try {
 			//数据检查
-			VipBasic vip = (VipBasic) map.get("vipBasic");
-			if(vip == null || !"1".equals(vip.getStatus()) ) {
+			if(vipId == null || vipId < 1 ) {
 				return;
 			}
 			if("undefined".equals(filename)) {
 				return;
 			}
-			String url = this.mfyxServerUrl + this.imageShowFileurl + vip.getVipId() + "/" + filename;
+			String url = this.mfyxServerUrl + this.imageShowFileurl + vipId + "/" + filename;
 			File file = HttpUtils.downloadFile(this.tmpFileDir,url);
 			BufferedImage image = ImageIO.read(file);
 			response.setContentType("image/*");
