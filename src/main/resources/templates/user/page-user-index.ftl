@@ -98,7 +98,7 @@
             </span>
          </li>
          <li style="background-color:white" >
-           <a href="#">
+           <a href="/aftersales/user/mgr/refund">
              <span class="pull-right" > 退款换货 &gt; </span>
              <img alt="" src="/icons/无忧售后.png" width="20px" height="20px"> 无忧售后
            </a>
@@ -133,7 +133,12 @@
              <span class=" pull-right" style=""> 就加入  &gt;</span>
              <img alt="" src="/icons/服务号-营销推广.png" width="20px" height="20px"> 我要推广
            </a>
-         </li>       
+         </li> 
+         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
+           <a href="/logout">
+             <img alt="" src="/icons/退出登录.png" width="20px" height="20px"> 退出登录
+           </a>
+         </li>                
        </ul>
       </div>
     </div>

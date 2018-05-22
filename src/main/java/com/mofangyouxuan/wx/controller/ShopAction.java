@@ -1,5 +1,7 @@
 package com.mofangyouxuan.wx.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,8 +11,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
+import com.mofangyouxuan.dto.Category;
+import com.mofangyouxuan.dto.Goods;
 import com.mofangyouxuan.dto.PartnerBasic;
-import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.wx.utils.PageCond;
 
@@ -29,9 +32,15 @@ public class ShopAction {
 	 * @param map
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping("/index")
 	public String getIndex(ModelMap map) {
-		
+		List<Category> categories = (List<Category>) map.get("categories");
+		if(categories == null) {
+			categories = GoodsService.getCategories();
+			map.put("categories", categories);
+		}
+
 		map.put("isDayFresh", "0");	//系统默认为访问商城管理
 		map.put("sys_func", "shop");
 		
@@ -84,4 +93,7 @@ public class ShopAction {
 		}
 		return jsonRet.toString();
 	}
+	
+	
+	
 }

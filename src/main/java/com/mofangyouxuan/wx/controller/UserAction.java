@@ -36,6 +36,7 @@ import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.UserService;
 import com.mofangyouxuan.service.VipService;
+import com.mofangyouxuan.wx.utils.SignUtils;
 
 /**
  * 个人中心管理
@@ -57,6 +58,7 @@ public class UserAction {
 	    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	    binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
 	}
+	
 	
 	/**
 	 * 用户管理主页面-我之基本

@@ -52,7 +52,10 @@
        <span class="pull-left">{{reason.time}}</span>
      </div>
      <div class="row">
-       {{reason.content}}
+       <p>{{reason.content.reason}}</p>
+       <p v-if="reason.type.indexOf('退货')">
+       {{getDispatchMode(reason.content.dispatchMode)}} {{reason.content.logisticsComp}} {{reason.content.logisticsNo}}
+       </p>
      </div>
     </div>
   </div>
@@ -69,7 +72,10 @@
        <span class="pull-left">{{reason.time}}</span>
      </div>
      <div class="row">
-       {{reason.content}}
+       <p>{{reason.content.reason}}</p>
+       <p v-if="reason.type.indexOf('退货')">
+       {{getDispatchMode(reason.content.dispatchMode)}} {{reason.content.dispatchMode.logisticsComp}} {{reason.content.dispatchMode.logisticsNo}}
+       </p>
      </div>
     </div>
   </div> 

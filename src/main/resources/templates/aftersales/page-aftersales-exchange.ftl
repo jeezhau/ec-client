@@ -53,19 +53,14 @@
          <input type="text" class="form-control" v-model="param.logisticsComp" required maxlength="100">
        </div>
   </div> 
+  
+  <#if (vipBasic.status) == '1'>
   <div class="row" style="margin:3px 0">
     	  <label class="col-xs-3 control-label" style="padding-right:0">配送单号<span style="color:red">*</span></label>
        <div class="col-xs-9" style="padding-left:0">
          <input type="text" class="form-control" v-model="param.logisticsNo" required maxlength="100">
        </div>
    </div>
-  <#if ((vipBasic.status)!'') == '1'>
-  <div class="row" style="margin:3px 0">
-    	  <label class="col-xs-3 control-label" style="padding-right:0">会员密码<span style="color:red">*</span></label>
-       <div class="col-xs-9" style="padding-left:0">
-         <input type="password" class="form-control" v-model="param.passwd" required maxlength="20">
-       </div>
-   </div>  
    </#if>
    <div class="row" style="margin:5px 0;text-align:center">
       <button type="submit" class="btn btn-danger" @click="submit">提交发货</button>
@@ -83,7 +78,6 @@ var containerVue = new Vue({
 		
 		param:{
 			orderId:'${order.orderId}',
-			passwd:'',
 			logisticsComp:'',
 			logisticsNo:''
 		}

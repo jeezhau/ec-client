@@ -207,8 +207,8 @@ containerVue.getAllAppr();
 	    </span>
 	    <p class="weui-tabbar__label">逛商家</p>
      </a>    
-     <a href="/order/place/${(goods.goodsId)?string('#')}" class="weui-tabbar__item " style='background-color:red;text-align:center;vertical-align:center;'>
-	    <span class="weui-tabbar__label" style="font-size:20px;color:white">立即下单</span>
+     <a href="/order/place/${(goods.goodsId)?string('#')}" class="weui-tabbar__item " style="background-color:red;text-align:center;">
+        <p><p class="weui-tabbar__label" style="font-size:20px;color:white;vertical-align:center;">立即下单</p>
      </a>     	
   </div>
 </footer>

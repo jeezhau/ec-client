@@ -36,17 +36,17 @@
 	        <img alt="" :src="'/image/file/show/' + goods.partner.vipId + '/' + goods.mainImgPath" style="width:90%;height:150px">
 	      </a>
 	    </div>
-	    <div style="margin:1px 1px;" >
+	    <div class="row" style="margin:1px 1px;" >
 	      <div style="margin:1px 0;padding:0 5px;background-color:white" >
 		        {{goods.goodsName}}
 	      </div>
-	      <div style="margin:1px 0px;padding:0 5px;background-color:white;color:red" >
+	      <div class="row" style="margin:1px 0px;padding:0 5px;background-color:white;color:red" >
 	      	<span class="pull-left ">惠¥: <span>{{goods.priceLowest}}</span>元</span>
 	      	<span class="pull-right ">库存: <span>{{goods.stockSum}}</span>件</span>
 	      </div>
-	      <div style="margin:1px 0px 2px 0;padding:0 5px 3px 5px;background-color:white;text-align:center" >
-	        <a class="btn btn-danger " style="padding:3px 12px" :href="'/order/place/'+ goods.goodsId"><span style="color:white">立即下单</span></a>
-	        <a class="btn btn-primary" style="padding:3px 12px" :href="'/order/order/begin/' + goods.goodsId"><span style="color:white">加入收藏</span></a>
+	      <div class="row" style="margin:1px 0px 2px 0;padding:0 5px 3px 5px;background-color:white;text-align:center" >
+	        <a class="btn btn-danger " style="padding:3px 5px" :href="'/order/place/'+ goods.goodsId"><span style="color:white">立即下单</span></a>
+	        <a class="btn btn-primary" style="padding:3px 5px" :href="'/order/order/begin/' + goods.goodsId"><span style="color:white">加入收藏</span></a>
 	      </div>
 	    </div>
     </div>
@@ -142,3 +142,4 @@
 
 </body>
 </html>
+

@@ -64,9 +64,8 @@ public class PartnerAction {
 			map.put("errmsg", "您尚未激活会员账户功能！")	;
 			return "forward:/user/index/vip" ;
 		}
-		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-		if(partner == null) {
-			partner = PartnerMgrService.getPartnerByVip(vipBasic.getVipId());
+		PartnerBasic partner = PartnerMgrService.getPartnerByVip(vipBasic.getVipId());
+		if(partner != null) {
 			map.put("partnerBasic", partner);
 		}
 		map.put("sys_func", "partner-index");
@@ -116,6 +115,8 @@ public class PartnerAction {
 
 	/**
 	 * 获取合作伙伴的商户展示页面信息
+	 * 【权限人】
+	 * 任何人
 	 * @param partnerId
 	 * @param map
 	 * @return

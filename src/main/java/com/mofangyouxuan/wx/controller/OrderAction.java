@@ -41,7 +41,7 @@ import com.mofangyouxuan.wx.utils.PageCond;
 @SessionAttributes({"userBasic","vipBasic","partnerBasic"})
 public class OrderAction {
 	
-	private String[] statusArr = new String[]{"all","4pay","4delivery","4sign","4appraise","4refund"};
+	private String[] statusArr = new String[]{"all","4pay","4delivery","4sign","4appraise","refund","exchange"};
 	/**
 	 * 选中商品开始下单
 	 * @param goodsId
@@ -377,12 +377,14 @@ public class OrderAction {
 						statCode = "10,12";
 					}else if("4delivery".equals(stat)) {
 						statCode = "20,21";
-					}else if("4sign".equals(stat)) {
-						statCode = "30";
-					}else if("4appraise".equals(stat)) {
+					}else if("4sign".equals(stat)) {	//待收货
+						statCode = "30,54";
+					}else if("4appraise".equals(stat)) { //待初次评价
 						statCode = "40,55";
-					}else if("4refund".equals(stat)) {
-						statCode = "50,51,52,53,54,55,60,61,62,63,64";
+					}else if("refund".equals(stat)) { //可申请退款与已经进行中
+						statCode = "20,21,22,30,31,40,41,50,51,52,53,54,55,56,60,61,62,63,64,65";
+					}else if("exchange".equals(stat)) { //可申请退货与已经进行中
+						statCode = "40,41,50,51,52,53,54,55,56";
 					}
 					break;
 				}
@@ -452,8 +454,10 @@ public class OrderAction {
 						statCode = "30";
 					}else if("4appraise".equals(stat)) {
 						statCode = "41,56";
-					}else if("4refund".equals(stat)) {
-						statCode = "50,51,52,53,54,55,60,61,62,63,64";
+					}else if("4refund".equals(stat)) { //可申请退款与已经进行中
+						statCode = "21,22,30,31,40,41,50,51,52,53,54,55,56,60,61,62,63,64,65";
+					}else if("4exchange".equals(stat)) { //可申请退货与已经进行中
+						statCode = "40,41,50,51,52,53,54,55,56";
 					}
 					break;
 				}
@@ -1130,5 +1134,7 @@ public class OrderAction {
 		}
 		return jsonRet.toString();
 	}
+	
 }
+
 

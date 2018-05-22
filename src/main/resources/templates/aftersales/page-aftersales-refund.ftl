@@ -30,7 +30,6 @@
   <#include "/order/tpl-order-buy-user-4fm.ftl" encoding="utf8"> 
   <#include "/order/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
 
-  <#include "/order/tpl-order-buy-receiver-4fm.ftl" encoding="utf-8"> 
   <!-- 支付明细 -->
   <#if (payFlow.flowId)??>
   <#include "/order/tpl-order-pay-flow-4fm.ftl" encoding="utf8"> 
@@ -42,11 +41,43 @@
         ${order.partnerBusiName}
       </a>
   </div>
+  
+  <!-- 退款申请信息 -->
   <div class="row" style="margin:3px 0px;background-color:white; color:red">
     <p/>
-  	<span>&nbsp;&nbsp;&nbsp;&nbsp;填写说明：官方配送则名称为“摩放优选”，单号为订单号；商家配送则名称为“商家名称”，单号为订单号；
-  	快递配送则名称为“快递公司名称”，单号为物流公司的单号；客户自取则名称为“客户昵称”，单号为订单号；</span>
+  	<span>&nbsp;&nbsp;&nbsp;&nbsp;填写说明：退货则需要填写退货的物流信息，官方配送则名称为“摩放优选”，单号为订单号；商家自取则名称为“商家名称”，单号为订单号；
+  	快递配送则名称为“快递公司名称”，单号为物流公司的单号；买家送达则名称为“买家昵称”，单号为订单号；</span>
   </div>
+  <div class="row" style="margin:3px 0">
+    	  <label class="col-xs-3 control-label" style="padding-right:0">退款类型<span style="color:red">*</span></label>
+       <div class="col-xs-9" style="padding-left:0">
+         <select class="form-control" v-model="param.type" required >
+           <option value="" disabled> 请选择... </option>
+           <option value="1"> 未收到货 </option>
+           <option value="3"> 签收退货 </option>
+         </select>
+       </div>
+  </div>
+  <div class="row" style="margin:3px 0">
+    	  <label class="col-xs-3 control-label" style="padding-right:0">退款原因<span style="color:red">*</span></label>
+       <div class="col-xs-9" style="padding-left:0">
+         <textarea class="form-control" v-model="param.reason" required placeholder="退款原因最少3个字符">
+           
+         </textarea>
+       </div>
+  </div>
+  <div v-if="param.type == '3'" >
+  <div class="row" style="margin:3px 0">
+    	  <label class="col-xs-3 control-label" style="padding-right:0">配送类型<span style="color:red">*</span></label>
+       <div class="col-xs-9" style="padding-left:0">
+         <select class="form-control" v-model="param.dispatchMode" required @change="changeDispatch">
+           <option value="" disabled> 请选择...</option>
+           <option value="2"> 商家自取 </option>
+           <option value="3"> 快递配送 </option>
+           <option value="4"> 买家送达 </option>
+         </select>
+       </div>
+  </div>  
   <div class="row" style="margin:3px 0">
     	  <label class="col-xs-3 control-label" style="padding-right:0">配送方名称<span style="color:red">*</span></label>
        <div class="col-xs-9" style="padding-left:0">
@@ -59,6 +90,7 @@
          <input type="text" class="form-control" v-model="param.logisticsNo" required maxlength="100">
        </div>
    </div>
+   </div>
   <#if ((vipBasic.status)!'') == '1'>
   <div class="row" style="margin:3px 0">
     	  <label class="col-xs-3 control-label" style="padding-right:0">会员密码<span style="color:red">*</span></label>
@@ -66,9 +98,9 @@
          <input type="password" class="form-control" v-model="param.passwd" required maxlength="20">
        </div>
    </div>  
-   </#if>
+   </#if>   
    <div class="row" style="margin:5px 0;text-align:center">
-      <button type="submit" class="btn btn-danger" @click="submit">提交发货</button>
+      <button type="submit" class="btn btn-danger" @click="submit">提交退款申请</button>
    </div>
 </div><!-- end of container -->
 
@@ -84,28 +116,60 @@ var containerVue = new Vue({
 		param:{
 			orderId:'${order.orderId}',
 			passwd:'',
+			type:'',
+			reason:'',
+			dispatchMode:'',
 			logisticsComp:'',
 			logisticsNo:''
 		}
 	},
 	methods:{
+		changeDispatch: function(){
+			if('3' != this.param.dispatchMode){
+				this.param.logisticsNo = '${order.orderId}';
+				if('1' == this.param.dispatchMode){
+					this.param.logisticsComp = '摩放优选';
+				}else if('2' == this.param.dispatchMode){
+					this.param.logisticsComp = '${(order.partnerBusiName)!""}';
+				}else if('4' == this.param.dispatchMode){
+					this.param.logisticsComp = '${(order.nickname)!''}';
+				}
+			}else{
+				containerVue.param.logisticsNo = '';
+				containerVue.param.logisticsComp = '';
+			}
+		},
 		submit:function(){
-			if(!this.param.logisticsComp || this.param.logisticsComp.length<2){
-				alertMsg('错误提示','配送方名称不可小于2个字符！');
+			if(!this.param.type ){
+				alertMsg('错误提示','退款类型不可为空！');
 				return;
 			}
-			if(!this.param.logisticsNo || this.param.logisticsNo.length<3){
-				alertMsg('错误提示','配送单号不可小于2个字符！');
+			if(!this.param.reason || this.param.reason.length<3){
+				alertMsg('错误提示','退款原因不可少于3个字符！');
 				return;
+			}
+			if('3' == this.param.type){
+				if(!this.param.dispatchMode ){
+					alertMsg('错误提示','配送方式不可为空！');
+					return;
+				}
+				if(!this.param.logisticsComp || this.param.logisticsComp.length<2){
+					alertMsg('错误提示','配送方名称不可小于2个字符！');
+					return;
+				}
+				if(!this.param.logisticsNo || this.param.logisticsNo.length<3){
+					alertMsg('错误提示','配送单号不可小于2个字符！');
+					return;
+				}
 			}
 			$.ajax({
-				url: '/order/partner/delivery/submit/' + this.param.orderId ,
+				url: '/aftersales/user/refund/submit/' + this.param.orderId ,
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//成功
-							window.location.href = "/order/partner/show/all";
+							window.location.href = "/aftersales/user/mgr/refund";
 						}else{//出现逻辑错误
 							alertMsg('错误提示',jsonRet.errmsg);
 						}
@@ -118,19 +182,7 @@ var containerVue = new Vue({
 		}
 	}
 });
-if('3' != '${order.dispatchMode}'){
-	containerVue.param.logisticsNo = '${order.orderId}';
-	if('1' == '${order.dispatchMode}'){
-		containerVue.param.logisticsComp = '摩放优选';
-	}else if('2' == '${order.dispatchMode}'){
-		containerVue.param.logisticsComp = '${(order.partnerBusiName)!""}';
-	}else if('4' == '${order.dispatchMode}'){
-		containerVue.param.logisticsComp = '${(order.nickname)!''}';
-	}
-}else{
-	containerVue.param.logisticsNo = '';
-	containerVue.param.logisticsComp = '';
-}
+
 </script>
 </#if> 
 

@@ -32,23 +32,20 @@
   </div>
   <div class="row" style="margin:5px 0;text-align:center" >
     <ul class="nav navbar-nav nav-tabs" style="padding:0 5px">
-        <li class="<#if status='all'> active </#if>"  @click="getOrders('all',$event)"> 
+        <li class="<#if status='all'> active </#if>" style="width:20%" @click="getOrders('all',$event)"> 
           <a href="javascript:;" style="padding:2px 3px"> 全 部 </a> 
         </li>  
-        <li class="<#if status='4pay'> active </#if>"  @click="getOrders('4pay',$event)"> 
+        <li class="<#if status='4pay'> active </#if>" style="width:20%" @click="getOrders('4pay',$event)"> 
           <a href="javascript:;" style="padding:2px 3px"> 待付款 </a> 
         </li> 
-        <li class="<#if status='4delivery'> active </#if>"  @click="getOrders('4delivery',$event)"> 
+        <li class="<#if status='4delivery'> active </#if>" style="width:20%" @click="getOrders('4delivery',$event)"> 
           <a href="javascript:;" style="padding:2px 3px"> 待发货 </a> 
         </li> 
-        <li class="<#if status='4sign'> active </#if>"  @click="getOrders('4sign',$event)"> 
+        <li class="<#if status='4sign'> active </#if>" style="width:20%" @click="getOrders('4sign',$event)"> 
           <a href="javascript:;" style="padding:2px 3px"> 待收货 </a> 
         </li> 
-        <li class="<#if status='4appraise'> active </#if>"  @click="getOrders('4appraise',$event)"> 
+        <li class="<#if status='4appraise'> active </#if>" style="width:20%" @click="getOrders('4appraise',$event)"> 
           <a href="javascript:;" style="padding:2px 3px"> 待评价 </a> 
-        </li> 
-        <li class="<#if status='4refund'> active </#if>"  @click="getOrders('4refund',$event)"> 
-          <a href="javascript:;" style="padding:2px 3px"> 退换货 </a> 
         </li>                                               
      </ul>
   </div>
@@ -72,7 +69,6 @@
 		    <a v-if="!order.apprUserTime && (order.status==='31' || startWith(order.status,'4') || order.status==='55' || order.status==='56')" class="btn btn-primary pull-right" :href="'/order/partner/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即评价</span></a>
 		    <a v-if="order.apprUserTime" class="btn btn-primary pull-right" :href="'/order/partner/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >追加评价</span></a>
 		    
-		    <a v-if="order.status==='31' " class="btn btn-danger pull-right" href="/order/order/begin/goodsId" style="padding:0 3px;margin:0 3px"><span >售后处理</span></a>
       </div>
 	</div>
   </div>

@@ -28,23 +28,14 @@
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8"> 
 
 <div class="container " id="container" style="oveflow:scroll">
-  <div class="row" style="margin:5px 0;text-align:center" >
-    <ul class="nav navbar-nav nav-tabs" style="width:100%;padding:0 5px">
-        <li class="<#if status='all'> active </#if>" style="width:20%"  @click="getOrders('all',$event)"> 
-          <a href="javascript:;" style="padding:2px 3px"> 全 部 </a> 
-        </li>  
-        <li class="<#if status='4pay'> active </#if>" style="width:20%" @click="getOrders('4pay',$event)"> 
-          <a href="javascript:;" style="padding:2px 3px"> 待付款 </a> 
+  <div class="row" style="margin:5px ;text-align:center" >
+    <ul class="nav navbar-nav nav-tabs" style="padding:0 5px;font-size:18px;font-weight:bold;">  
+        <li class="<#if status='refund'> active </#if>" style="width:50%" @click="getOrders('refund',$event)"> 
+          <a href="javascript:;"> 退款 </a> 
         </li> 
-        <li class="<#if status='4delivery'> active </#if>" style="width:20%" @click="getOrders('4delivery',$event)"> 
-          <a href="javascript:;" style="padding:2px 3px"> 待发货 </a> 
-        </li> 
-        <li class="<#if status='4sign'> active </#if>" style="width:20%" @click="getOrders('4sign',$event)"> 
-          <a href="javascript:;" style="padding:2px 3px"> 待签收 </a> 
-        </li> 
-        <li class="<#if status='4appraise'> active </#if>" style="width:20%" @click="getOrders('4appraise',$event)"> 
-          <a href="javascript:;" style="padding:2px 3px"> 待评价 </a> 
-        </li>                                               
+        <li class="<#if status='exchange'> active </#if>" style="width:50%" @click="getOrders('exchange',$event)"> 
+          <a href="javascript:;" > 换货 </a> 
+        </li>                      
      </ul>
   </div>
   <div class="row"><!-- 所有订单之容器 -->
@@ -56,15 +47,11 @@
 		    <a v-if="startWith(order.status,'1') || order.status == '20'" class="btn btn-default pull-right" :href="'/order/user/cancel/begin/'+order.orderId" style="padding:0 3px;margin:0 3px" >
 		      <span >取消订单</span>
 		    </a>
-		    <a v-if="order.status ==='10' || order.status ==='12'" class="btn btn-danger pull-right" :href="'/order/pay/choose/' + order.orderId" style="padding:0 3px;margin:0 3px">
-		      <span >立即付款</span>
-		    </a>
+		    <a v-if="startWith(order.status,'3') ||  startWith(order.status,'4') || startWith(order.status,'5')" class="btn btn-default pull-right" :href="'/order/logistics/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >查看物流</span></a>
 		    
-		    <a v-if="order.status==='30' " class="btn btn-default pull-right" :href="'/order/logistics/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >查看物流</span></a>
+		    <a v-if="param.status=='refund' && (startWith(order.status,'3') ||  startWith(order.status,'4') || order.status==='54' || order.status==='55' || order.status==='56')" class="btn btn-primary pull-right" :href="'/aftersales/user/refund/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >申请退款</span></a>
 		    
-		    <a v-if="order.status==='30' || order.status==='54'" class="btn btn-primary pull-right" :href="'/order/user/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >签收评价</span></a>
-		    <a v-if="order.status==='31' || order.status==='40' || order.status==='55'" class="btn btn-primary pull-right" :href="'/order/user/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即评价</span></a>
-		    <a v-if="order.status==='41' || order.status==='56'" class="btn btn-primary pull-right" :href="'/order/user/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >追加评价</span></a>
+		    <a v-if="param.status=='exchange' && (order.status==='40' || order.status==='41')" class="btn btn-primary pull-right" :href="'/aftersales/user/exchange/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >申请换货</span></a>
 		    
 		</div>
 	  </div>
@@ -76,7 +63,7 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		param:{
-			status:'',
+			status:"${status!'refund'}",
 			begin:0,
 			pageSize:100
 		},
@@ -120,14 +107,10 @@ var containerVue = new Vue({
 				},
 				dataType: 'json'
 			});
-		},
-		cancelOrder:function(order){
-			$('#cancelOrderModal').modal('show');
-			cancelOrderVue.order = order;
 		}
 	}
 });
-containerVue.getOrders('${status!''}');
+containerVue.getOrders("${status!'refund'}");
 </script>
 
 
