@@ -23,6 +23,7 @@
 </head>
 <body class="light-gray-bg" >
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
 <header >
 	<ul class="nav nav-tabs" style="margin:3px 8px 3px 8px">
 	  <li onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#manageNotice').show();$('#goodsListShow').hide()">
@@ -128,26 +129,35 @@
 		goodsList:[] 
 	 },
 	 methods:{
-		 getAll: function(){
-			 containerVue.goodsList = [];
+		 getAll: function(refresh){
+			 $("#loadingData").show();
+			 $("#nomoreData").hide();
+			 if(refresh){  //重新刷新
+			 	containerVue.goodsList = [];
+			 }
+			 if(containerVue.goodsList.length >= 100){
+				 containerVue.goodsList = [];
+			 }
 			 $.ajax({
 					url: '/goods/getall',
 					method:'post',
 					data: this.param,
 					success: function(jsonRet,status,xhr){
-						if(jsonRet ){
-							if(jsonRet.errcode == 0){//
-								for(var i=0;i<jsonRet.datas.length;i++){
-									containerVue.goodsList.push(jsonRet.datas[i]);
-								}
-								containerVue.param.pageSize = jsonRet.pageCond.pageSize;
-								containerVue.param.begin = jsonRet.pageCond.begin;
-							}else{
-								alertMsg('错误提示',jsonRet.errmsg);
+						if(jsonRet && jsonRet.errcode == 0){//
+							for(var i=0;i<jsonRet.datas.length;i++){
+								containerVue.goodsList.push(jsonRet.datas[i]);
 							}
+							containerVue.param.pageSize = jsonRet.pageCond.pageSize;
+							containerVue.param.begin = jsonRet.pageCond.begin;
 						}else{
-							alertMsg('错误提示','获取数据失败！')
+							if(jsonRet.errmsg !=='ok'){
+								//$("#nomoreData").show();
+							}
 						}
+						$("#loadingData").hide();
+					},
+					failure:function(){
+						$("#loadingData").hide();
 					},
 					dataType: 'json'
 				});			 
@@ -185,7 +195,7 @@
 		 }
 	 }
  });
- containerVue.getAll();
+ containerVue.getAll(true); //初始化
  
  
  var winHeight = $(window).height(); //页面可视区域高度   
@@ -194,12 +204,15 @@
      var scrollHeight = $(window).scrollTop(); //滚动条top   
      var r = (pageHieght - winHeight - scrollHeight) / winHeight;
      if (r < 0.5) {//上拉翻页 
-    	 	containerVue.begin = containerVue.begin + containerVue.pageSize;
-    	 	containerVue.getAll();
+    	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
+    	 	containerVue.getAll(false);
      }
      if(scrollHeight<0){//下拉刷新
-    	 	containerVue.param.begin = 0;
-    	 	containerVue.param.getAll();
+    	 	containerVue.param.begin = containerVue.param.begin - containerVue.param.pageSize;
+    	 	if(containerVue.param.begin <= 0){
+    	 		containerVue.param.begin = 0;
+    	 	}
+    	 	containerVue.param.getAll(true);
      }
  }  
  //定义鼠标滚动事件  

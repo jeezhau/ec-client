@@ -34,36 +34,87 @@
   <#if (payFlow.flowId)??>
   <#include "/order/tpl-order-pay-flow-4fm.ftl" encoding="utf8"> 
   </#if>
-  <!-- 商家 -->
+  <!-- 联系买家 -->
   <div class="row" style="margin:3px 0px;padding:5px 10px;background-color:white">
-      <a class="pull-left" href="/partner/mcht/${order.partnerId}">
-        <img alt="头像" src="/partner/cert/show/logo/${order.partnerId}" width="20px" height="20px" style="border-radius:50%"> 
-        ${order.partnerBusiName}
-      </a>
+      <span>买家联系电话：</span> <span>${(order.userPhone)!''}</span>
   </div>
+  <#if (order.aftersalesReason)??>
+  <!-- 买家售后申请信息 -->
+  <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
+    <div class="row" style="margin:1px 0px;background-color:white;">
+      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">买家售后申请</span>
+    </div>
+    <div v-for="reason in order.aftersalesReason" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
+     <div class="row">
+       <span class="pull-right">{{reason.type}}</span>
+       <span class="pull-left">{{reason.time}}</span>
+     </div>
+     <div class="row">
+       <p>{{reason.content.reason}}</p>
+       <p v-if="reason.type.indexOf('退货')">
+       {{getDispatchMode(reason.content.dispatchMode)}} {{reason.content.logisticsComp}} {{reason.content.logisticsNo}}
+       </p>
+     </div>
+    </div>
+  </div>
+  </#if>
+  <#if (order.aftersalesResult)??>
+  <!-- 卖家售后回复信息 -->
+  <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
+    <div class="row" style="margin:1px 0px;background-color:white;">
+      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">卖家售后处理</span>
+    </div>
+    <div v-for="reason in order.aftersalesResult" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
+     <div class="row">
+       <span class="pull-right">{{reason.type}}</span>
+       <span class="pull-left">{{reason.time}}</span>
+     </div>
+     <div class="row">
+       <p>{{reason.content.reason}}</p>
+       <p v-if="reason.content.dispatchMode">
+       {{getDispatchMode(reason.content.dispatchMode)}} {{reason.content.dispatchMode.logisticsComp}} {{reason.content.dispatchMode.logisticsNo}}
+       </p>
+     </div>
+    </div>
+  </div> 
+  </#if>
   
-  <!-- 退款申请信息 -->
+  <!-- 换货处理信息 -->
   <div class="row" style="margin:3px 0px;background-color:white; color:red">
     <p/>
-  	<span>&nbsp;&nbsp;&nbsp;&nbsp;填写说明：退货则需要填写退货的物流信息，官方配送则名称为“摩放优选”，单号为订单号；商家自取则名称为“商家名称”，单号为订单号；
+  	<span>&nbsp;&nbsp;&nbsp;&nbsp;填写说明：重新发货则需要填写发货的物流信息，官方配送则名称为“摩放优选”，单号为订单号；商家自取则名称为“商家名称”，单号为订单号；
   	快递配送则名称为“快递公司名称”，单号为物流公司的单号；买家送达则名称为“买家昵称”，单号为订单号；</span>
   </div>
   <div class="row" style="margin:3px 0">
-    	  <label class="col-xs-3 control-label" style="padding-right:0">换货原因<span style="color:red">*</span></label>
+    	  <label class="col-xs-3 control-label" style="padding-right:0">处理结果<span style="color:red">*</span></label>
        <div class="col-xs-9" style="padding-left:0">
-         <textarea class="form-control" v-model="param.reason" required placeholder="退款原因最少3个字符">
+         <select class="form-control" v-model="param.result" required @change="">
+           <option value="" disabled> 请选择... </option>
+           <#if order.status=='51'>
+           <option value="52"> 已收到退货、核验中 </option>
+           </#if>
+           <option value="53"> 核验不通过、协商解决 </option>
+           <option value="54"> 已重新发货 </option>
+         </select>
+       </div>
+  </div>
+  <div class="row" style="margin:3px 0">
+    	  <label class="col-xs-3 control-label" style="padding-right:0">处理明细<span style="color:red">*</span></label>
+       <div class="col-xs-9" style="padding-left:0">
+         <textarea class="form-control" v-model="param.reason" required placeholder="处理明细最少3个字符">
            
          </textarea>
        </div>
   </div>
+  <div v-if="param.result == '54'">
   <div class="row" style="margin:3px 0">
     	  <label class="col-xs-3 control-label" style="padding-right:0">配送类型<span style="color:red">*</span></label>
        <div class="col-xs-9" style="padding-left:0">
          <select class="form-control" v-model="param.dispatchMode" required @change="changeDispatch">
            <option value="" disabled> 请选择...</option>
-           <option value="2"> 商家自取 </option>
+           <option value="2"> 商家自配 </option>
            <option value="3"> 快递配送 </option>
-           <option value="4"> 买家送达 </option>
+           <option value="4"> 买家自取 </option>
          </select>
        </div>
   </div>  
@@ -78,6 +129,7 @@
        <div class="col-xs-9" style="padding-left:0">
          <input type="text" class="form-control" v-model="param.logisticsNo" required maxlength="100">
        </div>
+   </div>
    </div>
   <#if ((vipBasic.status)!'') == '1'>
   <div class="row" style="margin:3px 0">
@@ -99,6 +151,8 @@ var containerVue = new Vue({
 		order:{
 			status:'${order.status}',
 			goodsSpec:JSON.parse('${(order.goodsSpec)!"[]"}'),
+			aftersalesReason: JSON.parse('${(order.aftersalesReason)!"[]"}'),
+			aftersalesResult: JSON.parse('${(order.aftersalesResult)!"[]"}'),
 		},
 		
 		param:{
@@ -127,30 +181,36 @@ var containerVue = new Vue({
 			}
 		},
 		submit:function(){
+			if(!this.param.result){
+				alertMsg('错误提示','处理结果不可为空！');
+				return;
+			}
 			if(!this.param.reason || this.param.reason.length<3){
-				alertMsg('错误提示','退货原因不可少于3个字符！');
+				alertMsg('错误提示','处理明细不可少于3个字符！');
 				return;
 			}
-			if(!this.param.dispatchMode ){
-				alertMsg('错误提示','配送方式不可为空！');
-				return;
-			}
-			if(!this.param.logisticsComp || this.param.logisticsComp.length<2){
-				alertMsg('错误提示','配送方名称不可小于2个字符！');
-				return;
-			}
-			if(!this.param.logisticsNo || this.param.logisticsNo.length<3){
-				alertMsg('错误提示','配送单号不可小于2个字符！');
-				return;
+			if(this.param.result == '54'){
+				if(!this.param.dispatchMode ){
+					alertMsg('错误提示','配送方式不可为空！');
+					return;
+				}
+				if(!this.param.logisticsComp || this.param.logisticsComp.length<2){
+					alertMsg('错误提示','配送方名称不可小于2个字符！');
+					return;
+				}
+				if(!this.param.logisticsNo || this.param.logisticsNo.length<3){
+					alertMsg('错误提示','配送单号不可小于2个字符！');
+					return;
+				}
 			}
 			$.ajax({
-				url: '/aftersales/user/exchange/submit/' + this.param.orderId ,
+				url: '/aftersales/partner/exchange/submit/' + this.param.orderId ,
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//成功
-							window.location.href = "/aftersales/user/mgr/exchange";
+							window.location.href = "/aftersales/partner/mgr/exchanging";
 						}else{//出现逻辑错误
 							alertMsg('错误提示',jsonRet.errmsg);
 						}
@@ -171,7 +231,7 @@ var containerVue = new Vue({
  <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
 </#if>
 
-<#include "/menu/page-bottom-menu.ftl" encoding="utf8">
+<#include "/menu/page-partner-func-menu.ftl" encoding="utf8">
 
 </body>
 </html>

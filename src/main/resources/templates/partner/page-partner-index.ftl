@@ -67,6 +67,14 @@
 		</a>
        </div>
     </div>
+    <div class="col-xs-6" style="padding-left:5px">
+       <div style="background-color:white">
+	    <a href="/aftersales/partner/mgr/refunding" >
+		    <img src="/icons/售后服务.png" alt="" width="90px" height="90px">
+		    <p >售后服务</p>
+		</a>
+       </div>
+    </div>
   </div>
   <div class="row" style="margin-top:3px;vertical-align:center">
     <div class="col-xs-12">

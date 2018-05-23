@@ -90,53 +90,59 @@
 	           </td>  	                         
 	           <td style="padding:2px 2px;text-align:center">
 	             <button type="button" class="btn btn-danger btn-xs" style="margin:0" @click="addBuyNum(index,'sub')">-</button>
-                 <input type="number" :id="'buyNum_'+index" style="width:50%" min=0 :max="item.stock" value=0 @change="changeBuyNum(index)">
+                 <input type="number" :id="'buyNum_'+index" style="width:50%;text-align:center" min=0 :max="item.stock" value=0 @change="changeBuyNum(index)">
                  <button type="button" class="btn btn-danger btn-xs" style="margin:0" @click="addBuyNum(index,'add')">+</button>
 	           </td>
 	         </tr>
 	       </table>    
         </div>
       </div>
-      <div class="row" style="margin:3px 15px 3px 15px;padding:5px 3px;">
-        <label class="col-xs-12 control-label" style="vertical-algin:center;">配送信息<span style="color:red">*</span>:</label>
+      <div class="row" style="margin:3px 15px 3px 15px;padding:5px 3px;" id="receiverAddr">
+        <!-- <label class="col-xs-12 control-label" style="vertical-algin:center;">配送信息(选择收货地址)<span style="color:red">*</span>:</label> -->
         <div class="col-xs-12">
           <div class="row">
-            <div class="col-xs-9" style="padding:0">
+            <div class="col-xs-9" style="padding:0;font-weight:bolder">
               <div class="row" style="margin:0">
 	              <div class="col-xs-6" style="padding:0">
 	                <input type="hidden" name="recvId" v-model="param.recvId">
-	                <input type="text" class="form-control" name="recvName" v-model="param.recvName" readonly style="width:100%;" placeholder="收货人姓名" required>
+	                <input type="text" class="form-control" name="recvName" v-model="param.recvName" disabled style="width:100%;" placeholder="收货人姓名" required>
 	              </div>
 	              <div class="col-xs-6" style="padding:0">
-	                <input type="text" class="form-control" name="recvPhone" v-model="param.recvPhone" readonly style="width:100%" placeholder="联系电话" required>
+	                <input type="text" class="form-control" name="recvPhone" v-model="param.recvPhone" disabled style="width:100%" placeholder="联系电话" required>
 	              </div>
               </div>
-              <div class="row" style="margin:0">
+              <div class="row" style="margin:0;font-weight:bolder">
               	<div class="col-xs-3" style="padding:0 ">
               	 <input type="hidden" name="recvCountry" v-model="param.recvCountry">
-                  <input type="text" class="form-control" name="recvProvince" v-model="param.recvProvince" readonly placeholder="省份" required>
+                  <input type="text" class="form-control" name="recvProvince" v-model="param.recvProvince" disabled placeholder="省份" required>
                  </div>
               	<div class="col-xs-4" style="padding:0">
-                  <input type="text" class="form-control" name="recvCity" v-model="param.recvCity" readonly placeholder="市" required>
+                  <input type="text" class="form-control" name="recvCity" v-model="param.recvCity" disabled placeholder="市" required>
                  </div>
               	<div class="col-xs-5" style="padding:0">
-                  <input type="text" class="form-control" name="recvArea" v-model="param.recvArea" readonly placeholder="区县" required>
+                  <input type="text" class="form-control" name="recvArea" v-model="param.recvArea" disabled placeholder="区县" required>
                  </div>                                  
               </div>
             </div>
-            <div class="col-xs-3" style="vertical-algin:center;">
+            <div class="col-xs-3" style="vertical-algin:center;font-weight:bolder;">
               <a class="btn btn-default" href="javascript:;" @click="selectReceiver">
-               <img alt="" src="/icons/收货地址.png" width="100%" height="100%"><br>
-               <span style="font-size:5px">收货地址</span>
+               <img alt="" src="/icons/收货地址.png" width="70%" height="70%"><br>
+               <span style="font-size:14px">收货地址</span>
               </a>
             </div>
           </div>
-          <div class="row">
-            <input type="text" class="form-control" name="recvAddr" v-model="param.recvAddr" readonly placeholder="收货人地址" required>
+          <div class="row" style="font-weight:bolder">
+            <input type="text" class="form-control" name="recvAddr" v-model="param.recvAddr" disabled placeholder="收货人地址" required>
           </div>
         </div>
 
       </div> 
+      <div class="row" style="text-align:right;">
+        <div class="col-xs-12" style="padding-right:40px">
+         <button v-if="param.flag == 0" type="button" class="btn btn-sm btn-danger" @click="checkData">数据检查/金额计算</button>
+         <!-- <button v-if="param.flag == 1" type="button" class="btn btn-sm btn-danger" >请选择配送方式</button> -->
+        </div>
+      </div>
       <div class="row" style="margin:8px 15px 3px 15px;">
         <label class="col-xs-3 control-label">配送方式<span style="color:red">*</span>:</label>
         <div class="col-sx-9">
@@ -151,24 +157,43 @@
        <div class="row" style="margin:8px 15px 3px 15px;">
          <label class="col-xs-3 control-label">买家留言:</label>
          <div class="col-sx-9">
-           <textarea class="form-control" style="width:66%" rows="5" name="remark"></textarea>
+           <textarea class="form-control" style="width:66%" maxlength=600 name="remark"></textarea>
          </div>
        </div> 
      </div>
      
      <div class="row" style="margin:15px 25px;padding:3px 3px;">
-       <div class="col-xs-7">
-         共<span style="color:red">{{param.countAll}}</span>件，
-         邮费¥<span style="color:red">{{param.carrage}}</span><br>
-         总金额¥<span style="color:red">{{(new Number(param.amount) + new Number(param.carrage)).toFixed(2)}}</span>
+       <div class="col-xs-7" style="font-size:16px;">
+         <div class="col-xs-12" style="padding:0">
+           <div class="col-xs-6" style="padding:0">
+             共<span style="color:red"> {{param.countAll}} </span>件
+           </div>
+           <div class="col-xs-6" style="padding:0">
+             <span style="color:red"> {{param.amount}} </span>元<br>
+           </div>
+         </div>
+          <div class="col-xs-12" style="padding:0">
+           <div class="col-xs-6" style="padding:0">
+             <label>邮费</label>
+           </div>
+           <div class="col-xs-6" style="padding:0">
+             <span style="color:red"> {{param.carrage}} </span>元<br>
+           </div>
+         </div> 
+         <div class="col-xs-12" style="padding:0">
+           <div class="col-xs-6" style="padding:0">
+             <label>总金额</label>
+           </div>
+           <div class="col-xs-6" style="padding:0">
+             <span style="color:red"> {{(new Number(param.amount) + new Number(param.carrage)).toFixed(2)}} </span>元<br>
+           </div>
+         </div>        
        </div>
-       <div class="col-xs-5">
+       <div class="col-xs-5" style="text-align:right;padding-right:0px">
          <input type="hidden" name="goodsSpec" v-model="param.goodsSpec" required>
          <input type="hidden" name="dispatchMode" v-model="param.dispatchMode" required>
 	     <input type="hidden" name="postageId" v-model="param.postageId" required>
-         <button v-if="param.flag == 0" type="button" class="btn btn-sm btn-danger" @click="checkData">数据检查/金额计算</button>
-         <button v-if="param.flag == 1" type="button" class="btn btn-sm btn-danger" >请选择配送方式</button>
-         <button v-if="param.flag == 2" type="submit" class="btn btn-sm btn-danger" @click="getGoodsSpec">立即下单</button>
+         <button v-if="param.flag == 2" type="submit" class="btn btn-sm btn-danger" style="font-size:18px;font-weight:bold" @click="submitCheck">立即下单</button>
        </div>
     </div>
     </form>
@@ -212,8 +237,8 @@ var containerVue = new Vue({
 			var spec = this.goods.specDetailArr[index];
 			var value = $('#buyNum_' + index).val();
 			var val = parseInt(value);
-			if(isNaN(val) || val < 0 || val > spec.stock){
-				$(event.target).focus();
+			if(isNaN(val) ){
+				$('#buyNum_' + index).focus();
 				return false;
 			}
 			$('#buyNum_' + index).val(val);
@@ -226,6 +251,11 @@ var containerVue = new Vue({
 				this.param.countAll = this.param.countAll + num;
 			}
 			this.param.flag = 0;//重新检查
+			this.dispatchMatchs = [];
+			this.param.carrage = 0;
+			this.param.dispatchMode = '';
+			this.param.postageId = ''
+			this.param.postageIdAndMode = '';
 		},
 		addBuyNum:function(index,type){
 			var spec = this.goods.specDetailArr[index];
@@ -248,6 +278,11 @@ var containerVue = new Vue({
 				this.param.countAll = this.param.countAll + num;
 			}
 			this.param.flag = 0;//重新检查
+			this.dispatchMatchs = [];
+			this.param.carrage = 0;
+			this.param.dispatchMode = '';
+			this.param.postageId = ''
+			this.param.postageIdAndMode = '';
 		},
 		changeDispatch:function(){
 			var arr = this.param.postageIdAndMode.split("-");
@@ -298,6 +333,11 @@ var containerVue = new Vue({
 				containerVue.param.recvAddr = receiver.addr;
 				$('#selectReceiverModal').modal('hide');
 				containerVue.param.flag = 0;//重新检查
+				containerVue.dispatchMatchs = [];
+				containerVue.param.carrage = 0;
+				containerVue.param.dispatchMode = '';
+				containerVue.param.postageId = '';
+				containerVue.param.postageIdAndMode = '';
 			}
 		},
 		checkData: function(){
@@ -336,8 +376,12 @@ var containerVue = new Vue({
 				dataType: 'json'
 			});
 		},
-		getGoodsSpec:function(){
-			
+		submitCheck:function(){
+			if(this.param.flag != 2){
+				alertMsg('系统提示','请完成数据检查！');
+				return false;
+			}
+			$("#receiverAddr .form-control[disabled]").removeAttr("disabled"); 
 			return true;
 		}
 	}

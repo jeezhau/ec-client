@@ -66,14 +66,14 @@
     <div class="row" style="margin:1px 0px;background-color:white;">
       <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">卖家售后</span>
     </div>
-    <div v-for="reason in aftersalesReason" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
+    <div v-for="reason in aftersalesResult" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
      <div class="row">
        <span class="pull-right">{{reason.type}}</span>
        <span class="pull-left">{{reason.time}}</span>
      </div>
      <div class="row">
        <p>{{reason.content.reason}}</p>
-       <p v-if="reason.type.indexOf('退货')">
+       <p v-if="reason.content.dispatchMode">
        {{getDispatchMode(reason.content.dispatchMode)}} {{reason.content.dispatchMode.logisticsComp}} {{reason.content.dispatchMode.logisticsNo}}
        </p>
      </div>

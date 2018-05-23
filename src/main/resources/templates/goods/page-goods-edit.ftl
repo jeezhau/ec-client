@@ -483,8 +483,6 @@ if(goodsContainerVue.specDetailArr.length == 0){
 goodsContainerVue.param.goodsDesc = $('#hiddenGoodsDesc').val();
 </script>
 
-<#include "/image/page-image-show-tpl.ftl" encoding="utf8"> 
-
 <#if errmsg??>
 <!-- 错误提示模态框（Modal） -->
 <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">

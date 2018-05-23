@@ -30,10 +30,10 @@
 
 <div class="container goods-container" id="container" style="padding:0 1px;overflow:scroll">
   <div class="row" style="margin:0 0;overflow:scroll">
-    <div v-for="goods in goodsList" class="col-xs-6" style="padding:3px 2px;">
+    <div v-for="goods in goodsList" class="col-xs-6 col-sm-4 col-md-4 col-lg-3" style="padding:3px 2px;">
 	    <div style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
 	      <a v-bind:href="'/goods/show/' + goods.goodsId">
-	        <img alt="" :src="'/image/file/show/' + goods.partner.vipId + '/' + goods.mainImgPath" style="width:90%;height:150px">
+	        <img alt="" :src="'/image/file/show/' + goods.partner.vipId + '/' + goods.mainImgPath" style="width:90%;height:150px;max-width:200px">
 	      </a>
 	    </div>
 	    <div class="row" style="margin:1px 1px;" >
@@ -41,7 +41,7 @@
 		        {{goods.goodsName}}
 	      </div>
 	      <div class="row" style="margin:1px 0px;padding:0 5px;background-color:white;color:red" >
-	      	<span class="pull-left ">惠¥: <span>{{goods.priceLowest}}</span>元</span>
+	      	<span class="pull-left ">售价: <span>{{goods.priceLowest}}</span>元</span>
 	      	<span class="pull-right ">库存: <span>{{goods.stockSum}}</span>件</span>
 	      </div>
 	      <div class="row" style="margin:1px 0px 2px 0;padding:0 5px 3px 5px;background-color:white;text-align:center" >
@@ -49,7 +49,8 @@
 	        <a class="btn btn-primary" style="padding:3px 5px" :href="'/order/order/begin/' + goods.goodsId"><span style="color:white">加入收藏</span></a>
 	      </div>
 	    </div>
-    </div>
+    </div> 
+ 
   </div>
 </div><!-- end of container -->
 <script type="text/javascript">

@@ -47,21 +47,21 @@
     <div class="row" style="margin:5px 0;">
     	   <label class="col-xs-5 control-label" style="padding-right:0">物流服务得分<span style="color:red">*</span></label>
        <div class="col-xs-7" style="padding-left:0">
-         <input id="scoreLogistics" type="text"  data-slider-ticks="[1,3,5,8,10]" data-slider-ticks-labels='["1", "3", "5","8","10"]'
+         <input id="scoreLogistics" type="text"  data-slider-ticks="[1,10]" data-slider-ticks-labels='["1", "10"]'
               data-slider-min="1" data-slider-max="10" data-slider-step="1" data-slider-value="9" data-slider-tooltip="show">
        </div>
     </div>
     <div class="row" style="margin:5px 0">
     	   <label class="col-xs-5 control-label" style="padding-right:0">商品品质描述得分<span style="color:red">*</span></label>
        <div class="col-xs-7" style="padding-left:0">
-         <input id="scoreGoods" type="text"  data-slider-ticks="[1,3,5,8,10]" data-slider-ticks-labels='["1", "3", "5","8","10"]'
+         <input id="scoreGoods" type="text"  data-slider-ticks="[1,10]" data-slider-ticks-labels='["1", "10"]'
               data-slider-min="1" data-slider-max="10" data-slider-step="1" data-slider-value="9" data-slider-tooltip="show">
        </div>
      </div>
      <div class="row" style="margin:5px 0">
     	   <label class="col-xs-5 control-label" style="padding-right:0">商家服务得分<span style="color:red">*</span></label>
        <div class="col-xs-7" style="padding-left:0">
-         <input id="scoreMerchant" type="text"  data-slider-ticks="[1,3,5,8,10]" data-slider-ticks-labels='["1", "3", "5","8","10"]'
+         <input id="scoreMerchant" type="text"  data-slider-ticks="[1,10]" data-slider-ticks-labels='["1", "10"]'
               data-slider-min="1" data-slider-max="10" data-slider-step="1" data-slider-value="9" data-slider-tooltip="show">
        </div>
      </div>

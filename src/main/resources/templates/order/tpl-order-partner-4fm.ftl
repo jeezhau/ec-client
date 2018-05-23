@@ -1,5 +1,5 @@
 
-    <div class="row" style="margin:0px 0px;padding:5px 10px;background-color:white">
+    <div class="col-xs-12 col-" style="margin:0px 0px;padding:5px 10px;background-color:white">
       <a class="pull-left" href="/partner/mcht/${(order.partnerId)?string('#')}">
         <img alt="头像" src="/partner/cert/show/logo/${(order.partnerId)?string('#')}" width="20px" height="20px" style="border-radius:50%"> 
         ${(order.partnerBusiName)!''}

@@ -610,11 +610,11 @@ public class OrderService {
 	 * @param partner
 	 * @param order
 	 * @param nextStat	下一个状态／处理结果（52:已收到退货、核验中，53:核验不通过、协商解决，54:已重新发货、待收货，62：已收到退货、核验中，63:核验不通过、协商解决，64:同意退款，申请资金回退）
-	 * @param content	售后处理内容
+	 * @param content	评价内容，json格式{reason,dispatchMode,logisticsComp,logisticsNo}
 	 * @return {errcode,errmsg}
 	 */
 	public static JSONObject updAfterSales(PartnerBasic partner,Order order,
-			String nextStat,JSONObject content) {
+			String nextStat,JSONObject content,String passwd) {
 		JSONObject jsonRet = new JSONObject();
 		Map<String,Object> params = new HashMap<String,Object>();
 		//向服务中心发送申请
@@ -623,6 +623,7 @@ public class OrderService {
 		url = url.replace("{orderId}", order.getOrderId() + "");
 		params.put("nextStat", nextStat);
 		params.put("content", content.toJSONString());
+		params.put("passwd", passwd);
 		String strRet = HttpUtils.doPost(url, params);
 		try {
 			jsonRet = JSONObject.parseObject(strRet);

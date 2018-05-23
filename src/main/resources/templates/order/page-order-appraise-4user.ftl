@@ -47,7 +47,7 @@
     <div class="row" style="margin:5px 0;">
     	   <label class="col-xs-4 control-label" style="padding-right:0">客户得分<span style="color:red">*</span></label>
        <div class="col-xs-7" style="padding-left:0">
-         <input id="score" type="text"  data-slider-ticks="[1,3,5,8,10]" data-slider-ticks-labels='["1", "3", "5","8","10"]'
+         <input id="score" type="text"  data-slider-ticks="[1,10]" data-slider-ticks-labels='["1","10"]'
               data-slider-min="1" data-slider-max="10" data-slider-step="1" data-slider-value="9" data-slider-tooltip="show">
        </div>
      </div>
