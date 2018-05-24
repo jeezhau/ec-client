@@ -90,6 +90,7 @@ var containerVue = new Vue({
 	},
 	methods:{
 		submit:function(){
+			$("#dealingData").hide();
 			if(!this.param.logisticsComp || this.param.logisticsComp.length<2){
 				alertMsg('错误提示','配送方名称不可小于2个字符！');
 				return;
@@ -103,6 +104,7 @@ var containerVue = new Vue({
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
+					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//成功
 							window.location.href = "/order/partner/show/all";
@@ -112,6 +114,9 @@ var containerVue = new Vue({
 					}else{
 						alertMsg('错误提示','系统数据访问失败！');
 					}
+				},
+				failure:function(){
+					$("#dealingData").hide();
 				},
 				dataType: 'json'
 			});

@@ -80,7 +80,9 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		param:{
-			status:''
+			status:'',
+			begin:0,
+			pageSize:100
 		},
 		orders:[]
 	},
@@ -106,6 +108,8 @@ var containerVue = new Vue({
 							item.headimgurl = startWith(item.headimgurl,'http')? item.headimgurl: ('/user/headimg/show/'+item.userId);
 							containerVue.orders.push(item);
 						}
+						containerVue.param.pageSize = jsonRet.pageCond.pageSize;
+						containerVue.param.begin = jsonRet.pageCond.begin;
 					}else{
 						if(jsonRet && jsonRet.errmsg){
 							//alert(jsonRet.errmsg);
@@ -131,6 +135,25 @@ var containerVue = new Vue({
 	}
 });
 containerVue.getOrders('${status!''}');
+var winHeight = $(window).height(); //页面可视区域高度   
+var scrollHandler = function () {  
+    var pageHieght = $(document.body).height();  
+    var scrollHeight = $(window).scrollTop(); //滚动条top   
+    var r = (pageHieght - winHeight - scrollHeight) / winHeight;
+    if (r < 0.5) {//上拉翻页 
+   	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
+   	    containerVue.getOrders(containerVue.param.status);
+    }
+    if(scrollHeight<0){//下拉翻页
+   	 	containerVue.param.begin = containerVue.param.begin - containerVue.param.pageSize;
+   	 	if(containerVue.param.begin <= 0){
+   	 		containerVue.param.begin = 0;
+   	 	}
+   	    containerVue.getOrders(containerVue.param.status);
+    }
+}  
+//定义鼠标滚动事件  
+$("#container").scroll(scrollHandler);
 </script>
 <!-- 卖家协商取消订单（Modal） -->
 <div class="modal fade " id="cancelOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrderTitle" aria-hidden="false" data-backdrop="static" style="top:20%">
@@ -204,11 +227,13 @@ containerVue.getOrders('${status!''}');
 	 },
 	 methods:{
 		 submit: function(){
+			 $("#dealingData").show();
 			 $.ajax({
 				url: '/order/partner/ready/' + this.order.orderId,
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
+					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//成功
 							window.location.href = "/order/partner/show/all";
@@ -218,6 +243,9 @@ containerVue.getOrders('${status!''}');
 					}else{
 						alertMsg('错误提示','系统数据访问失败！');
 					}
+				},
+				failure:function(){
+					$("#dealingData").hide();
 				},
 				dataType: 'json'
 			});

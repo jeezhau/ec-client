@@ -63,14 +63,26 @@
 			pageSize:20,
 			begin:0
 		},
-		goodsList:[] 
+		goodsList:[] ,
+		goodsCnt:0,
 	 },
 	 methods:{
-		 getAll: function(){
+		 getAll: function(isRefresh,isFirst){
 			 $("#loadingData").show();
 			 $("#nomoreData").hide();
 			 if(containerVue.goodsList.length>100){
 			 	containerVue.goodsList = [];
+			 }
+			 if(isRefresh){ //清空数据
+				 containerVue.goodsCnt = 0;
+				 containerVue.goodsList = [];
+			 }
+			 if(containerVue.goodsList.lenght>=300){
+				 if(isFirst){//清除后一百条
+					 containerVue.goodsList.splice(200,100);
+				 }else{
+					 containerVue.goodsList.splice(0,100); 
+				 }
 			 }
 			 $.ajax({
 					url: '/shop/getall',
@@ -78,8 +90,15 @@
 					data: this.param,
 					success: function(jsonRet,status,xhr){
 						if(jsonRet && jsonRet.errcode == 0){//
-							for(var i=0;i<jsonRet.datas.length;i++){
-								containerVue.goodsList.push(jsonRet.datas[i]);
+							var i=0;
+							var j = jsonRet.datas.length;
+							for(;i<jsonRet.datas.length;){
+								if(isFirst){
+									containerVue.goodsList.unshift(jsonRet.datas[j]);
+								}else{
+									containerVue.goodsList.push(jsonRet.datas[i]);
+								}
+								i++;j--;
 							}
 							containerVue.param.pageSize = jsonRet.pageCond.pageSize;
 							containerVue.param.begin = jsonRet.pageCond.begin;
@@ -97,20 +116,20 @@
 		 }
 	 }
  });
- containerVue.getAll();
+ containerVue.getAll(true,false);
  //分类查询
  function getGoodsByCat(categoryId){
 	 containerVue.goodsList = [];
 	 containerVue.param.categoryId = categoryId;
 	 containerVue.param.begin = 0;
-	 containerVue.getAll();
+	 containerVue.getAll(true,false);
  }
  function getGoodsByKey(keywords){
 	 if(keywords){
 		 containerVue.goodsList = [];
 		 containerVue.param.keywords = keywords;
 		 containerVue.param.begin = 0;
-		 containerVue.getAll();
+		 containerVue.getAll(true,false);
 	 }
  } 
  
@@ -121,14 +140,19 @@
      var r = (pageHieght - winHeight - scrollHeight) / winHeight;
      if (r < 0.5) {//上拉翻页 
     	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
-    	 	containerVue.getAll();
+    	 	containerVue.getAll(false,false);
      }
      if(scrollHeight<0){ //下拉翻页
+    	 	var cnt = containerVue.goodsList.length%containerVue.param.pageSize;
+ 		cnt = containerVue.goodsList - cnt;
+	 	containerVue.param.begin = containerVue.param.begin - cnt;
     	 	containerVue.param.begin = containerVue.param.begin - containerVue.param.pageSize;
-     	if(containerVue.param.begin < 0){
+     	if(containerVue.param.begin <= 0){
      		containerVue.param.begin = 0;
+     		containerVue.getAll(true,true);
+     	}else{
+    	 		containerVue.getAll(false,true);
      	}
-    	 	containerVue.getAll();
      }
  }  
  //定义鼠标滚动事件  

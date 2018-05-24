@@ -96,6 +96,7 @@
 	  },
 	  methods:{
 		  submitPhone: function(){
+			  $("#dealingData").show();
 			  var pattern1 = /^1[3-9]\d{9}$/;
 			  var pattern2 = /^\d{6}$/;
 			  if(!pattern1.exec(this.param.newPhone)){
@@ -117,6 +118,7 @@
 					method:'post',
 					data: this.param,
 					success: function(jsonRet,status,xhr){
+						$("#dealingData").hide();
 						if(jsonRet && jsonRet.errmsg){
 							if(jsonRet.errcode !== 0){
 								alertMsg('错误提示',jsonRet.errmsg)
@@ -126,6 +128,9 @@
 						}else{
 							alertMsg('错误提示','绑定手机号失败！')
 						}
+					},
+					failure:function(){
+						$("#dealingData").hide();
 					},
 					dataType: 'json'
 				});

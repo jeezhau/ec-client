@@ -96,6 +96,7 @@ var containerVue = new Vue({
 	},
 	methods:{
 		submit:function(){
+			$("#dealingData").show();
 			if(this.param.content && this.param.content.length > 600){
 				alertMsg('错误提示','评价内容不可多于600个字符！');
 				return;
@@ -108,6 +109,7 @@ var containerVue = new Vue({
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
+					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//成功
 							window.location.href = "/order/partner/show/all";
@@ -118,6 +120,9 @@ var containerVue = new Vue({
 						alertMsg('错误提示','系统数据访问失败！');
 					}
 				},
+				failure:function(){
+					$("#dealingData").hide();
+				}
 				dataType: 'json'
 			});
 		}

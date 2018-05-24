@@ -62,9 +62,20 @@ var containerVue = new Vue({
 		}
 	},
 	methods:{
-		getAllAppr: function(){
-			 containerVue.appr.apprCnt = 0;
-			 containerVue.appr.apprList = [];
+		getAllAppr: function(isRefresh,isFirst){//是否刷新，是否从前面插入
+			 $("#loadingData").show();
+			 $("#nomoreData").hide();
+			 if(isRefresh){ //清空数据
+			 	containerVue.appr.apprCnt = 0;
+			 	containerVue.appr.apprList = [];
+			 }
+			 if(containerVue.appr.apprList.lenght>=300){
+				 if(isFirst){//清除后一百条
+					 containerVue.appr.apprList.splice(200,100);
+				 }else{
+					 containerVue.appr.apprList.splice(0,100); 
+				 }
+			 }
 			 var url = '';
 			 if(this.param.objNm == 'goods'){
 				 url = '/appraise/getall/goods/' + this.param.objId;
@@ -79,27 +90,67 @@ var containerVue = new Vue({
 					data: this.param,
 					success: function(jsonRet,status,xhr){
 						if(jsonRet && jsonRet.errcode == 0){//
-							for(var i=0;i<jsonRet.datas.length;i++){
-								var appr = jsonRet.datas[i];
+							var i=0;
+						    var j=jsonRet.datas.length;
+							for(;i<jsonRet.datas.length;){
+								var appr = null;
+								if(isFirst){
+									appr = jsonRet.datas[j];
+								}else{
+									appr = jsonRet.datas[i];
+								}
 								if(appr.appraiseInfo){//有评价内容
 									appr.appraiseInfo = JSON.parse(appr.appraiseInfo);
 								}else{
 									appr.appraiseInfo = {'time':appr.appraiseTime,'content':"卖家太懒，啥也没留下！！！"}
 								}
 								appr.goodsSpec = JSON.parse(appr.goodsSpec);
-								appr.headimgurl = startWith(appr.headimgurl,'http')?appr.headimgurl:('/user/headimg/show/'+appr.userId)
-								containerVue.appr.apprList.push(appr);
+								appr.headimgurl = startWith(appr.headimgurl,'http')?appr.headimgurl:('/user/headimg/show/'+appr.userId);
+								if(isFirst){	
+									containerVue.appr.apprList.unshift(appr);
+								}else{
+									containerVue.appr.apprList.push(appr);
+								}
+								i++;j--;
 							}
 							containerVue.param.begin = jsonRet.pageCond.begin;
 							containerVue.appr.apprCnt = jsonRet.pageCond.count;
+						}else{
+							$("#loadingData").hide();
 						}
+					},
+					failure:function(){
+						$("#loadingData").hide();
 					},
 					dataType: 'json'
 				});			 
 		 }
 	}
 });
-containerVue.getAllAppr();
+containerVue.getAllAppr(true,false);
+var winHeight = $(window).height(); //页面可视区域高度   
+var scrollHandler = function () {  
+    var pageHieght = $(document.body).height();  
+    var scrollHeight = $(window).scrollTop(); //滚动条top   
+    var r = (pageHieght - winHeight - scrollHeight) / winHeight;
+    if (r < 0.5) {//上拉翻页 
+   	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
+   	 	containerVue.getAllAppr(false,false);
+    }
+    if(scrollHeight<0){//下拉翻页
+    		var cnt = containerVue.appr.apprList.length%containerVue.param.pageSize;
+    		cnt = containerVue.appr.apprList.length - cnt;
+   	 	containerVue.param.begin = containerVue.param.begin - cnt;
+   	 	if(containerVue.param.begin <= 0){
+   	 		containerVue.param.begin = 0;
+   	 		containerVue.param.getAllAppr(true,true);
+   	 	}else{
+   	 		containerVue.param.getAllAppr(false,true);
+   	 	}
+    }
+}  
+//定义鼠标滚动事件  
+$("#container").scroll(scrollHandler); 
 </script>
 
 <footer>

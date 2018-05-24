@@ -84,13 +84,11 @@
   
   <!-- 支付方式选择 -->
   <div class="row" style="">
-  <#if wxPay!''=='1' >
     <div class="col-xs-12 " style="margin:1px 5px ;padding:10px 25px;background-color:white" @click="choosePay(2)">
      <img alt="" src="/icons/微信支付.png" width="20px" height=20px>
      <span>微信支付</span>
      <span v-if="param.payType == 2 " class="pull-right"><img src="/icons/选择.png" style="widht:20px;height:20px;"></span>
     </div>
-   </#if>
     <div class="col-xs-12" style="margin:1px 5px;padding:10px 25px;background-color:white" @click="choosePay(1)">
      <img alt="" src="/icons/余额.png" width="20px" height=20px>
      <span>会员余额</span>
@@ -130,6 +128,7 @@ var containerVue = new Vue({
 			this.param.payType = tp;
 		},
 		prepay: function(){
+			$("#dealingData").show();
 			if(!this.param.payType){
 				alertMsg('系统提示','请先选择支付方式！');
 				return;
@@ -139,25 +138,19 @@ var containerVue = new Vue({
 				method:'post',
 				data: {},
 				success: function(jsonRet,status,xhr){
+					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//创建支付成功
 							if(jsonRet.payType == '1'){ //使用余额支付
 								 window.location.href = "/order/pay/use/bal/" + containerVue.param.orderId;
 							}
-							<#if wxPay!''=='1' >
 							else if(jsonRet.payType == '2'{//微信支付
-								if (typeof WeixinJSBridge == "undefined"){
-									if( document.addEventListener ){
-										document.addEventListener('WeixinJSBridgeReady', onBridgeReady(jsonRet.appId,jsonRet.timeStamp,jsonRet.nonceStr,jsonRet.prepay_id,jsonRet.paySign), false);
-									}else if (document.attachEvent){
-										document.attachEvent('WeixinJSBridgeReady', onBridgeReady(jsonRet.appId,jsonRet.timeStamp,jsonRet.nonceStr,jsonRet.prepay_id,jsonRet.paySign)); 
-										document.attachEvent('onWeixinJSBridgeReady', onBridgeReady(jsonRet.appId,jsonRet.timeStamp,jsonRet.nonceStr,jsonRet.prepay_id,jsonRet.paySign));
-									}
+								if (jsonRet.outPayUrl){
+									window.location.href = jsonRet.outPayUrl;
 								}else{
-									 onBridgeReady(jsonRet.appId,jsonRet.timeStamp,jsonRet.nonceStr,jsonRet.prepay_id,jsonRet.paySign);
+									alertMsg('错误提示','调用微信支付失败！');
 								}
 							}
-							</#if>
 						}else{//出现逻辑错误
 							alertMsg('错误提示',jsonRet.errmsg);
 						}
@@ -165,33 +158,14 @@ var containerVue = new Vue({
 						alertMsg('错误提示','系统数据访问失败！');
 					}
 				},
+				failure:function(){
+					$("#dealingData").hide();
+				},
 				dataType: 'json'
 			});
 		}
 	}
 });
-<#if wxPay!''=='1' >
-function onBridgeReady(appId,timeStamp,nonceStr,prepay_id,paySign){
-   WeixinJSBridge.invoke(
-       'getBrandWCPayRequest', {
-           "appId":appId,     //公众号名称，由商户传入     
-           "timeStamp":timeStamp,         //时间戳，自1970年以来的秒数     
-           "nonceStr":nonceStr, //随机串     
-           "package":"prepay_id=" + prepay_id,     
-           "signType":"MD5",         //微信签名方式：     
-           "paySign":paySign //微信签名 
-       },
-       function(res){     
-           if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-        	        // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回  ok，但并不保证它绝对可靠。 
-        	  	   window.location.href = "/order/pay/finish/" + containerVue.param.orderId + '/success';
-           }else{
-        	   	   window.location.href = "/order/pay/finish/" + containerVue.param.orderId + '/fail';
-           }
-       }
-   );
-}
-</#if>
 </script>
 </#if>
 

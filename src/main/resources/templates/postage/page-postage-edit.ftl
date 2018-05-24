@@ -283,12 +283,14 @@ var postageContainerVue = new Vue({
 			}
 		},
 		saveEdit : function(){//保存信息编辑
+			$("#dealingData").show();
 			$.ajax({
 				url: '/postage/save',
 				method:'post',
 				data: postageContainerVue.param,
 				success: function(jsonRet,status,xhr){
-					if(jsonRet){
+					$("#dealingData").hide();
+					if(jsonRet && jsonRet.errmsg){
 						if(0 == jsonRet.errcode){
 							window.location.href='/postage/index';
 						}else{//出现逻辑错误
@@ -297,6 +299,9 @@ var postageContainerVue = new Vue({
 					}else{
 						alertMsg('错误提示','系统数据访问失败！')
 					}
+				},
+				failure:function(){
+					$("#dealingData").hide();
 				},
 				dataType: 'json'
 			});

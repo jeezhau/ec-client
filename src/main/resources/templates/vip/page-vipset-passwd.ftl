@@ -72,6 +72,7 @@ var containerVue = new Vue({
 	},
 	methods:{
 		submit: function(){
+			$("#dealingData").show();
 			//密码强度正则，6-20位，包括至少1个大写字母，1个小写字母，1个数字
 			var pPattern = /^.*(?=.{6,20})(?=.*\d)(?=.*[A-Z])(?=.*[a-z]).*$/;
 			if(!pPattern.exec(this.param.newPwd)){
@@ -91,6 +92,7 @@ var containerVue = new Vue({
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
+					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode !== 0){
 							alertMsg('错误提示',jsonRet.errmsg);
@@ -100,6 +102,9 @@ var containerVue = new Vue({
 					}else{
 						alertMsg('错误提示','设置会员密码失败！')
 					}
+				},
+				failure:function(){
+					$("#dealingData").hide();
 				},
 				dataType: 'json'
 			});

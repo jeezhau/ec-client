@@ -392,19 +392,16 @@ public class OrderService {
 	 * 发送支付完成请求
 	 * @param order
 	 * @param user
-	 * @param status 客户端发送的支付状态
 	 * @return
 	 */
-	public static JSONObject payFinish(Order order,UserBasic user,String status) {
+	public static JSONObject payFinish(Order order,UserBasic user) {
 		JSONObject jsonRet = new JSONObject();
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("status",status);
 		
 		//向服务中心发送申请
 		String url = mfyxServerUrl + orderPayFinishUrl;
 		url = url.replace("{userId}", user.getUserId() + "");
 		url = url.replace("{orderId}", order.getOrderId() + "");
-		url = url.replace("{status}", status );
 		String strRet = HttpUtils.doPost(url, params);
 		try {
 			jsonRet = JSONObject.parseObject(strRet);

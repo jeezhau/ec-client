@@ -113,11 +113,13 @@ var containerVue = new Vue({
 	},
 	methods:{
 		submit: function(){
+			$("#dealingData").show();
 			$.ajax({
 				url: '/vip/vipset/updact',
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
+					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode !== 0){
 							alertMsg('错误提示',jsonRet.errmsg)
@@ -127,6 +129,9 @@ var containerVue = new Vue({
 					}else{
 						alertMsg('错误提示','绑定邮箱失败！')
 					}
+				},
+				failure:function(){
+					$("#dealingData").hide();
 				},
 				dataType: 'json'
 			});

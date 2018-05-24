@@ -378,7 +378,7 @@ var containerVue = new Vue({
 		},
 		submitCheck:function(){
 			if(this.param.flag != 2){
-				alertMsg('系统提示','请完成数据检查！');
+				alertMsg('系统提示','请完成数据检查并选择配送方式！');
 				return false;
 			}
 			$("#receiverAddr .form-control[disabled]").removeAttr("disabled"); 

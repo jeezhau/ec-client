@@ -275,11 +275,13 @@ var partnerContainerVue = new Vue({
 			this.param.locationY = locY;
 		},
 		submit: function(){
+			$("#dealingData").show();
 			$.ajax({
 				url: '/partner/save',
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
+					$("#dealingData").hide();
 					if(jsonRet){
 						if(0 == jsonRet.errcode){
 							alertMsg('系统提示',"合作伙伴基本信息保存成功！");
@@ -291,6 +293,9 @@ var partnerContainerVue = new Vue({
 					}else{
 						alertMsg('错误提示','系统数据访问失败！')
 					}
+				},
+				failure:function(){
+					$("#dealingData").hide();
 				},
 				dataType: 'json'
 			});

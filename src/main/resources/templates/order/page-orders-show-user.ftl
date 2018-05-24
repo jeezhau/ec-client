@@ -128,6 +128,25 @@ var containerVue = new Vue({
 	}
 });
 containerVue.getOrders('${status!''}');
+var winHeight = $(window).height(); //页面可视区域高度   
+var scrollHandler = function () {  
+    var pageHieght = $(document.body).height();  
+    var scrollHeight = $(window).scrollTop(); //滚动条top   
+    var r = (pageHieght - winHeight - scrollHeight) / winHeight;
+    if (r < 0.5) {//上拉翻页 
+   	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
+   	    containerVue.getOrders(containerVue.param.status);
+    }
+    if(scrollHeight<0){//下拉翻页
+   	 	containerVue.param.begin = containerVue.param.begin - containerVue.param.pageSize;
+   	 	if(containerVue.param.begin <= 0){
+   	 		containerVue.param.begin = 0;
+   	 	}
+   	    containerVue.getOrders(containerVue.param.status);
+    }
+}  
+//定义鼠标滚动事件  
+$("#container").scroll(scrollHandler);
 </script>
 
 

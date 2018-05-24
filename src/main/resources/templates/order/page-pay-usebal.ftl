@@ -108,6 +108,7 @@ var containerVue = new Vue({
 	},
 	methods:{
 		submit:function(){
+			$("#dealingData").show();
 			if(!this.param.passwd || this.param.passwd.length<6){
 				alertMsg('错误提示','支付密码不可为空！');
 				return;
@@ -117,6 +118,7 @@ var containerVue = new Vue({
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
+					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//创建支付成功
 							window.location.href = "/order/pay/finish/" + containerVue.param.orderId + '/success';
@@ -126,6 +128,9 @@ var containerVue = new Vue({
 					}else{
 						alertMsg('错误提示','系统数据访问失败！');
 					}
+				},
+				failure:function(){
+					$("#dealingData").hide();
 				},
 				dataType: 'json'
 			});

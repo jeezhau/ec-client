@@ -382,6 +382,7 @@ var goodsContainerVue = new Vue({
 			}
 		},
 		submit: function(){
+			$('#dealingData').show();
 			//组织规格数据
 			var okSpecArr = [];
 			//var stockSum = 0;
@@ -456,6 +457,7 @@ var goodsContainerVue = new Vue({
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
+					$("#dealingData").hide();
 					if(jsonRet){
 						if(0 == jsonRet.errcode){
 							window.location.href='/goods/manage';
@@ -465,6 +467,9 @@ var goodsContainerVue = new Vue({
 					}else{
 						alertMsg('错误提示','系统数据访问失败！')
 					}
+				},
+				failure:function(){
+					$("#dealingData").hide();
 				},
 				dataType: 'json'
 			});

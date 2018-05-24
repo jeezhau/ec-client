@@ -96,6 +96,7 @@
 	  },
 	  methods:{
 		  submit: function(){
+			  $("#dealingData").show();
 			  var pattern1 = /^[A-Za-z0-9_\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
 			  var pattern2 = /^\d{6}$/;
 			  if(!pattern1.exec(this.param.newEmail)){
@@ -117,6 +118,7 @@
 					method:'post',
 					data: this.param,
 					success: function(jsonRet,status,xhr){
+						$("#dealingData").hide();
 						if(jsonRet && jsonRet.errmsg){
 							if(jsonRet.errcode !== 0){
 								alertMsg('错误提示',jsonRet.errmsg)
@@ -126,6 +128,9 @@
 						}else{
 							alertMsg('错误提示','绑定邮箱失败！')
 						}
+					},
+					failure:function(){
+						$("#dealingData").hide();
 					},
 					dataType: 'json'
 				});

@@ -19,6 +19,9 @@
 </div><!-- /.modal -->
 <script>
 function alertMsg(title,content){
+	if($("#dealingData")){
+		$("#dealingData").hide();
+	}
 	$('#alertMsgTitle').html(title);
 	$('#alertMsgContent').html(content);
 	$('#alertMsgModal').modal('show');

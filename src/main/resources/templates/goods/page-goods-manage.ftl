@@ -122,22 +122,19 @@
 		param:{
 			status:'1', 
 			reviewResult:'1',
-			pageSize:20,
+			pageSize:30,
 			begin:'0'
 		},
 		selectedArr:[],
 		goodsList:[] 
 	 },
 	 methods:{
-		 getAll: function(refresh){
+		 getAll: function(isFirst){
 			 $("#loadingData").show();
 			 $("#nomoreData").hide();
-			 if(refresh){  //重新刷新
-			 	containerVue.goodsList = [];
-			 }
-			 if(containerVue.goodsList.length >= 100){
-				 containerVue.goodsList = [];
-			 }
+			 
+			 containerVue.goodsList = [];
+			 
 			 $.ajax({
 					url: '/goods/getall',
 					method:'post',
@@ -151,7 +148,9 @@
 							containerVue.param.begin = jsonRet.pageCond.begin;
 						}else{
 							if(jsonRet.errmsg !=='ok'){
-								//$("#nomoreData").show();
+								if(containerVue.goodsList.lenght == 0){
+									$("#nomoreData").show();
+								}
 							}
 						}
 						$("#loadingData").hide();
@@ -207,7 +206,7 @@
     	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
     	 	containerVue.getAll(false);
      }
-     if(scrollHeight<0){//下拉刷新
+     if(scrollHeight<0){//下拉翻页
     	 	containerVue.param.begin = containerVue.param.begin - containerVue.param.pageSize;
     	 	if(containerVue.param.begin <= 0){
     	 		containerVue.param.begin = 0;

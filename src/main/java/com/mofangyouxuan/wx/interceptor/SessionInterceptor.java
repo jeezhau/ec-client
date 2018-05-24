@@ -37,6 +37,7 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 		//String contextPath = request.getContextPath();  
 		HttpSession session = request.getSession();
 		String uri = request.getRequestURI();
+		//String agent= request.getHeader("user-agent").toLowerCase();
 		//System.out.println(uri);
 		//不需要控制session的路径
 		String[] excluceUrl = {"/login","/image/file/show/","/partner/cert/show/","/user/headimg/show/",

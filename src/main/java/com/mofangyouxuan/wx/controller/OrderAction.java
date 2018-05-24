@@ -1,10 +1,12 @@
 package com.mofangyouxuan.wx.controller;
 
+import java.net.URLEncoder;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -42,6 +44,9 @@ import com.mofangyouxuan.wx.utils.PageCond;
 public class OrderAction {
 	
 	private String[] statusArr = new String[]{"all","4pay","4delivery","4sign","4appraise","refund","exchange"};
+	@Value("${sys.local-server-url}")
+	private String localServier;
+	
 	/**
 	 * 选中商品开始下单
 	 * @param goodsId
@@ -162,10 +167,10 @@ public class OrderAction {
 			String agent= request.getHeader("user-agent").toLowerCase();
 			int index = agent.indexOf("micromessenger/");
 			if(index >=0) {
-				String sub = agent.substring(index + "micromessenger/".length());
+				String sub = agent.substring(index + "micromessenger/".length(),index + "micromessenger/".length()+2);
 				try {
 					Double bb = Double.parseDouble(sub);
-					if(bb > 5.0) {
+					if(bb >= 5.0) {
 						map.put("wxPay", "1");
 					}
 				}catch(Exception e) {
@@ -271,9 +276,9 @@ public class OrderAction {
 	 * @param status 支付结果 succees-成功，fail-失败
 	 * @return
 	 */
-	@RequestMapping("/pay/finish/{orderId}/{status}")
+	@RequestMapping("/pay/finish/{orderId}")
 	public String finishPay(@PathVariable("orderId")String orderId,
-			@PathVariable("status")String status,ModelMap map) {
+			ModelMap map) {
 		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
@@ -284,7 +289,7 @@ public class OrderAction {
 				if(!user.getUserId().equals(order.getUserId())) {
 					map.put("errmsg", "该订单不是您的宝贝订单！");
 				}else {//判断系统是否已经支付成功
-					jsonRet = OrderService.payFinish(order, user, status);
+					jsonRet = OrderService.payFinish(order, user);
 					if(jsonRet != null && jsonRet.containsKey("errcode")) {
 						map.put("payRetCode", jsonRet.getIntValue("errcode"));
 						map.put("payRetMsg", jsonRet.getString("errmsg"));
@@ -737,11 +742,11 @@ public class OrderAction {
 	 * @param orderId
 	 * @param payType 支付方式：1-余额，2-微信
 	 * @param map
-	 * @return {errcode,errmsg,payType,appId,timeStamp,nonceStr,prepay_id,paySign}
+	 * @return {errcode,errmsg,payType,prepay_id,outPayUrl}
 	 */
 	@RequestMapping("/prepay/{orderId}/{payType}")
 	@ResponseBody
-	public String prepayOrder(@PathVariable("orderId")String orderId,
+	public String createPrepay(@PathVariable("orderId")String orderId,
 			@PathVariable("payType")Integer payType,HttpServletRequest request,
 			ModelMap map) {
 		UserBasic user = (UserBasic) map.get("userBasic");
@@ -781,6 +786,14 @@ public class OrderAction {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");
 				return jsonRet.toString();
+			}else if(jsonRet.containsKey("outPayUrl")) {
+				if(2 == payType) { //微信H5支付
+					String outPayUrl = jsonRet.getString("outPayUrl");
+					String redirectUrl = this.localServier + "/order/pay/finish/" + orderId;
+					redirectUrl = URLEncoder.encode(redirectUrl, "utf8");
+					outPayUrl = outPayUrl + "&redirect_url=" + redirectUrl;
+					jsonRet.put(outPayUrl, outPayUrl);
+				}
 			}
 		}catch(Exception e) {
 			e.printStackTrace();

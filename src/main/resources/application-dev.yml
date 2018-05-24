@@ -109,7 +109,7 @@ mfyx:
   order-checkdata-url: '/order/{userId}/checkData' 
   order-cancel-url: '/order/{userId}/cancel/{orderId}'
   order-prepay-url: '/order/{userId}/createpay/{orderId}'
-  order-pay-finish-url: '/order/{userId}/payfinish/{orderId}/{status}'
+  order-pay-finish-url: '/order/{userId}/payfinish/{orderId}'
   order-refund-url: '/order/{userId}/refund/{orderId}'
   order-exchange-url: '/order/{userId}/exchange/{orderId}'
   order-appr2mcht-url: '/order/{userId}/appr2mcht/{orderId}'

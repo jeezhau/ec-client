@@ -189,6 +189,7 @@ var createDirVue = new Vue({
 	},
 	methods:{
 		submit:function(){
+			$("#dealingData").show();
 			var patt = new RegExp('^[a-zA-Z0-9_\u4e00-\u9fa5]{2,10}$');
 			if(!patt.test(this.folderName)){
 				alertMsg('错误提示',"新建文件夹名为(2-10字母数字汉字)！");
@@ -198,6 +199,7 @@ var createDirVue = new Vue({
 				url: '/image/folder/create',
 				data: this.params,
 				success: function(jsonRet,status,xhr){
+					$("#dealingData").hide();
 					if(jsonRet){
 						if(0 == jsonRet.errcode){
 							containerVue.files.push(createDirVue.params.folderName);
@@ -213,6 +215,9 @@ var createDirVue = new Vue({
 						alertMsg('错误提示','系统数据访问失败！');
 					}
 					$("#createDirModal").modal('hide');
+				},
+				failure:function(){
+					$("#dealingData").hide();
 				},
 				dataType: 'json'
 			});

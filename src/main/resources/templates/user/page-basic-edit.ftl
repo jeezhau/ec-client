@@ -171,12 +171,14 @@ var editFormVue = new Vue({
 			getCities();
 		},
 		submit: function(){
+			$("#dealingData").show();
 			$.ajax({
 				url: '/user/basic/update',
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
-					if(jsonRet){
+					$("#dealingData").hide();
+					if(jsonRet && jsonRet.errmsg){
 						if(0 == jsonRet.errcode){
 							alertMsg('系统提示',"基本信息修改成功！")
 						}else{//出现逻辑错误
@@ -185,6 +187,9 @@ var editFormVue = new Vue({
 					}else{
 						alertMsg('错误提示','系统数据访问失败！')
 					}
+				},
+				failure:function(){
+					$("#dealingData").hide();
 				},
 				dataType: 'json'
 			});
