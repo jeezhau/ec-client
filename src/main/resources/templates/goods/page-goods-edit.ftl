@@ -23,6 +23,7 @@
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 <div class="container" id="goodsContainer" style="padding:0px 0px;oveflow:scroll">
   <div class="row">
      <ul class="nav nav-tabs" style="margin:0 15%">
@@ -58,14 +59,14 @@
         <label class="col-xs-4 control-label" style="padding-right:1px">商品主图<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
           <div class="col-xs-9" style="padding-left:0"><input class="form-control"  v-model="param.mainImgPath" required readonly placeholder="请选择图片"></div>
-          <div class="col-xs-3" style="padding-left:0"><button class="btn btn-info" @click="selectImage(1,'main')">选择</button></div>
+          <div class="col-xs-3" style="padding-left:0"><button type="button" class="btn btn-info" @click="selectImage(1,'main')">选择</button></div>
         </div>
       </div> 
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">商品轮播图<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
            <div class="col-xs-9" style="padding-left:0"><textarea class="col-xs-9 form-control" v-model="param.carouselImgPaths" maxLength=500 rows=10 readonly placeholder="请选择图片" ></textarea></div>
-           <div class="col-xs-3" style="padding-left:0"><button class="btn btn-info" @click="selectImage(10,'carousel')">选择</button></div>
+           <div class="col-xs-3" style="padding-left:0"><button type="button" class="btn btn-info" @click="selectImage(10,'carousel')">选择</button></div>
         </div>
       </div>
       <div class="form-group">
@@ -184,9 +185,7 @@
   	<p>审批意见：{{review.reviewLog}}</p>
   </div>
 </div><!-- end of container -->
-<footer>
-  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
-</footer>
+
 <script type="text/javascript">
 var goodsContainerVue = new Vue({
 	el:'#goodsContainer',
@@ -487,6 +486,11 @@ if(goodsContainerVue.specDetailArr.length == 0){
 }
 goodsContainerVue.param.goodsDesc = $('#hiddenGoodsDesc').val();
 </script>
+
+<#include "/image/page-image-show-tpl.ftl" encoding="utf8">
+<footer>
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
+</footer>
 
 <#if errmsg??>
 <!-- 错误提示模态框（Modal） -->

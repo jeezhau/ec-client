@@ -22,6 +22,9 @@
     <link href="/css/mfyx.css" rel="stylesheet">
 </head>
 <body class="light-gray-bg">
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+
 <div class="container " id="container" style="padding:0px 0px;oveflow:scroll">
   <div class="row">
      <a class="col-xs-2" href="/user/index/basic" style="vertical-algin:center;text-align:center"><img width="15px" height="15px" alt="" src="/icons/返回.png"></a>

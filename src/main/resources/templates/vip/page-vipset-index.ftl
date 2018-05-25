@@ -28,6 +28,8 @@
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+
 <#if ((vipBasic.status)!'') == "1">
 <div class="container" id="container" style="padding:0px 0px;oveflow:scroll">
  

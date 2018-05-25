@@ -24,6 +24,7 @@
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
  <#if (order.orderId)?? >
 <div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
@@ -144,7 +145,7 @@ var containerVue = new Vue({
 							if(jsonRet.payType == '1'){ //使用余额支付
 								 window.location.href = "/order/pay/use/bal/" + containerVue.param.orderId;
 							}
-							else if(jsonRet.payType == '2'{//微信支付
+							else if(jsonRet.payType == '2'){//微信支付
 								if (jsonRet.outPayUrl){
 									window.location.href = jsonRet.outPayUrl;
 								}else{

@@ -24,6 +24,8 @@
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+
 <#if (mcht.partnerId)??>  
 <div class="container" id="container" style="padding:0;oveflow:scroll">
   <!-- 商家基础信息 -->

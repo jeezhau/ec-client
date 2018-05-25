@@ -27,7 +27,7 @@ public class UserBasic {
     @Pattern(regexp="^[012]$",message=" 性别：取值范围[0-保密，1-男，2-女]！")
     private String sex;
 
-    @Size(max=20,message=" 密码： 最长20个字符! ")
+    //@Size(max=20,message=" 密码： 最长20个字符! ")
     private String passwd;
 
     @Size(max=100,message=" 国家：最长 100 字符! ")

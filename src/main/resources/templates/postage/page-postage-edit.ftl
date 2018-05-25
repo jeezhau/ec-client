@@ -23,6 +23,8 @@
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+
 <div class="container" id="postageContainer" style="padding:0px 0px;oveflow-y:scroll">
   <div class="row" id="editpostage" style="background-color:white;margin:0 0;padding:0 5px">
     <h5 style="text-align:center;margin:15px 0">运费模版信息编辑</h5>

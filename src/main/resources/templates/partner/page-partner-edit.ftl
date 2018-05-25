@@ -25,10 +25,12 @@
     
     <link href="/css/mfyx.css" rel="stylesheet">
     <script src="/script/common.js" type="text/javascript"></script>
-
+	<script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.6&key=2b12c05334ea645bd934b55c8e46f6ea"></script> 
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+
 <div class="container" id="partnerContainer" style="padding:0px 0px;oveflow:scroll">
   <div class="row">
      <ul class="nav nav-tabs" style="margin:0 15%">
@@ -566,38 +568,35 @@ $(document).on('ready', function() {
 </script>
 
 <script>
-  wx.config({
-      debug: false,
-      appId: '${APP_ID}',
-      timestamp: ${timestamp},
-      nonceStr: '${nonceStr}',
-      signature: '${signature}',
-      jsApiList: [
-        'checkJsApi',
-        'chooseImage',
-        'previewImage',
-        'uploadImage',
-        'downloadImage',
-        'getNetworkType',
-        'openLocation',
-        'getLocation'
-      ]
- });
- wx.ready(function(){
-	wx.getLocation({
-		  type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
-		  success: function (res) {
-		  var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
-		  var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
-		  var speed = res.speed; // 速度，以米/每秒计
-		  var accuracy = res.accuracy; // 位置精度
-		  partnerContainerVue.getLocation(longitude,latitude);
+
+var mapObj = new AMap.Map('iCenter');
+mapObj.plugin('AMap.Geolocation', function () {
+    geolocation = new AMap.Geolocation({
+        enableHighAccuracy: true,//是否使用高精度定位，默认:true
+        timeout: 10000,          //超过10秒后停止定位，默认：无穷大
+        maximumAge: 0,           //定位结果缓存0毫秒，默认：0
+        convert: true,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
+        showButton: true,        //显示定位按钮，默认：true
+        buttonPosition: 'LB',    //定位按钮停靠位置，默认：'LB'，左下角
+        buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+        showMarker: true,        //定位成功后在定位到的位置显示点标记，默认：true
+        showCircle: true,        //定位成功后用圆圈表示定位精度范围，默认：true
+        panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
+        zoomToAccuracy:true      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+    });
+    mapObj.addControl(geolocation);
+    geolocation.getCurrentPosition(function(status,result){
+    		if(status == 'complete'){
+    			/* containerVue.param.city = result.addressComponent.city;
+    			containerVue.param.area = result.addressComponent.district;
+    			containerVue.param.lat = result.position.lat;
+    			containerVue.param.lng = result.position.lng; */
+    			//系统业务调用
+    			partnerContainerVue.getLocation(result.position.lng,result.position.lat);
 		}
-	});
-});
-wx.error(function(res){
-	  alertMsg('错误提示','config信息验证失败！');
-	  // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+    });
+    //AMap.event.addListener(geolocation, 'complete', onComplete);//返回定位信息
+   //AMap.event.addListener(geolocation, 'error', onError);      //返回定位出错信息
 });
 </script>
 

@@ -32,8 +32,6 @@ import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.PartnerMgrService;
-import com.mofangyouxuan.wx.api.JSAPITicket;
-import com.mofangyouxuan.wx.api.WebAuth;
 
 /**
  * 合作伙伴管理
@@ -89,24 +87,6 @@ public class PartnerAction {
 		if(partner != null) {
 			map.put("partnerBasic", partner);
 		}
-		String nonceStr = "wddgwefw";
-		Long timestamp = System.currentTimeMillis()/1000;
-		String url = localServerUrl + "/partner/edit";
-		String signature = "";
-		try {
-			signature = JSAPITicket.signature(url, timestamp, nonceStr);
-			if(signature == null) {
-				map.put("errmsg", "获取微信JSAPI ticket 失败！");
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
-		}
-		
-		map.put("APP_ID", WebAuth.APPID);
-		map.put("nonceStr", nonceStr);
-		map.put("timestamp", timestamp + "");
-		map.put("signature", signature);
 		map.put("sys_func", "partner-index");
 		
 		return "partner/page-partner-edit";

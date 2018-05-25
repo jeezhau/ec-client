@@ -7,12 +7,12 @@
 	    </span>
 	    <p class="weui-tabbar__label">商城首页</p>
 	</a>
-   	<a href="/dayfresh/index/today" class="weui-tabbar__item <#if sys_func=='dayfresh'>weui-bar__item_on </#if>" >
+<!--    	<a href="/dayfresh/index/today" class="weui-tabbar__item <#if sys_func=='dayfresh'>weui-bar__item_on </#if>" >
       <span style="display: inline-block;position: relative;">
         <img src="/img/mfyx_logo.jpeg" alt="" class="weui-tabbar__icon">
       </span>
       <p class="weui-tabbar__label">每日鲜推</p>
-    </a>	
+    </a>	 -->
 	<a href="/nearby/index" class="weui-tabbar__item <#if sys_func=='nearby'>weui-bar__item_on </#if>" >
 	    <img src="/icons/附近商家.png" alt="" class="weui-tabbar__icon">
 	    <p class="weui-tabbar__label">优选同城</p>

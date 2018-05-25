@@ -26,6 +26,7 @@
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 <div class="container" id="container" style="oveflow:scroll">
   <div class="row">
      <h3 style="margin:10px 0;text-align:center" >我的图库</h3>

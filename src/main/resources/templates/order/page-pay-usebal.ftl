@@ -24,6 +24,7 @@
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
 <#if (payFlow.flowId)?? >
 <div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">

@@ -49,7 +49,8 @@ public class ShopAction {
 	
 	@RequestMapping("/getall")
 	@ResponseBody
-	public String getShopAllGoods(Integer categoryId,String keywords,PageCond pageCond) {
+	public String getShopAllGoods(Integer categoryId,String keywords,PageCond pageCond,
+			String city,String area,String lat,String lng) {
 		JSONObject jsonRet = new JSONObject();
 		try {
 			JSONObject params = new JSONObject();
