@@ -24,13 +24,14 @@
     <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.6&key=2b12c05334ea645bd934b55c8e46f6ea"></script> 
 </head>
 <body class="light-gray-bg" >
-<header >
-  <#include "/menu/page-category-menu.ftl" encoding="utf8"> 
-</header>
+
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
 <div class="container goods-container" id="container" style="padding:0 1px;overflow:scroll">
+  <header >
+    <#include "/menu/page-category-menu.ftl" encoding="utf8"> 
+  </header>
   <div class="col-xs-12">
    <span>您的当前位置：{{param.province}}{{param.city}}{{param.area}}{{param.town}}</span>
   </div>
@@ -49,7 +50,7 @@
         </div>
 	    <div style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
 	      <a v-bind:href="'/goods/detail/' + goods.goodsId">
-	        <img alt="" :src="'/image/file/show/' + goods.partner.vipId + '/' + goods.mainImgPath" style="width:90%;height:150px">
+	        <img alt="" :src="'/image/file/show/' + goods.partner.vipId + '/' + goods.mainImgPath" style="width:90%;max-width:200px;height:150px">
 	      </a>
 	    </div>
 	    <div style="margin:1px 1px;" >
@@ -62,7 +63,7 @@
 	      </div>
 	      <div style="margin:1px 0px 2px 0;padding:0 5px 3px 5px;background-color:white;text-align:center" >
 	        <a class="btn btn-danger " style="padding:3px 12px" :href="'/order/place/'+ goods.goodsId"><span style="color:white">立即下单</span></a>
-	        <a class="btn btn-primary" style="padding:3px 12px" :href="'/order/order/begin/' + goods.goodsId"><span style="color:white">加入收藏</span></a>
+	        <a class="btn btn-primary" style="padding:3px 12px" href="javascript:;" @click="addCollection('2',goods.goodsId)"><span style="color:white">加入收藏</span></a>
 	      </div>
 	    </div>
     </div>
@@ -70,85 +71,102 @@
 </div><!-- end of container -->
 
 <script type="text/javascript">
- var containerVue = new Vue({
-	 el:'#container',
-	 data:{
-		param:{
-			province:'${(receiverPosition.province)!''}',
-			city:'${(receiverPosition.city)!''}',
-			area:'${(receiverPosition.area)!''}',
-			town:'${(receiverPosition.town)!''}',
-			lat:'${(receiverPosition.lat)!''}',
-			lng:'${(receiverPosition.lng)!''}',
-			categoryId:'', 
-			keywords:'',
-			pageSize:20,
-			begin:0
-		},
-		goodsList:[] ,
-		goodsCnt:0,
-	 },
-	 methods:{
-		 getShortAddr(addr){
-			 if(addr.length>11){
-				 return addr.substring(0,8) + '...';
-			 }else{
-				 return addr;
-			 }
-		 },
-		 getAll: function(isRefresh,isFirst){
-			 if(!this.param.city || !this.param.lat ||!this.param.lng){
-				 alertMsg('系统提示',"因系统无法获取您的当前位置信息，该服务暂无法提供！");
-				 return;
-			 }
-			 $("#loadingData").show();
-			 $("#nomoreData").hide();
-			 if(containerVue.goodsList.length>100){
-			 	containerVue.goodsList = [];
-			 }
-			 if(isRefresh){ //清空数据
-				 containerVue.goodsCnt = 0;
-				 containerVue.goodsList = [];
-			 }
-			 if(containerVue.goodsList.lenght>=300){
-				 if(isFirst){//清除后一百条
-					 containerVue.goodsList.splice(200,100);
-				 }else{
-					 containerVue.goodsList.splice(0,100); 
-				 }
-			 }
-			 $.ajax({
-					url: '/nearby/getall',
-					method:'post',
-					data: this.param,
-					success: function(jsonRet,status,xhr){
-						if(jsonRet && jsonRet.errcode == 0){//
-							var i=0;
-							var j = jsonRet.datas.length;
-							for(;i<jsonRet.datas.length;){
-								if(isFirst){
-									containerVue.goodsList.unshift(jsonRet.datas[j]);
-								}else{
-									containerVue.goodsList.push(jsonRet.datas[i]);
-								}
-								i++;j--;
-							}
-							containerVue.param.pageSize = jsonRet.pageCond.pageSize;
-							containerVue.param.begin = jsonRet.pageCond.begin;
-						}else{
-							//alert(jsonRet.errmsg);
-							$("#nomoreData").show();
-						}
-						$("#loadingData").hide();
-					},
-					failure:function(){
-						$("#loadingData").hide();
-					},
-					dataType: 'json'
-				});			 
+var containerVue = new Vue({
+ el:'#container',
+ data:{
+	param:{
+		province:'${(receiverPosition.province)!''}',
+		city:'${(receiverPosition.city)!''}',
+		area:'${(receiverPosition.area)!''}',
+		town:'${(receiverPosition.town)!''}',
+		lat:'${(receiverPosition.lat)!''}',
+		lng:'${(receiverPosition.lng)!''}',
+		categoryId:'', 
+		keywords:'',
+		pageSize:20,
+		begin:0
+	},
+	goodsList:[] ,
+	goodsCnt:0,
+ },
+ methods:{
+	 getShortAddr(addr){
+		 if(addr.length>11){
+			 return addr.substring(0,8) + '...';
+		 }else{
+			 return addr;
 		 }
-	 }
- });
+	 },
+	 getAll: function(isRefresh,isFirst){
+		 if(!this.param.city || !this.param.lat ||!this.param.lng){
+			 alertMsg('系统提示',"因系统无法获取您的当前位置信息，该服务暂无法提供！");
+			 return;
+		 }
+		 $("#loadingData").show();
+		 $("#nomoreData").hide();
+		 if(containerVue.goodsList.length>100){
+		 	containerVue.goodsList = [];
+		 }
+		 if(isRefresh){ //清空数据
+			 containerVue.goodsCnt = 0;
+			 containerVue.goodsList = [];
+		 }
+		 if(containerVue.goodsList.lenght>=300){
+			 if(isFirst){//清除后一百条
+				 containerVue.goodsList.splice(200,100);
+			 }else{
+				 containerVue.goodsList.splice(0,100); 
+			 }
+		 }
+		 $.ajax({
+				url: '/nearby/getall',
+				method:'post',
+				data: this.param,
+				success: function(jsonRet,status,xhr){
+					if(jsonRet && jsonRet.errcode == 0){//
+						var i=0;
+						var j = jsonRet.datas.length;
+						for(;i<jsonRet.datas.length;){
+							if(isFirst){
+								containerVue.goodsList.unshift(jsonRet.datas[j]);
+							}else{
+								containerVue.goodsList.push(jsonRet.datas[i]);
+							}
+							i++;j--;
+						}
+						containerVue.param.pageSize = jsonRet.pageCond.pageSize;
+						containerVue.param.begin = jsonRet.pageCond.begin;
+					}else{
+						//alert(jsonRet.errmsg);
+						$("#nomoreData").show();
+					}
+					$("#loadingData").hide();
+				},
+				failure:function(){
+					$("#loadingData").hide();
+				},
+				dataType: 'json'
+			});			 
+	 },
+	 addCollection: function(collType,targetId){
+			$.ajax({
+				url: '/collection/add/'+collType + '/' + targetId,
+				method:'post',
+				data: {},
+				success: function(jsonRet,status,xhr){
+					if(jsonRet && jsonRet.errmsg){
+						if(jsonRet.errcode !==0){
+							alertMsg('错误提示',jsonRet.errmsg);
+						}
+					}else{
+						alertMsg('错误提示','系统失败！');
+					}
+				},
+				dataType: 'json'
+			});
+		}
+ 	}
+});
 
  //分类查询
  function getGoodsByCat(categoryId){

@@ -22,6 +22,7 @@ public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter{
     @SuppressWarnings("deprecation")
 	@Override
     public void addInterceptors(InterceptorRegistry registry) {
+    		registry.addInterceptor(new AllInterceptor()).addPathPatterns("/**");
         // addPathPatterns 用于添加拦截规则, 
         // excludePathPatterns 用户排除拦截
     		//registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/**");

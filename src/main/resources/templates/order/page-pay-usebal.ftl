@@ -122,7 +122,7 @@ var containerVue = new Vue({
 					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//创建支付成功
-							window.location.href = "/order/pay/finish/" + containerVue.param.orderId + '/success';
+							window.location.href = "/order/pay/finish/" + containerVue.param.orderId;
 						}else{//出现逻辑错误
 							alertMsg('错误提示',jsonRet.errmsg);
 						}

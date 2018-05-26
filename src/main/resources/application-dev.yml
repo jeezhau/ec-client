@@ -120,6 +120,11 @@ mfyx:
   order-balpay-submit-url: '/order/{userId}/balpay/submit/{orderId}'
   order-payflow-get-url: '/order/{userId}/payflow/{orderId}'
   
+  collection-getall-url: '/collection/{userId}/getall'
+  collection-getcnt-url: '/collection/{userId}/count'
+  collection-add-url: '/collection/{userId}/add'
+  collection-delete-url: '/collection/{userId}/delete'
+  
 ######系统参数############  
 sys:
   local-server-url: 'http://192.168.0.102:8000'

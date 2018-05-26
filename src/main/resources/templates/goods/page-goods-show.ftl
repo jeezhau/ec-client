@@ -181,7 +181,24 @@ var containerVue = new Vue({
 					},
 					dataType: 'json'
 				});			 
-		 }
+		 },
+		 addCollection: function(collType,targetId){
+			$.ajax({
+				url: '/collection/add/'+collType + '/' + targetId,
+				method:'post',
+				data: {},
+				success: function(jsonRet,status,xhr){
+					if(jsonRet && jsonRet.errmsg){
+						if(jsonRet.errcode !==0){
+							alertMsg('错误提示',jsonRet.errmsg);
+						}
+					}else{
+						alertMsg('错误提示','系统失败！');
+					}
+				},
+				dataType: 'json'
+			});
+		}
 	}
 });
 containerVue.getAllAppr();
@@ -196,18 +213,19 @@ containerVue.getAllAppr();
 	    </span>
 	    <p class="weui-tabbar__label">商城首页</p>
 	</a>
-    <a href="#" class="weui-tabbar__item " >
+    <a href="/partner/mcht/${(goods.partnerId)?string('#')}" class="weui-tabbar__item " >
+	    <span style="display: inline-block;position: relative;">
+	        <img src="/icons/商家.png" alt="" class="weui-tabbar__icon">
+	    </span>
+	    <p class="weui-tabbar__label">逛商家</p>
+    </a> 	
+    <a href="javascript:;" onclick="containerVue.addCollection('2','${(goods.goodsId)?string('#')}')" class="weui-tabbar__item " >
 	    <span style="display: inline-block;position: relative;">
 	        <img src="/icons/收藏.png" alt="" class="weui-tabbar__icon">
 	    </span>
 	    <p class="weui-tabbar__label">加入收藏</p>
      </a>
-     <a href="/partner/mcht/${(goods.partnerId)?string('#')}" class="weui-tabbar__item " >
-	    <span style="display: inline-block;position: relative;">
-	        <img src="/icons/商家.png" alt="" class="weui-tabbar__icon">
-	    </span>
-	    <p class="weui-tabbar__label">逛商家</p>
-     </a>    
+   
      <a href="/order/place/${(goods.goodsId)?string('#')}" class="weui-tabbar__item " style="background-color:red;text-align:center;">
         <p><p class="weui-tabbar__label" style="font-size:20px;color:white;vertical-align:center;">立即下单</p>
      </a>     	

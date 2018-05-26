@@ -104,10 +104,10 @@
            </a>
          </li>
          <li style="background-color:white" >
-           <a href="#">
+           <a href="/collection/manage">
              <span class="pull-right" >查看 &gt; </span>
              <img alt="" src="/icons/收藏.png" width="20px" height="20px"> 我的收藏
-             <span class="badge " style="color:red">8 </span>
+             <span class="badge " style="color:red">${collCnt!''}</span>
            </a>
          </li>
          <li style="background-color:white" >
@@ -205,10 +205,11 @@
 	       </div>
 	    </div>
       </div>
-    </div>    
-	<#if vipBasic.status != '1'>
+      	<#if vipBasic.status != '1'>
   			<p style="margin:5px 5px;font-size:18px;color:red">您尚未激活会员账户，所有会员功能将不可用！激活方式见：个人心中／我-基本／我要推广！</p>
   	</#if>
+    </div>    
+
 </div> <!-- end of container -->
 <script>
 var containerVue = new Vue({
@@ -233,7 +234,7 @@ var containerVue = new Vue({
 							}
 						}
 					}else{
-						alertMsg('错误提示','获取城市数据(地级市)失败！')
+						alertMsg('错误提示','系统失败！');
 					}
 				},
 				dataType: 'json'

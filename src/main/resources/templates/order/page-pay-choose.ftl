@@ -148,6 +148,26 @@ var containerVue = new Vue({
 							else if(jsonRet.payType == '2'){//微信支付
 								if (jsonRet.outPayUrl){
 									window.location.href = jsonRet.outPayUrl;
+								<#if (wxPay!'')=='1'>
+								}else if(jsonRet.prepay_id){
+									WeixinJSBridge.invoke(
+								       'getBrandWCPayRequest', {
+								           "appId":jsonRet.appId,     //公众号名称，由商户传入     
+								           "timeStamp":jsonRet.timeStamp,         //时间戳，自1970年以来的秒数     
+								           "nonceStr":jsonRet.nonceStr, //随机串     
+								           "package":"prepay_id=" + jsonRet.prepay_id,     
+								           "signType":"MD5",         //微信签名方式：     
+								           "paySign":jsonRet.paySign //微信签名
+										},
+										function(res){     
+											if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+												 window.location.href = "/order/pay/finish/" + containerVue.param.orderId;
+											}else{
+												alertMsg('系统提示','使用微信支付出现失败！'+ res.err_msg);		        	   
+											}
+										}
+									); 
+								</#if>
 								}else{
 									alertMsg('错误提示','调用微信支付失败！');
 								}
@@ -167,6 +187,7 @@ var containerVue = new Vue({
 		}
 	}
 });
+
 </script>
 </#if>
 

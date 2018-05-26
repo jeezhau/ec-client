@@ -34,6 +34,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
+import com.mofangyouxuan.service.CollectionService;
 import com.mofangyouxuan.service.UserService;
 import com.mofangyouxuan.service.VipService;
 import com.mofangyouxuan.wx.utils.SignUtils;
@@ -81,6 +82,10 @@ public class UserAction {
 		VipBasic vipBasic = VipService.getVipBasic(user.getUserId());
 		if(vipBasic != null) {
 			map.put("vipBasic", vipBasic);
+		}
+		JSONObject jsonCnt = CollectionService.getCnt(user.getUserId());
+		if(jsonCnt != null && jsonCnt.containsKey("cnt") && jsonCnt.getIntValue("cnt")>0) {
+			map.put("collCnt", jsonCnt.getIntValue("cnt"));
 		}
 		map.put("mode", mode);
 		map.put("sys_func", "user");
