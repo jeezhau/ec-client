@@ -61,69 +61,14 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 		if(vipBasic != null && vipBasic.getVipId() != null) {
 			return true;
 		}
-		String code = request.getParameter("code");
-		String state = request.getParameter("state"); 
-		if(code != null && code.length()>0 && state != null && WebAuth.STATE.equals(state)) {//从微信访问
-			JSONObject auth = this.accessFromWX(code);
-			if(auth == null) {
-				response.sendRedirect("/error/fromwx");
-				return false;
-			}
-			String openId = null; //微信公众号OPENID、UNIONDID
-			openId = auth.getString("openid");
-			session.setAttribute("webAuth", auth);
-			session.setAttribute("openId", openId);
-			userBasic = UserService.getUserBasic(openId);
-			if(userBasic == null) {
-				response.sendRedirect("/error/nouser");
-				return false;
-			}
-			session.setAttribute("userBasic", userBasic);
-			
-			if(vipBasic == null || vipBasic.getVipId() == null) {
-				vipBasic = VipService.getVipBasic(userBasic.getUserId());
-				session.setAttribute("vipBasic", vipBasic);
-			}
-		}else { //使用其他方式访问
-			if(userBasic == null || userBasic.getUserId() == null) {
-				session.setAttribute("fromUrl", uri);
-				response.sendRedirect("/login");
-				return false;
-			}
+		if(userBasic == null || userBasic.getUserId() == null) {
+			session.setAttribute("fromUrl", uri);
+			response.sendRedirect("/login");
+			return false;
 		}
-		
 		//保存访问日志
 		
         return true; 
 	}
 	
-	private JSONObject accessFromWX(String code) {
-		//获取授权信息
-		JSONObject auth = WebAuth.getAccessToken(code, true, null);
-		if(auth == null) {
-			//response.sendRedirect("/error/fromwx");
-			return null;
-		}
-		String openId = auth.getString("openid");
-		//检查用户是否已经存在
-		UserBasic userBasic = UserService.getUserBasic(openId);
-		if(userBasic == null) {//发起注册
-			userBasic = WebAuth.getUserInfo(auth);
-			if(userBasic != null) {
-				JSONObject ret = UserService.createUserBasic(userBasic);
-				if(ret != null && ret.containsKey("errcode") && ret.getIntValue("errcode") ==0) {
-					//用户信息注册成功
-					;
-				}else {//用户注册失败
-					//response.sendRedirect("/error/fromwx");
-					return null;
-				}
-			}else {//从微信获取用户失败
-				//response.sendRedirect("/error/fromwx");
-				return null;
-			}
-		}
-		return auth;
-	}
-		
 }

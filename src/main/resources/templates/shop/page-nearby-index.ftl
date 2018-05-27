@@ -61,9 +61,9 @@
 	      	<span class="pull-left ">售价: <span>{{goods.priceLowest}}</span>元</span>
 	      	<span class="pull-right ">销量: <span>{{goods.saledCnt}}</span>件</span>
 	      </div>
-	      <div style="margin:1px 0px 2px 0;padding:0 5px 3px 5px;background-color:white;text-align:center" >
-	        <a class="btn btn-danger " style="padding:3px 12px" :href="'/order/place/'+ goods.goodsId"><span style="color:white">立即下单</span></a>
-	        <a class="btn btn-primary" style="padding:3px 12px" href="javascript:;" @click="addCollection('2',goods.goodsId)"><span style="color:white">加入收藏</span></a>
+	      <div class="row" style="margin:1px 0px 2px 0;padding:0 5px 3px 5px;background-color:white;text-align:center" >
+	        <a class="btn btn-danger " style="padding:3px 5px" :href="'/order/place/'+ goods.goodsId"><span style="color:white">立即下单</span></a>
+	        <a class="btn btn-primary" style="padding:3px 5px" href="javascript:;" @click="addCollection('2',goods.goodsId)"><span style="color:white">加入收藏</span></a>
 	      </div>
 	    </div>
     </div>

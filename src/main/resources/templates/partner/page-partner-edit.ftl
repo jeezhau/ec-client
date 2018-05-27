@@ -25,7 +25,12 @@
     
     <link href="/css/mfyx.css" rel="stylesheet">
     <script src="/script/common.js" type="text/javascript"></script>
-	<script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.6&key=2b12c05334ea645bd934b55c8e46f6ea"></script> 
+    <script src="http://cache.amap.com/lbs/static/es5.min.js"></script>
+	<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.6&key=2b12c05334ea645bd934b55c8e46f6ea"></script>
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
+    <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main.css"/>
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
@@ -46,13 +51,18 @@
     <h5 style="text-align:center">合作伙伴基本信息编辑</h5>
     <h6>
       &nbsp;&nbsp;&nbsp;&nbsp;所有的照片一旦上传，只可使用新照片再次上传替换删除，不可直接删除；页面删除操作只在本地进行，不会删除服务器上的照片数据！<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;系统需要获取经营地的经纬度信息，因此请您务必在经营地执行编辑提交操作，并同意我们获取您的当前位置，否则可能无法提交或审核不通过！
+      &nbsp;&nbsp;&nbsp;&nbsp;系统需要获取经营地的经纬度信息，因此请您务必<span style="color:red">在地图中获取位置</span>并提交操作，并同意我们获取您的当前位置，否则可能无法提交或审核不通过！
     </h6>
 	<form class="form-horizontal" method ="post" autocomplete="on" enctype="multipart/form-data" role="form" >
+	  <div class="form-group">
+	    <div class="col-xs-12" style="padding:0 30px;text-align:right">
+	      <a href="javascript:;" @click="showMap"><img alt="" src="/icons/收货地址.png" width=30px height=30px></a>
+	    </div>
+	  </div>
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">经营地-省份<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
-          <select class="form-control" v-model="param.province" v-on:change="changeProvince">
+        <div class="col-xs-8" style="padding-left:1px" >
+          <select class="form-control" v-model="param.province" v-on:change="changeProvince" v-bind:disabled="!param.canUpdAdd">
             <option v-for="item in metadata.provinces" v-bind:value="item.provName">{{item.provName}}</option>
           </select>
         </div>
@@ -60,7 +70,7 @@
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">经营地-城市<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <select class="form-control"  v-model="param.city" v-on:change="changeCity">
+          <select class="form-control"  v-model="param.city" v-on:change="changeCity" v-bind:disabled="!param.canUpdAdd">
             <option v-for="item in metadata.cities" v-bind:value="item.cityName">{{item.cityName}}</option>
           </select>
         </div>
@@ -68,7 +78,7 @@
        <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">经营地-县<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <select class="form-control"  v-model="param.area" >
+          <select class="form-control"  v-model="param.area" v-bind:disabled="!param.canUpdAdd">
             <option v-for="item in metadata.areas" v-bind:value="item.areaName">{{item.areaName}}</option>
           </select>
         </div>
@@ -76,7 +86,7 @@
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">详细地经营地址<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <input type="text" class="form-control" v-model="param.addr" maxLength=200 placeholder="请输入详细经营地址，不含省市县" >
+          <input type="text" class="form-control" v-model="param.addr" maxLength=200 v-bind:disabled="!param.canUpdAdd" placeholder="请输入详细经营地址，不含省市县" >
         </div>
       </div>
       <div class="form-group">
@@ -144,12 +154,12 @@
 	  <div class="form-group">
 	    <label class="col-xs-12 control-label">法人身份证照片<span style="color:red" >*</span></label>
 	      <div class="col-xs-12">
+	        <h6 >头像正面</h6>
 	        <input class="form-control" id="certFile_1"  height="100px" width="100%" type="file" name="image" type="file" accept="image/jpg" class="file-loading">
-	        <h4 style="text-align:center">头像正面</h4>
 	      </div>
 	      <div class="col-xs-12">
+	        <h6 >国徽反面</h6>
 	        <input class="form-control" id="certFile_2"  type="file" name="image" type="file" accept="image/jpg" class="file-loading">
-	         <h4 style="text-align:center">国徽反面</h4>
 	      </div>
 	  </div>
 	  <div class="form-group">
@@ -221,7 +231,8 @@ var partnerContainerVue = new Vue({
 			phone:'${(partnerBasic.phone)!''}',
 			introduce:'${(partnerBasic.introduce)!''}',
 			locationX:'${(partnerBasic.locationX)!''}',
-			locationY:'${(partnerBasic.locationY)!''}'
+			locationY:'${(partnerBasic.locationY)!''}',
+			canUpdAdd:false
 		}
 	},
 	methods:{
@@ -272,9 +283,19 @@ var partnerContainerVue = new Vue({
 			partnerContainerVue.metadata.areas = [];
 			getAreas();
 		},
-		getLocation:function(locX,locY){
+		showMap: function(){
+			$('#showAddrMap').show();
+			//$('#showAddrMap').css("z-index",0);
+		},
+		getLocation:function(province,city,area,street,locX,locY){
+			this.param.province = province;
+			this.param.city = city;
+			this.param.area = area;
+			this.param.addr = street;
 			this.param.locationX = locX;
 			this.param.locationY = locY;
+			getCities();
+			this.param.canUpdAdd = true;
 		},
 		submit: function(){
 			$("#dealingData").show();
@@ -392,9 +413,11 @@ $(document).on('ready', function() {
         previewSettings: {
             image: {width: "100px", height: "100px"},
         },
+        <#if (partnerBasic.busiName)??>
         initialPreview: [ //预览图片的设置
             '<img src="/partner/cert/show/logo/${(partnerBasic.partnerId)!''}" alt="LOGO照片" class="file-preview-image" style="width:96px">'
         ]
+        </#if>
     });
     //异步上传错误结果处理
     $('#logoImg').on('fileerror', function(event, data, msg) {
@@ -441,9 +464,11 @@ $(document).on('ready', function() {
         previewSettings: {
             image: {width: "100px", height: "100px"},
         },
+        <#if (partnerBasic.busiName)??>
         initialPreview: [ //预览图片的设置
             '<img src="/partner/cert/show/idcard1/${(partnerBasic.partnerId)!''}" alt="法人身份证正面" class="file-preview-image" style="width:96px">'
         ]
+        </#if>
     });
     //异步上传错误结果处理
     $('#certFile_1').on('fileerror', function(event, data, msg) {
@@ -490,9 +515,11 @@ $(document).on('ready', function() {
         previewSettings: {
             image: {width: "100px", height: "100px"},
         },
+        <#if (partnerBasic.busiName)??>
         initialPreview: [ //预览图片的设置
             '<img src="/partner/cert/show/idcard2/${(partnerBasic.partnerId)!''}" alt="法人身份证反面" class="file-preview-image" style="width:100px;height:100px">'
         ]
+        </#if>
     });
     //异步上传错误结果处理
     $('#certFile_2').on('fileerror', function(event, data, msg) {
@@ -539,9 +566,11 @@ $(document).on('ready', function() {
         previewSettings: {
             image: {width: "100px", height: "100px"},
         },
+        <#if (partnerBasic.busiName)??>
         initialPreview: [ //预览图片的设置
             '<img src="/partner/cert/show/licence/${(partnerBasic.partnerId)!''}" alt="营业执照照片" class="file-preview-image" style="width:96px">'
         ]
+        </#if>
     });
     //异步上传错误结果处理
     $('#licenceImg').on('fileerror', function(event, data, msg) {
@@ -566,9 +595,76 @@ $(document).on('ready', function() {
      
 });
 </script>
-
+   <div id="showAddrMap" style="position:fixed;left:0;top:0;right:0;bottom:0;margin:0;width:100%;display:none;z-index:1000;background:rgba(0,0,0,0.2);display:none;">
+		<div id="mapContainer" style="top:10px;width:100%;height:500px;"></div>
+		<div id="myPageTop" style="left:10px">
+		    <table style="text-align:right">
+		        <tr>
+		            <td class="column2"><label><a onclick="$('#showAddrMap').hide();">关闭</a></label></td>
+		        </tr>
+		        <tr>
+		            <td class="column2"><input type="text" id="keyword" name="keyword" value="请输入关键字：(选定后搜索)" style="width:90%" onfocus='this.value=""'/></td> 
+		        </tr>
+		        <tr>
+		            <td class="column2">
+		              <label>选取位置点击并关闭:</label>
+		              <input type="text" readonly id="lnglat">
+		            </td>
+		        </tr>		        
+		    </table>
+		</div>
+		<script type="text/javascript">
+		var windowsArr = [];
+	    var marker = [];
+		    var map = new AMap.Map("mapContainer", {
+		        resizeEnable: true,
+		        zoom: 13,
+		    });
+		    AMap.plugin('AMap.Geocoder',function(){
+		        var geocoder = new AMap.Geocoder({
+		            city: "010"//城市，默认：“全国”
+		        });
+		        var marker = new AMap.Marker({
+		            map:map,
+		            bubble:true
+		        })
+		        map.on('click',function(e){
+		            marker.setPosition(e.lnglat);
+		            document.getElementById("lnglat").value = e.lnglat.getLng() + ',' + e.lnglat.getLat();
+		            geocoder.getAddress(e.lnglat,function(status,result){
+		              if(status=='complete'){
+		                var addr = result.regeocode;
+		                partnerContainerVue.getLocation(addr.addressComponent.province,addr.addressComponent.city,
+		                		addr.addressComponent.district,addr.addressComponent.street,e.lnglat.getLng(),e.lnglat.getLat());
+		                $('#showAddrMap').hide();
+		              }else{
+		                 alertMsg('系统提示','无法获取地址');
+		              }
+		            });
+		        })
+		    });
+		     AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],function(){
+		        var autoOptions = {
+		          city: "昆明", //城市，默认全国
+		          input: "keyword",//使用联想输入的input的id
+		          
+		        };
+		        autocomplete= new AMap.Autocomplete(autoOptions);
+		        var placeSearch = new AMap.PlaceSearch({
+		              city:'昆明',
+		              map:map
+		        });
+		        AMap.event.addListener(autocomplete, "select", function(e){
+		           //TODO 针对选中的poi实现自己的功能
+		           placeSearch.setCity(e.poi.adcode);
+		           placeSearch.search(e.poi.name)
+		        });
+		      }); 
+		   
+		</script>
+</div>
+<!-- 
 <script>
-
 var mapObj = new AMap.Map('iCenter');
 mapObj.plugin('AMap.Geolocation', function () {
     geolocation = new AMap.Geolocation({
@@ -592,13 +688,13 @@ mapObj.plugin('AMap.Geolocation', function () {
     			containerVue.param.lat = result.position.lat;
     			containerVue.param.lng = result.position.lng; */
     			//系统业务调用
-    			partnerContainerVue.getLocation(result.position.lng,result.position.lat);
+    			partnerContainerVue.getLocation(result.addressComponent.city,result.addressComponent.district,result.position.lng,result.position.lat);
 		}
     });
     //AMap.event.addListener(geolocation, 'complete', onComplete);//返回定位信息
    //AMap.event.addListener(geolocation, 'error', onError);      //返回定位出错信息
 });
-</script>
+</script> -->
 
 <#if errmsg??>
  <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
