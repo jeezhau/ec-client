@@ -45,7 +45,7 @@ public class OrderAction {
 	
 	private String[] statusArr = new String[]{"all","4pay","4delivery","4sign","4appraise","refund","exchange"};
 	@Value("${sys.local-server-url}")
-	private String localServier;
+	private String localServerName;
 	
 	/**
 	 * 选中商品开始下单
@@ -123,7 +123,7 @@ public class OrderAction {
 			JSONObject jsonRet = OrderService.createOrder(order, user.getUserId());
 			if(jsonRet != null && jsonRet.containsKey("orderId")){
 				String orderId = jsonRet.getString("orderId");
-				return "redirect:/order/pay/choose/" + orderId; //跳转到支付页面
+				return "redirect:" + this.localServerName + "/order/pay/choose/" + orderId; //跳转到支付页面
 			}else if(!jsonRet.containsKey("errcode")){
 				map.put("errmsg", "订单生成失败，出现系统错误！");
 			}else {
@@ -789,7 +789,7 @@ public class OrderAction {
 			}else if(jsonRet.containsKey("outPayUrl")) {
 				if(2 == payType) { //微信H5支付
 					String outPayUrl = jsonRet.getString("outPayUrl");
-					String redirectUrl = this.localServier + "/order/pay/finish/" + orderId;
+					String redirectUrl = this.localServerName + "/order/pay/finish/" + orderId;
 					redirectUrl = URLEncoder.encode(redirectUrl, "utf8");
 					outPayUrl = outPayUrl + "&redirect_url=" + redirectUrl;
 					jsonRet.put(outPayUrl, outPayUrl);

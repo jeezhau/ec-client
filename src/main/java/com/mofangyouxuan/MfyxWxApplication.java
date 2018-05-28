@@ -8,5 +8,6 @@ public class MfyxWxApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(MfyxWxApplication.class, args);
+		
 	}
 }

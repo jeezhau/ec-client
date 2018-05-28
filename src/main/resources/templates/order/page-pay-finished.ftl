@@ -15,7 +15,7 @@
     <link href="/css/font-awesome.min.css" rel="stylesheet">
     <link href="/css/templatemo-style.css" rel="stylesheet">
     
-    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     
     <link href="/css/weui.css" rel="stylesheet">
     
@@ -29,7 +29,7 @@
 <div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
  <#if payRetCode?? >
  <!-- 支付结果信息 -->
-  <div class="row" style="margin:5px 1px ;padding:3px 0;height:80px;background-color:#6699FF;" >
+  <div class="row" style="margin:5px 1px ;padding:3px 0;min-height:80px;background-color:#6699FF;" >
     <div class="col-xs-12" style="text-align:center;vertical-align:center;font-size:20px;font-weight:bold;padding-top:20px">
      <#if (payRetCode >= 0) > <img alt="" src="/icons/支付成功.png" width=30px height=30px > </#if>
      <span style="padding:5px">${payRetMsg}</span>

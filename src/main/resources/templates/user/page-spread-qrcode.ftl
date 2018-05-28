@@ -15,7 +15,7 @@
     <link href="/css/font-awesome.min.css" rel="stylesheet">
     <link href="/css/templatemo-style.css" rel="stylesheet">
     
-    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     
     <link href="/css/weui.css" rel="stylesheet">
     
@@ -59,8 +59,8 @@
    	<h5>2、参与方法：</h5>
    	&nbsp;&nbsp;&nbsp;&nbsp;仅需将摩放优选介绍个其他人，然后让TA扫一扫您的推广二维码后关注摩放优选公众号即可；一定要是您的二维码，每个人的推广二维码不同！！！<br>
     <h5>3、奖励措施：</h5>
-    &nbsp;&nbsp;&nbsp;&nbsp;1）您每推广一个用户即可获得10个积分，现金消费10元获得一个积分，当积分数量达到100时，系统自动激活会员账户；<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;2）您所推广的用户一旦有了现金消费交易，您将会获得特定比例的分润，目前为消费金额的千分之三，分润金额进入会员可用余额；<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;1）您每推广一个用户即可获得${(sysparam_spread_per_user_score)!'20'}个积分，现金消费1元获得${(sysparam_trade_score_one_yuan)!'1'}个积分，当积分数量达到${(sysparam_vip_activate_need_score)!'1000'}时，系统自动激活会员账户；<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;2）您所推广的用户一旦有了现金消费交易，您将会获得特定比例的分润，分润金额进入会员可用余额；<br>
     &nbsp;&nbsp;&nbsp;&nbsp;3）会员可用余额可用于消费也可提现到您的微信钱包，积分可用于指定商品兑换；<br>
    </div>
   </div>

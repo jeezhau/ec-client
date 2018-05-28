@@ -8,12 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import com.alibaba.fastjson.JSONObject;
+import com.mofangyouxuan.common.SysParam;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
-import com.mofangyouxuan.service.UserService;
-import com.mofangyouxuan.service.VipService;
-import com.mofangyouxuan.wx.api.WebAuth;
 
 
 
@@ -33,7 +30,7 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		
+		String serverName = SysParam.localServerName;
 		//String contextPath = request.getContextPath();  
 		HttpSession session = request.getSession();
 		String uri = request.getRequestURI();
@@ -63,7 +60,7 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 		}
 		if(userBasic == null || userBasic.getUserId() == null) {
 			session.setAttribute("fromUrl", uri);
-			response.sendRedirect("/login");
+			response.sendRedirect(serverName + "/login");
 			return false;
 		}
 		//保存访问日志

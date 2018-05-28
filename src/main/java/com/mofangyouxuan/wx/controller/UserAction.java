@@ -32,12 +32,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
+import com.mofangyouxuan.common.SysParam;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.CollectionService;
 import com.mofangyouxuan.service.UserService;
 import com.mofangyouxuan.service.VipService;
-import com.mofangyouxuan.wx.utils.SignUtils;
 
 /**
  * 个人中心管理
@@ -193,7 +193,13 @@ public class UserAction {
 		}else {
 			map.put("errmsg", ret.getString("errmsg"));
 		}
+		map.put("sysparam_spread_user_profit_ratio", SysParam.getSysParam("spread_user_profit_ratio"));
+		map.put("sysparam_spread_per_user_score", SysParam.getSysParam("spread_per_user_score"));
+		map.put("sysparam_vip_activate_need_score", SysParam.getSysParam("vip_activate_need_score"));
+		map.put("sysparam_trade_score_one_yuan", SysParam.getSysParam("trade_score_one_yuan"));
+		
 		return "user/page-spread-qrcode";
+		
 	}
 	
 	

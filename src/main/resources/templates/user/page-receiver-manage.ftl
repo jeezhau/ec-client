@@ -15,10 +15,14 @@
     <link href="/css/font-awesome.min.css" rel="stylesheet">
     <link href="/css/templatemo-style.css" rel="stylesheet">
     
-    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-    
+    <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <link href="/css/weui.css" rel="stylesheet">
     
+    	<link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css"/>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.6&key=2b12c05334ea645bd934b55c8e46f6ea"></script>
+    <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
+    <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main.css"/>
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">

@@ -119,6 +119,8 @@ var receiverManageVue = new Vue({
 			editReceiverVue.param.receiver = receiver ? receiver.receiver : '';
 			editReceiverVue.param.phone = receiver ? receiver.phone : '';
 			editReceiverVue.param.isDefault = receiver ? receiver.isDefault : '1';
+			editReceiverVue.param.locationX = receiver ? receiver.locationX : '';
+			editReceiverVue.param.locationY = receiver ? receiver.locationY : '';
 			getCities();
 		}
 	}
@@ -155,22 +157,27 @@ receiverManageVue.getAll();
 		      <div class="col-xs-12" style="padding:1px 18px ">	  
 				  <div class="form-group">
 			          <div class="col-xs-12" style="padding:1px 1px">
-			            <div class="col-xs-3" style="padding:0 1px">
+			            <div class="col-xs-2" style="padding:0 1px">
+				          <a href="javascript:;" @click="showMap"><img alt="" src="/icons/收货地址.png" width=30px height=30px></a>
+			            </div>
+			            <div class="col-xs-9" style="padding:0 1px">
 				          <select class="form-control" v-model="param.province" v-on:change="changeProvince">
 				            <option v-for="item in metadata.provinces" v-bind:value="item.provName">{{item.provName}}</option>
 				          </select>
 			            </div>
-			            <div class="col-xs-4" style="padding:0 1px">
+			          </div>
+			          <div class="col-xs-12" style="padding:1px 1px">
+			            <div class="col-xs-5" style="padding:0 1px">
 			              <select class="form-control"  v-model="param.city" v-on:change="changeCity">
                             <option v-for="item in metadata.cities" v-bind:value="item.cityName">{{item.cityName}}</option>
                           </select>
 			            </div>
-			            <div class="col-xs-5" style="padding:0 1px">
-			              <select class="form-control"  v-model="param.area" >
+			            <div class="col-xs-7" style="padding:0 1px">
+			              <select class="form-control"  v-model="param.area" v-on:change="changeArea">
             				   <option v-for="item in metadata.areas" v-bind:value="item.areaName">{{item.areaName}}</option>
                           </select>
 			            </div>
-			          </div>
+			          </div>			          
 			          <div class="col-xs-12" style="padding:1px 1px">
 			            <input class="form-control" type="text" v-model="param.addr"  required placeholder="街道详细地址" >
 			          </div>          
@@ -213,7 +220,9 @@ var editReceiverVue = new Vue({
 			addr:'',
 			receiver:'',
 			phone:'',
-			isDefault:''
+			isDefault:'',
+			locationX:'',
+			locationY:''
 		}
 	},
 	methods:{
@@ -238,21 +247,40 @@ var editReceiverVue = new Vue({
 				dataType: 'json'
 			});
 		},
+		showMap: function(){
+			$('#showAddrMap').show();
+			$('#editReceiverModal').modal('hide');
+		},
+		getLocation:function(province,city,area,addr,locX,locY){
+			this.param.province = province;
+			this.param.city = city;
+			this.param.area = area;
+			this.param.addr = addr.replace(province,'').replace(city,'').replace(area,'');
+			this.param.locationX = locX;
+			this.param.locationY = locY;
+			getCities();
+			this.param.canUpdAdd = true;
+		},
 		changeProvince: function(){
-			editReceiverVue.param.city = '';
-			editReceiverVue.param.area = '';
-			editReceiverVue.metadata.cities = [];
-			editReceiverVue.metadata.areas = [];
+			this.param.city = '';
+			this.param.area = '';
+			this.metadata.cities = [];
+			this.metadata.areas = [];
 			getCities();
 		},
 		changeCity: function(){
-			editReceiverVue.param.area = '';
-			editReceiverVue.metadata.areas = [];
+			this.param.area = '';
+			this.metadata.areas = [];
 			getAreas();
+		},
+		changeArea: function(){
+			this.param.addr = '';
+			this.param.locationX = '';
+			this.param.locationY = '';
 		},
 		submit:function(){
 			if(!this.param.area || !this.param.addr || !this.param.phone || !this.param.receiver){
-				alertMsg('错误提示',"数据有误，所有项都需正确填写！");
+				alert("数据有误，所有项都需正确填写！");
 				return;
 			}
 			$.ajax({
@@ -260,15 +288,15 @@ var editReceiverVue = new Vue({
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
-					if(jsonRet){
+					if(jsonRet && jsonRet.errmsg){
 						if(0 == jsonRet.errcode){
 							receiverManageVue.getAll();
 							$('#editReceiverModal').modal('hide');
 						}else{//出现逻辑错误
-							alertMsg('错误提示',jsonRet.errmsg);
+							alert(jsonRet.errmsg);
 						}
 					}else{
-						alertMsg('错误提示','系统数据访问失败！')
+						alert('系统数据访问失败！');
 					}
 				},
 				dataType: 'json'
@@ -335,4 +363,69 @@ function getAreas(){
 	});
 }
 </script>
+   <div id="showAddrMap" style="position:fixed;left:0;top:0;right:0;bottom:0;margin:0;width:100%;display:none;z-index:1000;background:rgba(0,0,0,0.2);display:none;">
+		<div id="mapContainer" style="top:10px;width:100%;height:500px;"></div>
+		<div id="myPageTop" style="left:10px">
+		    <table style="width:100%;text-align:right">
+		        <tr style="width:100%">
+		            <td class="column1"><label><a onclick="$('#showAddrMap').hide();$('#editReceiverModal').modal('show');">关闭</a></label></td>
+		        </tr>
+		        <tr>
+		            <td class="column1"><input type="text" style="width:90%" readonly id="lnglat" placeholder="点击地图选择地点"></td>
+		        </tr>		        
+		        <tr>
+		            <td class="column1"><input type="text" id="keyword" name="keyword" value="请输入关键字：(选定后搜索)" style="width:90%" onfocus='this.value=""'/></td> 
+		        </tr>
+		        
+		    </table>
+		</div>
+		<script type="text/javascript">
+		var windowsArr = [];
+	    var marker = [];
+		    var map = new AMap.Map("mapContainer", {
+		        resizeEnable: true,
+		        zoom: 13,
+		    });
+		    AMap.plugin('AMap.Geocoder',function(){
+		        var geocoder = new AMap.Geocoder({
+		            city: "010"//城市，默认：“全国”
+		        });
+		        var marker = new AMap.Marker({
+		            map:map,
+		            bubble:true
+		        })
+		        map.on('click',function(e){
+		            marker.setPosition(e.lnglat);
+		            geocoder.getAddress(e.lnglat,function(status,result){
+		              if(status=='complete'){
+		                var addr = result.regeocode;
+		                editReceiverVue.getLocation(addr.addressComponent.province,addr.addressComponent.city,
+		                		addr.addressComponent.district,addr.formattedAddress,e.lnglat.getLng(),e.lnglat.getLat());
+		                document.getElementById("lnglat").value = addr.formattedAddress;
+		              }else{
+		                 alertMsg('系统提示','无法获取地址');
+		              }
+		            });
+		        })
+		    });
+		     AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],function(){
+		        var autoOptions = {
+		          city: "昆明", //城市，默认全国
+		          input: "keyword",//使用联想输入的input的id
+		          
+		        };
+		        autocomplete= new AMap.Autocomplete(autoOptions);
+		        var placeSearch = new AMap.PlaceSearch({
+		              city:'昆明',
+		              map:map
+		        });
+		        AMap.event.addListener(autocomplete, "select", function(e){
+		           //TODO 针对选中的poi实现自己的功能
+		           placeSearch.setCity(e.poi.adcode);
+		           placeSearch.search(e.poi.name)
+		        });
+		      }); 
+		   
+		</script>
+</div>
 

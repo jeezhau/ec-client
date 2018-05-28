@@ -14,13 +14,14 @@
       <p class="weui-tabbar__label">每日鲜推</p>
     </a>	 -->
 	<a href="/nearby/index" class="weui-tabbar__item <#if sys_func=='nearby'>weui-bar__item_on </#if>" >
-	    <img src="/icons/附近商家.png" alt="" class="weui-tabbar__icon">
+	    <span style="display: inline-block;position: relative;">
+	        <img src="/icons/附近商家.png" alt="" class="weui-tabbar__icon">
+	    </span>
 	    <p class="weui-tabbar__label">优选同城</p>
 	</a>
 	<a href="/srvcenter/index/about" class="weui-tabbar__item <#if sys_func=='srvcenter'>weui-bar__item_on </#if>" >
 	    <span style="display: inline-block;position: relative;">
 	        <img src="/icons/服务.png" alt="" class="weui-tabbar__icon">
-	        <span class="weui-badge weui-badge_dot" style="position: absolute;top: 0;right: -6px;"></span>
 	    </span>
 	    <p class="weui-tabbar__label">服务中心</p>
 	</a>

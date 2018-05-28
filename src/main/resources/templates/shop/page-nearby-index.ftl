@@ -15,13 +15,15 @@
     <link href="/css/font-awesome.min.css" rel="stylesheet">
     <link href="/css/templatemo-style.css" rel="stylesheet">
     
-    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     
     <link href="/css/weui.css" rel="stylesheet">
     
     <link href="/css/mfyx.css" rel="stylesheet">
     
-    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.6&key=2b12c05334ea645bd934b55c8e46f6ea"></script> 
+    <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css"/>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.6&key=2b12c05334ea645bd934b55c8e46f6ea"></script>
+    <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main.css"/>
 </head>
 <body class="light-gray-bg" >
 
@@ -33,7 +35,8 @@
     <#include "/menu/page-category-menu.ftl" encoding="utf8"> 
   </header>
   <div class="col-xs-12">
-   <span>您的当前位置：{{param.province}}{{param.city}}{{param.area}}{{param.town}}</span>
+   <span>您的当前收货位置：{{param.province}}{{param.city}}{{param.area}}{{param.town}}</span>
+   <a href="javascript:;" @click="showMap"><img alt="" src="/icons/收货地址.png" width=20px height=20px></a>
   </div>
   <div class="row" style="margin:0 0;">
     <div v-for="goods in goodsList" class="col-xs-6 col-sm-4 col-md-4 col-lg-3" style="padding:3px 2px;">
@@ -148,6 +151,18 @@ var containerVue = new Vue({
 				dataType: 'json'
 			});			 
 	 },
+	 showMap: function(){
+			$('#showAddrMap').show();
+	},
+	 getLocation: function(province,city,area,town,lng,lat){
+			this.param.province = province;
+			this.param.city = city;
+			this.param.area = area;
+			this.param.town = town;
+			this.param.lng = lng;
+			this.param.lat = lat;
+			this.param.canUpdAdd = true;
+	},
 	 addCollection: function(collType,targetId){
 			$.ajax({
 				url: '/collection/add/'+collType + '/' + targetId,
@@ -231,24 +246,84 @@ mapObj.plugin('AMap.Geolocation', function () {
     mapObj.addControl(geolocation);
     geolocation.getCurrentPosition(function(status,result){
     		if(status == 'complete'){
-    			containerVue.param.province = result.addressComponent.province;
-    			containerVue.param.city = result.addressComponent.city;
-    			containerVue.param.area = result.addressComponent.district;
-    			containerVue.param.town = result.addressComponent.township;
-    			containerVue.param.lat = result.position.lat;
-    			containerVue.param.lng = result.position.lng;
+    			containerVue.getLocation(result.addressComponent.province,result.addressComponent.city,result.addressComponent.district,
+    			result.addressComponent.township,result.position.lng,result.position.lat);
     			//系统业务调用
     			containerVue.getAll(true,false);
 		}
     });
-    //AMap.event.addListener(geolocation, 'complete', onComplete);//返回定位信息
-   //AMap.event.addListener(geolocation, 'error', onError);      //返回定位出错信息
 });
+</script>
+<div id="showAddrMap" style="position:fixed;left:0;top:0;right:0;bottom:0;margin:0;width:100%;display:none;z-index:1000;background:rgba(0,0,0,0.2);display:none;">
+<div id="mapContainer" style="top:10px;width:100%;height:500px;"></div>
+<div id="myPageTop" style="left:10px">
+    <table style="width:100%;text-align:right">
+        <tr style="width:100%">
+            <td class="column1"><label><a onclick="$('#showAddrMap').hide();">关闭</a></label></td>
+        </tr>
+        <tr>
+            <td class="column1"><input type="text" style="width:90%" readonly id="lnglat" placeholder="点击地图选择地点"></td>
+        </tr>		        
+        <tr>
+            <td class="column1"><input type="text" id="keyword" name="keyword" value="请输入关键字：(选定后搜索)" style="width:90%" onfocus='this.value=""'/></td> 
+        </tr>
+        
+    </table>
+</div>
+<script type="text/javascript">
+var windowsArr = [];
+   var marker = [];
+    var map = new AMap.Map("mapContainer", {
+        resizeEnable: true,
+        zoom: 13,
+    });
+    AMap.plugin('AMap.Geocoder',function(){
+        var geocoder = new AMap.Geocoder({
+            city: "010"//城市，默认：“全国”
+        });
+        var marker = new AMap.Marker({
+            map:map,
+            bubble:true
+        })
+        map.on('click',function(e){
+            marker.setPosition(e.lnglat);
+            geocoder.getAddress(e.lnglat,function(status,result){
+              if(status=='complete'){
+                var addr = result.regeocode;
+                containerVue.getLocation(addr.addressComponent.province,addr.addressComponent.city,
+                		addr.addressComponent.district,addr.addressComponent.township,e.lnglat.getLng(),e.lnglat.getLat());
+                document.getElementById("lnglat").value = addr.formattedAddress;
+              }else{
+                 alertMsg('系统提示','无法获取地址');
+              }
+            });
+        })
+    });
+     AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],function(){
+        var autoOptions = {
+          city: "昆明", //城市，默认全国
+          input: "keyword",//使用联想输入的input的id
+          
+        };
+        autocomplete= new AMap.Autocomplete(autoOptions);
+        var placeSearch = new AMap.PlaceSearch({
+              city:'昆明',
+              map:map
+        });
+        AMap.event.addListener(autocomplete, "select", function(e){
+           //TODO 针对选中的poi实现自己的功能
+           placeSearch.setCity(e.poi.adcode);
+           placeSearch.search(e.poi.name)
+        });
+      }); 
+   
+</script>
+</div>
+<script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+<script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
 <#else>
 	containerVue.getAll(true,false);
 </#if>
-</script>
-
 
 <footer >
   <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 

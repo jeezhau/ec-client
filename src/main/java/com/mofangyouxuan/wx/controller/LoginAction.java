@@ -1,5 +1,8 @@
 package com.mofangyouxuan.wx.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +18,8 @@ import com.mofangyouxuan.wx.utils.SignUtils;
 @Controller
 @SessionAttributes({"userBasic","openId","vipBasic","fromUrl"})
 public class LoginAction {
-	
+	@Value("${sys.local-server-url}")
+	private String localServerName;
 	/**
 	 * 用户登录
 	 * @param map
@@ -23,7 +27,7 @@ public class LoginAction {
 	 */
 	@RequestMapping(value="/login")
 	public String login(String username,String password,
-			ModelMap map) {
+			ModelMap map,HttpServletRequest request) {
 		if(username != null && password != null) {
 			UserBasic userBasic = UserService.getUserBasic(username);
 			if(userBasic != null && "1".equals(userBasic.getStatus())) { //有正常用户
@@ -37,9 +41,9 @@ public class LoginAction {
 						}
 						String fromUrl = (String) map.get("fromUrl");
 						if(fromUrl != null && fromUrl.length()>0) {
-							return "redirect:" + fromUrl;
+							return "redirect:" + localServerName + fromUrl;
 						}else {
-							return "redirect:/user/index/basic";
+							return "redirect:" + localServerName + "/user/index/basic";
 						}
 					}else {
 						map.put("username", username);
@@ -68,7 +72,7 @@ public class LoginAction {
 		if(user != null ){
 			session.setComplete();	//清除用户session
 		}
-		return "redirect:/shop/index";
+		return "redirect:" + localServerName+ "/shop/index";
 	}
 	
 }
