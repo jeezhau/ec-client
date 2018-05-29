@@ -1,5 +1,6 @@
 package com.mofangyouxuan.service;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,8 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
+import com.mofangyouxuan.common.ErrCodes;
+import com.mofangyouxuan.dto.SettleAccount;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.wx.utils.HttpUtils;
+import com.mofangyouxuan.wx.utils.ObjectToMap;
 
 /**
  * 用户与会员服务，主要用于向服务中心发送请求
@@ -27,8 +31,10 @@ public class VipService {
 	private static String vipUpdEmailUrl;
 	private static String vipResetPwdUrl;
 	private static String vipUpdPwdUrl;
-	private static String vipUpdActUrl;
 	
+	private static String settleAccountSaveUrl;
+	private static String settleAccountDeleteUrl;
+	private static String settleAccountGetAllUrl;
 	
 	private static String messmpServerUrl;
 	private static String vipPhoneVeriCodeGetUrl;
@@ -61,10 +67,20 @@ public class VipService {
 	public void setVipUpdPwdUrl(String url) {
 		vipUpdPwdUrl = url;
 	}
-	@Value("${mfyx.vip-upd-act-url}")
-	public void setVipUpdActUrl(String url) {
-		vipUpdActUrl = url;
+	
+	@Value("${mfyx.settle-account-save-url}")
+	public void setSettleAccountSaveUrl(String url) {
+		settleAccountSaveUrl = url;
 	}
+	@Value("${mfyx.settle-account-delete-url}")
+	public void setSettleAccountDeleteUrl(String url) {
+		settleAccountDeleteUrl = url;
+	}
+	@Value("${mfyx.settle-account-getall-url}")
+	public void setSettleAccountGetAllUrl(String url) {
+		settleAccountGetAllUrl = url;
+	}
+	
 	@Value("${mfyx.vip-upd-phone-url}")
 	public void setVipUpdPhoneUrl(String url) {
 		vipUpdPhoneUrl = url;
@@ -179,35 +195,96 @@ public class VipService {
 	}
 	
 	/**
-	 * 更新会员提现账户信息
+	 * 保存会员提现账户信息
 	 * 
 	 * @param vipId
-	 * @param idNo
-	 * @param actNm
-	 * @param actNo
-	 * @param actBlk
-	 * @param pwd
-	 * @return
+	 * @param account
+	 * @param passwd
+	 * @return {errcode,errmsg}
 	 */
-	public static JSONObject updAccount(Integer vipId,String cashTp,String actTp,String idNo,String actNm,String actNo,String actBlk,String pwd) {
-		String url = mfyxServerUrl + vipUpdActUrl;
+	public static JSONObject saveAccount(Integer vipId,SettleAccount account,String passwd) {
+		String url = mfyxServerUrl + settleAccountSaveUrl;
 		url = url.replace("{vipId}", vipId +"");
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("cashTp",cashTp);
-		params.put("actTp",actTp);
-		params.put("idNo", idNo);
-		params.put("actNm", actNm);
-		params.put("actNo", actNo);
-		params.put("actBlk", actBlk);
-		params.put("pwd", pwd);
-		String strRet = HttpUtils.doPostSSL(url, params);
+	
+		Map<String, Object> params = new HashMap<String,Object>();
+		String[] excludeFields = {"updateTime","status"};
+		params = ObjectToMap.object2Map(account,excludeFields,false);
+		params.put("passwd", passwd);
+		String strRet = HttpUtils.doPost(url, params);
+		JSONObject jsonRet = new JSONObject();
 		try {
-			JSONObject jsonRet = JSONObject.parseObject(strRet);
-			return jsonRet;
+			jsonRet = JSONObject.parseObject(strRet);
+			if(!jsonRet.containsKey("errcode")) {
+				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+				jsonRet.put("errmsg", "出现系统访问错误，错误信息：" + strRet);
+			}
 		}catch(Exception e) {
 			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "系统异常，异常信息：" + e.getMessage());
 		}
-		return null;
+		return jsonRet;
+	}
+	
+	/**
+	 * 删除提现账户信息
+	 * 
+	 * @param vipId
+	 * @param settleId
+	 * @param passwd
+	 * @return {errcode,errmsg}
+	 */
+	public static JSONObject deleteAccount(Integer vipId,Long settleId,String passwd) {
+		String url = mfyxServerUrl + settleAccountDeleteUrl;
+		url = url.replace("{vipId}", vipId +"");
+	
+		Map<String, Object> params = new HashMap<String,Object>();
+		params.put("passwd", passwd);
+		params.put("settleId", settleId);
+		String strRet = HttpUtils.doPost(url, params);
+		JSONObject jsonRet = new JSONObject();
+		try {
+			jsonRet = JSONObject.parseObject(strRet);
+			if(!jsonRet.containsKey("errcode")) {
+				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+				jsonRet.put("errmsg", "出现系统访问错误，错误信息：" + strRet);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "系统异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet;
+	}
+	
+	/**
+	 * 获取会员所有提现账户信息
+	 * 
+	 * @param vipId
+	 * @param settleId
+	 * @param passwd
+	 * @return {errcode,errmsg,datas:[{...}...]}
+	 */
+	public static JSONObject getAllAccount(Integer vipId,String passwd) {
+		String url = mfyxServerUrl + settleAccountGetAllUrl;
+		url = url.replace("{vipId}", vipId +"");
+	
+		Map<String, Object> params = new HashMap<String,Object>();
+		params.put("passwd", passwd);
+		String strRet = HttpUtils.doPost(url, params);
+		JSONObject jsonRet = new JSONObject();
+		try {
+			jsonRet = JSONObject.parseObject(strRet);
+			if(!jsonRet.containsKey("errcode")) {
+				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+				jsonRet.put("errmsg", "出现系统访问错误，错误信息：" + strRet);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "系统异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet;
 	}
 	
 	/**

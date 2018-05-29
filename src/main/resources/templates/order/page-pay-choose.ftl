@@ -87,7 +87,7 @@
     <div class="col-xs-12 " style="margin:1px 5px ;padding:10px 25px;background-color:white" @click="choosePay(2)">
      <img alt="" src="/icons/微信支付.png" width="20px" height=20px>
      <span>微信支付</span>
-     <span v-if="param.payType == 2 " class="pull-right"><img src="/icons/选择.png" style="widht:20px;height:20px;"></span>
+     <span v-if="param.payType == 2" class="pull-right"><img src="/icons/选择.png" style="widht:20px;height:20px;"></span>
     </div>
     <div class="col-xs-12" style="margin:1px 5px;padding:10px 25px;background-color:white" @click="choosePay(1)">
      <img alt="" src="/icons/余额.png" width="20px" height=20px>
@@ -104,7 +104,7 @@
   <div class="row" style="margin:50px 0"></div>
   <div class="weui-tabbar" style="position:fixed;left:0px;bottom:5px">
     	<span class="weui-tabbar__item " >
-	    <span class="weui-tabbar__label" >实付(含运费) <span style="color:red;font-size:18px">¥ ${order.amount}</span></span>
+	    <span class="weui-tabbar__label" >金额(含运费) <span style="color:red;font-size:18px">¥ ${order.amount}</span></span>
 	</span>   
      <a href="javascript:;" class="weui-tabbar__item " style='background-color:red;text-align:center;vertical-align:center;'>
 	    <span class="weui-tabbar__label" style="font-size:20px;color:white" @click="prepay">立即支付</span>
@@ -120,7 +120,7 @@ var containerVue = new Vue({
 		goodsSpecArr:JSON.parse('${(order.goodsSpec)!"[]"}'),
 		param:{
 			orderId:'${(order.orderId)}',
-			payType:0 //支付方式:1-会员余额,2-微信
+			payType:0 //支付方式:1-会员余额,21-微信公众号，22-微信H5
 		}
 	},
 	methods:{
@@ -133,8 +133,16 @@ var containerVue = new Vue({
 				alertMsg('系统提示','请先选择支付方式！');
 				return;
 			}
+			var payType = this.param.payType;
+			if(payType == 2){
+				<#if (wxPubPay!'')=='1'>
+				payType = 21;
+				<#else>
+				payType = 22;
+				</#if>
+			}
 			$.ajax({
-				url: '/order/prepay/' + this.param.orderId + '/' + this.param.payType,
+				url: '/order/prepay/' + this.param.orderId + '/' + payType,
 				method:'post',
 				data: {},
 				success: function(jsonRet,status,xhr){
@@ -144,11 +152,10 @@ var containerVue = new Vue({
 							if(jsonRet.payType == '1'){ //使用余额支付
 								 window.location.href = "/order/pay/use/bal/" + containerVue.param.orderId;
 							}
-							else if(jsonRet.payType == '2'){//微信支付
+							else if(startWith(jsonRet.payType,'2')){//微信支付
 								if (jsonRet.outPayUrl){
 									window.location.href = jsonRet.outPayUrl;
-								<#if (wxPay!'')=='1'>
-								}else if(jsonRet.prepay_id){
+								}else if(jsonRet.payType == '21'){//公众号支付
 									WeixinJSBridge.invoke(
 								       'getBrandWCPayRequest', {
 								           "appId":jsonRet.appId,     //公众号名称，由商户传入     
@@ -166,7 +173,6 @@ var containerVue = new Vue({
 											}
 										}
 									); 
-								</#if>
 								}else{
 									alertMsg('错误提示','调用微信支付失败！');
 								}
@@ -189,6 +195,25 @@ var containerVue = new Vue({
 
 </script>
 </#if>
+
+<!-- 微信支付返回提示 -->
+<div class="modal fade " id="payFinishTipModal" tabindex="-1" role="dialog" aria-labelledby="payFinishTipTitle" aria-hidden="false" data-backdrop="static" style="top:30%">
+	<div class="modal-dialog">
+  		<div class="modal-content">
+     		<div class="modal-header">
+        			<h5 class="modal-title" id="payFinishTipTitle" style="text-align:center">请确认微信支付是否已完成</h5>
+     		</div>
+     		<div class="modal-body">
+       			<p style="text-align:center;color:red" onclick="window.location.href='/order/pay/finish/${(order.orderId)}'"> 已经支付完成 <p/>
+     		</div>
+     		<div class="modal-footer">
+     		   <div class="row"  style="text-align:center;color:gray">
+     			<span onclick="$('#payFinishTipModal').modal('hide')">支付遇到问题，重新支付</span>
+     		   </div>
+     		</div>
+  		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 <#if errmsg??>
  <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">

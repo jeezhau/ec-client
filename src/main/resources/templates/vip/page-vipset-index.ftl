@@ -69,7 +69,7 @@
        </span>
     </li>    
     <li class="list-group-item">
-      <span>提现设置</span>
+      <span>账户设置</span>
       <span class="pull-right" >
        <a href="/vip/account/mgr">设置</a>
       </span>

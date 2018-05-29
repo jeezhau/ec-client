@@ -42,6 +42,10 @@
         ${order.partnerBusiName}
       </a>
   </div>
+  <div class="row" style="margin:3px 0px;padding:5px 10px;background-color:white">
+   <span>以下为买家备注：</span><br>
+   <p>${order.remark}</p>
+  </div>
   <div class="row" style="margin:3px 0px;background-color:white; color:red">
     <p/>
   	<span>&nbsp;&nbsp;&nbsp;&nbsp;填写说明：官方配送则名称为“摩放优选”，单号为订单号；商家配送则名称为“商家名称”，单号为订单号；

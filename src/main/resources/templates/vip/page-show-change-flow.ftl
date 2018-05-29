@@ -49,7 +49,7 @@
 	   <span class="col-xs-9" style="padding:0">{{getChangeFlowType(flow.changeType)}}</span>
 	 </div>
 	 <div class="col-xs-12">
-	   <label class="col-xs-3" style="padding:0">相关金额¥</label>
+	   <label class="col-xs-3" style="padding:0">相关金额(分)</label>
 	   <span class="col-xs-9" style="padding:0">{{flow.amount}}</span>
 	 </div>
 	 <div class="col-xs-12">

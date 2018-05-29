@@ -71,6 +71,9 @@
 	    </div>
     </div>
   </div>
+  <div class="row" style="margin:10px 20px 80px 20px;">
+      <p style="color:gray">没有更多数据了....</p>
+  </div>
 </div><!-- end of container -->
 
 <script type="text/javascript">
@@ -106,7 +109,6 @@ var containerVue = new Vue({
 			 return;
 		 }
 		 $("#loadingData").show();
-		 $("#nomoreData").hide();
 		 if(containerVue.goodsList.length>100){
 		 	containerVue.goodsList = [];
 		 }
@@ -139,9 +141,6 @@ var containerVue = new Vue({
 						}
 						containerVue.param.pageSize = jsonRet.pageCond.pageSize;
 						containerVue.param.begin = jsonRet.pageCond.begin;
-					}else{
-						//alert(jsonRet.errmsg);
-						$("#nomoreData").show();
 					}
 					$("#loadingData").hide();
 				},
@@ -204,14 +203,14 @@ var containerVue = new Vue({
      var pageHieght = $(document.body).height();  
      var scrollHeight = $(window).scrollTop(); //滚动条top   
      var r = (pageHieght - winHeight - scrollHeight) / winHeight;
-     if (r < 0.5) {//上拉翻页 
+     if (r>0 && r < 0.2) {//上拉后翻页 
     	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
     	 	containerVue.getAll(false,false);
      }
-     if(scrollHeight<0){ //下拉翻页
-    	 	var cnt = containerVue.goodsList.length%containerVue.param.pageSize;
- 		cnt = containerVue.goodsList - cnt;
-	 	containerVue.param.begin = containerVue.param.begin - cnt;
+     if(scrollHeight<0){ //下拉前翻页
+    	 	var cnt = containerVue.goodsList.length%containerVue.param.pageSize; //不足一页的数量
+ 		cnt = containerVue.goodsList - cnt; 
+	 	containerVue.param.begin = containerVue.param.begin - cnt; //当前页的开始记录数
     	 	containerVue.param.begin = containerVue.param.begin - containerVue.param.pageSize;
      	if(containerVue.param.begin <= 0){
      		containerVue.param.begin = 0;
@@ -226,8 +225,9 @@ var containerVue = new Vue({
  
 </script> 
 
-<script>
+
 <#if !(receiverPosition.province)??>
+<script>
 var mapObj = new AMap.Map('iCenter');
 mapObj.plugin('AMap.Geolocation', function () {
     geolocation = new AMap.Geolocation({
@@ -322,11 +322,14 @@ var windowsArr = [];
 <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
 <script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
 <#else>
+<script>
 	containerVue.getAll(true,false);
+</script>
 </#if>
 
 <footer >
   <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
 </footer>
+
 </body>
 </html>

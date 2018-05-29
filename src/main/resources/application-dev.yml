@@ -54,10 +54,12 @@ mfyx:
   vip-upd-email-url: '/vip/{vipId}/updemail'
   vip-reset-pwd-url: '/vip/{vipId}/resetpwd'
   vip-upd-pwd-url: '/vip/{vipId}/updpwd'
-  vip-upd-act-url: '/vip/{vipId}/updact'  
   vip-phone-vericode-get-url: '/sms/vericode/send'
   vip-email-vericode-get-url: '/email/vericode/send'
   
+  settle-account-save-url: '/settle/{vipId}/saveact'
+  settle-account-delete-url: '/settle/{vipId}/delete'
+  settle-account-getall-url: '/settle/{vipId}/getall'
   
   partner-get-byvip-url: '/partner/get/byvip/'
   partner-get-byid-url: '/partner/get/byid/'
@@ -130,6 +132,7 @@ mfyx:
 ######系统参数############  
 sys:
   local-server-url: 'http://192.168.0.102:8000'
+  local-server-url-4user: 'http://192.168.0.102:8000'
   tmp-file-dir: '/Users/jeekhan/mfyx-wx/tmp/'
 
   

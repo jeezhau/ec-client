@@ -159,8 +159,8 @@
         </div>
         <div class="row" style="margin:10px 5px;color:gray">
           <div class="col-xs-4" style="padding:0 3px;text-align:center"><span><img alt="" src="/icons/积分.png" width="20px" height="20px">${vipBasic.scores!!0}</span ></div>
-          <div class="col-xs-4" style="padding:0 3px;text-align:center"><span><img alt="" src="/icons/余额.png" width="20px" height="20px"> ${vipBasic.balance!!0} </span></div>
-          <div class="col-xs-4" style="padding:0 3px;text-align:center"><span><img alt="" src="/icons/冻结.png" width="20px" height="20px"> ${vipBasic.freeze!!0} </span></div>
+          <div class="col-xs-4" style="padding:0 3px;text-align:center"><span><img alt="" src="/icons/余额.png" width="20px" height="20px"> ${((vipBasic.balance!!0)/100)?string('#0.00')} </span></div>
+          <div class="col-xs-4" style="padding:0 3px;text-align:center"><span><img alt="" src="/icons/冻结.png" width="20px" height="20px"> ${((vipBasic.freeze!!0)/100)?string('#0.00')} </span></div>
         </div>
       </div>
       <div class="row" style="margin:30px 1px 15px 1px;text-align:center;vertical-align:center">

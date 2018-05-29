@@ -1,16 +1,24 @@
 package com.mofangyouxuan.wx.controller;
 
+import java.util.List;
+
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
-import com.mofangyouxuan.dto.UserBasic;
+import com.mofangyouxuan.dto.SettleAccount;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.VipService;
 import com.mofangyouxuan.wx.utils.PageCond;
@@ -22,7 +30,7 @@ import com.mofangyouxuan.wx.utils.PageCond;
  */
 @Controller
 @RequestMapping("/vip")
-@SessionAttributes({"openId","vipBasic","userBasic","isDayFresh","sys_func"})
+@SessionAttributes({"openId","userBasic","isDayFresh","sys_func"})
 public class VipMgrAction {
 	
 	private String regexpPhone = "1[3-9]\\d{9}";
@@ -34,8 +42,7 @@ public class VipMgrAction {
 	 * @return
 	 */
 	@RequestMapping("/flow/show")
-	public String showFlow(ModelMap map) {
-		VipBasic vip = (VipBasic) map.get("vipBasic");
+	public String showFlow(@SessionAttribute("vipBasic") VipBasic vip,ModelMap map,HttpSession session) {
 		if(vip == null || !"1".equals(vip.getStatus())) {
 			map.put("errmsg", "您当前还未开通会员账户！");
 		}
@@ -52,9 +59,8 @@ public class VipMgrAction {
 	 */
 	@RequestMapping("/flow/getall")
 	@ResponseBody
-	public String getAllFlow(String jsonParams,PageCond pageCond,ModelMap map) {
+	public String getAllFlow(@SessionAttribute("vipBasic") VipBasic vip,String jsonParams,PageCond pageCond,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
-		VipBasic vip = (VipBasic) map.get("vipBasic");
 		try {
 			if(vip == null || !"1".equals(vip.getStatus())) {
 				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
@@ -85,13 +91,10 @@ public class VipMgrAction {
 	 * @return
 	 */
 	@RequestMapping("/vipset")
-	public String getVipSetIndex(ModelMap map) {
-		UserBasic user = (UserBasic) map.get("userBasic");
-		VipBasic vipBasic = VipService.getVipBasic(user.getUserId());
-		if(vipBasic != null) {
-			map.put("vipBasic", vipBasic);
-		}
-		if(vipBasic == null || !"1".equals(vipBasic.getStatus())) {
+	public String getVipSetIndex(@SessionAttribute("vipBasic") VipBasic vip,ModelMap map,HttpSession session) {
+		vip = VipService.getVipBasic(vip.getVipId());
+		session.setAttribute("vipBasic", vip);
+		if(vip == null || !"1".equals(vip.getStatus())) {
 			map.put("errmsg", "您当前还未开通会员账户！");
 		}
 		map.put("sys_func", "user");
@@ -104,8 +107,7 @@ public class VipMgrAction {
 	 * @return
 	 */
 	@RequestMapping("/phone/mgr")
-	public String getPhoneMgr(ModelMap map) {
-		VipBasic vip = (VipBasic) map.get("vipBasic");
+	public String getPhoneMgr(@SessionAttribute("vipBasic") VipBasic vip,ModelMap map) {
 		if(vip == null || !"1".equals(vip.getStatus())) {
 			map.put("errmsg", "您当前还未开通会员账户！");
 		}
@@ -120,8 +122,7 @@ public class VipMgrAction {
 	 * @return
 	 */
 	@RequestMapping("/email/mgr")
-	public String getEmailMgr(ModelMap map) {
-		VipBasic vip = (VipBasic) map.get("vipBasic");
+	public String getEmailMgr(@SessionAttribute("vipBasic") VipBasic vip,ModelMap map) {
 		if(vip == null || !"1".equals(vip.getStatus())) {
 			map.put("errmsg", "您当前还未开通会员账户！");
 		}
@@ -131,13 +132,12 @@ public class VipMgrAction {
 	
 	
 	/**
-	 * 获取提现设置首页
+	 * 获取提现账户设置首页
 	 * @param map
 	 * @return
 	 */
 	@RequestMapping("/account/mgr")
-	public String getAccountMgr(ModelMap map) {
-		VipBasic vip = (VipBasic) map.get("vipBasic");
+	public String getAccountMgr(@SessionAttribute("vipBasic") VipBasic vip,ModelMap map) {
 		if(vip == null || !"1".equals(vip.getStatus())) {
 			map.put("errmsg", "您当前还未开通会员账户！");
 		}
@@ -152,8 +152,7 @@ public class VipMgrAction {
 	 * @return
 	 */
 	@RequestMapping("/passwd/mgr")
-	public String getPasswdMgr(ModelMap map) {
-		VipBasic vip = (VipBasic) map.get("vipBasic");
+	public String getPasswdMgr(@SessionAttribute("vipBasic") VipBasic vip,ModelMap map) {
 		if(vip == null || !"1".equals(vip.getStatus())) {
 			map.put("errmsg", "您当前还未开通会员账户！");
 		}
@@ -171,11 +170,10 @@ public class VipMgrAction {
 	 */
 	@RequestMapping(value="/vipset/updphone",method=RequestMethod.POST)
 	@ResponseBody
-	public Object updPhone(String oldVeriCode,
+	public Object updPhone(@SessionAttribute("vipBasic") VipBasic vip,String oldVeriCode,
 			@RequestParam(value="newPhone",required=true)String newPhone,
 			@RequestParam(value="newVeriCode",required=true)String newVeriCode,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
-		VipBasic vip = (VipBasic) map.get("vipBasic");
 		try {
 			if(vip == null || !"1".equals(vip.getStatus())) {
 				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
@@ -230,11 +228,10 @@ public class VipMgrAction {
 	 */
 	@RequestMapping(value="/vipset/updemail",method=RequestMethod.POST)
 	@ResponseBody
-	public Object updEmail(String oldVeriCode,
+	public Object updEmail(@SessionAttribute("vipBasic") VipBasic vip,String oldVeriCode,
 			@RequestParam(value="newEmail",required=true)String newEmail,
 			@RequestParam(value="newVeriCode",required=true)String newVeriCode,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
-		VipBasic vip = (VipBasic) map.get("vipBasic");
 		try {
 			if(vip == null || !"1".equals(vip.getStatus())) {
 				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
@@ -287,10 +284,10 @@ public class VipMgrAction {
 	 */
 	@RequestMapping(value="/vipset/updpwd",method=RequestMethod.POST)
 	@ResponseBody
-	public String updPwd(@RequestParam(value="oldPwd",required=true)String oldPwd,
+	public String updPwd(@SessionAttribute("vipBasic") VipBasic vip,
+			@RequestParam(value="oldPwd",required=true)String oldPwd,
 			@RequestParam(value="newPwd",required=true)String newPwd,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
-		VipBasic vip = (VipBasic) map.get("vipBasic");
 		try {
 			if(vip == null || !"1".equals(vip.getStatus())) {
 				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
@@ -331,9 +328,9 @@ public class VipMgrAction {
 	 */
 	@RequestMapping(value="/vipset/resetpwd",method=RequestMethod.POST)
 	@ResponseBody
-	public String resetPwd(@RequestParam(value="type",required=true)String type,ModelMap map) {
+	public String resetPwd(@SessionAttribute("vipBasic") VipBasic vip,
+			@RequestParam(value="type",required=true)String type,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
-		VipBasic vip = (VipBasic) map.get("vipBasic");
 		try {
 			//数据验证
 			type = type.trim();
@@ -372,27 +369,18 @@ public class VipMgrAction {
 	}
 	
 	/**
-	 * 更新会员提现信息
+	 * 保存提现账户信息
 	 * 
-	 * @param vipId
-	 * @param idNo
-	 * @param actNm
-	 * @param actNo
-	 * @param actBlk
+	 * @param account
 	 * @param pwd
 	 * @return
 	 */
-	@RequestMapping(value="/vipset/updact",method=RequestMethod.POST)
+	@RequestMapping(value="/settle/save",method=RequestMethod.POST)
 	@ResponseBody
-	public Object updAccount(@RequestParam(value="cashTp",required=true)String cashTp,
-			@RequestParam(value="actTp",required=true)String actTp,
-			@RequestParam(value="idNo",required=true)String idNo,
-			@RequestParam(value="actNm",required=true)String actNm,
-			@RequestParam(value="actNo",required=true)String actNo,
-			@RequestParam(value="actBlk",required=true)String actBlk,
-			@RequestParam(value="pwd",required=true)String pwd,ModelMap map) {
+	public Object saveAccount(@Valid SettleAccount account,BindingResult result,
+			@RequestParam(value="passwd",required=true)String passwd,HttpSession session ) {
 		JSONObject jsonRet = new JSONObject();
-		VipBasic vip = (VipBasic) map.get("vipBasic");
+		VipBasic vip = (VipBasic) session.getAttribute("vipBasic");
 		try {
 			if(vip == null || !"1".equals(vip.getStatus())) {
 				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
@@ -400,54 +388,24 @@ public class VipMgrAction {
 				return jsonRet.toJSONString();
 			}
 			//数据格式验证
-			cashTp = cashTp.trim();
-			actTp =actTp.trim();
-			idNo = idNo.trim();
-			actNm = actNm.trim();
-			actNo = actNo.trim();
-			actBlk = actBlk.trim();
-			if(!cashTp.matches("[123]")) {
-				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-				jsonRet.put("errmsg", "提现方式格式不正确！");
+			if(result.hasErrors()){
+				StringBuilder sb = new StringBuilder();
+				List<ObjectError> list = result.getAllErrors();
+				for(ObjectError e :list){
+					sb.append(e.getDefaultMessage());
+				}
+				jsonRet.put("errmsg", sb.toString());
+				jsonRet.put("errcode", ErrCodes.COMMON_PARAM_ERROR);
 				return jsonRet.toString();
 			}
-			if(!actTp.matches("[12]")) {
-				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-				jsonRet.put("errmsg", "账户类型格式不正确！");
-				return jsonRet.toString();
-			}
-			if(!idNo.matches("[1-9]\\d{16}[0-9Xx]")) {
-				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-				jsonRet.put("errmsg", "身份证号码格式不正确！");
-				return jsonRet.toString();
-			}
-			if(actNm.length()<2 || actNm.length()>100) {
-				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-				jsonRet.put("errmsg", "账户名长度为2-100位字符！");
-				return jsonRet.toString();
-			}
-			if(actNo.length()<3 || actNo.length()>30) {
-				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-				jsonRet.put("errmsg", "账户号长度为3-30位字符！");
-				return jsonRet.toString();
-			}
-			if(actBlk.length()<2 || actBlk.length()>100) {
-				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-				jsonRet.put("errmsg", "开户行名称长度为2-100位字符！");
-				return jsonRet.toString();
-			}
-			pwd = pwd.trim();
-			if(pwd.length()<6 || pwd.length()>20) {
+			passwd = passwd.trim();
+			if(passwd.length()<6 || passwd.length()>20) {
 				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
 				jsonRet.put("errmsg", "密码长度为6-20位字符！");
 				return jsonRet.toString();
 			}
-			jsonRet = VipService.updAccount(vip.getVipId(), cashTp, actTp, idNo, actNm, actNo, actBlk, pwd);
-			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
-				jsonRet = new JSONObject();
-				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
-				jsonRet.put("errmsg", "更新账户信息失败！");
-			}
+			account.setVipId(vip.getVipId());
+			jsonRet = VipService.saveAccount(vip.getVipId(), account, passwd);
 		}catch(Exception e) {
 			//数据处理
 			e.printStackTrace();
@@ -458,17 +416,80 @@ public class VipMgrAction {
 	}
 
 	/**
+	 * 删除提现账户信息
+	 * 
+	 * @param settleId
+	 * @param passwd
+	 * @return
+	 */
+	@RequestMapping(value="/settle/delete",method=RequestMethod.POST)
+	@ResponseBody
+	public Object deleteAccount(@SessionAttribute("vipBasic") VipBasic vip,
+			@RequestParam(value="settleId",required=true)Long settleId,
+			@RequestParam(value="passwd",required=true)String passwd) {
+		JSONObject jsonRet = new JSONObject();
+		try {
+			if(vip == null || !"1".equals(vip.getStatus())) {
+				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
+				jsonRet.put("errmsg", "您当前还未开通会员账户！");
+				return jsonRet.toJSONString();
+			}
+			
+			passwd = passwd.trim();
+			if(passwd.length()<6 || passwd.length()>20) {
+				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+				jsonRet.put("errmsg", "密码长度为6-20位字符！");
+				return jsonRet.toString();
+			}
+			jsonRet = VipService.deleteAccount(vip.getVipId(), settleId, passwd);
+		}catch(Exception e) {
+			//数据处理
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
+	}
+	
+	/**
+	 * 获取所有账户信息
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value="/settle/getall",method=RequestMethod.POST)
+	@ResponseBody
+	public Object getAllAccount(@SessionAttribute("vipBasic") VipBasic vip,
+			@RequestParam(value="passwd",required=false)String passwd) {
+		JSONObject jsonRet = new JSONObject();
+		try {
+			if(vip == null || !"1".equals(vip.getStatus())) {
+				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
+				jsonRet.put("errmsg", "您当前还未开通会员账户！");
+				return jsonRet.toJSONString();
+			}
+			
+			jsonRet = VipService.getAllAccount(vip.getVipId(), passwd);
+		}catch(Exception e) {
+			//数据处理
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
+	}
+	
+	/**
 	 * 申请手机短信验证码
 	 * @param phone
 	 * @return
 	 */
 	@RequestMapping(value="/vericode/phone/apply",method=RequestMethod.POST)
 	@ResponseBody
-	public Object applyPhoneVeriCode(@RequestParam(value="phone",required=true)String phone,
+	public Object applyPhoneVeriCode(@SessionAttribute("vipBasic") VipBasic vip,
+			@RequestParam(value="phone",required=true)String phone,
 			ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			VipBasic vip = (VipBasic) map.get("vipBasic");
 			if(vip == null || !"1".equals(vip.getStatus())) {
 				jsonRet.put("errmsg", "您当前还未开通会员账户！");
 				jsonRet.put("errcode", -1);
@@ -501,11 +522,11 @@ public class VipMgrAction {
 	 */
 	@RequestMapping(value="/vericode/email/apply",method=RequestMethod.POST)
 	@ResponseBody
-	public Object applyEmailVeriCode(@RequestParam(value="email",required=true)String email,
+	public Object applyEmailVeriCode(@SessionAttribute("vipBasic") VipBasic vip,
+			@RequestParam(value="email",required=true)String email,
 			ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			VipBasic vip = (VipBasic) map.get("vipBasic");
 			if(vip == null || !"1".equals(vip.getStatus())) {
 				jsonRet.put("errmsg", "您当前还未开通会员账户！");
 				jsonRet.put("errcode", -1);

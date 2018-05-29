@@ -72,7 +72,7 @@
    <span class="pull-right">限购时间：{{goods.beginTime}} 至 {{goods.endTime}}</span>
   </div>  
   
-  <form action="/order/create" method="post">
+  <form action="/order/create" method="post" style="margin-bottom:80px">
     <input type="hidden" name="goodsId" value="${(goods.goodsId)?string('#')}">
     <div class="row" style="margin:15px 1px;">
       <div class="row" style="margin:3px 15px 3px 15px;padding:3px 3px">
@@ -146,13 +146,13 @@
       </div> 
       <div class="row" style="text-align:right;">
         <div class="col-xs-12" style="padding-right:40px">
-         <button v-if="param.flag == 0" type="button" class="btn btn-sm btn-danger" @click="checkData">数据检查/金额计算</button>
+         <button v-if="param.flag == 0" type="button" class="btn btn-sm btn-danger" @click="checkData">请点击确认购买内容与收货信息</button>
          <!-- <button v-if="param.flag == 1" type="button" class="btn btn-sm btn-danger" >请选择配送方式</button> -->
         </div>
       </div>
       <div class="row" style="margin:8px 15px 3px 15px;">
-        <label class="col-xs-3 control-label">配送方式<span style="color:red">*</span>:</label>
-        <div class="col-sx-9">
+        <label class="col-xs-3 control-label" style="padding-right:0">配送方式<span style="color:red">*</span>:</label>
+        <div class="col-sx-9" style="padding-left:0">
           <select required v-model="param.postageIdAndMode" @change="changeDispatch">
             <option value="" disabled>请选择(须先完成数据检查计算)...</option>
             <option v-for="item in dispatchMatchs" v-bind:value="item.postageId + '-' + item.mode">
@@ -162,8 +162,8 @@
         </div>
        </div>
        <div class="row" style="margin:8px 15px 3px 15px;">
-         <label class="col-xs-3 control-label">买家留言:</label>
-         <div class="col-sx-9">
+         <label class="col-xs-3 control-label" style="padding-right:0">买家留言:</label>
+         <div class="col-sx-9" style="padding-left:0">
            <textarea class="form-control" style="width:66%" maxlength=600 name="remark"></textarea>
          </div>
        </div> 

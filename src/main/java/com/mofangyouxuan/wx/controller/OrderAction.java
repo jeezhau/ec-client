@@ -30,6 +30,7 @@ import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.service.OrderService;
 import com.mofangyouxuan.service.VipService;
+import com.mofangyouxuan.wx.utils.CommonUtil;
 import com.mofangyouxuan.wx.utils.PageCond;
 
 /**
@@ -64,13 +65,13 @@ public class OrderAction {
 			goods = JSONObject.toJavaObject(jsonRet.getJSONObject("goods"),Goods.class);
 			map.put("goods", goods);
 		}
-		//
+		
 		return "order/page-place-order";
 	}
 
 	/**
-	 * 买价完成下单信息，成功后跳转到开始支付
-	 * 生成新点单，然后跳转至支付页面
+	 * 完成下单信息
+	 * 生成新点单，然后跳转至支付选择页面
 	 * @param order
 	 * @return
 	 */
@@ -163,15 +164,15 @@ public class OrderAction {
 			}else {
 				map.put("errmsg", "获取订单信息失败！");
 			}
-			//判断客户端是否支持微信支付
+			//判断客户端是否支持微信公众号支付
 			String agent= request.getHeader("user-agent").toLowerCase();
 			int index = agent.indexOf("micromessenger/");
 			if(index >=0) {
 				String sub = agent.substring(index + "micromessenger/".length(),index + "micromessenger/".length()+2);
 				try {
 					Double bb = Double.parseDouble(sub);
-					if(bb >= 5.0) {
-						map.put("wxPay", "1");
+					if(bb >= 5.0 && user.getOpenId() != null && user.getOpenId().length()>10) {
+						map.put("wxPubPay", "1");
 					}
 				}catch(Exception e) {
 					
@@ -769,7 +770,7 @@ public class OrderAction {
 				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
 				return jsonRet.toString();
 			}
-			if(1 != payType && 2!= payType) {
+			if(1 != payType && 21!= payType && 22!= payType) {
 				jsonRet.put("errcode", ErrCodes.ORDER_PARAM_ERROR);
 				jsonRet.put("errmsg", "支付方式取值不正确！");
 				return jsonRet.toJSONString();
@@ -781,18 +782,19 @@ public class OrderAction {
 				}
 			}
 			String ip = request.getRemoteHost();
+			ip = CommonUtil.getIpAddr(request);
 			jsonRet = OrderService.createPay(payType, order, user, ip);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");
 				return jsonRet.toString();
 			}else if(jsonRet.containsKey("outPayUrl")) {
-				if(2 == payType) { //微信H5支付
+				if(22 == payType) { //微信H5支付
 					String outPayUrl = jsonRet.getString("outPayUrl");
 					String redirectUrl = this.localServerName + "/order/pay/finish/" + orderId;
 					redirectUrl = URLEncoder.encode(redirectUrl, "utf8");
 					outPayUrl = outPayUrl + "&redirect_url=" + redirectUrl;
-					jsonRet.put(outPayUrl, outPayUrl);
+					jsonRet.put("outPayUrl", outPayUrl);
 				}
 			}
 		}catch(Exception e) {

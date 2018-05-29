@@ -202,6 +202,10 @@ $("#container").scroll(scrollHandler);
      		<div class="modal-body">
        			<#include "/order/tpl-order-buy-user-4vue.ftl" encoding="utf8"> 
       			<#include "/order/tpl-order-buy-content-4vue.ftl" encoding="utf8"> 
+	     		<div class="row" style="margin:3px 0px;padding:5px 10px;background-color:white">
+				   <span>以下为买家备注：</span><br>
+				   <p>{{order.remark}</p>
+				</div>      			
        			 <div class="row" style="margin:3px 0px;background-color:white; color:red">
        			   <p/>
        			   <p>订单状态: {{getOrderStatus(order.status)}}</p>

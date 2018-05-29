@@ -31,93 +31,200 @@
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
 <#if ((vipBasic.status)!'') == '1'>
+
 <div class="container"  id="container" style="padding:0px 0px;oveflow:scroll">
-  <div class="row" style="width:100%;margin:0px 0px 0px 0px;padding:5px 8px;background-color:white;">
-    <p style="color:red">&nbsp;&nbsp;&nbsp;&nbsp;请正确输入银行账户信息，如果信息有误，导致的打款失败或错误，将由会员您自己承担！！！</p>
-	<form class="form-horizontal"  action="" method ="post" autocomplete="on" enctype="multipart/form-data" role="form" >
-	  <div class="form-group">
-	    <label class="col-xs-3 control-label" style="padding-right:0">提现方式<span style="color:red">*</span></label>
-	    <div class="col-xs-8">
-	      <select v-model="param.cashTp">
-	        <option value="1">手动</option>
-	        <option value="2">自动(每周一)</option>
-	        <option value="3">自动(每月一号)</option>
-	      </select>
-	    </div>
-	  </div>	
-	  <div class="form-group">
-	    <label class="col-xs-3 control-label" style="padding-right:0">账户类型<span style="color:red">*</span></label>
-	    <div class="col-xs-8">
-		   <label><input type="radio" value="1" v-model="param.actTp" style="display:inline-block;width:18px;height:18px" >对私</label>
-		   <label><input type="radio" value="2" v-model="param.actTp" style="display:inline-block;width:18px;height:18px" >对公</label>
-	    </div>
-	  </div>	  
-	  <div class="form-group">
-	    <label class="col-xs-3 control-label" style="padding-right:0">身份证号<span style="color:red">*</span></label>
-	    <div class="col-xs-8">
-	      <input type="text" class="form-control" v-model="param.idNo" pattern="\w{18}"  maxLength=100 required placeholder="请输入开户人身份证号">
-	    </div>
-	  </div>
-	  <div class="form-group">
-	    <label class="col-xs-3 control-label" style="padding-right:0">账户名称<span style="color:red">*</span></label>
-	    <div class="col-xs-8">
-	      <input type="text" class="form-control" v-model="param.actNm" pattern="\w{2,100}" maxLength=100 required placeholder="请输入账户名称（2-100个字符）">
-	    </div>
-	  </div>
-	  <div class="form-group">
-        <label class="col-xs-3 control-label" style="padding-right:0">账户号<span style="color:red">*</span></label>
-        <div class="col-xs-8">
-          <input type="text" class="form-control" v-model="param.actNo" pattern="\w{3,30}" maxLength=30 required placeholder="请输入账户号（3-30个字符）">
-        </div>
+
+  <div class="row" style="min-height:100px">
+    <div v-for="item in dataList" class="row" style="margin:5px 10px;padding:3px 0;background-color:white">
+      <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+        <span class="col-xs-12" style="padding:0"><label> 账 户：</label><span>{{item.accountName}} {{item.accountNo}}</span></span>
       </div>
-      <div class="form-group">
-        <label class="col-xs-3 control-label" style="padding-right:0">开户行名称<span style="color:red">*</span></label>
-        <div class="col-xs-8">
-          <input type="text" class="form-control" v-model="param.actBlk" pattern="\w{2,100}" maxLength=100 required placeholder="请输入开户行名称（2-100个字符）">
-        </div>
+      <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+        <span class="col-xs-6" style="padding:0"><label> 提现方式：</label><span>{{getCashType(item.cashType)}}</span></span>
+        <span class="col-xs-6" style="padding:0"><label> 通道类型：</label><span>{{getChannelType(item.channelType)}}</span></span>
       </div>
-      <div class="form-group">
-        <label class="col-xs-3 control-label"  style="padding-right:0">会员密码<span style="color:red">*</span></label>
-        <div class="col-xs-8">
-          <input type="password" class="form-control" v-model="param.pwd" pattern="\w{6,20}" maxLength=20 required placeholder="请输入会员密码（6-20个字符）">
-        </div>
+      <div class="col-xs-12" style="text-align:center">
+        <span class="col-xs-4"><button class="btn btn-info" style="width:90%" @click="showAccount(item)"> 详 情 </button></span>
+        <span class="col-xs-4"><button class="btn btn-primary" style="width:90%" @click="updAccount(item)"> 变 更 </button></span>
+        <span class="col-xs-4"><button class="btn btn-default" style="width:90%" @click="delAccount(item)"> 删 除 </button></span>
       </div>
-      <div class="form-group">
-         <div style="text-align:center">
-           <button type="button" class="btn btn-info"  style="margin:20px" @click="submit">&nbsp;&nbsp;提 交&nbsp;&nbsp;</button>
-           <button type="button" class="btn btn-warning"  style="margin:20px" @click="reset">&nbsp;&nbsp;重 置&nbsp;&nbsp; </button>
-         </div>
-      </div>
-	</form>	
+    </div>
   </div>
+  <div class="row" style="margin:10px ;text-align:center">
+    <button type="button" class="btn btn-danger" style="width:90%" @click="addAccount"> 新增账户 </button>
+  </div>
+  
 </div><!-- end of container -->
-<script type="text/javascript">
+<script>
 var containerVue = new Vue({
 	el:'#container',
 	data:{
-		initData:{
-			cashTp:'${(vipBasic.cashType)!""}',
-			idNo:'${(vipBasic.idNo)!""}',
-			actTp:'${(vipBasic.accountType)!""}',
-			actNm:'${(vipBasic.accountName)!""}',
-			actNo:'${(vipBasic.accountNo)!""}',
-			actBlk:'${(vipBasic.accountBank)!""}',
-		},	//初始化的数据
+		dataList:[]
+	},
+	methods:{
+		addAccount: function(){
+			$('#saveAccountModal').modal('show');
+			saveAccountVue.saveAccountTitle = '新增账户';
+			saveAccountVue.oprFlag = 1;
+			saveAccountVue.param.settleId = 0;
+		},
+		updAccount: function(item){
+			$('#saveAccountModal').modal('show');
+			saveAccountVue.saveAccountTitle = '变更账户';
+			saveAccountVue.oprFlag = 2;
+			$.extend(saveAccountVue.param,item); 
+			saveAccountVue.initData = item;
+		},
+		delAccount: function(item){
+			$('#saveAccountModal').modal('show');
+			saveAccountVue.saveAccountTitle = '删除账户';
+			saveAccountVue.oprFlag = 3;
+			$.extend(saveAccountVue.param,item);
+		},
+		showAccount: function(item){
+			$('#saveAccountModal').modal('show');
+			saveAccountVue.saveAccountTitle = '账户详情';
+			saveAccountVue.oprFlag = 0;
+			$.extend(saveAccountVue.param,item);
+		},
+		getAll: function(){
+			$("#loadingData").show();
+			$.ajax({
+				url: '/vip/settle/getall',
+				method:'post',
+				data: this.param,
+				success: function(jsonRet,status,xhr){
+					containerVue.dataList = [];
+					$("#loadingData").hide();
+					if(jsonRet && jsonRet.datas){
+						for(var i=0;i<jsonRet.datas.length;i++){
+							containerVue.dataList.push(jsonRet.datas[i]);
+						}
+					}else{
+						//alertMsg('错误提示',jsonRet.errmsg)
+					}
+				},
+				failure:function(){
+					$("#loadingData").hide();
+				},
+				dataType: 'json'
+			});
+		}
+	}
+});
+containerVue.getAll();
+</script>
+
+<div class="modal fade " id="saveAccountModal" tabindex="-1" role="dialog" aria-labelledby="saveAccountTitle" aria-hidden="false" data-backdrop="static" style="top:10px">
+<div class="modal-dialog">
+<div class="modal-content">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
+    <h4 class="modal-title" id="saveAccountTitle" style="color:red" >{{saveAccountTitle}}</h4>
+  </div>
+  <div class="modal-body">
+	  <div class="row" style="width:100%;margin:0px 0px 0px 0px;padding:5px 8px;background-color:white;">
+	    <p v-if="oprFlag == 1 || oprFlag == 2" style="color:red">&nbsp;&nbsp;&nbsp;&nbsp;请正确输入账户信息，如果信息有误，导致的打款失败或错误，将由会员您自己承担！！！</p>
+		<form class="form-horizontal"  action="" method ="post" autocomplete="on" enctype="multipart/form-data" role="form" >
+		  <div class="form-group">
+		    <label class="col-xs-3 control-label" style="padding-right:0">提现方式<span style="color:red">*</span></label>
+		    <div class="col-xs-8">
+		      <select v-model="param.cashType" :disabled="oprFlag == 0 || oprFlag ==3">
+		        <option value="" disabled> 请选择提现方式... </option>
+		        <option value="1">手动</option>
+		        <!-- <option value="2">自动(每周一)</option>
+		        <option value="3">自动(每月一号)</option> -->
+		      </select>
+		    </div>
+		  </div>	
+		  <div class="form-group">
+		    <label class="col-xs-3 control-label" style="padding-right:0">账户类型<span style="color:red">*</span></label>
+		    <div class="col-xs-8">
+			   <label><input type="radio" value="1" v-model="param.accountType" style="display:inline-block;width:18px;height:18px" :disabled="oprFlag == 0 || oprFlag ==3">对私</label>
+			   <label><input type="radio" value="2" v-model="param.accountType" style="display:inline-block;width:18px;height:18px" :disabled="oprFlag == 0 || oprFlag ==3">对公</label>
+		    </div>
+		  </div>	
+		  <div class="form-group">
+		    <label class="col-xs-3 control-label" style="padding-right:0">身份证号<span style="color:red">*</span></label>
+		    <div class="col-xs-8">
+		      <input type="text" class="form-control" v-model="param.idNo" pattern="\w{18}"  maxLength=100 required placeholder="持账户人身份证号" :disabled="oprFlag == 0 || oprFlag ==3">
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label class="col-xs-3 control-label" style="padding-right:0">通道类型<span style="color:red">*</span></label>
+		    <div class="col-xs-8">
+		       <select v-model="param.channelType" :disabled="oprFlag == 0 || oprFlag ==3">
+		        <option value="" disabled> 请选择通道类型... </option>
+		        <option value="1">银行</option>
+		        <!-- <option value="2">微信</option>
+		        <option value="3">支付宝</option> -->
+		      </select>
+		    </div>
+		  </div>		  
+		  <div class="form-group">
+		    <label class="col-xs-3 control-label" style="padding-right:0">账户名称<span style="color:red">*</span></label>
+		    <div class="col-xs-8">
+		      <input type="text" class="form-control" v-model="param.accountName" pattern="\w{2,100}" maxLength=100 required placeholder="账户名称（2-100个字符）" :disabled="oprFlag == 0 || oprFlag ==3">
+		    </div>
+		  </div>
+		  <div class="form-group">
+	        <label class="col-xs-3 control-label" style="padding-right:0">账户号<span style="color:red">*</span></label>
+	        <div class="col-xs-8">
+	          <input type="text" class="form-control" v-model="param.accountNo" pattern="\w{3,30}" maxLength=30 required placeholder="账户号（3-30个字符）" :disabled="oprFlag == 0 || oprFlag ==3">
+	        </div>
+	      </div>
+	      <div class="form-group">
+	        <label class="col-xs-3 control-label" style="padding-right:0">开户行<span style="color:red">*</span></label>
+	        <div class="col-xs-8">
+	          <input type="text" class="form-control" v-model="param.accountBank" pattern="\w{2,100}" maxLength=100 required placeholder="开户行名称（2-100个字符）" :disabled="oprFlag == 0 || oprFlag ==3">
+	        </div>
+	      </div>
+	      <div class="form-group" v-if="oprFlag != 0">
+	        <label class="col-xs-3 control-label"  style="padding-right:0">会员密码<span style="color:red">*</span></label>
+	        <div class="col-xs-8">
+	          <input type="password" class="form-control" v-model="param.passwd" pattern="\w{6,20}" maxLength=20 required placeholder="会员操作密码（6-20个字符）" >
+	        </div>
+	      </div>
+	      <div class="form-group">
+	         <div style="text-align:center">
+	           <button v-if="oprFlag==1 || oprFlag==2" type="button" class="btn btn-info"  style="margin:20px" @click="submit">&nbsp;&nbsp;保 存&nbsp;&nbsp;</button>
+	           <button v-if="oprFlag==1 || oprFlag==2" type="button" class="btn btn-danger"  style="margin:20px" @click="reset">&nbsp;&nbsp;重 置&nbsp;&nbsp; </button>
+	           <button v-if="oprFlag==3 " type="button" class="btn btn-danger"  style="margin:20px" @click="deleteAct">&nbsp;&nbsp;删 除&nbsp;&nbsp; </button>
+	           <button v-if="oprFlag==0 || oprFlag==3" type="button" class="btn btn-default"  style="margin:20px" @click="close">&nbsp;&nbsp;关 闭&nbsp;&nbsp; </button>
+	         </div>
+	      </div>
+		</form>	
+	  </div>
+  </div>
+</div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script type="text/javascript">
+var saveAccountVue = new Vue({
+	el:'#saveAccountModal',
+	data:{
+		oprFlag:1,
+		saveAccountTitle:'',
+		initData:{},
 		param:{
-			cashTp:'${(vipBasic.cashType)!""}',
-			idNo:'${(vipBasic.idNo)!""}',
-			actTp:'${(vipBasic.accountType)!""}',
-			actNm:'${(vipBasic.accountName)!""}',
-			actNo:'${(vipBasic.accountNo)!""}',
-			actBlk:'${(vipBasic.accountBank)!""}',
-			pwd:''
+			settleId:'',
+			cashType:'',
+			idNo:'',
+			channelType:'',
+			accountType:'',
+			accountName:'',
+			accountNo:'',
+			accountBank:'',
+			passwd:''
 		}
 	},
 	methods:{
 		submit: function(){
+			delete this.param.updateTime;
+			delete this.param.vipId;
 			$("#dealingData").show();
 			$.ajax({
-				url: '/vip/vipset/updact',
+				url: '/vip/settle/save',
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
@@ -126,11 +233,12 @@ var containerVue = new Vue({
 						if(jsonRet.errcode !== 0){
 							alertMsg('错误提示',jsonRet.errmsg)
 						}else{
-							window.location.href = "/vip/vipset";
+							containerVue.getAll();
 						}
 					}else{
-						alertMsg('错误提示','绑定邮箱失败！')
+						alertMsg('错误提示',jsonRet.errmsg)
 					}
+					$('#saveAccountModal').modal('hide');
 				},
 				failure:function(){
 					$("#dealingData").hide();
@@ -140,10 +248,38 @@ var containerVue = new Vue({
 		},
 		reset: function(){
 			$.extend(containerVue.param,containerVue.initData); 
+		},
+		close: function(){
+			$('#saveAccountModal').modal('hide');
+		},
+		deleteAct: function(){
+			$("#dealingData").show();
+			$.ajax({
+				url: '/vip/settle/delete',
+				method:'post',
+				data: this.param,
+				success: function(jsonRet,status,xhr){
+					$("#dealingData").hide();
+					if(jsonRet && jsonRet.errmsg){
+						if(jsonRet.errcode !== 0){
+							alertMsg('错误提示',jsonRet.errmsg)
+						}else{
+							containerVue.getAll();
+						}
+						containerVue.getAll();
+					}else{
+						alertMsg('错误提示',jsonRet.errmsg)
+					}
+					$('#saveAccountModal').modal('hide');
+				},
+				failure:function(){
+					$("#dealingData").hide();
+				},
+				dataType: 'json'
+			});
 		}
 	}
 });
-
 </script>
 </#if>
 

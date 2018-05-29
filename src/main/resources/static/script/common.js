@@ -84,7 +84,7 @@ function getChangeFlowType(code){
 function getPayType(tp){
 	if('1' == tp){
 		return '余额支付';
-	}else if('2' == tp){
+	}else if(startWith(tp,'2')){
 		return '微信支付';
 	}
 }
@@ -106,3 +106,39 @@ function getPayStatus(code){
 		return code;
 	}
 }
+
+/**
+ * 获取提现方式
+ * @param code
+ * @returns
+ */
+function getCashType(code){
+	if('1' == code){
+		return '手动';
+	}else if('2' == code){
+		return '自动每天';
+	}else if('3' == code){
+		return '自动每周';
+	}else if('4' == code){
+		return '自动每月';
+	}
+	return '未知';
+}
+
+
+/**
+ * 获取通道类型
+ * @param code
+ * @returns
+ */
+function getChannelType(code){
+	if('1' == code){
+		return '银行';
+	}else if('2' == code){
+		return '微信';
+	}else if('3' == code){
+		return '支付宝';
+	}
+	return '未知';
+}
+
