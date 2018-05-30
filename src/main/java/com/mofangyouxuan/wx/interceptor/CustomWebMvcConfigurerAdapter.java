@@ -33,7 +33,7 @@ public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter{
         sessionReg.addPathPatterns("/partner/**");
         sessionReg.addPathPatterns("/goods/**");
         sessionReg.addPathPatterns("/order/**");
-        sessionReg.addPathPatterns("/srvcenter/**");
+        sessionReg.addPathPatterns("/complain/**");
         sessionReg.addPathPatterns("/image/**");
         sessionReg.addPathPatterns("/postage/**");
         sessionReg.addPathPatterns("/receiver/**");

@@ -39,13 +39,14 @@
       <div class="row">
         <div class="thumbnail">
 	      <img id="qrcodeshow" alt="推广二维码" src="${showurl!''}" width="80%" height="80%">
-	      <div class="caption">
-		    <p style="text-align:center">我的推广二维码(有效期28天后自动重新生成新的)</p>
+	      <div class="caption" style="text-align:center">
+	        <span>长按可分享二维码给朋友</span>
+		    <p style="text-align:center">我的微信推广二维码(有效期28天后自动重新生成新的)</p>
 	      </div>
 	      <form action="/user/spread">
         		<input type="hidden" name="create" value="1">
         		<div style="text-align:center">
-        			<button type="submit" class="btn btn-primary">重新生成</button>
+        			<button type="button" class="btn btn-primary">重新生成</button>
         		</div>
            </form>
         </div>
@@ -61,7 +62,7 @@
     <h5>3、奖励措施：</h5>
     &nbsp;&nbsp;&nbsp;&nbsp;1）您每推广一个用户即可获得${(sysparam_spread_per_user_score)!'20'}个积分，现金消费1元获得${(sysparam_trade_score_one_yuan)!'1'}个积分，当积分数量达到${(sysparam_vip_activate_need_score)!'1000'}时，系统自动激活会员账户；<br>
     &nbsp;&nbsp;&nbsp;&nbsp;2）您所推广的用户一旦有了现金消费交易，您将会获得特定比例的分润，分润金额进入会员可用余额；<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;3）会员可用余额可用于消费也可提现到您的微信钱包，积分可用于指定商品兑换；<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;3）会员可用余额可用于消费也可提现，积分可用于指定商品兑换；<br>
    </div>
   </div>
 </div><!-- end of container -->

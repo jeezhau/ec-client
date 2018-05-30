@@ -97,12 +97,12 @@
 
             </span>
          </li>
-         <li style="background-color:white" >
-           <a href="/aftersales/user/mgr/refund">
-             <span class="pull-right" > 退款换货 &gt; </span>
-             <img alt="" src="/icons/无忧售后.png" width="20px" height="20px"> 无忧售后
+         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
+           <a href="/user/spread">
+             <span class=" pull-right" style=""> 就加入  &gt;</span>
+             <img alt="" src="/icons/服务号-营销推广.png" width="20px" height="20px"> 我要推广
            </a>
-         </li>
+         </li>          
          <li style="background-color:white" >
            <a href="/collection/manage">
              <span class="pull-right" >查看 &gt; </span>
@@ -128,12 +128,24 @@
              <img alt="" src="/icons/客服.png" width="20px" height="20px"> 官方客服
            </a>
          </li> 
-         <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
-           <a href="/user/spread">
-             <span class=" pull-right" style=""> 就加入  &gt;</span>
-             <img alt="" src="/icons/服务号-营销推广.png" width="20px" height="20px"> 我要推广
+         <li style="background-color:white" >
+           <a href="/aftersales/user/mgr/refund">
+             <span class="pull-right" > 退款换货 &gt; </span>
+             <img alt="" src="/icons/无忧售后.png" width="20px" height="20px"> 无忧售后
            </a>
-         </li> 
+         </li>
+         <li style="background-color:white" >
+           <a href="/complain/manage/order">
+             <span class="pull-right" > 订单投诉 &gt; </span>
+             <img alt="" src="/icons/投诉.png" width="20px" height="20px"> 我要投诉
+           </a>
+         </li>  
+         <li style="background-color:white" >
+           <a href="/srvc/about">
+             <span class=" pull-right" > 关于摩放优选  &gt;</span>
+             <img alt="" src="/icons/关于我们.png" width="20px" height="20px"> About&Join
+           </a>
+         </li>       
          <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
            <a href="/logout">
              <img alt="" src="/icons/退出登录.png" width="20px" height="20px"> 退出登录

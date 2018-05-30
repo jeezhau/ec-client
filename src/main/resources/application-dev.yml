@@ -129,6 +129,12 @@ mfyx:
   
   sysparam-getall-url: '/sysparam/sys/getall'
   
+  complain-getall-url: '/complain/getall'
+  complain-order-save-url: '/complain/{userId}/order/save'
+  complain-partner-save-url: '/complain/{vipId}/partner/save'
+  complain-order-delete-url: '/complain/{userId}/order/delete/{cplainId}'
+  complain-partner-delete-url: '/complain/{vipId}/partner/delete/{cplainId}' 
+  
 ######系统参数############  
 sys:
   local-server-url: 'http://192.168.0.102:8000'
