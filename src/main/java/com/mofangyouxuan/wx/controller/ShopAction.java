@@ -2,6 +2,8 @@ package com.mofangyouxuan.wx.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +26,7 @@ import com.mofangyouxuan.wx.utils.PageCond;
  */
 @Controller
 @RequestMapping("/shop")
-@SessionAttributes({"isDayFresh","sys_func","categories"})
+@SessionAttributes({"clientPF","isDayFresh","sys_func","categories"})
 public class ShopAction {
 	
 	/**
@@ -34,13 +36,13 @@ public class ShopAction {
 	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping("/index")
-	public String getIndex(ModelMap map) {
+	public String getIndex(ModelMap map,HttpServletRequest request) {
 		List<Category> categories = (List<Category>) map.get("categories");
 		if(categories == null) {
 			categories = GoodsService.getCategories();
 			map.put("categories", categories);
 		}
-
+		map.put("isFirstWxPage", request.getAttribute("isFirstWxPage"));
 		map.put("isDayFresh", "0");	//系统默认为访问商城管理
 		map.put("sys_func", "shop");
 		

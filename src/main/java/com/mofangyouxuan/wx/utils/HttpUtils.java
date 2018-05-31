@@ -625,6 +625,54 @@ public class HttpUtils {
 	}
 	
 	/**
+	 * 文件下载（GET）
+	 * @param fileSaveDir 文件本地保存目录
+	 * @param apiUrl	文件下载路径
+	 * @return [inputStrean,filename]
+	 */
+	public static Object[] downloadFile(String apiUrl){
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		CloseableHttpResponse httpResponse = null;
+		HttpGet httpGet = new HttpGet(apiUrl);
+		try {
+			httpGet.setConfig(requestConfig);
+			httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+            if (statusCode != HttpStatus.SC_OK) {
+                return null;
+            }
+            HttpEntity entity = httpResponse.getEntity();
+            if (entity == null) {
+                return null;
+            }
+            InputStream in = entity.getContent();
+            Header fileHead= httpResponse.getFirstHeader("filename");
+            String typeHead = entity.getContentType().getValue();
+            String type = typeHead.substring(typeHead.lastIndexOf("/"));
+            String fileName = UUID.randomUUID().toString() + "." +type;
+            if(fileHead != null){
+            		fileName = fileHead.getValue();
+            }
+            return new Object[] {in,fileName};
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (httpResponse != null) {
+				try {
+					httpResponse.close();
+				} catch (Exception e) {
+				}
+			}
+			try {
+				httpClient.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 *  SSL 文件下载（GET）
 	 * @param fileSaveDir 文件本地保存目录
 	 * @param apiUrl	文件下载路径

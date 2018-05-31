@@ -3,6 +3,7 @@ package com.mofangyouxuan.wx.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 /**
  * 系统服务中心
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 @RequestMapping("/srvc")
+@SessionAttributes({"clientPF"})
 public class ServerCenterAction {
 
 	/**

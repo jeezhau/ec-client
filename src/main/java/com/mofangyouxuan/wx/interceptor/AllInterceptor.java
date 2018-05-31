@@ -15,6 +15,7 @@ import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.UserService;
 import com.mofangyouxuan.service.VipService;
 import com.mofangyouxuan.wx.api.WebAuth;
+import com.mofangyouxuan.wx.utils.CommonUtil;
 
 
 
@@ -37,33 +38,43 @@ public class AllInterceptor extends HandlerInterceptorAdapter{
 		
 		HttpSession session = request.getSession();
 		String uri = request.getRequestURI();
-		//String agent= request.getHeader("user-agent").toLowerCase();
+		//获取客户端平台
+		String clientPF = (String) session.getAttribute("clientPF");
+		if(clientPF == null || clientPF.length()<1) {
+			CommonUtil.getPlatform(request);  //客户端平台
+			session.setAttribute("clientPF", clientPF);
+		}
+		System.out.println("访问地址："+uri);
+		UserBasic userBasic = (UserBasic) session.getAttribute("userBasic");
+		VipBasic vipBasic = (VipBasic) session.getAttribute("vipBasic");
 		//微信登录
-		String code = request.getParameter("code");
-		String state = request.getParameter("state"); 
-		if(code != null && code.length()>0 && state != null && WebAuth.STATE.equals(state)) {//从微信访问
-			//登录访问控制
-			UserBasic userBasic = (UserBasic) session.getAttribute("userBasic");
-			VipBasic vipBasic = (VipBasic) session.getAttribute("vipBasic");
-			JSONObject auth = this.accessFromWX(code);
-			if(auth == null) {
-				response.sendRedirect(serverName + "/error/fromwx");
-				return false;
-			}
-			String openId = null; //微信公众号OPENID、UNIONDID
-			openId = auth.getString("openid");
-			session.setAttribute("webAuth", auth);
-			session.setAttribute("openId", openId);
-			userBasic = UserService.getUserBasic(openId);
-			if(userBasic == null) {
-				response.sendRedirect(serverName + "/error/nouser");
-				return false;
-			}
-			session.setAttribute("userBasic", userBasic);
-			
-			if(vipBasic == null || vipBasic.getVipId() == null) {
-				vipBasic = VipService.getVipBasic(userBasic.getUserId());
-				session.setAttribute("vipBasic", vipBasic);
+		if(vipBasic == null || vipBasic.getVipId() == null) {
+			String code = request.getParameter("code");
+			String state = request.getParameter("state"); 
+			if(code != null && code.length()>0 && state != null && WebAuth.STATE.equals(state)) {//从微信访问
+				request.setAttribute("isFirstWxPage", "1"); //从微信进来的第一个页面
+				//登录访问控制
+				
+				JSONObject auth = this.accessFromWX(code);
+				if(auth == null) {
+					response.sendRedirect(serverName + "/error/fromwx");
+					return false;
+				}
+				String openId = null; //微信公众号OPENID、UNIONDID
+				openId = auth.getString("openid");
+				session.setAttribute("webAuth", auth);
+				session.setAttribute("openId", openId);
+				userBasic = UserService.getUserBasic(openId);
+				if(userBasic == null) {
+					response.sendRedirect(serverName + "/error/nouser");
+					return false;
+				}
+				session.setAttribute("userBasic", userBasic);
+				
+				if(vipBasic == null || vipBasic.getVipId() == null) {
+					vipBasic = VipService.getVipBasic(userBasic.getUserId());
+					session.setAttribute("vipBasic", vipBasic);
+				}
 			}
 		}
 		//重定向首页访问至商城

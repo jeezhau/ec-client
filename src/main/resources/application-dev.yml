@@ -33,13 +33,13 @@ wx:
   
  #微信管理平台访问 
 wxmp:
-  wxmp-server-url: 'http://192.168.0.102:9000'
+  wxmp-server-url: 'http://localhost:9000'
   jsapi-sign-url: '/jsapi/sign' 
   
 ######业务参数-摩放优选服务中心访问############
 mfyx:
-  mfyx-server-url: 'http://192.168.0.102:8080'
-  messmp-server-url: 'http://192.168.0.102:8888'
+  mfyx-server-url: 'http://localhost:8080'
+  messmp-server-url: 'http://localhost:8888'
   
   user-basic-get-url: '/user/get'
   user-basic-create-url: '/user/create'
@@ -69,7 +69,13 @@ mfyx:
   partner-review-url: '/partner/review'
   partner-cert-upload-url: '/partner/cert/upload'
   partner-cert-show-url: '/partner/cert/show/'
-  
+  pstaff-save-url: '/pstaff/{partnerId}/saveStaff'
+  pstaff-delete-url: '/pstaff/{partnerId}/deleteStaff'
+  pstaff-updatepwd-url: '/pstaff/{partnerId}/updpwd'
+  pstaff-resetpwd-url: '/pstaff/{partnerId}/resetpwd'
+  pstaff-upload-url: '/{partnerId}/upload/{mode}'
+  pstaff-show-url: '/pstaff/{partnerId}/show/{userId}/{mode}'
+  pstaff-getall-url: '/pstaff/{partnerId}/getall'
   
   city-get-provinces-url: '/city/province/getall'
   city-get-cities-url: '/city/city/getbyprov/'
@@ -137,8 +143,8 @@ mfyx:
   
 ######系统参数############  
 sys:
-  local-server-url: 'http://192.168.0.102:8000'
-  local-server-url-4user: 'http://192.168.0.102:8000'
+  local-server-url: 'http://localhost:8000'
+  local-server-url-4user: 'http://localhost:8000'
   tmp-file-dir: '/Users/jeekhan/mfyx-wx/tmp/'
 
   

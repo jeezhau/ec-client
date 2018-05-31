@@ -3,6 +3,8 @@ package com.mofangyouxuan.wx.controller;
 import java.math.BigDecimal;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +36,7 @@ public class NearbyMgrAction {
 	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping("/index")
-	public String getIndex(ModelMap map) {
+	public String getIndex(ModelMap map,HttpServletRequest request) {
 		List<Category> categories = (List<Category>) map.get("categories");
 		if(categories == null) {
 			categories = GoodsService.getCategories();
@@ -42,7 +44,7 @@ public class NearbyMgrAction {
 		}
 
 		map.put("sys_func", "nearby");
-		
+		map.put("isFirstWxPage", request.getAttribute("isFirstWxPage"));
 		return "shop/page-nearby-index";
 	}
 

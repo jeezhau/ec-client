@@ -11,7 +11,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.wx.utils.HttpUtils;
 
 /**
- * 收货人信息接口调用处理
+ * 系统参数接口调用处理
  * @author jeekhan
  *
  */

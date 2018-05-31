@@ -1,13 +1,12 @@
 package com.mofangyouxuan.wx.controller;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -347,15 +346,24 @@ public class PartnerAction {
 			if(!flag) {
 				return;
 			}
-			File file = PartnerMgrService.showCert(partner.getVipId(), certType);
-			if(file == null || !file.exists()) {
+			Object[] retObj = PartnerMgrService.showCert(partner.getPartnerId(), certType);
+			if(retObj == null) {
 				return;
 			}
-			BufferedImage image = ImageIO.read(file);
-			response.setContentType("image/*");
-			OutputStream os = response.getOutputStream();  
-			String type = file.getName().substring(file.getName().lastIndexOf('.')+1);
-			ImageIO.write(image, type, os); 
+			InputStream is = (InputStream)retObj[0];
+			String filename = (String) retObj[1];
+			if(is != null) {
+				response.setContentType("image/*");
+				response.addHeader("filename", filename);
+				OutputStream os = response.getOutputStream(); 
+				byte[] buff = new byte[1024];
+				int len = 0;
+				while((len=is.read(buff))>0) {
+					os.write(buff, 0, len);
+				}
+			}else {
+				return;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -36,7 +36,7 @@
 	    <label class="col-xs-6 control-label" style="padding-left:1px">${count!0}</label>
 	  </div>  	  
 
-      <div class="row">
+      <div class="row" style="margin:0">
         <div class="thumbnail">
 	      <img id="qrcodeshow" alt="推广二维码" src="${showurl!''}" width="80%" height="80%">
 	      <div class="caption" style="text-align:center">

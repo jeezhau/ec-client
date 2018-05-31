@@ -12,7 +12,7 @@ import com.mofangyouxuan.wx.utils.HttpUtils;
 import com.mofangyouxuan.wx.utils.PageCond;
 
 /**
- * 收货人信息接口调用处理
+ * 用户投诉调用处理
  * @author jeekhan
  *
  */

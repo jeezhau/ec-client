@@ -46,7 +46,7 @@ import com.mofangyouxuan.service.VipService;
  */
 @Controller
 @RequestMapping("/user")
-@SessionAttributes({"openId","vipBasic","userBasic","isDayFresh","sys_func"})
+@SessionAttributes({"clientPF","openId","vipBasic","userBasic","isDayFresh","sys_func"})
 public class UserAction {
 	
 	@Value("${sys.tmp-file-dir}")
@@ -68,7 +68,7 @@ public class UserAction {
 	 * @throws JSONException 
 	 */
 	@RequestMapping("/index/{mode}")
-	public String getIndex(@PathVariable("mode")String mode,ModelMap map){
+	public String getIndex(@PathVariable("mode")String mode,ModelMap map,HttpServletRequest request){
 		UserBasic user = (UserBasic) map.get("userBasic");
 		if(!"basic".equals(mode) && !"vip".equals(mode)) {
 			mode = "basic";
@@ -90,6 +90,7 @@ public class UserAction {
 		map.put("mode", mode);
 		map.put("sys_func", "user");
 		
+		map.put("isFirstWxPage", request.getAttribute("isFirstWxPage"));
 		return "user/page-user-index";
 		
 	}

@@ -21,11 +21,11 @@ spring:
 ######微信参数############
 wx:
 #userId 公众号
-  PUBLIC-USER-ID: gh_ed70fd57008b
+  PUBLIC-USER-ID: gh_613e2c864c97
 #appId
-  APPID: wx8864bd7398aa5270
+  APPID: wx34a58dad7a6542ca
 #appSecret
-  APPSECRET: c2c15a91c950e8a6fc106192b044adfb
+  APPSECRET: f49ce34b7d5db1532968212bb3ec5249
 #token
   TOKEN: 1314
 #state
@@ -39,11 +39,27 @@ wxmp:
 ######业务参数-摩放优选服务中心访问############
 mfyx:
   mfyx-server-url: 'http://172.18.235.107:8080'
+  messmp-server-url: 'http://172.18.235.107:8888'
+  
   user-basic-get-url: '/user/get'
   user-basic-create-url: '/user/create'
   user-basic-update-url: '/user/update'
-  spread-qrcode-url: '/qrcode/spread'
-  vip-basic-get-url: '/vip/get'
+  user-spread-qrcode-url: '/qrcode/spread'
+  user-headimg-upload-url: '/user/headimg/upload/{userId}'
+  user-headimg-show-url: '/user/headimg/show/{userId}'
+  
+  vip-basic-get-url: '/vip/get/{vipId}'
+  vip-cash-flow-getall-url: '/vip/flow/getall'
+  vip-upd-phone-url: '/vip/{vipId}/updphone'
+  vip-upd-email-url: '/vip/{vipId}/updemail'
+  vip-reset-pwd-url: '/vip/{vipId}/resetpwd'
+  vip-upd-pwd-url: '/vip/{vipId}/updpwd'
+  vip-phone-vericode-get-url: '/sms/vericode/send'
+  vip-email-vericode-get-url: '/email/vericode/send'
+  
+  settle-account-save-url: '/settle/{vipId}/saveact'
+  settle-account-delete-url: '/settle/{vipId}/delete'
+  settle-account-getall-url: '/settle/{vipId}/getall'
   
   partner-get-byvip-url: '/partner/get/byvip/'
   partner-get-byid-url: '/partner/get/byid/'
@@ -53,7 +69,13 @@ mfyx:
   partner-review-url: '/partner/review'
   partner-cert-upload-url: '/partner/cert/upload'
   partner-cert-show-url: '/partner/cert/show/'
-  
+  pstaff-save-url: '/pstaff/{partnerId}/saveStaff'
+  pstaff-delete-url: '/pstaff/{partnerId}/deleteStaff'
+  pstaff-updatepwd-url: '/pstaff/{partnerId}/updpwd'
+  pstaff-resetpwd-url: '/pstaff/{partnerId}/resetpwd'
+  pstaff-upload-url: '/{partnerId}/upload/{mode}'
+  pstaff-show-url: '/pstaff/{partnerId}/show/{userId}/{mode}'
+  pstaff-getall-url: '/pstaff/{partnerId}/getall'
   
   city-get-provinces-url: '/city/province/getall'
   city-get-cities-url: '/city/city/getbyprov/'
@@ -87,18 +109,43 @@ mfyx:
   receiver-setdefault-url: '/receiver/{userId}/setdefault/{recvId}'
   
   order-get-url: '/order/get/{orderId}'
+  order-logistics-url: '/order/logistics/{orderId}'
+  order-count-partiby-status-url: '/order/count/partibystatus' 
+  order-search-url: '/order/getall' 
   order-create-url: '/order/{userId}/create'
   order-update-url: '/order/{userId}/update'
   order-checkdata-url: '/order/{userId}/checkData' 
-  order-search-url: '/order/getall' 
-  order-count-partiby-status-url: '/order/count/partibystatus'  
   order-cancel-url: '/order/{userId}/cancel/{orderId}'
-  order-prepay-url: '/order/{userId}/prepay/{orderId}'
+  order-prepay-url: '/order/{userId}/createpay/{orderId}'
+  order-pay-finish-url: '/order/{userId}/payfinish/{orderId}'
+  order-refund-url: '/order/{userId}/refund/{orderId}'
+  order-exchange-url: '/order/{userId}/exchange/{orderId}'
+  order-appr2mcht-url: '/order/{userId}/appr2mcht/{orderId}'
+  order-appr2user-url: '/order/{partnerId}/appr2user/{orderId}'
+  order-ready-url: '/order/{partnerId}/ready/{orderId}'
+  order-delivery-url: '/order/{partnerId}/delivery/{orderId}'
+  order-updaftersales-url: '/order/{partnerId}/aftersales/{orderId}'
+  order-balpay-submit-url: '/order/{userId}/balpay/submit/{orderId}'
+  order-payflow-get-url: '/order/{userId}/payflow/{orderId}'
   
+  collection-getall-url: '/collection/{userId}/getall'
+  collection-getcnt-url: '/collection/{userId}/count'
+  collection-add-url: '/collection/{userId}/add'
+  collection-delete-url: '/collection/{userId}/delete'
   
+  sysparam-getall-url: '/sysparam/sys/getall'
+
+  complain-getall-url: '/complain/getall'
+  complain-order-save-url: '/complain/{userId}/order/save'
+  complain-partner-save-url: '/complain/{vipId}/partner/save'
+  complain-order-delete-url: '/complain/{userId}/order/delete/{cplainId}'
+  complain-partner-delete-url: '/complain/{vipId}/partner/delete/{cplainId}' 
+    
 ######系统参数############  
 sys:
-  local-server-url: 'http://wx.mofangyouxuan.com'
+  local-server-url: 'https://h5.mofangyouxuan.com'
   tmp-file-dir: '/var/mfyx-wx/tmp/'
 
+  
+  
   

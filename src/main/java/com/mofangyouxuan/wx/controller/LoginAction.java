@@ -16,7 +16,7 @@ import com.mofangyouxuan.service.VipService;
 import com.mofangyouxuan.wx.utils.SignUtils;
 
 @Controller
-@SessionAttributes({"userBasic","openId","vipBasic","fromUrl"})
+@SessionAttributes({"clientPF","userBasic","openId","vipBasic","fromUrl"})
 public class LoginAction {
 	@Value("${sys.local-server-url}")
 	private String localServerName;

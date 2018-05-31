@@ -15,7 +15,7 @@ import com.mofangyouxuan.wx.utils.HttpUtils;
 import com.mofangyouxuan.wx.utils.ObjectToMap;
 
 /**
- * 用户与会员服务，主要用于向服务中心发送请求
+ * 会员服务，主要用于向服务中心发送请求
  * @author jeekhan
  *
  */

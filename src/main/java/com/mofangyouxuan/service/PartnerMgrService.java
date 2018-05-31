@@ -144,7 +144,7 @@ public class PartnerMgrService {
 	}
 	
 	/**
-	 * 更新合作伙伴状态
+	 * 更新合作伙伴状态:主动关店与开店
 	 * @param partnerId
 	 * @param currUserId
 	 * @return {errcode:0,errmsg:'ok'}
@@ -166,11 +166,11 @@ public class PartnerMgrService {
 	 * @param userId
 	 * @return {errcode:0,errmsg:""}
 	 */
-	public static String uploadCert(File imageFile,String certType,Integer userId) {
+	public static String uploadCert(File imageFile,String certType,Integer vipId) {
 		String url = mfyxServerUrl + partnerCertUploadUrl;
 		Map<String,String> paramPairs = new HashMap<String,String>();
 		paramPairs.put("certType", certType);
-		paramPairs.put("currUserId", "" + userId);
+		paramPairs.put("currVipId", "" + vipId);
 		String strRet = HttpUtils.uploadFile(url, imageFile, "image", paramPairs);
 		return strRet;
 	}
@@ -179,12 +179,12 @@ public class PartnerMgrService {
 	 * 获取证件照
 	 * @param certType
 	 * @param userId
-	 * @return
+	 * @return [InputSteam,filename]
 	 */
-	public static File showCert(Integer userId,String certType) {
-		String url = mfyxServerUrl + partnerCertShowUrl + userId + "/" + certType;
-		File file = HttpUtils.downloadFile(tmpFileDir,url);
-		return file;
+	public static Object[] showCert(Integer partnerId,String certType) {
+		String url = mfyxServerUrl + partnerCertShowUrl + partnerId + "/" + certType;
+		Object[] ret = HttpUtils.downloadFile(url);
+		return ret;
 	}
 
 }

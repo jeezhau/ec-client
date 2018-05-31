@@ -10,7 +10,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.wx.utils.HttpUtils;
 
 /**
- * 收货人信息接口调用处理
+ * 用户收藏口调用处理
  * @author jeekhan
  *
  */
