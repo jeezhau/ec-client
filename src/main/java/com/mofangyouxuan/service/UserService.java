@@ -23,6 +23,7 @@ public class UserService {
 	private static String tmpFileDir;
 	private static String mfyxServerUrl;
 	private static String userBasicGetUrl;
+	private static String userBasicGetByIdUrl;
 	private static String userBasicCreateUrl;
 	private static String userBasicUpdateUrl;
 	private static String userSpreadQrCodeUrl;
@@ -42,6 +43,11 @@ public class UserService {
 	@Value("${mfyx.user-basic-get-url}")
 	public void setUserBasicGetUrl(String url) {
 		userBasicGetUrl = url;
+	}
+
+	@Value("${mfyx.user-basic-getbyid-url}")
+	public void setUserBasicGetByIdUrl(String url) {
+		userBasicGetByIdUrl = url;
 	}
 	
 	@Value("${mfyx.user-basic-update-url}")
@@ -87,7 +93,28 @@ public class UserService {
 			e.printStackTrace();
 			userBasic = null;
 		}
-		
+		return userBasic;
+	}
+	
+	/**
+	 * 获取用户基本信息
+	 * @param userId
+	 * @return
+	 */
+	public static UserBasic getUserBasicById(Integer userId) {
+		UserBasic userBasic = null;
+		String url = mfyxServerUrl + userBasicGetByIdUrl;
+		url = url.replace("{userId}", userId+"");
+		String strRet = HttpUtils.doPost(mfyxServerUrl + userBasicGetUrl);
+		try {
+			JSONObject ret = JSONObject.parseObject(strRet);
+			if(ret.containsKey("userId")) {//成功
+				userBasic = JSONObject.toJavaObject(ret, UserBasic.class);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			userBasic = null;
+		}
 		return userBasic;
 	}
 	

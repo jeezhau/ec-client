@@ -41,7 +41,7 @@
     <!-- 轮播（Carousel）项目 -->
     <div class="carousel-inner">
         <div  v-bind:class="[{active:(index===0)}, 'item']" v-for="imgpath,index in courselImgPaths" >
-            <img :src="'/image/file/show/${((goods.partner.vipId)!'')?string('#')}/' + imgpath" >
+            <img :src="'/pimage/file/show/${((goods.partnerId)!'')?string('#')}/' + imgpath" >
         </div>
     </div>
     <!-- 轮播（Carousel）导航 -->

@@ -75,7 +75,7 @@ public class Goods {
 
     private String reviewLog;
 
-    private Integer reviewOpr;
+    private Integer updateOpr;
 
     private Date reviewTime;
 
@@ -256,12 +256,12 @@ public class Goods {
         this.reviewLog = reviewLog == null ? null : reviewLog.trim();
     }
 
-    public Integer getReviewOpr() {
-        return reviewOpr;
+    public Integer getUpdateOpr() {
+        return updateOpr;
     }
 
-    public void setReviewOpr(Integer reviewOpr) {
-        this.reviewOpr = reviewOpr;
+    public void setUpdateOpr(Integer updateOpr) {
+        this.updateOpr = updateOpr;
     }
 
     public String getReviewTime() {

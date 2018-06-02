@@ -2,11 +2,13 @@ package com.mofangyouxuan.service;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.PartnerStaff;
@@ -21,7 +23,7 @@ import com.mofangyouxuan.wx.utils.PageCond;
  */
 @Component
 public class PartnerStaffService {
-	
+	private static String tmpFileDir;
 	private static String mfyxServerUrl;
 	private static String pstaffGetAllUrl;
 	private static String pstaffSaveUrl;
@@ -31,6 +33,10 @@ public class PartnerStaffService {
 	private static String pstaffUploadUrl;
 	private static String pstaffShowUrl;
 	
+	@Value("${sys.tmp-file-dir}")
+	public void setTmpFileDir(String url) {
+		tmpFileDir = url;
+	}
 	
 	@Value("${mfyx.mfyx-server-url}")
 	public void setMfyxServerUrl(String mfyxServerUrl) {
@@ -74,7 +80,7 @@ public class PartnerStaffService {
 	 * @param passwd
 	 * @return {errcode,errmsg}
 	 */
-	public static JSONObject saveStaff(Integer partnerId,PartnerStaff staff,Integer oprId,String passwd) {
+	public static JSONObject saveStaff(Integer partnerId,PartnerStaff staff,String passwd) {
 		String url = mfyxServerUrl + pstaffSaveUrl;
 		url = url.replace("{partnerId}", partnerId +"");
 	
@@ -231,6 +237,24 @@ public class PartnerStaffService {
 		return jsonRet;
 	}
 	
+	public static PartnerStaff getStaffByUserId(Integer partnerId,Integer userId) {
+		try {
+			JSONObject search = new JSONObject();
+			search.put("userId", userId);
+			PageCond pageCond = new PageCond(0,1);
+			JSONObject jsonRet = getPartnersAll(partnerId,search,pageCond);
+			if(jsonRet.containsKey("datas")) {
+				List<PartnerStaff> list = JSONArray.parseArray(jsonRet.getJSONObject("datas").toJSONString(), PartnerStaff.class);
+				if(list.size()>0) {
+					return list.get(0);
+				}
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	/**
 	 * 照片上传
 	 * 
@@ -270,15 +294,15 @@ public class PartnerStaffService {
 	 * @param partnerId
 	 * @param mode
 	 * @param userId
-	 * @return [InputSteam,filename]
+	 * @return file
 	 */
-	public static Object[] showImg(Integer partnerId,String mode,Integer userId) {
+	public static File showImg(Integer partnerId,String mode,Integer userId) {
 		String url = mfyxServerUrl + pstaffShowUrl;
 		url = url.replace("{partnerId}", partnerId +"");
 		url = url.replace("{userId}", userId + "");
 		url = url.replace("{mode}", mode);
-		Object[] ret = HttpUtils.downloadFile(url);
-		return ret;
+		File file = HttpUtils.downloadFile(tmpFileDir,url);
+		return file;
 	}
 
 }

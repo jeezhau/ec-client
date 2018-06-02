@@ -67,7 +67,7 @@
             <option v-for="item in metadata.provinces" v-bind:value="item.provName">{{item.provName}}</option>
           </select>
         </div>
-      </div>         
+      </div>
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">经营地-城市<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
@@ -76,7 +76,7 @@
           </select>
         </div>
       </div> 
-       <div class="form-group">
+      <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">经营地-区县<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
           <select class="form-control"  v-model="param.area" disabled>
@@ -90,6 +90,16 @@
           <input type="text" class="form-control" v-model="param.addr" maxLength=200 v-bind:disabled="!param.canUpdAdd" placeholder="请输入详细经营地址，不含省市县" >
         </div>
       </div>
+      <div class="form-group">
+        <label class="col-xs-4 control-label" style="padding-right:1px">合作伙伴类型<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:1px">
+          <select class="form-control"  v-model="param.pbTp">
+            <option value="" disabled>请选择合作伙伴类型...</option>
+            <option value="1">特约商户</option>
+            <option value="2">推广招商</option>
+          </select>
+        </div>
+      </div> 
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">经营名称<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
@@ -164,7 +174,7 @@
 	      </div>
 	  </div>
 	  <div class="form-group">
-	    <label class="col-xs-12 control-label" style="padding-right:1px">营业执照照片</label>
+	    <label class="col-xs-12 control-label" style="padding-right:1px">公司营业执照或小微商户法人手持身份证正面照</label>
 	    <div class="col-xs-12">
 	        <input class="form-control" id="licenceImg"  type="file" name="image" type="file" accept="image/jpg" class="file-loading">
 	    </div>
@@ -191,21 +201,22 @@ var partnerContainerVue = new Vue({
 	el:'#partnerContainer',
 	data:{
 		initData:{
+			pbTp:'${(myPartner.pbTp)!''}',
 			country:'中国',
-			province:'${(partnerBasic.province)!''}',
-			city:'${(partnerBasic.city)!''}',
-			area:'${(partnerBasic.area)!''}',
-			addr:'${(partnerBasic.addr)!''}',
-			busiName:'${(partnerBasic.busiName)!''}',
-			legalPername:'${(partnerBasic.legalPername)!''}',
-			legalPeridno:'${(partnerBasic.legalPeridno)!''}',
-			compType:'${(partnerBasic.compType)!''}',
-			compName:'${(partnerBasic.compName)!''}',
-			licenceNo:'${(partnerBasic.licenceNo)!''}',
-			phone:'${(partnerBasic.phone)!''}',
-			introduce:'${(partnerBasic.introduce)!''}',
-			locationX:'${(partnerBasic.locationX)!''}',
-			locationY:'${(partnerBasic.locationY)!''}'
+			province:'${(myPartner.province)!''}',
+			city:'${(myPartner.city)!''}',
+			area:'${(myPartner.area)!''}',
+			addr:'${(myPartner.addr)!''}',
+			busiName:'${(myPartner.busiName)!''}',
+			legalPername:'${(myPartner.legalPername)!''}',
+			legalPeridno:'${(myPartner.legalPeridno)!''}',
+			compType:'${(myPartner.compType)!''}',
+			compName:'${(myPartner.compName)!''}',
+			licenceNo:'${(myPartner.licenceNo)!''}',
+			phone:'${(myPartner.phone)!''}',
+			introduce:`${(myPartner.introduce)!''} `,
+			locationX:'${(myPartner.locationX)!''}',
+			locationY:'${(myPartner.locationY)!''}'
 		},	//初始化的数据
 		metadata:{
 			provinces:[],
@@ -213,26 +224,27 @@ var partnerContainerVue = new Vue({
 			areas:[]
 		},
 		review:{
-			status:'${(partnerBasic.status)!"0"}',
-			reviewTime:'${(partnerBasic.reviewTime)!''}' ,
-			reviewLog:"${(partnerBasic.reviewLog)!''}"
+			status:'${(myPartner.status)!"0"}',
+			reviewTime:'${(myPartner.reviewTime)!''}' ,
+			reviewLog:"${(myPartner.reviewLog)!''}"
 		},
 		param:{
+			pbTp:'${(myPartner.pbTp)!''}',
 			country:'中国',
-			province:'${(partnerBasic.province)!''}',
-			city:'${(partnerBasic.city)!''}',
-			area:'${(partnerBasic.area)!''}',
-			addr:'${(partnerBasic.addr)!''}',
-			busiName:'${(partnerBasic.busiName)!''}',
-			legalPername:'${(partnerBasic.legalPername)!''}',
-			legalPeridno:'${(partnerBasic.legalPeridno)!''}',
-			compType:'${(partnerBasic.compType)!''}',
-			compName:'${(partnerBasic.compName)!''}',
-			licenceNo:'${(partnerBasic.licenceNo)!''}',
-			phone:'${(partnerBasic.phone)!''}',
-			introduce:'${(partnerBasic.introduce)!''}',
-			locationX:'${(partnerBasic.locationX)!''}',
-			locationY:'${(partnerBasic.locationY)!''}',
+			province:'${(myPartner.province)!''}',
+			city:'${(myPartner.city)!''}',
+			area:'${(myPartner.area)!''}',
+			addr:'${(myPartner.addr)!''}',
+			busiName:'${(myPartner.busiName)!''}',
+			legalPername:'${(myPartner.legalPername)!''}',
+			legalPeridno:'${(myPartner.legalPeridno)!''}',
+			compType:'${(myPartner.compType)!''}',
+			compName:'${(myPartner.compName)!''}',
+			licenceNo:'${(myPartner.licenceNo)!''}',
+			phone:'${(myPartner.phone)!''}',
+			introduce: `${(myPartner.introduce)!''}`,
+			locationX:'${(myPartner.locationX)!''}',
+			locationY:'${(myPartner.locationY)!''}',
 			canUpdAdd:false
 		}
 	},
@@ -413,9 +425,9 @@ $(document).on('ready', function() {
         previewSettings: {
             image: {width: "100px", height: "100px"},
         },
-        <#if (partnerBasic.busiName)??>
+        <#if (myPartner.busiName)??>
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/logo/${(partnerBasic.partnerId)!''}" alt="LOGO照片" class="file-preview-image" style="width:96px">'
+            '<img src="/partner/cert/show/logo/${(myPartner.partnerId)!''}" alt="LOGO照片" class="file-preview-image" style="width:96px">'
         ]
         </#if>
     });
@@ -464,9 +476,9 @@ $(document).on('ready', function() {
         previewSettings: {
             image: {width: "100px", height: "100px"},
         },
-        <#if (partnerBasic.busiName)??>
+        <#if (myPartner.busiName)??>
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/idcard1/${(partnerBasic.partnerId)!''}" alt="法人身份证正面" class="file-preview-image" style="width:96px">'
+            '<img src="/partner/cert/show/idcard1/${(myPartner.partnerId)!''}" alt="法人身份证正面" class="file-preview-image" style="width:96px">'
         ]
         </#if>
     });
@@ -515,9 +527,9 @@ $(document).on('ready', function() {
         previewSettings: {
             image: {width: "100px", height: "100px"},
         },
-        <#if (partnerBasic.busiName)??>
+        <#if (myPartner.busiName)??>
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/idcard2/${(partnerBasic.partnerId)!''}" alt="法人身份证反面" class="file-preview-image" style="width:100px;height:100px">'
+            '<img src="/partner/cert/show/idcard2/${(myPartner.partnerId)!''}" alt="法人身份证反面" class="file-preview-image" style="width:100px;height:100px">'
         ]
         </#if>
     });
@@ -566,9 +578,9 @@ $(document).on('ready', function() {
         previewSettings: {
             image: {width: "100px", height: "100px"},
         },
-        <#if (partnerBasic.busiName)??>
+        <#if (myPartner.busiName)??>
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/licence/${(partnerBasic.partnerId)!''}" alt="营业执照照片" class="file-preview-image" style="width:96px">'
+            '<img src="/partner/cert/show/licence/${(myPartner.partnerId)!''}" alt="营业执照照片" class="file-preview-image" style="width:96px">'
         ]
         </#if>
     });

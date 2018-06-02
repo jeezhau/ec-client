@@ -15,10 +15,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @Configuration
 public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter{
     @Bean   
-    public HandlerInterceptor getSessionInInterceptor(){
-        return new SessionInterceptor();
+    public HandlerInterceptor getUserSessionInInterceptor(){
+        return new UserSessionInterceptor();
     }
 
+    @Bean   
+    public HandlerInterceptor getPartnerSessionInInterceptor(){
+        return new PartnerSessionInterceptor();
+    }
+    
     @SuppressWarnings("deprecation")
 	@Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -27,17 +32,24 @@ public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter{
         // excludePathPatterns 用户排除拦截
     		//registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/**");
     	    //registry.addInterceptor(getSessionInInterceptor()).addPathPatterns("/shop/**");
-    		InterceptorRegistration  sessionReg = registry.addInterceptor(getSessionInInterceptor());
-    		sessionReg.addPathPatterns("/user/**");
-        sessionReg.addPathPatterns("/vip/**");
-        sessionReg.addPathPatterns("/partner/**");
-        sessionReg.addPathPatterns("/goods/**");
-        sessionReg.addPathPatterns("/order/**");
-        sessionReg.addPathPatterns("/complain/**");
-        sessionReg.addPathPatterns("/image/**");
-        sessionReg.addPathPatterns("/postage/**");
-        sessionReg.addPathPatterns("/receiver/**");
-        sessionReg.addPathPatterns("/aftersales/**");
+    		InterceptorRegistration  userSessionReg = registry.addInterceptor(getUserSessionInInterceptor());
+    		userSessionReg.addPathPatterns("/user/**");
+    		userSessionReg.addPathPatterns("/vip/**");
+    		//userSessionReg.addPathPatterns("/partner/**");
+        userSessionReg.addPathPatterns("/order/**");
+        userSessionReg.addPathPatterns("/complain/**");
+        userSessionReg.addPathPatterns("/receiver/**");
+        userSessionReg.addPathPatterns("/aftersales/**");
+ 
+		InterceptorRegistration  partnerSessionReg = registry.addInterceptor(getPartnerSessionInInterceptor());
+		partnerSessionReg.addPathPatterns("/partner/**");
+		partnerSessionReg.addPathPatterns("/goods/**");
+		partnerSessionReg.addPathPatterns("/psaleorder/**");
+	    //userSessionReg.addPathPatterns("/complain/**");
+	    partnerSessionReg.addPathPatterns("/pimage/**");
+	    partnerSessionReg.addPathPatterns("/postage/**");
+	    partnerSessionReg.addPathPatterns("/aftersales/**");
+        
         super.addInterceptors(registry);
     }
 }

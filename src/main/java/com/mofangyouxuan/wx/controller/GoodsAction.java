@@ -27,6 +27,7 @@ import com.mofangyouxuan.dto.Category;
 import com.mofangyouxuan.dto.Goods;
 import com.mofangyouxuan.dto.GoodsSpec;
 import com.mofangyouxuan.dto.PartnerBasic;
+import com.mofangyouxuan.dto.PartnerStaff;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.wx.utils.PageCond;
@@ -38,7 +39,7 @@ import com.mofangyouxuan.wx.utils.PageCond;
  */
 @Controller
 @RequestMapping("/goods")
-@SessionAttributes({"isDayFresh","sys_func","vipBasic","partnerBasic","categories"})
+@SessionAttributes({"partnerUserTP","partnerPasswd","partnerStaff","partnerBindVip","myPartner","categories"})
 public class GoodsAction {
 	
 	@InitBinder
@@ -53,23 +54,13 @@ public class GoodsAction {
 	 * @return
 	 */
 	@RequestMapping("/manage")
-	public String getMgrIndex(ModelMap map) {
-		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-		VipBasic vipBasic = (VipBasic) map.get("vipBasic");
-		if(vipBasic == null) {
-			return "error/page-no-user";
-		}else if(!"1".equals(vipBasic.getStatus())) {
-			map.put("errmsg", "您尚未激活会员账户功能！")	;
-			return "forward:/user/index/vip" ;
+	public String getManageIndex(ModelMap map) {
+		PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
+			return "forward:/partner/manage" ;
 		}
-		if(partner == null) {
-			map.put("errmsg", "您尚未开通合作伙伴功能！")	;
-			return "forward:/user/index/vip" ;
-		}
-		if(!"0".equals(partner.getStatus()) && !"S".equals(partner.getStatus())  && !"C".equals(partner.getStatus()) && !"R".equals(partner.getStatus())) {
-			map.put("errmsg", "您当前的合作伙伴状态有误，不可进行商品管理！")	;
-			return "forward:/user/index/vip" ;
-		}
+		
 		map.put("sys_func", "partner-goods");
 		return "goods/page-goods-manage";
 	}
@@ -83,21 +74,10 @@ public class GoodsAction {
 	 */
 	@RequestMapping("/edit/{goodsId}")
 	public String editGoods(@PathVariable("goodsId")Long goodsId,ModelMap map) {
-		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-		VipBasic vipBasic = (VipBasic) map.get("vipBasic");
-		if(vipBasic == null) {
-			return "error/page-no-user";
-		}else if(!"1".equals(vipBasic.getStatus())) {
-			map.put("errmsg", "您尚未激活会员账户功能！")	;
-			return "forward:/user/index/vip" ;
-		}
-		if(partner == null) {
-			map.put("errmsg", "您尚未开通合作伙伴功能！")	;
-			return "forward:/user/index/vip" ;
-		}
-		if(!"0".equals(partner.getStatus()) && !"S".equals(partner.getStatus())  && !"C".equals(partner.getStatus()) && !"R".equals(partner.getStatus())) {
-			map.put("errmsg", "您当前的合作伙伴状态有误，不可进行商品管理！")	;
-			return "forward:/user/index/vip" ;
+		PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
+			return "forward:/partner/manage" ;
 		}
 		
 		Goods goods = null;
@@ -110,7 +90,7 @@ public class GoodsAction {
 					return "forward:/goods/manage";
 				}else {
 					goods = JSONObject.toJavaObject(ret.getJSONObject("goods"),Goods.class);
-					if(!goods.getPartnerId().equals(partner.getPartnerId())) {
+					if(!goods.getPartnerId().equals(myPartner.getPartnerId())) {
 						map.put("errmsg", "您无权处理该商品信息！");
 						return "forward:/goods/manage";
 					}
@@ -140,18 +120,6 @@ public class GoodsAction {
 	public String saveGoods(@Valid Goods goods,BindingResult result,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			VipBasic vip = (VipBasic) map.get("vipBasic");
-			if(vip == null || !"1".equals(vip.getStatus()) ) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "系统中没有该会员或未激活！");
-				return jsonRet.toString();
-			}
-			PartnerBasic partner = (PartnerBasic)map.get("partnerBasic");
-			if(partner == null) {
-				jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
-				jsonRet.put("errmsg", "系统中没有该合作伙伴信息！");
-				return jsonRet.toString();
-			}
 			//信息验证结果处理
 			if(result.hasErrors()){
 				StringBuilder sb = new StringBuilder();
@@ -214,8 +182,6 @@ public class GoodsAction {
 					}
 				}
 			}
-			goods.setPriceLowest(priceLowest);
-			goods.setStockSum(stockSum);
 			//其他验证
 			Integer limitCnt = goods.getLimitedNum();
 			sb = new StringBuilder();
@@ -231,18 +197,43 @@ public class GoodsAction {
 				jsonRet.put("errmsg", sb.toString());
 				return jsonRet.toString();
 			}
-			//数据检查
-			if(!"0".equals(partner.getStatus()) && !"S".equals(partner.getStatus())  && !"C".equals(partner.getStatus()) && !"R".equals(partner.getStatus())) {
-				jsonRet.put("errcode", ErrCodes.GOODS_PARAM_ERROR);
-				jsonRet.put("errmsg", "您当前的合作伙伴状态有误，不可进行商品管理！");
-				return jsonRet.toString();
+			
+			//数据与权限检查
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			String partnerUserTP = (String) map.get("partnerUserTP");
+			String partnerPasswd = (String) map.get("partnerPasswd");
+			VipBasic vip = (VipBasic) map.get("partnerBindVip");
+			PartnerStaff staff = (PartnerStaff) map.get("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
+			}
+			Integer updateOpr = null;
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = vip.getVipId();
+			}else {
+				if(staff == null || staff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = staff.getUserId();
 			}
 			//数据处理
-			goods.setPartnerId(partner.getPartnerId());
+			goods.setPriceLowest(priceLowest);
+			goods.setStockSum(stockSum);
+			goods.setPartnerId(myPartner.getPartnerId());
+			goods.setUpdateOpr(updateOpr);
 			if(goods.getGoodsId() == 0) {
-				jsonRet = GoodsService.addGoods(goods,vip.getVipId());
+				jsonRet = GoodsService.addGoods(goods,myPartner.getPartnerId(),partnerPasswd);
 			}else {
-				jsonRet = GoodsService.updateGoods(goods,vip.getVipId());
+				jsonRet = GoodsService.updateGoods(goods,myPartner.getPartnerId(),partnerPasswd);
 			}
 			if(jsonRet == null) {
 				jsonRet = new JSONObject();
@@ -270,20 +261,32 @@ public class GoodsAction {
 	public String getOwnAll(String status,String reviewResult,PageCond pageCond,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			VipBasic vip = (VipBasic) map.get("vipBasic");
-			if(vip == null || !"1".equals(vip.getStatus()) ) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "系统中没有该会员或未激活！");
-				return jsonRet.toString();
+			//数据与权限检查
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			String partnerUserTP = (String) map.get("partnerUserTP");
+			VipBasic vip = (VipBasic) map.get("partnerBindVip");
+			PartnerStaff staff = (PartnerStaff) map.get("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
 			}
-			PartnerBasic partner = (PartnerBasic)map.get("partnerBasic");
-			if(partner == null) {
-				jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
-				jsonRet.put("errmsg", "系统中没有该合作伙伴信息！");
-				return jsonRet.toString();
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+			}else {
+				if(staff == null || staff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
 			}
+			
 			JSONObject params = new JSONObject();
-			params.put("partnerId", partner.getPartnerId());
+			params.put("partnerId", myPartner.getPartnerId());
 			params.put("isSelf", true);
 			if(status != null) {
 				params.put("status", status);	
@@ -314,18 +317,30 @@ public class GoodsAction {
 	public String getOwnById(@PathVariable("goodsId")Long goodsId,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			VipBasic vip = (VipBasic) map.get("vipBasic");
-			if(vip == null || !"1".equals(vip.getStatus()) ) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "系统中没有该会员或未激活！");
-				return jsonRet.toString();
+			//数据与权限检查
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			String partnerUserTP = (String) map.get("partnerUserTP");
+			VipBasic vip = (VipBasic) map.get("partnerBindVip");
+			PartnerStaff staff = (PartnerStaff) map.get("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
 			}
-			PartnerBasic partner = (PartnerBasic)map.get("partnerBasic");
-			if(partner == null) {
-				jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
-				jsonRet.put("errmsg", "系统中没有该合作伙伴信息！");
-				return jsonRet.toString();
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+			}else {
+				if(staff == null || staff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
 			}
+			
 			jsonRet = GoodsService.getGoods(false,goodsId,true);
 			if(jsonRet == null) {
 				jsonRet = new JSONObject();
@@ -334,7 +349,7 @@ public class GoodsAction {
 			}
 			if(jsonRet.containsKey("goods")) {
 				Goods goods = JSONObject.toJavaObject(jsonRet.getJSONObject("goods"),Goods.class);
-				if(!partner.getPartnerId().equals(goods.getPartnerId())) {//不是自己
+				if(!myPartner.getPartnerId().equals(goods.getPartnerId())) {//不是自己
 					jsonRet = new JSONObject();
 					jsonRet.put("errcode", ErrCodes.GOODS_PRIVILEGE_ERROR);
 					jsonRet.put("errmsg", "您没有权限查询该商品信息！");
@@ -362,26 +377,36 @@ public class GoodsAction {
 			@RequestParam(value="newStatus",required=true)String newStatus,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			VipBasic vip = (VipBasic) map.get("vipBasic");
-			if(vip == null || !"1".equals(vip.getStatus()) ) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "系统中没有该会员或未激活！");
-				return jsonRet.toString();
+			//数据与权限检查
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			String partnerUserTP = (String) map.get("partnerUserTP");
+			String partnerPasswd = (String) map.get("partnerPasswd");
+			VipBasic vip = (VipBasic) map.get("partnerBindVip");
+			PartnerStaff staff = (PartnerStaff) map.get("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
 			}
-			PartnerBasic partner = (PartnerBasic)map.get("partnerBasic");
-			if(partner == null) {
-				jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
-				jsonRet.put("errmsg", "系统中没有该合作伙伴信息！");
-				return jsonRet.toString();
+			Integer updateOpr = null;
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = vip.getVipId();
+			}else {
+				if(staff == null || staff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = staff.getUserId();
 			}
-			//数据检查
-			if(!"0".equals(partner.getStatus()) && !"S".equals(partner.getStatus())  && !"C".equals(partner.getStatus()) && !"R".equals(partner.getStatus())) {
-				jsonRet.put("errcode", ErrCodes.GOODS_PARAM_ERROR);
-				jsonRet.put("errmsg", "您当前的合作伙伴状态有误，不可进行商品管理！");
-				return jsonRet.toString();
-			}
+			
 			//数据处理
-			jsonRet = GoodsService.changeStatus(goodsIds, partner.getPartnerId(), newStatus);
+			jsonRet = GoodsService.changeStatus(goodsIds, myPartner.getPartnerId(), newStatus,updateOpr,partnerPasswd);
 			if(jsonRet == null) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
@@ -408,24 +433,6 @@ public class GoodsAction {
 			@RequestParam(value="specDetail",required=true)String specDetail,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			VipBasic vip = (VipBasic) map.get("vipBasic");
-			if(vip == null || !"1".equals(vip.getStatus()) ) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "系统中没有该会员或未激活！");
-				return jsonRet.toString();
-			}
-			PartnerBasic partner = (PartnerBasic)map.get("partnerBasic");
-			if(partner == null) {
-				jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
-				jsonRet.put("errmsg", "系统中没有该合作伙伴信息！");
-				return jsonRet.toString();
-			}
-			//数据检查
-			if(!"0".equals(partner.getStatus()) && !"S".equals(partner.getStatus())  && !"C".equals(partner.getStatus()) && !"R".equals(partner.getStatus())) {
-				jsonRet.put("errcode", ErrCodes.GOODS_PARAM_ERROR);
-				jsonRet.put("errmsg", "您当前的合作伙伴状态有误，不可进行商品管理！");
-				return jsonRet.toString();
-			}
 			List<GoodsSpec> specList = JSONArray.parseArray(specDetail, GoodsSpec.class);
 			if(specList == null || specList.size()<1 || specList.size()>30) {
 				jsonRet.put("errcode", ErrCodes.GOODS_PARAM_ERROR);
@@ -468,8 +475,36 @@ public class GoodsAction {
 					}
 				}
 			}
+			//数据与权限检查
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			String partnerUserTP = (String) map.get("partnerUserTP");
+			String partnerPasswd = (String) map.get("partnerPasswd");
+			VipBasic vip = (VipBasic) map.get("partnerBindVip");
+			PartnerStaff staff = (PartnerStaff) map.get("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
+			}
+			Integer updateOpr = null;
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = vip.getVipId();
+			}else {
+				if(staff == null || staff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = staff.getUserId();
+			}
+			
 			//数据处理
-			jsonRet = GoodsService.changeSpec(partner.getPartnerId(), goodsId, specDetail);
+			jsonRet = GoodsService.changeSpec(myPartner.getPartnerId(), goodsId, specDetail,updateOpr,partnerPasswd);
 			if(jsonRet == null) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
@@ -566,7 +601,6 @@ public class GoodsAction {
 		}
 		return jsonRet.toString();
 	}
-	
 }
 
 

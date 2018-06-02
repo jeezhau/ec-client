@@ -149,9 +149,7 @@
 	</form>
   </div>
 </div><!-- end of container -->
-<footer>
-  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
-</footer>
+
 <script type="text/javascript">
 var postageContainerVue = new Vue({
 	el:'#postageContainer',
@@ -294,7 +292,7 @@ var postageContainerVue = new Vue({
 					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(0 == jsonRet.errcode){
-							window.location.href='/postage/index';
+							window.location.href='/postage/manage';
 						}else{//出现逻辑错误
 							alertMsg('错误提示',jsonRet.errmsg);
 						}
@@ -318,7 +316,9 @@ postageContainerVue.getAllProvinces();
 
 </script>
 
-<#include "/image/page-image-show-tpl.ftl" encoding="utf8"> 
+<footer>
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
+</footer>
 
 <#if errmsg??>
 <!-- 错误提示模态框（Modal） -->

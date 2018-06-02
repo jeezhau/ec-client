@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.PartnerBasic;
+import com.mofangyouxuan.dto.PartnerStaff;
 import com.mofangyouxuan.dto.Postage;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.wx.utils.HttpUtils;
@@ -36,7 +37,7 @@ import com.mofangyouxuan.wx.utils.ObjectToMap;
  */
 @Controller
 @RequestMapping("/postage")
-@SessionAttributes({"vipBasic","userBasic","partnerBasic"})
+@SessionAttributes({"partnerUserTP","partnerPasswd","partnerStaff","partnerBindVip","myPartner"})
 public class PostageAction {
 	
 	@Value("${sys.tmp-file-dir}")
@@ -67,20 +68,14 @@ public class PostageAction {
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/index")
-	public String getMgrIndex(ModelMap map) {
-		VipBasic vipBasic = (VipBasic) map.get("vipBasic");
-		if(vipBasic == null) {
-			return "error/page-no-user";
-		}else if(!"1".equals(vipBasic.getStatus())) {
-			map.put("errmsg", "您尚未激活会员账户功能！")	;
-			return "forward:/user/index/vip" ;
+	@RequestMapping("/manage")
+	public String getManageIndex(ModelMap map) {
+		PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
+			return "forward:/partner/manage" ;
 		}
-		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-		if(partner == null) {
-			map.put("errmsg", "您还未开通合作伙伴！");
-			return "forward:/user/index/vip" ;
-		}
+		
 		map.put("sys_func", "partner-postage");
 		return "postage/page-postage-manage";
 	}
@@ -93,18 +88,12 @@ public class PostageAction {
 	 */
 	@RequestMapping("/edit/{postageId}")
 	public String editPostageTpl(@PathVariable("postageId")Long postageId,ModelMap map) {
-		VipBasic vipBasic = (VipBasic) map.get("vipBasic");
-		if(vipBasic == null) {
-			return "error/page-no-user";
-		}else if(!"1".equals(vipBasic.getStatus())) {
-			map.put("errmsg", "您尚未激活会员账户功能！")	;
-			return "forward:/user/index/vip" ;
+		PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
+			return "forward:/partner/manage" ;
 		}
-		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-		if(partner == null) {
-			map.put("errmsg", "您还未开通合作伙伴！");
-			return "forward:/user/index/vip" ;
-		}
+		
 		Postage postage = null;
 		if(postageId>0) {//修改
 			try {
@@ -137,19 +126,15 @@ public class PostageAction {
 	public JSONObject getById(@PathVariable("postageId")Long postageId,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			VipBasic vipBasic = (VipBasic) map.get("vipBasic");
-			if(vipBasic == null || !"1".equals(vipBasic.getStatus())) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "您尚未激活会员账户功能！");
-				return jsonRet;
-			}
-			PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-			if(partner == null) {
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
 				jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
 				jsonRet.put("errmsg", "您还未开通合作伙伴！");
 				return jsonRet;
 			}
-			String url = this.mfyxServerUrl + this.postageGetUrl + postageId;
+			String url = this.mfyxServerUrl + this.postageGetUrl ;
+			url = url.replace("{partnerId}", myPartner.getPartnerId()+"");
+			url = url.replace("{postageId}", postageId+"");
 			String strRet = HttpUtils.doGet(url);
 			jsonRet = JSONObject.parseObject(strRet);
 			return jsonRet;
@@ -171,19 +156,15 @@ public class PostageAction {
 	public Object getAllByPartner(ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			VipBasic vipBasic = (VipBasic) map.get("vipBasic");
-			if(vipBasic == null || !"1".equals(vipBasic.getStatus())) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "您尚未激活会员账户功能！");
-				return jsonRet.toString();
-			}
-			PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-			if(partner == null) {
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
 				jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
 				jsonRet.put("errmsg", "您还未开通合作伙伴！");
-				return jsonRet.toString();
+				return jsonRet;
 			}
-			String url = this.mfyxServerUrl + this.postageGetbypartnerUrl + partner.getPartnerId();
+			
+			String url = this.mfyxServerUrl + this.postageGetbypartnerUrl ;
+			url = url.replace("{partnerId}", myPartner.getPartnerId()+"");
 			String strRet = HttpUtils.doGet(url);
 			jsonRet = JSONObject.parseObject(strRet);
 			return jsonRet;
@@ -206,19 +187,16 @@ public class PostageAction {
 	public String getUsingCnt(@PathVariable("postageId")Integer postageId,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			VipBasic vipBasic = (VipBasic) map.get("vipBasic");
-			if(vipBasic == null || !"1".equals(vipBasic.getStatus())) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "您尚未激活会员账户功能！");
-				return jsonRet.toString();
-			}
-			PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-			if(partner == null) {
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
 				jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
 				jsonRet.put("errmsg", "您还未开通合作伙伴！");
-				return jsonRet.toString();
+				return jsonRet.toJSONString();
 			}
-			String url = this.mfyxServerUrl + this.postageGetusingcntUrl + partner.getPartnerId();
+			
+			String url = this.mfyxServerUrl + this.postageGetusingcntUrl ;
+			url = url.replace("{partnerId}", myPartner.getPartnerId()+"");
+			url = url.replace("{postageId}", postageId+"");
 			String strRet = HttpUtils.doGet(url);
 			jsonRet = JSONObject.parseObject(strRet);
 			return jsonRet.toJSONString();
@@ -241,17 +219,31 @@ public class PostageAction {
 	public String savePostage(@Valid Postage postage,BindingResult result,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			VipBasic vipBasic = (VipBasic) map.get("vipBasic");
-			if(vipBasic == null || !"1".equals(vipBasic.getStatus())) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "您尚未激活会员账户功能！");
-				return jsonRet.toString();
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			String partnerUserTP = (String) map.get("partnerUserTP");
+			String partnerPasswd = (String) map.get("partnerPasswd");
+			VipBasic vip = (VipBasic) map.get("partnerBindVip");
+			PartnerStaff staff = (PartnerStaff) map.get("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
 			}
-			PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-			if(partner == null) {
-				jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
-				jsonRet.put("errmsg", "您还未开通合作伙伴！");
-				return jsonRet.toString();
+			Integer updateOpr = null;
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = vip.getVipId();
+			}else {
+				if(staff == null || staff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = staff.getUserId();
 			}
 			//信息验证结果处理
 			if(result.hasErrors()){
@@ -264,6 +256,7 @@ public class PostageAction {
 				jsonRet.put("errcode", ErrCodes.POSTAGE_PARAM_ERROR);
 				return jsonRet.toString();
 			}
+			
 			//其他验证
 			String isCityWide = postage.getIsCityWide();
 			String isFree = postage.getIsFree();
@@ -334,13 +327,15 @@ public class PostageAction {
 			}
 			//数据处理
 			String[] excludeFields = {"status","updateTime"};
-			postage.setPartnerId(partner.getPartnerId());
+			postage.setPartnerId(myPartner.getPartnerId());
 			Map<String,Object> params = ObjectToMap.object2Map(postage, excludeFields, true);
-			params.put("currVipId", vipBasic.getVipId());
+			params.put("currUserId", updateOpr);
+			params.put("passwd", partnerPasswd);
 			String url = this.mfyxServerUrl + this.postageAddUrl; //添加
 			if(postage.getPostageId()>0) { //更新
 				url = this.mfyxServerUrl + this.postageUpdateUrl;
 			}
+			url = url.replace("{partnerId}", myPartner.getPartnerId()+"");
 			String strRet = HttpUtils.doPost(url, params);
 			jsonRet = JSONObject.parseObject(strRet);
 			return jsonRet.toJSONString();
@@ -362,23 +357,39 @@ public class PostageAction {
 	public String deletePostage(@PathVariable("postageId")Long postageId,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			VipBasic vipBasic = (VipBasic) map.get("vipBasic");
-			if(vipBasic == null || !"1".equals(vipBasic.getStatus())) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "您尚未激活会员账户功能！");
-				return jsonRet.toString();
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			String partnerUserTP = (String) map.get("partnerUserTP");
+			String partnerPasswd = (String) map.get("partnerPasswd");
+			VipBasic vip = (VipBasic) map.get("partnerBindVip");
+			PartnerStaff staff = (PartnerStaff) map.get("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
 			}
-			PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-			if(partner == null) {
-				jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
-				jsonRet.put("errmsg", "您还未开通合作伙伴！");
-				return jsonRet.toString();
+			Integer updateOpr = null;
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = vip.getVipId();
+			}else {
+				if(staff == null || staff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = staff.getUserId();
 			}
 			//其他验证
 			Map<String,Object> params = new HashMap<String,Object>();
 			params.put("postageId", postageId);
-			params.put("currVipId", vipBasic.getVipId());
+			params.put("currUserId", updateOpr);
+			params.put("passwd", partnerPasswd);
 			String url = this.mfyxServerUrl + this.postageDeleteUrl;
+			url = url.replace("{partnerId}", myPartner.getPartnerId()+"");
 			String strRet = HttpUtils.doPost(url, params);
 			jsonRet = JSONObject.parseObject(strRet);
 			return jsonRet.toJSONString();

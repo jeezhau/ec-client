@@ -13,6 +13,9 @@ public class PartnerBasic {
     private Integer partnerId;
 
     private Integer vipId;
+    
+    @Pattern(regexp="[12]",message="合作伙伴类型：取值【1-商家，2-招商推广】！")
+    private String pbTp;
 
     @NotNull(message=" 国家：不可为空！")
     @Size(min=2,max=50,message=" 国家：长度范围2-50字符 ！")
@@ -76,6 +79,9 @@ public class PartnerBasic {
     
     private String status;
 
+    @Null
+    private Integer updateOpr;
+    
     private Date updateTime;
 
     private String reviewLog;
@@ -227,7 +233,7 @@ public class PartnerBasic {
 	}
 
 	public void setIntroduce(String introduce) {
-		this.introduce = introduce;
+		this.introduce = introduce == null?null:introduce.trim();
 	}
 
 	public String getStatus() {
@@ -238,7 +244,16 @@ public class PartnerBasic {
         this.status = status == null ? null : status.trim();
     }
 
-    public String getUpdateTime() {
+    
+    public Integer getUpdateOpr() {
+		return updateOpr;
+	}
+
+	public void setUpdateOpr(Integer updateOpr) {
+		this.updateOpr = updateOpr;
+	}
+
+	public String getUpdateTime() {
         if(this.updateTime != null) {
 			return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(this.updateTime);
 		}else {
@@ -284,5 +299,14 @@ public class PartnerBasic {
 	public void setDistance(Integer distance) {
 		this.distance = distance;
 	}
+
+	public String getPbTp() {
+		return pbTp;
+	}
+
+	public void setPbTp(String pbTp) {
+		this.pbTp = pbTp;
+	}
     
+	
 }

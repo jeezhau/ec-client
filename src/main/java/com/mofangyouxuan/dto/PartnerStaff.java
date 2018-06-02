@@ -17,6 +17,7 @@ public class PartnerStaff {
 	@NotNull(message="用户ID：不可为空！")
     private Integer userId;
 
+	@Null
     private Integer partnerId;
 
 	@Size(max=30,message="内部员工ID：最长30个字符！")
@@ -50,6 +51,7 @@ public class PartnerStaff {
 
     private Date updateTime;
     
+    @Null
     private Integer updateOpr;
 
     private String status;

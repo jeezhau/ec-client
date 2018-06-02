@@ -37,7 +37,10 @@
     <!-- 基本信息管理-->
     <div class="row" id="userBasic" style="display:<#if mode='basic'>block<#else>none</#if>"> 
       <div class="row" style="padding:10px 10px;background-color:#880000">
-        <div class="row" style="margin:10px 25%;vertical-algin:center;text-align:center">
+        <div class="row" style="margin:5px 20px 3px 20px;color:gray">
+          <span>USERID: ${(userBasic.userId)?string('#')}</span>
+        </div>
+        <div class="row" style="margin:3px 25%;vertical-algin:center;text-align:center">
           <#if ((userBasic.headimgurl)!'')?starts_with('http')>
              <img alt="" src="${userBasic.headimgurl}" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" > 
             <#else>
@@ -158,7 +161,10 @@
     <!-- 会员信息管理-->
     <div class="row" id="userVip" style="display:<#if mode='vip'>block<#else>none</#if>"> 
       <div class="row" style="padding:10px 10px;background-color:#880000">
-        <div class="row" style="margin:10px 25%;vertical-algin:center;text-align:center">
+        <div class="row" style="margin:5px 20px 3px 20px;color:gray">
+          <span>VIPID: ${(vipBasic.vipId)?string('#')}</span>
+        </div>
+        <div class="row" style="margin:5px 25%;vertical-algin:center;text-align:center">
           <#if vipBasic.status != '1'>
            <img alt="" src="/icons/无效对象.png" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" >
           <#else>
@@ -210,7 +216,7 @@
 	    </div>
 	    <div class="col-xs-4" style="padding:3px;">
 	       <div style="background-color:white">
-		   <a href="<#if vipBasic.status = '1'>/partner/index<#else>javascript:;</#if>">
+		   <a href="<#if vipBasic.status = '1'>/partner/manage<#else>javascript:;</#if>">
 			    <img alt="" src="/icons/合作伙伴.png" width="90px" height="90px"> 
 			    <p >合作伙伴 </p>
 			</a>

@@ -26,32 +26,39 @@
   <div class="row">
      <h3 style="margin:10px 0;text-align:center" >我是合作伙伴</h3>
   </div>
-  <div class="row" style="margin-top:30px;text-align:center;vertical-align:center">
-    <div class="col-xs-6" style="padding-right:5px">
+  <div class="row" style="margin:30px 10px;text-align:center;vertical-align:center">
+    <#if (partnerUserTP=='bindVip') || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('basic') )>
+    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
       <div style="background-color:white">
 	    <a href="/partner/edit" >
 		    <img src="/icons/合作伙伴-申请开通.png" alt="" width="90px" height="90px">
-		    <p >我要开店</p>
+		    <p >基础信息管理</p>
 		</a>
       </div>
     </div>
-    <div class="col-xs-6" style="padding-left:5px">
+    </#if>
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('pimage') )>
+    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
        <div style="background-color:white">
-	    <a href="/image/index" >
+	    <a href="/pimage/manage" >
 		    <img src="/icons/图库管理.png" alt="" width="90px" height="90px">
 		    <p>图库管理</p>
 		</a>
 	  </div>
     </div> 
-    <div class="col-xs-6" style="padding-right:5px">
+    </#if>
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('postage') )>
+    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
        <div style="background-color:white">
-	    <a href="/postage/index" >
+	    <a href="/postage/manage" >
 		    <img src="/icons/运费模板管理.png" alt="" width="90px" height="90px">
 		    <p>运费模版管理</p>
 		</a>
 	  </div>
-    </div>    
-    <div class="col-xs-6" style="padding-left:5px">
+    </div> 
+    </#if>
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('goods') )>   
+    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
        <div style="background-color:white">
 	    <a href="/goods/manage" >
 		    <img src="/icons/商品管理.png" alt=""  width="90px" height="90px">
@@ -59,15 +66,19 @@
 		</a>
 	  </div>
     </div>
-    <div class="col-xs-6" style="padding-right:5px">
+    </#if>
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('order') )>
+    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
        <div style="background-color:white">
-	    <a href="/order/partner/show/all" >
+	    <a href="/psaleorder/show/all" >
 		    <img src="/icons/销售订单.png" alt="" width="90px" height="90px">
 		    <p >销售订单</p>
 		</a>
        </div>
     </div>
-    <div class="col-xs-6" style="padding-left:5px">
+    </#if>
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('aftersales') )>
+    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
        <div style="background-color:white">
 	    <a href="/aftersales/partner/mgr/refunding" >
 		    <img src="/icons/售后服务.png" alt="" width="90px" height="90px">
@@ -75,6 +86,7 @@
 		</a>
        </div>
     </div>
+    </#if>
   </div>
   <div class="row" style="margin-top:3px;vertical-align:center">
     <div class="col-xs-12">
@@ -92,7 +104,14 @@
       </div> 
     </div>
   </div>  
+  
+  <div class="row" style="margin:30px 0">
+    <div class="col-xs-12" style="text-align:center">
+      <a class="btn btn-danger" style="padding:8px 20px;width:80%" href="/partner/logout">退出登录</a>
+    </div>
+  </div>
 </div><!-- end of container -->
+
 <footer>
   <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
 </footer>

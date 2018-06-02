@@ -2,6 +2,8 @@ package com.mofangyouxuan.wx.controller;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,29 +26,30 @@ import org.springframework.web.multipart.MultipartFile;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.PartnerBasic;
+import com.mofangyouxuan.dto.PartnerStaff;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.wx.utils.HttpUtils;
 
 /**
- * 会员图库管理
+ * 合作伙伴图库管理
  * @author jeekhan
  *
  */
 @Controller
-@RequestMapping("/image")
-@SessionAttributes({"vipBasic","userBasic","partnerBasic"})
-public class ImageGalleryAction {
+@RequestMapping("/pimage")
+@SessionAttributes({"partnerUserTP","partnerPasswd","partnerStaff","partnerBindVip","myPartner"})
+public class PartnerImageAction {
 	@Value("${sys.tmp-file-dir}")
 	private String tmpFileDir;
 	@Value("${mfyx.mfyx-server-url}")
 	private String mfyxServerUrl;
-	@Value("${mfyx.image-file-upload-url}")
+	@Value("${mfyx.pimage-file-upload-url}")
 	private String imageUplodFileUrl;
-	@Value("${mfyx.image-folder-create-url}")
+	@Value("${mfyx.pimage-folder-create-url}")
 	private String imageCreateFolderUrl;
-	@Value("${mfyx.image-folder-list-url}")
+	@Value("${mfyx.pimage-folder-list-url}")
 	private String imageListFilesUrl;
-	@Value("${mfyx.image-file-show-url}")
+	@Value("${mfyx.pimage-file-show-url}")
 	private String imageShowFileurl;
 	
 	/**
@@ -54,22 +57,15 @@ public class ImageGalleryAction {
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/index")
-	public String getIndex(ModelMap map) {
-		VipBasic vipBasic = (VipBasic) map.get("vipBasic");
-		if(vipBasic == null) {
-			return "error/page-no-user";
-		}else if(!"1".equals(vipBasic.getStatus())) {
-			map.put("errmsg", "您尚未激活会员账户功能！")	;
-			return "forward:/user/index/vip" ;
-		}
-		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-		if(partner == null) {
-			map.put("errmsg", "您还未开通合作伙伴！");
-			return "forward:/user/index/vip" ;
+	@RequestMapping("/manage")
+	public String getMangeIndex(ModelMap map) {
+		PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
+			return "forward:/partner/manage" ;
 		}
 		map.put("sys_func", "partner-image");
-		return "image/page-image-manage";
+		return "pimage/page-image-manage";
 	}
 	
 	
@@ -83,16 +79,41 @@ public class ImageGalleryAction {
 	@ResponseBody
 	public String uploadFile(@RequestParam(value="folderPath",required=true)String folderPath,
 			@RequestParam(value="image")MultipartFile image,ModelMap map) {
-		
 		JSONObject jsonRet = new JSONObject();
 		File tmpFile = null;
 		try {
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			String partnerUserTP = (String) map.get("partnerUserTP");
+			String partnerPasswd = (String) map.get("partnerPasswd");
+			VipBasic vip = (VipBasic) map.get("partnerBindVip");
+			PartnerStaff staff = (PartnerStaff) map.get("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
+			}
+			Integer updateOpr = null;
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = vip.getVipId();
+			}else {
+				if(staff == null || staff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = staff.getUserId();
+			}
+			//文件类型判断
 			if(image == null || image.isEmpty()) {
 				jsonRet.put("errcode", ErrCodes.PARTNER_PARAM_ERROR);
 				jsonRet.put("errmsg", "图片信息不可为空！");
 				return jsonRet.toString();
 			}
-			//文件类型判断
 			String imgType = image.getOriginalFilename().substring(image.getOriginalFilename().lastIndexOf('.')+1);
 			if(!"jpg".equalsIgnoreCase(imgType) && !"jpeg".equalsIgnoreCase(imgType) && !"png".equalsIgnoreCase(imgType)) {
 				jsonRet.put("errcode", ErrCodes.IMAGE_PARAM_ERROR);
@@ -104,17 +125,14 @@ public class ImageGalleryAction {
 				jsonRet.put("errmsg", "文件归属目录须是 Home/.... ！");
 				return jsonRet.toString();
 			}
-			//数据检查
-			VipBasic vip = (VipBasic) map.get("vipBasic");
-			if(vip == null || !"1".equals(vip.getStatus()) ) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "系统中没有该会员或未激活！");
-				return jsonRet.toString();
-			}
+			
+			//数据处理
 			String url = this.mfyxServerUrl + this.imageUplodFileUrl;
+			url = url.replace("{partnerId}", myPartner.getPartnerId()+"");
 			Map<String,String> params = new HashMap<String,String>();
 			params.put("folderPath", folderPath);
-			params.put("currUserId", "" +vip.getVipId());
+			params.put("currUserId", "" + updateOpr);
+			params.put("passwd", partnerPasswd);
 			File dir = new File(this.tmpFileDir);
 			if(!dir.exists()) {
 				dir.mkdirs();
@@ -150,6 +168,32 @@ public class ImageGalleryAction {
 			ModelMap map){
 		JSONObject jsonRet = new JSONObject();
 		try {
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			String partnerUserTP = (String) map.get("partnerUserTP");
+			String partnerPasswd = (String) map.get("partnerPasswd");
+			VipBasic vip = (VipBasic) map.get("partnerBindVip");
+			PartnerStaff staff = (PartnerStaff) map.get("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
+			}
+			Integer updateOpr = null;
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = vip.getVipId();
+			}else {
+				if(staff == null || staff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = staff.getUserId();
+			}
 			folderName = folderName.trim();
 			if(!folderName.matches("^[a-zA-Z0-9_\u4e00-\u9fa5]{2,10}$")) {
 				jsonRet.put("errcode", ErrCodes.IMAGE_PARAM_ERROR);
@@ -168,18 +212,14 @@ public class ImageGalleryAction {
 				return jsonRet.toString();
 			}
 			
-			//数据检查
-			VipBasic vip = (VipBasic) map.get("vipBasic");
-			if(vip == null || !"1".equals(vip.getStatus()) ) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "系统中没有该会员或未激活！");
-				return jsonRet.toString();
-			}
+			//数据处理
 			String url = this.mfyxServerUrl + this.imageCreateFolderUrl;
+			url = url.replace("{partnerId}",myPartner.getPartnerId() + "");
 			Map<String,Object> params = new HashMap<String,Object>();
 			params.put("upFolderPath", upFolderPath);
 			params.put("folderName", folderName);
-			params.put("currUserId", "" +vip.getVipId());
+			params.put("currUserId", "" + updateOpr);
+			params.put("passwd", partnerPasswd);
 			String strRet = HttpUtils.doPost(url, params);
 			return strRet;
 		} catch (Exception e) {
@@ -202,22 +242,44 @@ public class ImageGalleryAction {
 	public Object listFiles(@RequestParam(value="folderPath",required=true)String folderPath,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			String partnerUserTP = (String) map.get("partnerUserTP");
+			String partnerPasswd = (String) map.get("partnerPasswd");
+			VipBasic vip = (VipBasic) map.get("partnerBindVip");
+			PartnerStaff staff = (PartnerStaff) map.get("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
+			}
+			Integer updateOpr = null;
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = vip.getVipId();
+			}else {
+				if(staff == null || staff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = staff.getUserId();
+			}
 			if(!folderPath.startsWith("Home")) {
 				jsonRet.put("errcode", ErrCodes.IMAGE_PARAM_ERROR);
 				jsonRet.put("errmsg", "文件夹目录须是 Home/.... ！");
 				return jsonRet.toString();
 			}
-			//数据检查
-			VipBasic vip = (VipBasic) map.get("vipBasic");
-			if(vip == null || !"1".equals(vip.getStatus()) ) {
-				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
-				jsonRet.put("errmsg", "系统中没有该会员或未激活！");
-				return jsonRet.toString();
-			}
+			//数据处理
 			String url = this.mfyxServerUrl + this.imageListFilesUrl;
+			url = url.replace("{partnerId}",myPartner.getPartnerId() + "");
 			Map<String,Object> params = new HashMap<String,Object>();
 			params.put("folderPath", folderPath);
-			params.put("currUserId", "" +vip.getVipId());
+			params.put("currUserId", "" + updateOpr);
+			params.put("passwd",partnerPasswd);
 			String strRet = HttpUtils.doPost(url, params);
 			return strRet;
 		} catch (Exception e) {
@@ -234,25 +296,35 @@ public class ImageGalleryAction {
 	 * @param filename
 	 * @return
 	 */
-	@RequestMapping("/file/show/{vipId}/{filename}")
-	public void showFile(@PathVariable(value="vipId",required=true)Integer vipId,
+	@RequestMapping("/file/show/{partnerId}/{filename}")
+	public void showFile(@PathVariable(value="partnerId",required=true)Integer partnerId,
 			@PathVariable(value="filename",required=true)String filename,
 			OutputStream out,HttpServletRequest request,HttpServletResponse response,ModelMap map) {
 		try {
 			//数据检查
-			if(vipId == null || vipId < 1 ) {
+			if(partnerId == null || partnerId < 1 ) {
 				return;
 			}
 			if("undefined".equals(filename)) {
 				return;
 			}
-			String url = this.mfyxServerUrl + this.imageShowFileurl + vipId + "/" + filename;
+			String url = this.mfyxServerUrl + this.imageShowFileurl; 
+			url = url.replace("{partnerId}",partnerId + "");
+			url = url.replace("{filename}",filename);	
 			File file = HttpUtils.downloadFile(this.tmpFileDir,url);
-			BufferedImage image = ImageIO.read(file);
+			InputStream is = new FileInputStream(file);
 			response.setContentType("image/*");
-			OutputStream os = response.getOutputStream();  
-			String type = file.getName().substring(file.getName().lastIndexOf('.')+1);
-			ImageIO.write(image, type, os); 
+			response.addHeader("filename", filename);
+			OutputStream os = response.getOutputStream(); 
+			byte[] buff = new byte[1024];
+			int len = 0;
+			while((len=is.read(buff))>0) {
+				os.write(buff, 0, len);
+			}
+			os.flush();
+			os.close();
+			is.close();
+			file.delete();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

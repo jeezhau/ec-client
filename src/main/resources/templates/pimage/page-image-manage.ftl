@@ -21,17 +21,15 @@
     <link href="/css/mfyx.css" rel="stylesheet">
     <!-- 文件上传 -->
     <script src="/script/fileinput.min.js" type="text/javascript"></script>
-    <script src="/script/zh.js" type="text/javascript"></script>
+    <script src="/script/fileinput_locale_zh.js" type="text/javascript"></script>
     <link href="/css/fileinput.min.css" rel="stylesheet">
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+
 <div class="container" id="container" style="oveflow:scroll">
-  <div class="row">
-     <h3 style="margin:10px 0;text-align:center" >我的图库</h3>
-  </div>
-  <div class="row" style="margin-top:10px;">
+  <div class="row" style="margin-top:0px;">
     <div class="row">
 	    <div class="col-xs-12" style="padding:0 15px">
 	      <ol class="breadcrumb " style="margin-bottom:1px;background-color:white">
@@ -44,24 +42,22 @@
     </div>
     <div class="row">
 	    <div class="col-xs-12" style="padding:0 5px;background-color:white;margin:0 20px 0 3px;text-align:center">
-	     <a class="btn" href="javascript:;" @click="createNewFolder"><img src="/icons/新建文件夹.png" width="20px" height="20px"></a>
-	     <a class="btn" href="javascript:;" @click="uploadImg"><img src="/icons/上传图片.png" width="20px" height="20px"></a>
+	     <a class="btn" href="javascript:;" @click="createNewFolder"><img src="/icons/新建文件夹.png" width="25px" height="25px"><br>新建文件夹</a>
+	     <a class="btn" href="javascript:;" @click="uploadImg"><img src="/icons/上传图片.png" width="25px" height="25px"><br>上传文件</a>
 	    </div>
     </div>
-    <div class="row">
-      <ul class="list-group" style="padding:0 5px;background-color:white;margin:0 20px 0 20px;">
+    <div class="row" style="margin:3px 0">
+      <ul class="list-group" style="padding:0 5px;background-color:white;">
         <li v-for="item in files" class="list-group-item">
           <a v-if="isFileOrDir(item)===false" href="javascript:;" @click="listFiles(folder.join('/') + '/' + item)"><img alt="文件夹" width=20px height=20px src="/icons/文件夹.png">&nbsp;&nbsp;&nbsp;{{item}}</a>
-          <span v-if="isFileOrDir(item)===true"><img alt="" width=20px height=20px  v-bind:src="'/image/file/show/${(vipBasic.vipId)?string('#')}/' + item"><span>&nbsp;&nbsp;&nbsp; {{item}}</span></span>
+          <span v-if="isFileOrDir(item)===true"><img alt="" width=20px height=20px  v-bind:src="'/pimage/file/show/${(myPartner.partnerId)?string('#')}/' + item"><span>&nbsp;&nbsp;&nbsp; {{item}}</span></span>
         </li>
       </ul>
     </div>
   </div>
  
 </div><!-- end of container -->
-<footer>
-  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
-</footer>
+
 <script>
 var containerVue = new Vue({
 	el:'#container',
@@ -99,7 +95,7 @@ var containerVue = new Vue({
 				return;
 			}
 			$.ajax({
-				url: '/image/folder/list',
+				url: '/pimage/folder/list',
 				method:'post',
 				data: {'folderPath':folderPath},
 				success: function(jsonRet,status,xhr){
@@ -159,14 +155,14 @@ containerVue.listFiles('Home');
                <div class="form-group">
                </div>
 			   <div class="form-group">
-			      <label class="col-xs-3 control-label" style="padding-right:1px">上级目录<span style="color:red" >*</span></label>
-			      <div class="col-xs-9" style="padding-left:1px">
+			      <label class="col-xs-4 control-label" style="padding-right:1px">上级目录<span style="color:red" >*</span></label>
+			      <div class="col-xs-8" style="padding-left:1px">
 			         <input type="text" class="form-control" v-model="params.upFolderPath" readonly disabled >
 			      </div>
 			   </div>
 			   <div class="form-group">
-			      <label class="col-xs-3 control-label" style="padding-right:1px">新建文件夹名<span style="color:red" >*</span></label>
-			      <div class="col-xs-9" style="padding-left:1px">
+			      <label class="col-xs-4 control-label" style="padding-right:1px">新建文件夹名<span style="color:red" >*</span></label>
+			      <div class="col-xs-8" style="padding-left:1px">
 			         <input type="text" class="form-control" v-model="params.folderName" maxLength=10 required placeholder="请输入新建文件夹名(2-10字母数字汉字)..." >
 			      </div>
 			   </div>
@@ -197,7 +193,7 @@ var createDirVue = new Vue({
 				return false;
 			}
 			$.ajax({
-				url: '/image/folder/create',
+				url: '/pimage/folder/create',
 				data: this.params,
 				success: function(jsonRet,status,xhr){
 					$("#dealingData").hide();
@@ -239,15 +235,15 @@ var createDirVue = new Vue({
                <div class="form-group">
                </div>
 			   <div class="form-group">
-			      <label class="col-xs-3 control-label" style="padding-right:1px">图片归属目录<span style="color:red" >*</span></label>
-			      <div class="col-xs-9" style="padding-left:1px">
+			      <label class="col-xs-4 control-label" style="padding-right:1px">图片归属目录<span style="color:red" >*</span></label>
+			      <div class="col-xs-8" style="padding-left:1px">
 			         <input type="text" class="form-control" id="uploadFolderPath" readonly disabled >
 			      </div>
 			   </div>
                <div class="form-group">
-                 <label class="col-xs-3 control-label" style="padding-right:1px">上传图片<span style="color:red" >*</span></label>
-                 <div class="col-xs-9" style="padding-left:1px">
-                   <input id="upFile" type="file" name="image" type="file" class="file-loading">
+                 <label class="col-xs-4 control-label" style="padding-right:1px">上传图片<span style="color:red" >*</span></label>
+                 <div class="col-xs-8" style="padding-left:1px">
+                   <input id="upFile" type="file" name="image" type="file" multiple class="file-loading">
                  </div>
                 </div>
 			</form>
@@ -262,7 +258,7 @@ var createDirVue = new Vue({
 function initFileUpload(folderPath){
 	$("#upFile").fileinput({
 		language: 'zh', //设置语言
-	    uploadUrl: '/image/file/upload', //上传的地址
+	    uploadUrl: '/pimage/file/upload', //上传的地址
 	    deleteUrl:'',
 	    uploadAsync:true,
 	    showUpload: true, //是否显示上传按钮
@@ -270,6 +266,9 @@ function initFileUpload(folderPath){
 	    deleteExtraData:{},
 	    allowedFileExtensions : ['jpg', 'png','jpeg'],//接收的文件后缀
 	    dropZoneEnabled:false,
+	    maxFileCount: 10, //表示允许同时上传的最大文件个数
+	    enctype: 'multipart/form-data',
+	    msgFilesTooMany: "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
 	    previewFileType: "image",
 	    browseClass: "btn btn-success",
 	    browseLabel: "Pick Image",
@@ -280,7 +279,7 @@ function initFileUpload(folderPath){
 	    uploadClass: "btn btn-info",
 	    uploadLabel: "Upload",
 	    uploadIcon: "<i class=\"glyphicon glyphicon-upload\"></i> ",
-	    maxFileSize: 2024,//单位为kb，如果为0表示不限制文件大小
+	    maxFileSize: 3036,//单位为kb，如果为0表示不限制文件大小
 	    previewSettings: {
 	        image: {width: "100px", height: "100px"},
 	    }
@@ -320,6 +319,10 @@ function initFileUpload(folderPath){
 	});
 }
 </script>
+
+<footer>
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
+</footer>
 
 </body>
 </html>

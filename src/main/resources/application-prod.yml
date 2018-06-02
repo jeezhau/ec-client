@@ -76,10 +76,6 @@ mfyx:
   pstaff-upload-url: '/{partnerId}/upload/{mode}'
   pstaff-show-url: '/pstaff/{partnerId}/show/{userId}/{mode}'
   pstaff-getall-url: '/pstaff/{partnerId}/getall'
-  
-  city-get-provinces-url: '/city/province/getall'
-  city-get-cities-url: '/city/city/getbyprov/'
-  city-get-areas-url: '/city/area/getbycity/'
 
   goods-add-url: '/goods/add'
   goods-update-url: '/goods/update'
@@ -90,10 +86,10 @@ mfyx:
   goods-change-spec-url: '/goods/changeSpec'
   goods-category-url: '/goods/category'
   
-  image-file-upload-url: '/image/file/upload'
-  image-file-show-url: '/image/file/show/'
-  image-folder-create-url: '/image/folder/create'
-  image-folder-list-url: '/image/folder/list'
+  pimage-file-upload-url: '/pimage/{partnerId}/file/upload'
+  pimage-file-show-url: '/pimage/{partnerId}/file/show/{filename}'
+  pimage-folder-create-url: '/pimage/{partnerId}/folder/create'
+  pimage-folder-list-url: '/pimage/{partnerId}/folder/list'
   
   postage-get-url: '/postage/get/'
   postage-getbypartner-url: '/postage/getbypartner/'
@@ -134,7 +130,11 @@ mfyx:
   collection-delete-url: '/collection/{userId}/delete'
   
   sysparam-getall-url: '/sysparam/sys/getall'
-
+  
+  city-get-provinces-url: '/city/province/getall'
+  city-get-cities-url: '/city/city/getbyprov/'
+  city-get-areas-url: '/city/area/getbycity/'
+  
   complain-getall-url: '/complain/getall'
   complain-order-save-url: '/complain/{userId}/order/save'
   complain-partner-save-url: '/complain/{vipId}/partner/save'

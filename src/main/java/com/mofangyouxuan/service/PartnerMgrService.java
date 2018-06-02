@@ -120,11 +120,13 @@ public class PartnerMgrService {
 	 * @throws IllegalAccessException 
 	 * @throws IllegalArgumentException 
 	 */
-	public static String create(PartnerBasic basic) throws IllegalArgumentException, IllegalAccessException {
+	public static String create(PartnerBasic basic,String passwd) throws IllegalArgumentException, IllegalAccessException {
 		String url = mfyxServerUrl + partnerBasicCreateUrl;
 		Map<String, Object> params = new HashMap<String,Object>();
 		String[] excludeFields = {"updateTime","reviewLog","reviewOpr","reviewTime","status","certDir"};
 		params = ObjectToMap.object2Map(basic,excludeFields,false);
+		params.put("passwd", passwd);
+	
 		String strRet = HttpUtils.doPost(url, params);
 		return strRet;
 	}
@@ -134,11 +136,12 @@ public class PartnerMgrService {
 	 * @param basic
 	 * @return {errcode:0,errmsg:"ok"}
 	 */
-	public static String update(PartnerBasic basic) {
+	public static String update(PartnerBasic basic,String passwd) {
 		String url = mfyxServerUrl + partnerBasicUpdateUrl;
 		Map<String, Object> params = new HashMap<String,Object>();
 		String[] excludeFields = {"updateTime","reviewLog","reviewOpr","reviewTime","status","certDir"};
 		params = ObjectToMap.object2Map(basic,excludeFields,false);
+		params.put("passwd", passwd);
 		String strRet = HttpUtils.doPost(url, params);
 		return strRet;
 	}
@@ -149,10 +152,11 @@ public class PartnerMgrService {
 	 * @param currUserId
 	 * @return {errcode:0,errmsg:'ok'}
 	 */
-	public static String changeStatus(Integer partnerId,Integer currUserId) {
+	public static String changeStatus(Integer partnerId,Integer currUserId,String passwd) {
 		JSONObject json = new JSONObject();
 		json.put("partnerId", partnerId);
 		json.put("currUserId", currUserId);
+		json.put("passwd", passwd);
 		String url = mfyxServerUrl + partnerChangeStatusUrl;
 		String strRet = HttpUtils.doPost(url, json.toString());
 		return strRet;
@@ -161,16 +165,19 @@ public class PartnerMgrService {
 	
 	/**
 	 * 证件照片上传
+	 * @param bindVipId
 	 * @param imageFile
 	 * @param certType
 	 * @param userId
 	 * @return {errcode:0,errmsg:""}
 	 */
-	public static String uploadCert(File imageFile,String certType,Integer vipId) {
+	public static String uploadCert(Integer bindVipId,File imageFile,String certType,Integer userId,String passwd) {
 		String url = mfyxServerUrl + partnerCertUploadUrl;
 		Map<String,String> paramPairs = new HashMap<String,String>();
 		paramPairs.put("certType", certType);
-		paramPairs.put("currVipId", "" + vipId);
+		paramPairs.put("bindVipId", "" + bindVipId);
+		paramPairs.put("userId", userId+"");
+		paramPairs.put("passwd", passwd);
 		String strRet = HttpUtils.uploadFile(url, imageFile, "image", paramPairs);
 		return strRet;
 	}
@@ -181,10 +188,10 @@ public class PartnerMgrService {
 	 * @param userId
 	 * @return [InputSteam,filename]
 	 */
-	public static Object[] showCert(Integer partnerId,String certType) {
+	public static File showCert(Integer partnerId,String certType) {
 		String url = mfyxServerUrl + partnerCertShowUrl + partnerId + "/" + certType;
-		Object[] ret = HttpUtils.downloadFile(url);
-		return ret;
+		File file = HttpUtils.downloadFile(tmpFileDir,url);
+		return file;
 	}
 
 }

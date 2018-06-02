@@ -20,8 +20,8 @@ import com.mofangyouxuan.dto.VipBasic;
  * @author jeekhan
  *
  */
-public class SessionInterceptor extends HandlerInterceptorAdapter{
-	Logger log = LoggerFactory.getLogger(SessionInterceptor.class);
+public class UserSessionInterceptor extends HandlerInterceptorAdapter{
+	Logger log = LoggerFactory.getLogger(UserSessionInterceptor.class);
 	
 	
 	/**
@@ -37,8 +37,7 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 		//String agent= request.getHeader("user-agent").toLowerCase();
 		//System.out.println(uri);
 		//不需要控制session的路径
-		String[] excluceUrl = {"/login","/image/file/show/","/partner/cert/show/","/user/headimg/show/",
-				"/goods/show/","/goods/show/","/partner/mcht/","/srvcenter/index/"}; 
+		String[] excluceUrl = {"/login","/user/headimg/show/","/srvcenter/index/"}; 
 		String isDayFresh = (String) request.getSession().getAttribute("isDayFresh");
 		String sysFunc = (String) request.getSession().getAttribute("sys_func");
 		if(isDayFresh == null) {

@@ -27,9 +27,6 @@
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
 
 <div class="container " id="container" style="oveflow:scroll">
-  <div class="row" style="margin:5px">
-    <h3 style="text-align:center">我的销售订单</h3>
-  </div>
   <div class="row" style="margin:5px 0;text-align:center" >
     <ul class="nav navbar-nav nav-tabs" style="padding:0 5px">
         <li class="<#if status='all'> active </#if>" style="width:20%" @click="getOrders('all',$event)"> 
@@ -62,12 +59,12 @@
 
 			<a v-if="order.status ==='20'" class="btn btn-info pull-right" style="padding:0 3px;margin:0 3px" @click="readyGoods(order)"><span >接单备货</span></a>
 			<a v-if="order.status ==='21'" class="btn btn-info pull-right" style="padding:0 3px;margin:0 3px" @click="readyGoods(order)"><span >取消备货</span></a>
-		    <a v-if="order.status ==='20' || order.status ==='21'" class="btn btn-danger pull-right" :href="'/order/partner/delivery/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即发货</span></a>
+		    <a v-if="order.status ==='20' || order.status ==='21'" class="btn btn-danger pull-right" :href="'/psaleorder/delivery/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即发货</span></a>
 		    
 		    <a v-if="order.status==='30' " class="btn btn-default pull-right" :href="'/order/logistics/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >查看物流</span></a>
 		    
 		    <a v-if="!order.apprUserTime && (order.status==='31' || startWith(order.status,'4') || order.status==='55' || order.status==='56')" class="btn btn-primary pull-right" :href="'/order/partner/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即评价</span></a>
-		    <a v-if="order.apprUserTime" class="btn btn-primary pull-right" :href="'/order/partner/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >追加评价</span></a>
+		    <a v-if="order.apprUserTime" class="btn btn-primary pull-right" :href="'/psaleorder/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >追加评价</span></a>
 		    
       </div>
 	</div>
@@ -97,7 +94,7 @@ var containerVue = new Vue({
 			this.param.status = stat;
 			containerVue.orders = [];
 			$.ajax({
-				url: '/order/partner/getall',
+				url: '/psaleorder/getall',
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
@@ -233,7 +230,7 @@ $("#container").scroll(scrollHandler);
 		 submit: function(){
 			 $("#dealingData").show();
 			 $.ajax({
-				url: '/order/partner/ready/' + this.order.orderId,
+				url: '/psaleorder/ready/' + this.order.orderId,
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){

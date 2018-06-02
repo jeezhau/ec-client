@@ -487,7 +487,7 @@ if(goodsContainerVue.specDetailArr.length == 0){
 goodsContainerVue.param.goodsDesc = $('#hiddenGoodsDesc').val();
 </script>
 
-<#include "/image/page-image-show-tpl.ftl" encoding="utf8">
+<#include "/pimage/page-image-show-tpl.ftl" encoding="utf8">
 <footer>
   <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
 </footer>
