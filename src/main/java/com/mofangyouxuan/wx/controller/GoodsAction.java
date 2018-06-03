@@ -539,39 +539,6 @@ public class GoodsAction {
 		return jsonRet.toJSONString();
 	}
 	
-	/**
-	 * 任何人获取指定商品的详细信息并展示，包含展示部分合作伙伴信息
-	 * @param goodsId
-	 * @param map
-	 * @return
-	 */
-	@RequestMapping("/show/{goodsId}")
-	public String showGoods(@PathVariable("goodsId")Long goodsId,ModelMap map) {
-		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-		Goods goods = null;
-		try {
-			JSONObject obj = GoodsService.getGoods(true,goodsId,true);
-			if(obj == null || !obj.containsKey("goods")) {
-				map.put("errmsg", "获取商品详情失败！");
-			}else {
-				goods = JSONObject.toJavaObject(obj.getJSONObject("goods"),Goods.class);
-				if(partner != null && partner.getPartnerId().equals(goods.getPartnerId())) {//自己
-					map.put("goods", goods);
-				}else { //其他人
-					if("S".equals(goods.getPartner().getStatus()) && 
-							"1".equals(goods.getStatus()) && "1".equals(goods.getReviewResult())) {
-						map.put("goods", goods);
-					}else {
-						map.put("errmsg", "该商品当前不可访问！");
-					}
-				}
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
-		}
-		return "goods/page-goods-show";
-	}
 	
 	/**
 	 * 任何人获取商品详细信息
@@ -601,6 +568,36 @@ public class GoodsAction {
 		}
 		return jsonRet.toString();
 	}
+	
+	/**
+	 * 任何人获取指定商品的详细信息并展示，包含展示部分合作伙伴信息
+	 * @param goodsId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/preview/{goodsId}")
+	public String previewGoods(@PathVariable("goodsId")Long goodsId,ModelMap map) {
+		Goods goods = null;
+		try {
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				map.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return "forward:/partner/manage" ;
+			}
+			JSONObject obj = GoodsService.getGoods(true,goodsId,true);
+			if(obj == null || !obj.containsKey("goods")) {
+				map.put("errmsg", "获取商品详情失败！");
+			}else {
+				goods = JSONObject.toJavaObject(obj.getJSONObject("goods"),Goods.class);
+				map.put("goods", goods);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return "goods/page-goods-preview";
+	}
+	
 }
 
 

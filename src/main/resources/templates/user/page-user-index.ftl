@@ -55,13 +55,13 @@
       <div class="row" style="margin:30px 1px 15px 1px;">
        <ul class="nav nav-pills nav-stacked" style="">
          <li style="background-color:white" >
-           <a href="/order/user/show/all" >
+           <a href="/order/show/all" >
              <span class=" pull-right" style="border:none">查询所有  &gt;</span>
              <img alt="" src="/icons/订单.png" width="20px" height="20px"> 我的订单
            </a>
            <span class="row">
              <span class="col-xs-3"  style="padding:0 3px">
-                <a href="/order/user/show/4pay" class="weui-tabbar__item ">
+                <a href="/order/show/4pay" class="weui-tabbar__item ">
                     <span style="display: inline-block;position: relative;">
                         <img src="/icons/等待付款.png" alt="" class="weui-tabbar__icon">
                         <span v-if="counts['10']>0" class="weui-badge" style="position: absolute;top: -2px;right: -13px;">{{counts['10']}}</span>
@@ -70,7 +70,7 @@
                 </a>
               </span>
               <span class="col-xs-3"  style="padding:0 3px">
-                <a href="/order/user/show/4delivery" class="weui-tabbar__item " >
+                <a href="/order/show/4delivery" class="weui-tabbar__item " >
                     <span style="display: inline-block;position: relative;">
                         <img src="/icons/待发货.png" alt="" class="weui-tabbar__icon">
                         <span v-if="counts['20']>0" class="weui-badge" style="position: absolute;top: -2px;right: -13px;">{{counts['20']}}</span>
@@ -79,7 +79,7 @@
                 </a>
               </span>
               <span class="col-xs-3" style="padding:0 3px">
-                <a href="/order/user/show/4sign" class="weui-tabbar__item ">
+                <a href="/order/show/4sign" class="weui-tabbar__item ">
                     <span style="display: inline-block;position: relative;">
                         <img src="/icons/待收货.png" alt="" class="weui-tabbar__icon">
                         <span v-if="counts['30']>0" class="weui-badge" style="position: absolute;top: -2px;right: -13px;">{{counts['30']}}</span>
@@ -89,7 +89,7 @@
                 </a>
               </span>
               <span class="col-xs-3" style="padding:0 3px">
-                <a href="/order/user/show/4appraise" class="weui-tabbar__item ">
+                <a href="/order/show/4appraise" class="weui-tabbar__item ">
                     <span style="display: inline-block;position: relative;">
                         <img src="/icons/待评价.png" alt="" class="weui-tabbar__icon">
                         <span v-if="counts['40']>0" class="weui-badge" style="position: absolute;top: -2px;right: -13px;">{{counts['40']}}</span>
@@ -110,7 +110,7 @@
            <a href="/collection/manage">
              <span class="pull-right" >查看 &gt; </span>
              <img alt="" src="/icons/收藏.png" width="20px" height="20px"> 我的收藏
-             <span class="badge " style="color:red">${collCnt!''}</span>
+             <span v-if="collCnt>0" class="badge " style="color:red">{{collCnt}}</span>
            </a>
          </li>
          <li style="background-color:white" >
@@ -132,9 +132,10 @@
            </a>
          </li> 
          <li style="background-color:white" >
-           <a href="/aftersales/user/mgr/refund">
+           <a href="/aftersale/manage/refund">
              <span class="pull-right" > 退款换货 &gt; </span>
              <img alt="" src="/icons/无忧售后.png" width="20px" height="20px"> 无忧售后
+             <span v-if="counts['SA']>0" class="badge " style="background-color:red">{{counts['SA']}}</span>
            </a>
          </li>
          <li style="background-color:white" >
@@ -233,12 +234,13 @@
 var containerVue = new Vue({
 	el:'#container',
 	data:{
+		collCnt:'${collCnt!""}',
 		counts:{'10':0,'20':0,'30':0,'40':0,'SA':0}
 	},
 	methods:{
 		getOrderCounts :function(){
 			$.ajax({
-				url: '/order/user/count',
+				url: '/order/count',
 				method:'post',
 				data: {},
 				success: function(jsonRet,status,xhr){

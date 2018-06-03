@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
+import com.mofangyouxuan.common.SysParam;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.PartnerStaff;
 import com.mofangyouxuan.dto.UserBasic;
@@ -53,6 +54,7 @@ public class PartnerBasicAction {
 	@Value("${sys.tmp-file-dir}")
 	private String tmpFileDir;
 	
+	private Integer openPartnerNeedScore = 2000; //开通合作伙伴需要多少积分
 	private String[] certTypeArr = {"logo","idcard1","idcard2","licence"}; 	//当前支持的证件类型
 	
 	/**
@@ -68,7 +70,7 @@ public class PartnerBasicAction {
 	 * @return
 	 */
 	@RequestMapping("/login")
-	public String Login(String userTp,Integer userId,Integer partnerId,String passwd,
+	public String login(String userTp,Integer userId,Integer partnerId,String passwd,
 			HttpServletRequest request,HttpSession session,ModelMap map) {
 		if(userTp == null || userId == null || passwd == null) {
 			return "partner/page-partner-login";
@@ -152,7 +154,7 @@ public class PartnerBasicAction {
 	 * @return
 	 */
 	@RequestMapping("/logout")
-	public String Login(HttpSession session,ModelMap map) {
+	public String logout(HttpSession session,ModelMap map) {
 		session.removeAttribute("myPartner"); 
 		session.removeAttribute("partnerBindVip"); 
 		session.removeAttribute("partnerUserTP"); 
@@ -191,6 +193,18 @@ public class PartnerBasicAction {
 		VipBasic partnerBindVip = (VipBasic) session.getAttribute("partnerBindVip");
 		PartnerStaff partnerStaff = (PartnerStaff) session.getAttribute("partnerStaff");
 		PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");
+		if("bindVip".equals(partnerUserTP) && partnerStaff == null) {
+			String needScore = SysParam.getSysParam("partner_open_need_socre");
+			try {
+				openPartnerNeedScore = new Integer(needScore);
+			}catch(Exception e) {
+				;
+			}
+			if(partnerBindVip.getScores() < openPartnerNeedScore) {
+				map.put("errmsg", "您的当前会员积分还不够开通合作伙伴，开通需要：" + openPartnerNeedScore + "会员积分！");
+				return "partner/page-partner-manage";
+			}
+		}
 		map.put("partnerUserTP", partnerUserTP);
 		map.put("partnerBindVip", partnerBindVip);
 		map.put("partnerStaff", partnerStaff);
@@ -198,27 +212,6 @@ public class PartnerBasicAction {
 		
 		map.put("sys_func", "partner-index");
 		return "partner/page-partner-edit";
-	}
-	
-
-	/**
-	 * 获取合作伙伴的商户展示页面信息
-	 * 【权限人】
-	 * 任何人
-	 * @param partnerId
-	 * @param map
-	 * @return
-	 */
-	@RequestMapping("/mcht/{partnerId}")
-	public String getMcht(@PathVariable("partnerId")Integer partnerId,ModelMap map) {
-
-		PartnerBasic partner = PartnerMgrService.getPartnerById(partnerId);
-		if(partner == null || !"S".equals(partner.getStatus())) {
-			map.put("errmsg", "系统中没有该商户信息！");
-		}else {
-			map.put("mcht", partner);
-		}
-		return "partner/page-partner-mcht";
 	}
 	
 	

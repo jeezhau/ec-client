@@ -1,9 +1,15 @@
 package com.mofangyouxuan.wx.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +23,8 @@ import com.mofangyouxuan.dto.Category;
 import com.mofangyouxuan.dto.Goods;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.service.GoodsService;
+import com.mofangyouxuan.service.PartnerMgrService;
+import com.mofangyouxuan.wx.utils.HttpUtils;
 import com.mofangyouxuan.wx.utils.PageCond;
 
 /**
@@ -28,6 +36,14 @@ import com.mofangyouxuan.wx.utils.PageCond;
 @RequestMapping("/shop")
 @SessionAttributes({"clientPF","isDayFresh","sys_func","categories"})
 public class ShopAction {
+	
+	@Value("${sys.tmp-file-dir}")
+	private String tmpFileDir;
+	@Value("${mfyx.mfyx-server-url}")
+	private String mfyxServerUrl;
+	@Value("${mfyx.pimage-file-show-url}")
+	private String imageShowFileurl;
+	private String[] certTypeArr = {"logo","idcard1","idcard2","licence"}; 	//当前支持的证件类型
 	
 	/**
 	 * 获取商城管理主页
@@ -75,7 +91,55 @@ public class ShopAction {
 		}
 		return jsonRet.toString();
 	}
+
+	/**
+	 * 任何人获取指定商品的详细信息并展示，包含展示部分合作伙伴信息
+	 * @param goodsId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/goods/{goodsId}")
+	public String showGoods(@PathVariable("goodsId")Long goodsId,ModelMap map) {
+		Goods goods = null;
+		try {
+			JSONObject obj = GoodsService.getGoods(true,goodsId,true);
+			if(obj == null || !obj.containsKey("goods")) {
+				map.put("errmsg", "获取商品详情失败！");
+			}else {
+				goods = JSONObject.toJavaObject(obj.getJSONObject("goods"),Goods.class);
+				if(goods != null && "S".equals(goods.getPartner().getStatus()) && 
+						"1".equals(goods.getStatus()) && "1".equals(goods.getReviewResult())) {
+					map.put("goods", goods);
+				}else {
+					map.put("errmsg", "该商品当前不可访问！");
+				}
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return "shop/page-goods-show";
+	}
 	
+	/**
+	 * 获取合作伙伴的商户展示页面信息
+	 * 【权限人】
+	 * 任何人
+	 * @param partnerId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/mcht/{partnerId}")
+	public String showMcht(@PathVariable("partnerId")Integer partnerId,ModelMap map) {
+
+		PartnerBasic partner = PartnerMgrService.getPartnerById(partnerId);
+		if(partner == null || !"S".equals(partner.getStatus())) {
+			map.put("errmsg", "系统中没有该商户信息！");
+		}else {
+			map.put("mcht", partner);
+		}
+		return "shop/page-mcht-index";
+	}
 	
 	@RequestMapping("/mcht/getall/{partnerId}")
 	@ResponseBody
@@ -97,6 +161,88 @@ public class ShopAction {
 		return jsonRet.toString();
 	}
 	
+	/**
+	 * 显示商品图片
+	 * @param filename
+	 * @return
+	 */
+	@RequestMapping("/gimage/{partnerId}/{filename}")
+	public void showGoodsFile(@PathVariable(value="partnerId",required=true)Integer partnerId,
+			@PathVariable(value="filename",required=true)String filename,
+			OutputStream out,HttpServletRequest request,HttpServletResponse response,ModelMap map) {
+		try {
+			//数据检查
+			if(partnerId == null || partnerId < 1 ) {
+				return;
+			}
+			if("undefined".equals(filename)) {
+				return;
+			}
+			String url = this.mfyxServerUrl + this.imageShowFileurl; 
+			url = url.replace("{partnerId}",partnerId + "");
+			url = url.replace("{filename}",filename);	
+			File file = HttpUtils.downloadFile(this.tmpFileDir,url);
+			InputStream is = new FileInputStream(file);
+			response.setContentType("image/*");
+			response.addHeader("filename", filename);
+			OutputStream os = response.getOutputStream(); 
+			byte[] buff = new byte[1024];
+			int len = 0;
+			while((len=is.read(buff))>0) {
+				os.write(buff, 0, len);
+			}
+			os.flush();
+			os.close();
+			is.close();
+			file.delete();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
+
+	/**
+	 * 显示证件图片
+	 * @param certType
+	 * @return
+	 */
+	@RequestMapping("/pcert/{certType}/{partnerId}")
+	public void showPartnerCert(@PathVariable(value="certType",required=true)String certType,
+			@PathVariable(value="partnerId",required=true)Integer partnerId,
+			OutputStream out,HttpServletRequest request,HttpServletResponse response,ModelMap map) {
+		try {
+			//证件类型判断
+			boolean flag = false;
+			for(String tp:certTypeArr) {
+				if(tp.equals(certType)) {
+					flag = true;
+					break;
+				}
+			}
+			if(!flag) {
+				return;
+			}
+			File file = PartnerMgrService.showCert(partnerId, certType);
+			if(file == null) {
+				return;
+			}
+			InputStream is = new FileInputStream(file);
+			String filename = file.getName();
+			response.setContentType("image/*");
+			response.addHeader("filename", filename);
+			OutputStream os = response.getOutputStream(); 
+			byte[] buff = new byte[1024];
+			int len = 0;
+			while((len=is.read(buff))>0) {
+				os.write(buff, 0, len);
+			}
+			os.flush();
+			os.close();
+			is.close();
+			file.delete();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 }

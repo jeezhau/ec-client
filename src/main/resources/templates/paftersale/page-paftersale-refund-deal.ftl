@@ -25,14 +25,15 @@
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+
 <#if (order.orderId)?? >
 <div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll;">
-  <#include "/order/tpl-order-buy-user-4fm.ftl" encoding="utf8"> 
-  <#include "/order/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
+  <#include "/porder/tpl-porder-buy-user-4fm.ftl" encoding="utf8"> 
+  <#include "/common/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
 
   <!-- 支付明细 -->
   <#if (payFlow.flowId)??>
-  <#include "/order/tpl-order-pay-flow-4fm.ftl" encoding="utf8"> 
+  <#include "/porder/tpl-porder-payflow-4fm.ftl" encoding="utf8"> 
   </#if>
   <!-- 联系买家 -->
   <div class="row" style="margin:3px 0px;padding:5px 10px;background-color:white">
@@ -88,11 +89,20 @@
        <div class="col-xs-9" style="padding-left:0">
          <select class="form-control" v-model="param.result" required >
            <option value="" disabled> 请选择... </option>
-           <#if order.status=='61'>
-           <option value="62"> 已收到退货、核验中 </option>
+           <#if order.status=='60'>
+           <option value="61"> 同意退货 </option>
+           <option value="65"> 同意退款，资金回退中 </option>
+           <option value="68"> 不同意退款 </option>
            </#if>
-           <option value="63"> 核验不通过、协商解决 </option>
-           <option value="64"> 同意退款，申请资金回退</option>
+           <#if order.status=='62'>
+           <option value="63"> 已收到退货、核验中 </option>
+           <option value="64"> 核验不通过、协商解决 </option>
+           <option value="65"> 同意退款，资金回退中 </option>
+           </#if>
+           <#if order.status=='63'>
+           <option value="64"> 核验不通过、协商解决 </option>
+           <option value="65"> 重新发货 </option>
+           </#if> 
          </select>
        </div>
   </div>
@@ -103,15 +113,7 @@
            
          </textarea>
        </div>
-  </div>
-  <#if ((vipBasic.status)!'') == '1'>
-  <div class="row" style="margin:3px 0">
-    	  <label class="col-xs-3 control-label" style="padding-right:0">会员密码<span style="color:red">*</span></label>
-       <div class="col-xs-9" style="padding-left:0">
-         <input type="password" class="form-control" v-model="param.passwd" required maxlength="20">
-       </div>
-   </div>  
-   </#if>   
+  </div>  
    <div class="row" style="margin:5px 0;text-align:center">
       <button type="submit" class="btn btn-danger" @click="submit">提交处理结果</button>
    </div>
@@ -130,7 +132,6 @@ var containerVue = new Vue({
 		
 		param:{
 			orderId:'${order.orderId}',
-			passwd:'',
 			result:'',
 			reason:''
 		}
@@ -147,13 +148,13 @@ var containerVue = new Vue({
 			}
 			
 			$.ajax({
-				url: '/aftersales/partner/refund/submit/' + this.param.orderId ,
+				url: '/paftersale/refund/submit/' + this.param.orderId ,
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//成功
-							window.location.href = "/aftersales/partner/mgr/refunding";
+							window.location.href = "/paftersale/manage/refunding";
 						}else{//出现逻辑错误
 							alertMsg('错误提示',jsonRet.errmsg);
 						}

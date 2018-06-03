@@ -31,8 +31,8 @@
   <div class="row" style="margin:0 0;overflow:scroll">
     <div v-for="goods in goodsList" class="col-xs-6 col-sm-4 col-md-4 col-lg-3" style="padding:3px 2px;">
 	    <div style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
-	      <a v-bind:href="'/goods/show/' + goods.goodsId"  target="_blank">
-	        <img alt="" :src="'/image/file/show/' + goods.partner.vipId + '/' + goods.mainImgPath" style="width:90%;max-width:200px;height:150px">
+	      <a v-bind:href="'/shop/goods/' + goods.goodsId"  target="_blank">
+	        <img alt="" :src="'/shop/gimage/' + goods.partnerId + '/' + goods.mainImgPath" style="width:90%;max-width:200px;height:150px">
 	      </a>
 	    </div>
 	    <div class="row" style="margin:1px 1px;" >

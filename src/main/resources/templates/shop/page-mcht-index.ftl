@@ -31,8 +31,8 @@
   <!-- 商家基础信息 -->
   <div class="row" style="margin:0 0px;padding:0;font-weight:bold;background-color:white;">
    <div class="col-xs-12" style="padding:3px 0;">
-     <div class="col-xs-4" style="text-align:center;background-color:gray">
-      <img alt="" src="/partner/cert/show/logo/${(mcht.partnerId)?string('#')}" width="50px" height=50px style="border-radius:30%">
+     <div class="col-xs-4" style="text-align:center;">
+      <img alt="" src="/shop/pcert/logo/${(mcht.partnerId)?string('#')}" width="50px" height=50px style="border-radius:30%">
       <br>
       <span>${mcht.busiName}</span>
      </div>
@@ -43,10 +43,12 @@
         <span>服务：10</span><br>
        </div>
      </div>
-     <div class="col-xs-4" style="text-align:center;background-color:green">
-      <img alt="" src="/partner/cert/show/logo/${(mcht.partnerId)?string('#')}" width="50px" height=50px style="border-radius:30%">
-      <br>
-      <span>${mcht.busiName}</span>
+     <div class="col-xs-4" style="text-align:center;">
+      <a href="javascript:;">
+        <img alt="" src="/icons/客服.png" width="50px" height=50px style="border-radius:30%">
+        <br>
+        <span>联系客服</span>
+      </a>
      </div>    
    </div>
    <div class="col-xs-12">
@@ -88,8 +90,8 @@
     <div class="row" style="margin:3px 0">
       <div v-for="goods in goodsList" class="col-xs-6" style="padding:3px 2px ;">
 	    <div style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
-	      <a v-bind:href="'/goods/show/' + goods.goodsId">
-	        <img alt="" :src="'/image/file/show/' + goods.partner.vipId + '/' + goods.mainImgPath" style="width:90%;height:150px">
+	      <a v-bind:href="'/shop/goods/' + goods.goodsId">
+	        <img alt="" :src="'/shop/gimage/' + goods.partnerId + '/' + goods.mainImgPath" style="width:90%;height:150px">
 	      </a>
 	    </div>
 	    <div class="row" style="margin:1px 1px;" >

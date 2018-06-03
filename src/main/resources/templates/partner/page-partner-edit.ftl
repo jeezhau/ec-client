@@ -20,7 +20,7 @@
     
     <!-- 文件上传 -->
     <script src="/script/fileinput.min.js" type="text/javascript"></script>
-    <script src="/script/zh.js" type="text/javascript"></script>
+    <script src="/script/fileinput_locale_zh.js" type="text/javascript"></script>
     <link href="/css/fileinput.min.css" rel="stylesheet">
     
     <link href="/css/mfyx.css" rel="stylesheet">
@@ -190,6 +190,7 @@
 
   <div class="row" id="reviewInfo" style="width:100%;margin:1px 0px 0px 0px;padding:5px 8px;background-color:white;display:none">
   	<h5 style="text-align:center">最新审批结果信息</h5>
+  	<p>合作伙伴ID：{{review.partnerId}}</p>
   	<p>审批时间：{{review.reviewTime}}</p>
   	<p>审批结果：{{getStatus()}} </p>
   	<p>审批意见：{{review.reviewLog}}</p>
@@ -224,6 +225,7 @@ var partnerContainerVue = new Vue({
 			areas:[]
 		},
 		review:{
+			partnerId:'${(myPartner.partnerId)!""}',
 			status:'${(myPartner.status)!"0"}',
 			reviewTime:'${(myPartner.reviewTime)!''}' ,
 			reviewLog:"${(myPartner.reviewLog)!''}"

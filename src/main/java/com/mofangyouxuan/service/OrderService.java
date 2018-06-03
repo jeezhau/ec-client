@@ -414,59 +414,6 @@ public class OrderService {
 	}
 	
 	/**
-	 * 卖家准备发货或取消备货
-	 * @param order
-	 * @param user
-	 * @param status 客户端发送的支付状态
-	 * @return {errcode,errmsg}
-	 */
-	public static JSONObject readyGoods(Order order,PartnerBasic partner) {
-		JSONObject jsonRet = new JSONObject();
-		Map<String,Object> params = new HashMap<String,Object>();
-		//向服务中心发送申请
-		String url = mfyxServerUrl + orderReadyUrl;
-		url = url.replace("{partnerId}", partner.getPartnerId() + "");
-		url = url.replace("{orderId}", order.getOrderId() + "");
-		String strRet = HttpUtils.doPost(url, params);
-		try {
-			jsonRet = JSONObject.parseObject(strRet);
-			return jsonRet;
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-		
-	}
-	
-	/**
-	 * 卖家发货设置物流信息：快递公司、单号
-	 * @param partner
-	 * @param order
-	 * @param logisticsComp
-	 * @param logisticsNo
-	 * @return
-	 */
-	public static JSONObject deliveryGoods(PartnerBasic partner,Order order,
-			String logisticsComp,String logisticsNo) {
-		JSONObject jsonRet = new JSONObject();
-		Map<String,Object> params = new HashMap<String,Object>();
-		//向服务中心发送申请
-		String url = mfyxServerUrl + orderDeliveryUrl;
-		url = url.replace("{partnerId}", partner.getPartnerId() + "");
-		url = url.replace("{orderId}", order.getOrderId() + "");
-		params.put("logisticsComp", logisticsComp);
-		params.put("logisticsNo", logisticsNo);
-		String strRet = HttpUtils.doPost(url, params);
-		try {
-			jsonRet = JSONObject.parseObject(strRet);
-			return jsonRet;
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	/**
 	 * 买家申请退款，并退货
 	 * @param user
 	 * @param order
@@ -575,34 +522,6 @@ public class OrderService {
 	}
 	
 	/**
-	 * 卖家对买家评价
-	 * @param partner
-	 * @param order
-	 * @param score		评分
-	 * @param content	评价内容
-	 * @return {errcode,errmsg}
-	 */
-	public static JSONObject appr2User(PartnerBasic partner,Order order,Integer score,String content) {
-		JSONObject jsonRet = new JSONObject();
-		Map<String,Object> params = new HashMap<String,Object>();
-		//向服务中心发送申请
-		String url = mfyxServerUrl + orderAppr2UserUrl;
-		url = url.replace("{partnerId}", partner.getPartnerId() + "");
-		url = url.replace("{orderId}", order.getOrderId() + "");
-		params.put("score", score);
-		params.put("content", content);
-		String strRet = HttpUtils.doPost(url, params);
-		try {
-			jsonRet = JSONObject.parseObject(strRet);
-			return jsonRet;
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-
-	/**
 	 * 卖家更新售后信息
 	 * @param partner
 	 * @param order
@@ -611,7 +530,7 @@ public class OrderService {
 	 * @return {errcode,errmsg}
 	 */
 	public static JSONObject updAfterSales(PartnerBasic partner,Order order,
-			String nextStat,JSONObject content,String passwd) {
+			String nextStat,JSONObject content,String passwd,Integer updateOpr) {
 		JSONObject jsonRet = new JSONObject();
 		Map<String,Object> params = new HashMap<String,Object>();
 		//向服务中心发送申请
@@ -621,6 +540,88 @@ public class OrderService {
 		params.put("nextStat", nextStat);
 		params.put("content", content.toJSONString());
 		params.put("passwd", passwd);
+		params.put("currUserId", updateOpr);
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	/**
+	 * 卖家发货设置物流信息：快递公司、单号
+	 * @param partner
+	 * @param order
+	 * @param logisticsComp
+	 * @param logisticsNo
+	 * @return
+	 */
+	public static JSONObject deliveryGoods(PartnerBasic partner,String orderId,
+			String logisticsComp,String logisticsNo,Integer updateOpr,String passwd) {
+		JSONObject jsonRet = new JSONObject();
+		Map<String,Object> params = new HashMap<String,Object>();
+		//向服务中心发送申请
+		String url = mfyxServerUrl + orderDeliveryUrl;
+		url = url.replace("{partnerId}", partner.getPartnerId() + "");
+		url = url.replace("{orderId}", orderId);
+		params.put("logisticsComp", logisticsComp);
+		params.put("logisticsNo", logisticsNo);
+		params.put("passwd", passwd);
+		params.put("currUserId", updateOpr);
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	/**
+	 * 卖家准备发货或取消备货
+	 * @param order
+	 * @param user
+	 * @param status 客户端发送的支付状态
+	 * @return {errcode,errmsg}
+	 */
+	public static JSONObject readyGoods(Order order,PartnerBasic partner) {
+		JSONObject jsonRet = new JSONObject();
+		Map<String,Object> params = new HashMap<String,Object>();
+		//向服务中心发送申请
+		String url = mfyxServerUrl + orderReadyUrl;
+		url = url.replace("{partnerId}", partner.getPartnerId() + "");
+		url = url.replace("{orderId}", order.getOrderId() + "");
+		String strRet = HttpUtils.doPost(url, params);
+		try {
+			jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
+	/**
+	 * 卖家对买家评价
+	 * @param partner
+	 * @param order
+	 * @param score		评分
+	 * @param content	评价内容
+	 * @return {errcode,errmsg}
+	 */
+	public static JSONObject appr2User(PartnerBasic partner,String orderId,Integer score,String content,Integer updateOpr,String passwd) {
+		JSONObject jsonRet = new JSONObject();
+		Map<String,Object> params = new HashMap<String,Object>();
+		//向服务中心发送申请
+		String url = mfyxServerUrl + orderAppr2UserUrl;
+		url = url.replace("{partnerId}", partner.getPartnerId() + "");
+		url = url.replace("{orderId}", orderId);
+		params.put("passwd", passwd);
+		params.put("currUserId", updateOpr);
+		params.put("score", score);
+		params.put("content", content);
 		String strRet = HttpUtils.doPost(url, params);
 		try {
 			jsonRet = JSONObject.parseObject(strRet);

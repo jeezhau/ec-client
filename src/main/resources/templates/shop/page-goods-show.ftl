@@ -41,7 +41,7 @@
     <!-- 轮播（Carousel）项目 -->
     <div class="carousel-inner">
         <div  v-bind:class="[{active:(index===0)}, 'item']" v-for="imgpath,index in courselImgPaths" >
-            <img :src="'/pimage/file/show/${((goods.partnerId)!'')?string('#')}/' + imgpath" >
+            <img :src="'/shop/gimage/${((goods.partnerId)!'')?string('#')}/' + imgpath" >
         </div>
     </div>
     <!-- 轮播（Carousel）导航 -->
@@ -60,18 +60,23 @@
   
   <!-- 商家信息 -->
   <div class="row" style="margin:5px 0px 3px 0px;background-color:white;padding:3px 8px;">
-    <a href="/partner/mcht/${(goods.partnerId)?string('#')}">
-     <img class="pull-left" alt="" src="/partner/cert/show/logo/${(goods.partnerId)?string('#')}" style="width:25px;height:25px;border-radius:30%">
+    <a href="/shop/mcht/${(goods.partnerId)?string('#')}">
+     <img class="pull-left" alt="" src="/shop/pcert/logo/${(goods.partnerId)?string('#')}" style="width:25px;height:25px;border-radius:30%">
     </a>
    <span class="pull-right">${(goods.partner.province)!''}-${(goods.partner.area)!''}-${(goods.partner.addr)!''}</span>
   </div>
 
   <!-- 服务特点 -->
   <div class="row" style="margin:5px 0px 3px 0px;font-weight:lighter;font-size:80%">
-    <div class="col-xs-3" style="padding:0 3px"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">正品保证</span></div>
-    <div class="col-xs-3" style="padding:0 3px"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">同城急速</span></div>
-    <div class="col-xs-3" style="padding:0 3px"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">退货保障</span></div>
-    <div class="col-xs-3" style="padding:0 3px"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">极速发货</span></div>
+    <div class="col-xs-3" style="padding:0 3px;text-align:center"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">正品保证</span></div>
+    <div class="col-xs-3" style="padding:0 3px;text-align:center"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">同城急速</span></div>
+    <#if goods.refundLimit==0>
+    <div class="col-xs-3" style="padding:0 3px;text-align:center"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">不支持无理由退换货</span></div>
+    </#if>
+    <#if (goods.refundLimit gt 0) >
+    <div class="col-xs-3" style="padding:0 3px;text-align:center"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">${goods.refundLimit}天无品质问题退换货</span></div>
+    </#if>
+    <div class="col-xs-3" style="padding:0 3px;text-align:center"><span ><img alt="" src="/icons/正确.png" width="15px" height="15px">极速发货</span></div>
   </div>
   
   <!--  ====== 前三条买家评价 ======= -->
@@ -171,7 +176,7 @@ var containerVue = new Vue({
 								if(appr.appraiseInfo){//有评价内容
 									appr.appraiseInfo = JSON.parse(appr.appraiseInfo);
 								}else{
-									appr.appraiseInfo = {'time':appr.appraiseTime,'content':"卖家太懒，啥也没留下！！！"}
+									appr.appraiseInfo = [{'time':appr.appraiseTime,'content':"买家太懒，啥也没留下！！！"}];
 								}
 								appr.headimgurl = startWith(appr.headimgurl,'http')?appr.headimgurl:('/user/headimg/show/'+appr.userId)
 								containerVue.apprList.push(appr);
@@ -213,11 +218,17 @@ containerVue.getAllAppr();
 	    </span>
 	    <p class="weui-tabbar__label">商城首页</p>
 	</a>
-    <a href="/partner/mcht/${(goods.partnerId)?string('#')}" class="weui-tabbar__item " >
+    <a href="javascript:;" class="weui-tabbar__item " >
+	    <span style="display: inline-block;position: relative;">
+	        <img src="/icons/客服.png" alt="" class="weui-tabbar__icon">
+	    </span>
+	    <p class="weui-tabbar__label">商家客服</p>
+    </a>	
+    <a href="/shop/mcht/${(goods.partnerId)?string('#')}" class="weui-tabbar__item " >
 	    <span style="display: inline-block;position: relative;">
 	        <img src="/icons/商家.png" alt="" class="weui-tabbar__icon">
 	    </span>
-	    <p class="weui-tabbar__label">逛商家</p>
+	    <p class="weui-tabbar__label">进入商家</p>
     </a> 	
     <a href="javascript:;" onclick="containerVue.addCollection('2','${(goods.goodsId)?string('#')}')" class="weui-tabbar__item " >
 	    <span style="display: inline-block;position: relative;">

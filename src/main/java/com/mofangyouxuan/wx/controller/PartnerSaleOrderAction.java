@@ -13,6 +13,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.Order;
 import com.mofangyouxuan.dto.PartnerBasic;
+import com.mofangyouxuan.dto.PartnerStaff;
+import com.mofangyouxuan.dto.PayFlow;
+import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.OrderService;
 import com.mofangyouxuan.wx.utils.PageCond;
 
@@ -25,7 +28,7 @@ import com.mofangyouxuan.wx.utils.PageCond;
  */
 @Controller
 @RequestMapping("/psaleorder")
-@SessionAttributes({"partnerUserTP","partnerPasswd","partnerStaff","partnerBindVip","myPartner"})
+@SessionAttributes({"sys_func","partnerUserTP","partnerPasswd","partnerStaff","partnerBindVip","myPartner"})
 public class PartnerSaleOrderAction {
 	
 	private String[] statusArr = new String[]{"all","4pay","4delivery","4sign","4appraise","refund","exchange"};
@@ -58,8 +61,8 @@ public class PartnerSaleOrderAction {
 			status = "all";
 		}
 		map.put("status", status);
-		map.put("sys_func", "partner-order");
-		return "order/page-orders-show-partner";
+		map.put("sys_func", "partner-saleorder");
+		return "porder/page-porder-show";
 	}
 	
 	
@@ -74,8 +77,8 @@ public class PartnerSaleOrderAction {
 	public String getAll(@RequestParam(required=true)String status,PageCond pageCond,
 			ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
-		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-		if(partner == null ) {
+		PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus())) ){
 			jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
 			jsonRet.put("errmsg", "您还未开通合作伙伴功能！");
 			return jsonRet.toJSONString();
@@ -109,17 +112,17 @@ public class PartnerSaleOrderAction {
 			}
 			JSONObject params = new JSONObject();
 			
-			params.put("partnerId", partner.getPartnerId());
+			params.put("partnerId", myPartner.getPartnerId());
 			params.put("status", statCode);
 			
 			JSONObject sortParams = new JSONObject();
 			sortParams.put("createTime", "1#1");
 			JSONObject showGroups = new JSONObject();
 			//needReceiver,needLogistics,needAppr,needAfterSales,needGoodsAndUser
-			showGroups.put("needReceiver", true);
-			showGroups.put("needLogistics", true);
-			showGroups.put("needAppr", true);
-			showGroups.put("needAfterSales", true);
+			showGroups.put("needReceiver", false);
+			showGroups.put("needLogistics", false);
+			showGroups.put("needAppr", false);
+			showGroups.put("needAfterSales", false);
 			showGroups.put("needGoodsAndUser", true);
 			jsonRet = OrderService.searchOrders(showGroups.toJSONString(),params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
@@ -145,13 +148,33 @@ public class PartnerSaleOrderAction {
 	@ResponseBody
 	public String readyOrUnOrder(@PathVariable(value="orderId")String orderId,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
-		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-		if(partner == null ) {
-			jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
-			jsonRet.put("errmsg", "您还未开通合作伙伴功能！");
-			return jsonRet.toJSONString();
-		}
 		try {
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			String partnerUserTP = (String) map.get("partnerUserTP");
+			//String partnerPasswd = (String) map.get("partnerPasswd");
+			VipBasic vip = (VipBasic) map.get("partnerBindVip");
+			PartnerStaff staff = (PartnerStaff) map.get("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
+			}
+			//Integer updateOpr = null;
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+				//updateOpr = vip.getVipId();
+			}else {
+				if(staff == null || staff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				//updateOpr = staff.getUserId();
+			}
 			jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();
@@ -164,7 +187,7 @@ public class PartnerSaleOrderAction {
 				jsonRet.put("errmsg", "该订单当前不可进行备货管理！");
 				return jsonRet.toJSONString();
 			}
-			jsonRet = OrderService.readyGoods(order, partner);
+			jsonRet = OrderService.readyGoods(order, myPartner);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");
@@ -188,16 +211,16 @@ public class PartnerSaleOrderAction {
 	public String beginDelivery(@PathVariable("orderId")String orderId,ModelMap map) {
 		Order order = null;
 		try {
-			PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-			if(partner == null ) {
-				map.put("errmsg", "您还未开通合作伙伴功能！");
-				return "order/page-order-delivery";
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus())) ){
+				map.put("errmsg", "您还未开通合作伙伴功能或状态限制！");
+				return "porder/page-porder-delivery";
 			}
 			JSONObject jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
 			
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
-				if(!partner.getPartnerId().equals(order.getPartnerId())) {
+				if(!myPartner.getPartnerId().equals(order.getPartnerId())) {
 					map.put("errmsg", "该订单不是您的销售订单！");
 				}else {
 					if(!"20".equals(order.getStatus()) && !"21".equals(order.getStatus())) {
@@ -214,7 +237,7 @@ public class PartnerSaleOrderAction {
 			e.printStackTrace();
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
-		return "order/page-order-delivery";
+		return "porder/page-porder-delivery";
 	}
 	
 	/**
@@ -233,26 +256,47 @@ public class PartnerSaleOrderAction {
 			@RequestParam(value="logisticsNo",required=true)String logisticsNo,
 			ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
-		PartnerBasic partner = (PartnerBasic) map.get("partnerBasic");
-		if(partner == null ) {
-			jsonRet.put("errcode", ErrCodes.PARTNER_NO_EXISTS);
-			jsonRet.put("errmsg", "您还未开通合作伙伴功能！");
-			return jsonRet.toJSONString();
-		}
 		try {
-			jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
-			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
-				jsonRet = new JSONObject();
-				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
-				jsonRet.put("errmsg", "获取订单信息失败！");
-			}
-			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
-			if(!"20".equals(order.getStatus()) && !"21".equals(order.getStatus())) {
-				jsonRet.put("errcode", ErrCodes.ORDER_PARAM_ERROR);
-				jsonRet.put("errmsg", "该订单当前不可进行发货管理！");
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			String partnerUserTP = (String) map.get("partnerUserTP");
+			String partnerPasswd = (String) map.get("partnerPasswd");
+			VipBasic vip = (VipBasic) map.get("partnerBindVip");
+			PartnerStaff staff = (PartnerStaff) map.get("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
 				return jsonRet.toJSONString();
 			}
-			jsonRet = OrderService.deliveryGoods(partner, order, logisticsComp, logisticsNo);
+			Integer updateOpr = null;
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = vip.getVipId();
+			}else {
+				if(staff == null || staff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = staff.getUserId();
+			}
+//			
+//			jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
+//			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+//				jsonRet = new JSONObject();
+//				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
+//				jsonRet.put("errmsg", "获取订单信息失败！");
+//			}
+//			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+//			if(!"20".equals(order.getStatus()) && !"21".equals(order.getStatus())) {
+//				jsonRet.put("errcode", ErrCodes.ORDER_PARAM_ERROR);
+//				jsonRet.put("errmsg", "该订单当前不可进行发货管理！");
+//				return jsonRet.toJSONString();
+//			}
+			jsonRet = OrderService.deliveryGoods(myPartner, orderId, logisticsComp, logisticsNo,updateOpr,partnerPasswd);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");
@@ -276,12 +320,17 @@ public class PartnerSaleOrderAction {
 	public String beginAppr4User(@PathVariable("orderId")String orderId,ModelMap map) {
 		Order order = null;
 		try {
-			PartnerBasic partner = (PartnerBasic)map.get("partnerBasic");
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus())) ){
+				map.put("errmsg", "您还未开通合作伙伴功能！");
+				return "porder/page-porder-appraise";
+			}
+			
 			JSONObject jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
 			
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
-				if(!partner.getPartnerId().equals(order.getPartnerId())) {
+				if(!myPartner.getPartnerId().equals(order.getPartnerId())) {
 					map.put("errmsg", "该订单不是您的销售订单！");
 				}else {
 					if(!"30".equals(order.getStatus()) && !"31".equals(order.getStatus()) && 
@@ -299,7 +348,7 @@ public class PartnerSaleOrderAction {
 			e.printStackTrace();
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
-		return "order/page-order-appraise-4user";
+		return "porder/page-porder-appraise";
 	}
 	
 	/**
@@ -312,31 +361,57 @@ public class PartnerSaleOrderAction {
 	@ResponseBody
 	public String submitAppr4User(@PathVariable("orderId")String orderId,
 			Integer score, String content,ModelMap map) {
-		PartnerBasic partner = (PartnerBasic)map.get("partnerBasic");
 		JSONObject jsonRet = new JSONObject();
 		try {
-			jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
-			if(jsonRet == null || !jsonRet.containsKey("order")) {
-				jsonRet.put("errmsg", "系统中没有该订单信息！");
-				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
-				return jsonRet.toString();
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			String partnerUserTP = (String) map.get("partnerUserTP");
+			String partnerPasswd = (String) map.get("partnerPasswd");
+			VipBasic vip = (VipBasic) map.get("partnerBindVip");
+			PartnerStaff staff = (PartnerStaff) map.get("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
+			}
+			Integer updateOpr = null;
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = vip.getVipId();
+			}else {
+				if(staff == null || staff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = staff.getUserId();
 			}
 			
-			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
-			if(!partner.getPartnerId().equals(order.getPartnerId())) {
-				jsonRet.put("errmsg", "您没有权限查询该订单信息！");
-				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
-				return jsonRet.toString();
-			}
-			if(!"30".equals(order.getStatus()) && !"31".equals(order.getStatus()) && 
-					!"40".equals(order.getStatus()) && !"41".equals(order.getStatus()) && 
-					!"54".equals(order.getStatus()) && !"55".equals(order.getStatus()) && !"56".equals(order.getStatus())) {
-				jsonRet.put("errmsg", "您当前不可对该订单进行评价！");
-				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
-				return jsonRet.toString();
-			}
+//			jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+//			if(jsonRet == null || !jsonRet.containsKey("order")) {
+//				jsonRet.put("errmsg", "系统中没有该订单信息！");
+//				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
+//				return jsonRet.toString();
+//			}
+//			
+//			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+//			if(!myPartner.getPartnerId().equals(order.getPartnerId())) {
+//				jsonRet.put("errmsg", "您没有权限查询该订单信息！");
+//				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
+//				return jsonRet.toString();
+//			}
+//			if(!"30".equals(order.getStatus()) && !"31".equals(order.getStatus()) && 
+//					!"40".equals(order.getStatus()) && !"41".equals(order.getStatus()) && 
+//					!"54".equals(order.getStatus()) && !"55".equals(order.getStatus()) && !"56".equals(order.getStatus())) {
+//				jsonRet.put("errmsg", "您当前不可对该订单进行评价！");
+//				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
+//				return jsonRet.toString();
+//			}
 			//发送请求
-			jsonRet = OrderService.appr2User(partner, order, score, content);
+			jsonRet = OrderService.appr2User(myPartner, orderId, score, content,updateOpr,partnerPasswd);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");
@@ -350,6 +425,80 @@ public class PartnerSaleOrderAction {
 		}
 		return jsonRet.toString();
 	}
+	
+	/**
+	 * 显示订单详情：仅买卖双方可看到
+	 * @param orderId
+	 * @param map
+	 */
+	@RequestMapping("/detail/{orderId}")
+	public String showDetail(@PathVariable("orderId")String orderId,ModelMap map) {
+		
+		PartnerBasic myPartner= (PartnerBasic) map.get("myPartner");
+		try {
+			if(myPartner == null || myPartner.getPartnerId() == null) {
+				map.put("errmsg", "您没有权限查询该订单信息！");
+				return "";
+			}
+			JSONObject jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+			if(jsonRet == null || !jsonRet.containsKey("order")) {
+				map.put("errmsg", "系统中没有该订单信息！");
+				return "";
+			}
+			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+			if(myPartner.getPartnerId().equals(order.getPartnerId())) {
+				jsonRet = OrderService.getPayFlow(order, order.getUserId(), null);
+				if(jsonRet != null && jsonRet.containsKey("payFlow")) {
+					PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
+					map.put("payFlow", payFlow);
+				}
+				map.put("order", order);
+			}else {
+				map.put("errmsg", "您没有权限查询该订单信息！");
+			}			
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return "porder/page-porder-detail";
+	}
+	
+	/**
+	 * 显示物流详情：仅买卖双方可看到
+	 * @param orderId
+	 * @param map
+	 */
+	@RequestMapping("/logistics/{orderId}")
+	public String showLogistics(@PathVariable("orderId")String orderId,ModelMap map) {
+		PartnerBasic myPartner= (PartnerBasic) map.get("myPartner");
+		try {
+			if(myPartner == null || myPartner.getPartnerId() == null) {
+				map.put("errmsg", "您没有权限查询该订单信息！");
+				return "";
+			}
+			JSONObject jsonRet = OrderService.getLogistics(orderId);
+			if(jsonRet == null || !jsonRet.containsKey("order")) {
+				if(jsonRet.containsKey("errmsg")) {
+					map.put("errmsg", jsonRet.getString("errmsg"));
+				}else {
+					map.put("errmsg", "系统中没有该订单信息！");
+				}
+				return "porder/page-porder-logistics";
+			}
+			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+			if(myPartner.getPartnerId().equals(order.getPartnerId())) {
+				map.put("order", order);
+			}else {
+				map.put("errmsg", "您没有权限查询该订单信息！");
+			}			
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return "porder/page-porder-logistics";
+	}
+	
+	
 	
 }
 

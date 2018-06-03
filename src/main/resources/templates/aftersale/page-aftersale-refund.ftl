@@ -27,17 +27,17 @@
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 <#if (order.orderId)?? >
 <div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
-  <#include "/order/tpl-order-buy-user-4fm.ftl" encoding="utf8"> 
-  <#include "/order/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
+  <#include "/common/tpl-order-partner-4fm.ftl" encoding="utf8"> 
+  <#include "/common/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
 
   <!-- 支付明细 -->
   <#if (payFlow.flowId)??>
-  <#include "/order/tpl-order-pay-flow-4fm.ftl" encoding="utf8"> 
+  <#include "/order/tpl-order-payflow-4fm.ftl" encoding="utf8"> 
   </#if>
   <!-- 商家 -->
   <div class="row" style="margin:3px 0px;padding:5px 10px;background-color:white">
-      <a class="pull-left" href="/partner/mcht/${order.partnerId}">
-        <img alt="头像" src="/partner/cert/show/logo/${order.partnerId}" width="20px" height="20px" style="border-radius:50%"> 
+      <a class="pull-left" href="/shop/mcht/${order.partnerId}">
+        <img alt="头像" src="/shop/pcert/logo/${order.partnerId}" width="20px" height="20px" style="border-radius:50%"> 
         ${order.partnerBusiName}
       </a>
   </div>
@@ -48,6 +48,7 @@
   	<span>&nbsp;&nbsp;&nbsp;&nbsp;填写说明：退货则需要填写退货的物流信息，官方配送则名称为“摩放优选”，单号为订单号；商家自取则名称为“商家名称”，单号为订单号；
   	快递配送则名称为“快递公司名称”，单号为物流公司的单号；买家送达则名称为“买家昵称”，单号为订单号；</span>
   </div>
+  <#if order.status != '61'>
   <div class="row" style="margin:3px 0">
     	  <label class="col-xs-3 control-label" style="padding-right:0">退款类型<span style="color:red">*</span></label>
        <div class="col-xs-9" style="padding-left:0">
@@ -58,6 +59,7 @@
          </select>
        </div>
   </div>
+  </#if>
   <div class="row" style="margin:3px 0">
     	  <label class="col-xs-3 control-label" style="padding-right:0">退款原因<span style="color:red">*</span></label>
        <div class="col-xs-9" style="padding-left:0">
@@ -66,6 +68,7 @@
          </textarea>
        </div>
   </div>
+  <#if order.status == '61'>
   <div v-if="param.type == '3'" >
   <div class="row" style="margin:3px 0">
     	  <label class="col-xs-3 control-label" style="padding-right:0">配送类型<span style="color:red">*</span></label>
@@ -91,6 +94,7 @@
        </div>
    </div>
    </div>
+   </#if>
   <#if ((vipBasic.status)!'') == '1'>
   <div class="row" style="margin:3px 0">
     	  <label class="col-xs-3 control-label" style="padding-right:0">会员密码<span style="color:red">*</span></label>
@@ -116,14 +120,19 @@ var containerVue = new Vue({
 		param:{
 			orderId:'${order.orderId}',
 			passwd:'',
+			<#if order.status != '61'>
 			type:'',
+			</#if>
 			reason:'',
+			<#if order.status == '61'>
 			dispatchMode:'',
 			logisticsComp:'',
 			logisticsNo:''
+			</#if>
 		}
 	},
 	methods:{
+		<#if order.status == '61'>
 		changeDispatch: function(){
 			if('3' != this.param.dispatchMode){
 				this.param.logisticsNo = '${order.orderId}';
@@ -139,7 +148,9 @@ var containerVue = new Vue({
 				containerVue.param.logisticsComp = '';
 			}
 		},
+		</#if>
 		submit:function(){
+			<#if order.status != '61'>
 			if(!this.param.type ){
 				alertMsg('错误提示','退款类型不可为空！');
 				return;
@@ -148,28 +159,29 @@ var containerVue = new Vue({
 				alertMsg('错误提示','退款原因不可少于3个字符！');
 				return;
 			}
-			if('3' == this.param.type){
-				if(!this.param.dispatchMode ){
-					alertMsg('错误提示','配送方式不可为空！');
-					return;
-				}
-				if(!this.param.logisticsComp || this.param.logisticsComp.length<2){
-					alertMsg('错误提示','配送方名称不可小于2个字符！');
-					return;
-				}
-				if(!this.param.logisticsNo || this.param.logisticsNo.length<3){
-					alertMsg('错误提示','配送单号不可小于2个字符！');
-					return;
-				}
+			</#if>
+			<#if order.status == '61'>
+			if(!this.param.dispatchMode ){
+				alertMsg('错误提示','配送方式不可为空！');
+				return;
 			}
+			if(!this.param.logisticsComp || this.param.logisticsComp.length<2){
+				alertMsg('错误提示','配送方名称不可小于2个字符！');
+				return;
+			}
+			if(!this.param.logisticsNo || this.param.logisticsNo.length<3){
+				alertMsg('错误提示','配送单号不可小于2个字符！');
+				return;
+			}
+			</#if>
 			$.ajax({
-				url: '/aftersales/user/refund/submit/' + this.param.orderId ,
+				url: '/aftersale/refund/submit/' + this.param.orderId ,
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//成功
-							window.location.href = "/aftersales/user/mgr/refund";
+							window.location.href = "/aftersale/manage/refund";
 						}else{//出现逻辑错误
 							alertMsg('错误提示',jsonRet.errmsg);
 						}

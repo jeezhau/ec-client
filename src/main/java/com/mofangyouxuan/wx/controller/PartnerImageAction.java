@@ -1,6 +1,5 @@
 package com.mofangyouxuan.wx.controller;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -8,7 +7,6 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -37,7 +35,7 @@ import com.mofangyouxuan.wx.utils.HttpUtils;
  */
 @Controller
 @RequestMapping("/pimage")
-@SessionAttributes({"partnerUserTP","partnerPasswd","partnerStaff","partnerBindVip","myPartner"})
+@SessionAttributes({"sys_func","partnerUserTP","partnerPasswd","partnerStaff","partnerBindVip","myPartner"})
 public class PartnerImageAction {
 	@Value("${sys.tmp-file-dir}")
 	private String tmpFileDir;
@@ -292,7 +290,7 @@ public class PartnerImageAction {
 	}
 	
 	/**
-	 * 显示用户图片
+	 * 显示合作伙伴图库图片
 	 * @param filename
 	 * @return
 	 */
@@ -329,6 +327,7 @@ public class PartnerImageAction {
 			e.printStackTrace();
 		}
 	}
+	
 }
 
 

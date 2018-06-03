@@ -125,9 +125,9 @@
         </div>       
       </div>
       <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">限购数量<span style="color:red">*</span></label>
+        <label class="col-xs-4 control-label" style="padding-right:1px">限购数量(件)<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <input type="datetime" class="form-control" v-model="param.limitedNum" min=0 max=999999 placeholder="请输入每人限购数量，0表示不限购" >
+          <input type="number" class="form-control" v-model="param.limitedNum" min=0 max=999999 placeholder="请输入每人限购数量，0表示不限购" >
         </div>
       </div>
       <div class="form-group" v-if="param.limitedNum>0">
@@ -142,6 +142,12 @@
           <input type="date" class="form-control" v-model="param.endTime"  maxLength=20  required placeholder="请输入限购开始时间">
         </div>
       </div>
+      <div class="form-group">
+        <label class="col-xs-4 control-label" style="padding-right:1px" title="签收后支持多少天可退换货，0表示不支持，质量问题除外">退换货期限(天)<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:1px">
+          <input type="number" class="form-control" v-model="param.refundLimit" title="签收后支持多少天可退换货，0表示不支持，质量问题除外" min=0 max=999999 placeholder="签收后支持多少天可退换货，0表示不支持" >
+        </div>
+      </div>   
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">运费模版<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
@@ -200,20 +206,21 @@ var goodsContainerVue = new Vue({
 			reviewLog:"${(goods.reviewLog)!''}"
 		},
 		param:{
-			goodsId:'${(goods.goodsId)!-1}'.replace(',',''),
+			goodsId:'${((goods.goodsId)!"-1")?string("#")}',
 			goodsName:'${(goods.goodsName)!''}',
-			categoryId:'${(goods.categoryId)!''}'.replace(',',''),
+			categoryId:'${((goods.categoryId)!'')?string("#")}',
 			goodsDesc:'',
 			mainImgPath:'${(goods.mainImgPath)!''}',
 			carouselImgPaths:'${(goods.carouselImgPaths)!''}',
 			place:'${(goods.place)!''}',
 			vender:'${(goods.vender)!''}',
-			//priceLowest:'${(goods.priceLowest)!''}'.replace(',',''),
-			//stockSum:'${(goods.stockSum)!''}'.replace(',',''),
+			//priceLowest:'${(goods.priceLowest)!''}',
+			//stockSum:'${(goods.stockSum)!''}',
 			specDetail:"",
-			limitedNum:'${(goods.limitedNum)!''}'.replace(',',''),
+			limitedNum:'${((goods.limitedNum)!'')?string("#")}',
 			beginTime:'${(goods.beginTime)!''}',
 			endTime:'${(goods.endTime)!''}',
+			refundLimit:'${((goods.refundLimit)!"7")?string("#")}',
 			postageIds:'${(goods.postageIds)!''}',
 			status:'${(goods.status)!''}'
 		},

@@ -15,6 +15,7 @@ import javax.validation.Valid;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,11 +41,29 @@ import com.mofangyouxuan.wx.utils.PageCond;
  */
 @Controller
 @RequestMapping("/pstaff")
-@SessionAttributes({"clientPF"})
+@SessionAttributes({"sys_func","partnerUserTP","partnerPasswd","partnerStaff","partnerBindVip","myPartner"})
 public class PartnerStaffAction {
 
 	@Value("${sys.tmp-file-dir}")
 	private String tmpFileDir;
+	
+	
+	/**
+	 * 获取合作伙伴员工管理页面
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/manage")
+	public String getManage(ModelMap map) {
+		PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
+			return "forward:/pstaff/manage" ;
+		}
+		
+		map.put("sys_func", "partner-pstaff");
+		return "pstaff/page-pstaff-manage";
+	}
 	
 	/**
 	 * 合作伙伴员工基本信息保存
@@ -359,7 +378,7 @@ public class PartnerStaffAction {
 	 */
 	@RequestMapping("/getall")
 	@ResponseBody
-	public Object getAllByPartner(String jsonSearchParams,PageCond pageCond,HttpSession session) {
+	public Object getAllBy(String jsonSearchParams,PageCond pageCond,HttpSession session) {
 		JSONObject jsonRet = new JSONObject();
 		try {
 			UserBasic user = (UserBasic) session.getAttribute("userBasic");

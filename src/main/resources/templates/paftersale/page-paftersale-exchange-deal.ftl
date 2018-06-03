@@ -28,12 +28,12 @@
 
 <#if (order.orderId)?? >
 <div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
-  <#include "/order/tpl-order-buy-user-4fm.ftl" encoding="utf8"> 
-  <#include "/order/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
+  <#include "/porder/tpl-porder-buy-user-4fm.ftl" encoding="utf8"> 
+  <#include "/common/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
 
   <!-- 支付明细 -->
   <#if (payFlow.flowId)??>
-  <#include "/order/tpl-order-pay-flow-4fm.ftl" encoding="utf8"> 
+  <#include "/porder/tpl-porder-payflow-4fm.ftl" encoding="utf8"> 
   </#if>
   <!-- 联系买家 -->
   <div class="row" style="margin:3px 0px;padding:5px 10px;background-color:white">
@@ -91,11 +91,19 @@
        <div class="col-xs-9" style="padding-left:0">
          <select class="form-control" v-model="param.result" required @change="">
            <option value="" disabled> 请选择... </option>
-           <#if order.status=='51'>
-           <option value="52"> 已收到退货、核验中 </option>
+           <#if order.status=='50'>
+           <option value="51"> 同意换货 </option>
+           <option value="58"> 不同意换货 </option>
            </#if>
-           <option value="53"> 核验不通过、协商解决 </option>
-           <option value="54"> 已重新发货 </option>
+           <#if order.status=='52'>
+           <option value="53"> 已收到退货、核验中 </option>
+           <option value="55"> 重新发货 </option>
+           <option value="54"> 核验不通过、协商解决 </option>
+           </#if>
+           <#if order.status=='53'>
+           <option value="55"> 重新发货 </option>
+           <option value="54"> 核验不通过、协商解决 </option>
+           </#if>       
          </select>
        </div>
   </div>
@@ -107,7 +115,7 @@
          </textarea>
        </div>
   </div>
-  <div v-if="param.result == '54'">
+  <div v-if="param.result == '55'">
   <div class="row" style="margin:3px 0">
     	  <label class="col-xs-3 control-label" style="padding-right:0">配送类型<span style="color:red">*</span></label>
        <div class="col-xs-9" style="padding-left:0">
@@ -131,15 +139,7 @@
          <input type="text" class="form-control" v-model="param.logisticsNo" required maxlength="100">
        </div>
    </div>
-   </div>
-  <#if ((vipBasic.status)!'') == '1'>
-  <div class="row" style="margin:3px 0">
-    	  <label class="col-xs-3 control-label" style="padding-right:0">会员密码<span style="color:red">*</span></label>
-       <div class="col-xs-9" style="padding-left:0">
-         <input type="password" class="form-control" v-model="param.passwd" required maxlength="20">
-       </div>
    </div>  
-   </#if>   
    <div class="row" style="margin:5px 0;text-align:center">
       <button type="submit" class="btn btn-danger" @click="submit">提交换货申请</button>
    </div>
@@ -158,7 +158,6 @@ var containerVue = new Vue({
 		
 		param:{
 			orderId:'${order.orderId}',
-			passwd:'',
 			reason:'',
 			dispatchMode:'',
 			logisticsComp:'',
@@ -190,7 +189,7 @@ var containerVue = new Vue({
 				alertMsg('错误提示','处理明细不可少于3个字符！');
 				return;
 			}
-			if(this.param.result == '54'){
+			if(this.param.result == '55'){
 				if(!this.param.dispatchMode ){
 					alertMsg('错误提示','配送方式不可为空！');
 					return;
@@ -205,13 +204,13 @@ var containerVue = new Vue({
 				}
 			}
 			$.ajax({
-				url: '/aftersales/partner/exchange/submit/' + this.param.orderId ,
+				url: '/paftersale/exchange/submit/' + this.param.orderId ,
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//成功
-							window.location.href = "/aftersales/partner/mgr/exchanging";
+							window.location.href = "/paftersale/manage/exchanging";
 						}else{//出现逻辑错误
 							alertMsg('错误提示',jsonRet.errmsg);
 						}

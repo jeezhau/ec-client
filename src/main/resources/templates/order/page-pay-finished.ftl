@@ -60,8 +60,8 @@
   </div> 
   <!-- 商家 -->
   <div class="row" style="margin:0px 0px;padding:5px 10px;background-color:white">
-      <a class="pull-left" href="/partner/mcht/${order.partnerId}">
-        <img alt="头像" src="/partner/cert/show/logo/${order.partnerId}" width="20px" height="20px" style="border-radius:50%"> 
+      <a class="pull-left" href="/shop/mcht/${order.partnerId}">
+        <img alt="头像" src="/shop/pcert/logo/${order.partnerId}" width="20px" height="20px" style="border-radius:50%"> 
         ${order.partnerBusiName}
       </a>
   </div>
@@ -69,8 +69,8 @@
   <div class="row" style="margin:3px 1px ;padding:3px 0;background-color:white" >
     <div class="col-xs-12" style="text-align:center;">${order.goodsName}</div>
     <div class="col-xs-12" style="text-align:center;">
-      <a href="/goods/show/${(order.goodsId)?string('#')}">
-       <img alt="" src="/image/file/show/${(order.mchtUId)?string('#')}/${(order.goodsMainImgPath)!''}" style="width:99%;height:150px;">
+      <a href="/shop/goods/${(order.goodsId)?string('#')}">
+       <img alt="" src="/shop/gimage/${(order.partnerId)?string('#')}/${(order.goodsMainImgPath)!''}" style="width:99%;height:150px;">
       </a>
     </div>
     <div class="col-xs-12" style="padding:0px 3px">

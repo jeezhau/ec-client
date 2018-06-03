@@ -101,7 +101,7 @@
               <input type="checkbox" v-model="selectedArr" v-bind:value="item.goodsId" style="display:inline-block;padding:0 5px;width:15px;height:15px">
             </td>
             <td style="padding:2px 2px">
-              <a :href="'/goods/show/' + item.goodsId">{{item.goodsName}}</a>
+              <a :href="'/goods/preview/' + item.goodsId">{{item.goodsName}}</a>
             </td>
             <td style="padding:2px 2px;text-align:center">
               <button class="btn btn-primary" style="padding:2px 3px" @click="changeSpec(item.goodsId,item.goodsName,item.specDetail)">规格库存</button>

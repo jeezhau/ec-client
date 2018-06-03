@@ -26,10 +26,11 @@
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+
 <#if (order.orderId)?? >
 <div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
-  <#include "/order/tpl-order-buy-user-4fm.ftl" encoding="utf8"> 
-  <#include "/order/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
+  <#include "/porder/tpl-porder-buy-user-4fm.ftl" encoding="utf8"> 
+  <#include "/common/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
 
   <!-- 商家 -->
   <div class="row" style="margin:3px 0px;padding:5px 10px;background-color:white">
@@ -105,14 +106,14 @@ var containerVue = new Vue({
 			this.param.score = $("#score").slider().val();
 			</#if>
 			$.ajax({
-				url: '/order/partner/appraise/submit/' + this.param.orderId ,
+				url: '/psaleorder/appraise/submit/' + this.param.orderId ,
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
 					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//成功
-							window.location.href = "/order/partner/show/all";
+							window.location.href = "/psaleorder/show/all";
 						}else{//出现逻辑错误
 							alertMsg('错误提示',jsonRet.errmsg);
 						}
@@ -122,7 +123,7 @@ var containerVue = new Vue({
 				},
 				failure:function(){
 					$("#dealingData").hide();
-				}
+				},
 				dataType: 'json'
 			});
 		}

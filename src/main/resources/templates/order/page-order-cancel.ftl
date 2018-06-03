@@ -25,14 +25,15 @@
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+
 <#if (order.orderId)?? >
 <div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
-  <#include "/order/tpl-order-buy-user-4fm.ftl" encoding="utf8"> 
-  <#include "/order/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
+  <#include "/common/tpl-order-partner-4fm.ftl" encoding="utf8"> 
+  <#include "/common/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
 
   <!-- 支付明细 -->
   <#if (payFlow.flowId)??>
-  <#include "/order/tpl-order-pay-flow-4fm.ftl" encoding="utf8"> 
+  <#include "/order/tpl-order-payflow-4fm.ftl" encoding="utf8"> 
   </#if>
   <div class="row" style="margin:3px 0px;background-color:white; color:red">
     <p/>
@@ -87,14 +88,14 @@ var containerVue = new Vue({
 			}
 			</#if>
 			$.ajax({
-				url: '/order/user/cancel/submit/' + this.param.orderId ,
+				url: '/order/cancel/submit/' + this.param.orderId ,
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
 					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//成功
-							window.location.href = "/order/user/show/all";
+							window.location.href = "/order/show/all";
 						}else{//出现逻辑错误
 							alertMsg('错误提示',jsonRet.errmsg);
 						}

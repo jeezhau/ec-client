@@ -1,15 +1,15 @@
   <!-- 商品信息 -->
   <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
     <div class="col-xs-12" style="text-align:center;">
-      <a class="pull-left" href="/partner/mcht/${(order.partnerId)?string('#')}">
-	    <img alt="头像" src="/partner/cert/show/logo/${(order.partnerId)?string('#')}" width="20px" height="20px" style="border-radius:50%"> 
+      <a class="pull-left" href="/shop/mcht/${(order.partnerId)?string('#')}">
+	    <img alt="LOGO" src="/shop/pcert/logo/${(order.partnerId)?string('#')}" width="20px" height="20px" style="border-radius:50%"> 
 	    <span>${(order.partnerBusiName)!''}</span>
 	  </a><br>
       <span>${order.goodsName}</span>
     </div>
     <div class="col-xs-12" style="text-align:center;">
-      <a href="/goods/show/${(order.goodsId)?string('#')}">
-       <img alt="" src="/image/file/show/${(order.mchtUId)?string('#')}/${(order.goodsMainImgPath)!''}" style="width:99%;height:150px;">
+      <a href="/shop/goods/${(order.goodsId)?string('#')}">
+       <img alt="" src="/shop/gimage/${(order.partnerId)?string('#')}/${(order.goodsMainImgPath)!''}" style="width:99%;height:150px;">
       </a>
     </div>
     <div class="col-xs-12" style="padding:0px 3px">

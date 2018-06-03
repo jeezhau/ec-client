@@ -42,8 +42,8 @@
     <div v-for="goods in goodsList" class="col-xs-6 col-sm-4 col-md-4 col-lg-3" style="padding:3px 2px;">
         <div class="row" style="margin:1px 1px;padding:2px 10px;background-color:white;text-align:center;vertical-align:center" >
           <div class="row" style="margin:0">
-            <a v-bind:href="'/partner/mcht/' + goods.partnerId">
-	          <img class="pull-left" alt="" :src="'/partner/cert/show/logo/' + goods.partnerId" style="width:25px;height:25px;border-radius:30%">
+            <a v-bind:href="'/shop/mcht/' + goods.partnerId">
+	          <img class="pull-left" alt="" :src="'/shop/pcert/logo/' + goods.partnerId" style="width:25px;height:25px;border-radius:30%">
 	        </a>
 	        <span class="pull-right">约{{goods.partner.distance}}km</span>
 	      </div>
@@ -52,8 +52,8 @@
 	      </div>
         </div>
 	    <div style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
-	      <a v-bind:href="'/goods/detail/' + goods.goodsId">
-	        <img alt="" :src="'/image/file/show/' + goods.partner.vipId + '/' + goods.mainImgPath" style="width:90%;max-width:200px;height:150px">
+	      <a v-bind:href="'/shop/goods/' + goods.goodsId">
+	        <img alt="" :src="'/shop/gimage/' + goods.partnerId + '/' + goods.mainImgPath" style="width:90%;max-width:200px;height:150px">
 	      </a>
 	    </div>
 	    <div style="margin:1px 1px;" >

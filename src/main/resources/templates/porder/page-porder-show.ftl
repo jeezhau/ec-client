@@ -28,7 +28,7 @@
 
 <div class="container " id="container" style="oveflow:scroll">
   <div class="row" style="margin:5px 0;text-align:center" >
-    <ul class="nav navbar-nav nav-tabs" style="padding:0 5px">
+    <ul class="nav navbar-nav nav-tabs" style="padding:0 5px;width:100%">
         <li class="<#if status='all'> active </#if>" style="width:20%" @click="getOrders('all',$event)"> 
           <a href="javascript:;" style="padding:2px 3px"> 全 部 </a> 
         </li>  
@@ -49,8 +49,8 @@
   <div class="row"><!-- 所有订单之容器 --> 
   
     <div v-for="order in orders" class="row" style="margin:8px 0;padding:0 0">
-      <#include "/order/tpl-order-buy-user-4vue.ftl" encoding="utf8"> 
-      <#include "/order/tpl-order-buy-content-4vue.ftl" encoding="utf8"> 
+      <#include "/porder/tpl-porder-buy-user-4vue.ftl" encoding="utf8"> 
+      <#include "/common/tpl-order-buy-content-4vue.ftl" encoding="utf8"> 
 
 	  <div class="row" style="margin:0px 0;padding:0px 18px 0px 18px;background-color:white;">
 		    <a v-if="order.status ==='10' || order.status ==='11' || order.status ==='12' || order.status ==='20'" class="btn btn-default pull-right" style="padding:0 3px;margin:0 3px" @click="cancelOrder(order)">
@@ -61,9 +61,9 @@
 			<a v-if="order.status ==='21'" class="btn btn-info pull-right" style="padding:0 3px;margin:0 3px" @click="readyGoods(order)"><span >取消备货</span></a>
 		    <a v-if="order.status ==='20' || order.status ==='21'" class="btn btn-danger pull-right" :href="'/psaleorder/delivery/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即发货</span></a>
 		    
-		    <a v-if="order.status==='30' " class="btn btn-default pull-right" :href="'/order/logistics/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >查看物流</span></a>
+		    <a v-if="order.status==='30' " class="btn btn-default pull-right" :href="'/psaleorder/logistics/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >查看物流</span></a>
 		    
-		    <a v-if="!order.apprUserTime && (order.status==='31' || startWith(order.status,'4') || order.status==='55' || order.status==='56')" class="btn btn-primary pull-right" :href="'/order/partner/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即评价</span></a>
+		    <a v-if="!order.apprUserTime && (order.status==='31' || startWith(order.status,'4') || order.status==='55' || order.status==='56')" class="btn btn-primary pull-right" :href="'/psaleorder/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即评价</span></a>
 		    <a v-if="order.apprUserTime" class="btn btn-primary pull-right" :href="'/psaleorder/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >追加评价</span></a>
 		    
       </div>
@@ -161,8 +161,8 @@ $("#container").scroll(scrollHandler);
         			<h4 class="modal-title" id="cancelOrderTitle" style="color:red">协商取消订单</h4>
      		</div>
      		<div class="modal-body">
-       			<#include "/order/tpl-order-buy-user-4vue.ftl" encoding="utf8"> 
-      			<#include "/order/tpl-order-buy-content-4vue.ftl" encoding="utf8"> 
+       			<#include "/porder/tpl-porder-buy-user-4vue.ftl" encoding="utf8"> 
+      			<#include "/common/tpl-order-buy-content-4vue.ftl" encoding="utf8"> 
        			 <div class="row" style="margin:3px 0px;background-color:white; color:red">
        			   <p/>
        			   <p>订单状态: {{getOrderStatus(order.status)}}</p>
@@ -197,12 +197,12 @@ $("#container").scroll(scrollHandler);
         			<h4 class="modal-title" id="readyGoodsModalTitle" style="color:red">接单备货</h4>
      		</div>
      		<div class="modal-body">
-       			<#include "/order/tpl-order-buy-user-4vue.ftl" encoding="utf8"> 
-      			<#include "/order/tpl-order-buy-content-4vue.ftl" encoding="utf8"> 
+       			<#include "/porder/tpl-porder-buy-user-4vue.ftl" encoding="utf8"> 
+      			<#include "/common/tpl-order-buy-content-4vue.ftl" encoding="utf8"> 
 	     		<div class="row" style="margin:3px 0px;padding:5px 10px;background-color:white">
 				   <span>以下为买家备注：</span><br>
-				   <p>{{order.remark}</p>
-				</div>      			
+				   <p>{{order.remark}}</p>
+				</div>     			
        			 <div class="row" style="margin:3px 0px;background-color:white; color:red">
        			   <p/>
        			   <p>订单状态: {{getOrderStatus(order.status)}}</p>
@@ -237,7 +237,7 @@ $("#container").scroll(scrollHandler);
 					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//成功
-							window.location.href = "/order/partner/show/all";
+							window.location.href = "/psaleorder/show/all";
 						}else{//出现逻辑错误
 							alertMsg('错误提示',jsonRet.errmsg);
 						}

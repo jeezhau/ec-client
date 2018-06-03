@@ -45,7 +45,7 @@
 		    <p>图库管理</p>
 		</a>
 	  </div>
-    </div> 
+    </div>
     </#if>
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('postage') )>
     <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
@@ -55,7 +55,7 @@
 		    <p>运费模版管理</p>
 		</a>
 	  </div>
-    </div> 
+    </div>
     </#if>
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('goods') )>   
     <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
@@ -67,7 +67,7 @@
 	  </div>
     </div>
     </#if>
-    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('order') )>
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('saleorder') )>
     <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
        <div style="background-color:white">
 	    <a href="/psaleorder/show/all" >
@@ -77,16 +77,26 @@
        </div>
     </div>
     </#if>
-    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('aftersales') )>
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('aftersale') )>
     <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
        <div style="background-color:white">
-	    <a href="/aftersales/partner/mgr/refunding" >
+	    <a href="/paftersale/manage/refunding" >
 		    <img src="/icons/售后服务.png" alt="" width="90px" height="90px">
 		    <p >售后服务</p>
 		</a>
        </div>
     </div>
     </#if>
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('pstaff') )>
+    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+       <div style="background-color:white">
+	    <a href="/pstaff/manage" >
+		    <img src="/icons/员工管理.png" alt="" width="90px" height="90px">
+		    <p >员工管理</p>
+		</a>
+       </div>
+    </div>
+    </#if>    
   </div>
   <div class="row" style="margin-top:3px;vertical-align:center">
     <div class="col-xs-12">

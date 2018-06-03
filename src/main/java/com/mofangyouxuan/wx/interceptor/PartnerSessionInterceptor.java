@@ -37,8 +37,7 @@ public class PartnerSessionInterceptor extends HandlerInterceptorAdapter{
 		//String agent= request.getHeader("user-agent").toLowerCase();
 		//System.out.println(uri);
 		//不需要控制session的路径
-		String[] excluceUrl = {"/partner/login","/pimage/file/show/","/partner/cert/show/",
-				"/goods/show/","/partner/mcht/","/srvcenter/index/"}; 
+		String[] excluceUrl = {"/partner/login"}; 
 
 		for(String exUri:excluceUrl) {
 			if(uri.startsWith(exUri)) {

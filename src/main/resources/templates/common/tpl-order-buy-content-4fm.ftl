@@ -1,7 +1,7 @@
 	<div class="row" style="margin:1px 0px;">
       <div class="row" style="margin:1px 0px;background-color:white;">
 	    <div class="col-xs-4" style="padding-left:1px;padding-right:0px">
-	      <a href="/goods/show/${(order.goodsId)?string('#')}"><img alt="" src="/image/file/show/${(order.mchtUId)?string('#')}/${(order.goodsMainImgPath)!''}" height=88px width=99%></a>
+	      <a href="/shop/goods/${(order.goodsId)?string('#')}"><img alt="" src="/shop/gimage/${(order.partnerId)?string('#')}/${(order.goodsMainImgPath)!''}" height=88px width=99%></a>
 	    </div>
 	    <div class="col-xs-8" style="overflow:scroll;padding:0 5px 1px 0">
 	       <div style="text-align:center">${order.goodsName}</div>

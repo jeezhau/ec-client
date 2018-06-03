@@ -39,7 +39,7 @@
   
   <#if (payFlow.flowId)??>
   <!-- 支付明细 -->
-  <#include "/order/tpl-order-payflow-4fm.ftl" encoding="utf8"> 
+  <#include "/porder/tpl-porder-payflow-4fm.ftl" encoding="utf8"> 
   </#if>
   
   <#if (order.aftersalesReason)??>

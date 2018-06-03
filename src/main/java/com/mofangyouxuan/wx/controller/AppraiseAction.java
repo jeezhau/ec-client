@@ -28,7 +28,7 @@ public class AppraiseAction {
 	 * @return
 	 */
 	@RequestMapping("/show/{objNm}/{objId}")
-	public String show(@PathVariable("objNm")String objNm,@PathVariable("objId")Long objId,ModelMap map) {
+	public String showAll(@PathVariable("objNm")String objNm,@PathVariable("objId")Long objId,ModelMap map) {
 		if(!"goods".equals(objNm) && "partnerId".equals(objNm)) {//访问非法
 			objNm = null;
 			objId = null;

@@ -35,21 +35,19 @@ public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter{
     		InterceptorRegistration  userSessionReg = registry.addInterceptor(getUserSessionInInterceptor());
     		userSessionReg.addPathPatterns("/user/**");
     		userSessionReg.addPathPatterns("/vip/**");
-    		//userSessionReg.addPathPatterns("/partner/**");
         userSessionReg.addPathPatterns("/order/**");
         userSessionReg.addPathPatterns("/complain/**");
         userSessionReg.addPathPatterns("/receiver/**");
-        userSessionReg.addPathPatterns("/aftersales/**");
+        userSessionReg.addPathPatterns("/aftersale/**");
  
 		InterceptorRegistration  partnerSessionReg = registry.addInterceptor(getPartnerSessionInInterceptor());
 		partnerSessionReg.addPathPatterns("/partner/**");
 		partnerSessionReg.addPathPatterns("/goods/**");
 		partnerSessionReg.addPathPatterns("/psaleorder/**");
-	    //userSessionReg.addPathPatterns("/complain/**");
 	    partnerSessionReg.addPathPatterns("/pimage/**");
 	    partnerSessionReg.addPathPatterns("/postage/**");
-	    partnerSessionReg.addPathPatterns("/aftersales/**");
-        
+	    partnerSessionReg.addPathPatterns("/paftersale/**");
+	    partnerSessionReg.addPathPatterns("/pstaff/**");
         super.addInterceptors(registry);
     }
 }

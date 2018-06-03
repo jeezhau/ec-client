@@ -36,7 +36,7 @@
          <span class="pull-left"><img alt="头像" :src="order.headimgurl" width="20px" height="20px" style="border-radius:50%">{{order.nickname}}</span>
          <span class="pull-right">{{order.appraiseTime}}</span>
        </div>
-       <#include "/order/tpl-order-buy-content-4vue.ftl" encoding="utf8">
+       <#include "/common/tpl-order-buy-content-4vue.ftl" encoding="utf8">
        <div class="row" style="margin:1px 0">
          <div class="col-xs-12" v-for="sub in order.appraiseInfo">
          {{sub.time}} &nbsp;&nbsp;&nbsp;&nbsp;{{sub.content}}
@@ -64,7 +64,6 @@ var containerVue = new Vue({
 	methods:{
 		getAllAppr: function(isRefresh,isFirst){//是否刷新，是否从前面插入
 			 $("#loadingData").show();
-			 $("#nomoreData").hide();
 			 if(isRefresh){ //清空数据
 			 	containerVue.appr.apprCnt = 0;
 			 	containerVue.appr.apprList = [];
@@ -89,6 +88,7 @@ var containerVue = new Vue({
 					method:'post',
 					data: this.param,
 					success: function(jsonRet,status,xhr){
+						 $("#loadingData").hide();
 						if(jsonRet && jsonRet.errcode == 0){//
 							var i=0;
 						    var j=jsonRet.datas.length;
@@ -102,7 +102,7 @@ var containerVue = new Vue({
 								if(appr.appraiseInfo){//有评价内容
 									appr.appraiseInfo = JSON.parse(appr.appraiseInfo);
 								}else{
-									appr.appraiseInfo = {'time':appr.appraiseTime,'content':"卖家太懒，啥也没留下！！！"}
+									appr.appraiseInfo = [{'time':appr.appraiseTime,'content':"买家太懒，啥也没留下！！！"}];
 								}
 								appr.goodsSpec = JSON.parse(appr.goodsSpec);
 								appr.headimgurl = startWith(appr.headimgurl,'http')?appr.headimgurl:('/user/headimg/show/'+appr.userId);
@@ -116,7 +116,7 @@ var containerVue = new Vue({
 							containerVue.param.begin = jsonRet.pageCond.begin;
 							containerVue.appr.apprCnt = jsonRet.pageCond.count;
 						}else{
-							$("#loadingData").hide();
+							;
 						}
 					},
 					failure:function(){

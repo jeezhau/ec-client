@@ -24,8 +24,8 @@
   </header>
   <form class="form-horizontal" action="/partner/login" method ="post" autocomplete="on" enctype="multipart/form-data" role="form" >
     <div class="form-group">
-      <label class="col-xs-4 control-label" style="padding-right:0">用户类型</label>	 
-    	  <div class="input-group" style="padding-left:0">
+      <label class="col-xs-4 control-label" style="padding-right:3px">用户类型</label>	 
+    	  <div class="input-group" style="padding-left:3px">
         	<select class="form-control" name="userTp" v-model="params.userTp">
         	  <option value="" disabled>请选择用户类型</option>
         	  <option value="bindVip">绑定VIP</option>
@@ -34,20 +34,20 @@
       </div>	
     	</div>
     <div v-if="params.userTp == 'staff'" class="form-group">
-      <label class="col-xs-4 control-label" style="padding-right:0">合作伙伴ID</label>
-    	  <div class="input-group" style="padding-left:0">
+      <label class="col-xs-4 control-label" style="padding-right:3px">合作伙伴ID</label>
+    	  <div class="input-group" style="padding-left:3px">
         <input class="form-control" type="text" name="partnerId" value="${partnerId!''}" v-bind:required="params.userTp == 'staff'" placeholder="合作伙伴ID">           
       </div>	
     	</div>
     	<div class="form-group">
-    	  <label class="col-xs-4 control-label" style="padding-right:0">用户ID</label>
-    	  <div class="input-group" style="padding-left:0">
+    	  <label class="col-xs-4 control-label" style="padding-right:3px">用户ID</label>
+    	  <div class="input-group" style="padding-left:3px">
            <input class="form-control" type="text" name="userId" value= "${userId!''}" required placeholder="员工ID或绑定会员ID">           
       </div>	
     	</div>
     	<div class="form-group">
-    	  <label class="col-xs-4 control-label" style="padding-right:0">密码<i class="fa fa-key fa-fw"></i></label>
-    	  <div class="input-group">
+    	  <label class="col-xs-4 control-label" style="padding-right:3px">密码<i class="fa fa-key fa-fw"></i></label>
+    	  <div class="input-group" style="padding-left:3px">
            <input class="form-control" type="password" name="passwd"  title="员工输入员工操作密码，绑定会员输入会员密码" required placeholder="******">           
       </div>	
     	</div>

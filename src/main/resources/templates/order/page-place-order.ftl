@@ -35,7 +35,7 @@
 <div class="container goods-container" id="container" style="margin:0 0;overflow:scroll">
  <div class="row" style="margin:5px 1px 1px ;" >
      <div style="margin:1px 0;padding:0 5px;background-color:white;font-size:130%;text-align:center" >
-      <a href="/goods/show/${(goods.goodsId)?string('#')}">  ${(goods.goodsName)!''} </a>
+      <a href="/shop/goods/${(goods.goodsId)?string('#')}">  ${(goods.goodsName)!''} </a>
      </div>
  </div>
  <div class="row " >
@@ -48,7 +48,7 @@
     <!-- 轮播（Carousel）项目 -->
     <div class="carousel-inner">
         <div  v-bind:class="[{active:(index===0)}, 'item']" v-for="imgpath,index in goods.courselImgPaths" >
-            <img :src="'/image/file/show/${(goods.partner.vipId)?string('#')}/' + imgpath" >
+            <img :src="'/shop/gimage/${(goods.partnerId)?string('#')}/' + imgpath" >
         </div>
     </div>
     <!-- 轮播（Carousel）导航 -->
@@ -60,8 +60,8 @@
   
   <!-- 商家信息 -->
   <div class="row" style="margin:3px 15px;background-color:white;padding:3px 8px;">
-    <a href="/partner/mcht/${(goods.partnerId)?string('#')}">
-     <img class="pull-left" alt="" src="/partner/cert/show/logo/${(goods.partnerId)?string('#')}" style="width:25px;height:25px;border-radius:30%">
+    <a href="/shop/mcht/${(goods.partnerId)?string('#')}">
+     <img class="pull-left" alt="" src="/shop/pcert/logo/${(goods.partnerId)?string('#')}" style="width:25px;height:25px;border-radius:30%">
     </a>
    <span class="pull-right">${(goods.partner.province)!''}-${(goods.partner.area)!''}-${(goods.partner.addr)!''}</span>
   </div> 

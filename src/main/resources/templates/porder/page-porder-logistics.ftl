@@ -73,9 +73,6 @@
 
   <#include "/common/tpl-order-buy-content-bigimg-4fm.ftl" encoding="utf-8">
   
-  <!-- 推荐商品 -->
-  <#include "/shop/tpl-goods-recommend.ftl" encoding="utf-8">
-  
 
 </#if>
 </div><!-- end of container -->
