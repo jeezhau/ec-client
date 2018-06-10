@@ -16,7 +16,6 @@
     <link href="/css/templatemo-style.css" rel="stylesheet">
     
     <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-    
     <link href="/css/weui.css" rel="stylesheet">
 </head>
 

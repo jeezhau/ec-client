@@ -244,7 +244,7 @@ public class PartnerStaffService {
 			PageCond pageCond = new PageCond(0,1);
 			JSONObject jsonRet = getPartnersAll(partnerId,search,pageCond);
 			if(jsonRet.containsKey("datas")) {
-				List<PartnerStaff> list = JSONArray.parseArray(jsonRet.getJSONObject("datas").toJSONString(), PartnerStaff.class);
+				List<PartnerStaff> list = JSONArray.parseArray(jsonRet.getJSONArray("datas").toJSONString(), PartnerStaff.class);
 				if(list.size()>0) {
 					return list.get(0);
 				}
@@ -268,9 +268,8 @@ public class PartnerStaffService {
 	public static JSONObject uploadImg(Integer partnerId,File imageFile,String mode,Integer userId,String passwd) {
 		String url = mfyxServerUrl + pstaffUploadUrl;
 		url = url.replace("{partnerId}", partnerId +"");
-		
+		url = url.replace("{mode}", mode);
 		Map<String,String> paramPairs = new HashMap<String,String>();
-		paramPairs.put("mode", mode);
 		paramPairs.put("userId", "" + userId);
 		paramPairs.put("passwd", "" + passwd);
 		String strRet = HttpUtils.uploadFile(url, imageFile, "image", paramPairs);;

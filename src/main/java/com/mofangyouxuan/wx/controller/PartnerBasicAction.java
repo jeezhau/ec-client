@@ -79,7 +79,7 @@ public class PartnerBasicAction {
 		map.put("userId", userId);
 		map.put("partnerId", partnerId);
 
-		if(!"bindVip".equals(userTp) && "staff".equals(userTp)) {
+		if(!"bindVip".equals(userTp) && !"staff".equals(userTp)) {
 			map.put("errmsg", "用户类型不正确！");
 			return "partner/page-partner-login";
 		}
@@ -193,7 +193,7 @@ public class PartnerBasicAction {
 		VipBasic partnerBindVip = (VipBasic) session.getAttribute("partnerBindVip");
 		PartnerStaff partnerStaff = (PartnerStaff) session.getAttribute("partnerStaff");
 		PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");
-		if("bindVip".equals(partnerUserTP) && partnerStaff == null) {
+		if("bindVip".equals(partnerUserTP) && myPartner == null) {
 			String needScore = SysParam.getSysParam("partner_open_need_socre");
 			try {
 				openPartnerNeedScore = new Integer(needScore);

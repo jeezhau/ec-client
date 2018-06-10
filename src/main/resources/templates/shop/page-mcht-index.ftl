@@ -44,7 +44,7 @@
        </div>
      </div>
      <div class="col-xs-4" style="text-align:center;">
-      <a href="javascript:;">
+      <a href="/shop/kfshow/${(mcht.partnerId)?string('#')}">
         <img alt="" src="/icons/客服.png" width="50px" height=50px style="border-radius:30%">
         <br>
         <span>联系客服</span>

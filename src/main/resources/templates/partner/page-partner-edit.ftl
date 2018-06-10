@@ -93,10 +93,14 @@
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">合作伙伴类型<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
+         <#if !(myPartner.partnerId)??>
           <select class="form-control"  v-model="param.pbTp">
+         <#else>
+          <select class="form-control"  v-model="param.pbTp" disabled>
+         </#if>
             <option value="" disabled>请选择合作伙伴类型...</option>
             <option value="1">特约商户</option>
-            <option value="2">推广招商</option>
+            <!-- <option value="2">推广招商</option> -->
           </select>
         </div>
       </div> 
@@ -202,7 +206,7 @@ var partnerContainerVue = new Vue({
 	el:'#partnerContainer',
 	data:{
 		initData:{
-			pbTp:'${(myPartner.pbTp)!''}',
+			pbTp:'${(myPartner.pbTp)!"1"}',
 			country:'中国',
 			province:'${(myPartner.province)!''}',
 			city:'${(myPartner.city)!''}',
@@ -435,7 +439,7 @@ $(document).on('ready', function() {
     });
     //异步上传错误结果处理
     $('#logoImg').on('fileerror', function(event, data, msg) {
-		alertMsg('系统提示',"营业执照照片文件上传失败！");
+		alertMsg('系统提示',"企业LOGO照片文件上传失败！");
 		$('#logoImg').fileinput('clear');
     });
     //异步上传成功结果处理

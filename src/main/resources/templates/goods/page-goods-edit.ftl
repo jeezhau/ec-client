@@ -28,10 +28,10 @@
   <div class="row">
      <ul class="nav nav-tabs" style="margin:0 15%">
 	  <li style="width:50%" class="active" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#editGoods').show();$('#reviewInfo').hide();">
-	    <a href="javascript:;">商品基本信息编辑</a>
+	    <a href="javascript:;">商品编辑</a>
 	  </li>
 	  <li style="width:50%" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#editGoods').hide();$('#reviewInfo').show();">
-	    <a href="javascript:;">审批反馈</a>
+	    <a href="javascript:;">审批进度</a>
 	  </li>
 	</ul>
   </div>
@@ -208,7 +208,7 @@ var goodsContainerVue = new Vue({
 		param:{
 			goodsId:'${((goods.goodsId)!"-1")?string("#")}',
 			goodsName:'${(goods.goodsName)!''}',
-			categoryId:'${((goods.categoryId)!'')?string("#")}',
+			categoryId:'${((goods.categoryId)!-1)?string("#")}',
 			goodsDesc:'',
 			mainImgPath:'${(goods.mainImgPath)!''}',
 			carouselImgPaths:'${(goods.carouselImgPaths)!''}',
@@ -217,10 +217,10 @@ var goodsContainerVue = new Vue({
 			//priceLowest:'${(goods.priceLowest)!''}',
 			//stockSum:'${(goods.stockSum)!''}',
 			specDetail:"",
-			limitedNum:'${((goods.limitedNum)!'')?string("#")}',
+			limitedNum:'${((goods.limitedNum)!0)?string("#")}',
 			beginTime:'${(goods.beginTime)!''}',
 			endTime:'${(goods.endTime)!''}',
-			refundLimit:'${((goods.refundLimit)!"7")?string("#")}',
+			refundLimit:'${((goods.refundLimit)!7)?string("#")}',
 			postageIds:'${(goods.postageIds)!''}',
 			status:'${(goods.status)!''}'
 		},

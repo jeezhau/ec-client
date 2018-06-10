@@ -60,6 +60,11 @@ public class GoodsAction {
 			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
 			return "forward:/partner/manage" ;
 		}
+		List<Category> categories = (List<Category>) map.get("categories");
+		if(categories == null) {
+			categories = GoodsService.getCategories();
+			map.put("categories", categories);
+		}
 		
 		map.put("sys_func", "partner-goods");
 		return "goods/page-goods-manage";

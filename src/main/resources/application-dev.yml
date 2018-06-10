@@ -74,7 +74,7 @@ mfyx:
   pstaff-delete-url: '/pstaff/{partnerId}/deleteStaff'
   pstaff-updatepwd-url: '/pstaff/{partnerId}/updpwd'
   pstaff-resetpwd-url: '/pstaff/{partnerId}/resetpwd'
-  pstaff-upload-url: '/{partnerId}/upload/{mode}'
+  pstaff-upload-url: '/pstaff/{partnerId}/upload/{mode}'
   pstaff-show-url: '/pstaff/{partnerId}/show/{userId}/{mode}'
   pstaff-getall-url: '/pstaff/{partnerId}/getall'
 

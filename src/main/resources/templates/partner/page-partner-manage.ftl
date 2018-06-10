@@ -37,7 +37,9 @@
       </div>
     </div>
     </#if>
-    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('pimage') )>
+    
+    <#if ((myPartner.pbTp)!'')=='1'>
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('pimage')) >
     <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
        <div style="background-color:white">
 	    <a href="/pimage/manage" >
@@ -47,7 +49,7 @@
 	  </div>
     </div>
     </#if>
-    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('postage') )>
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('postage')) >
     <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
        <div style="background-color:white">
 	    <a href="/postage/manage" >
@@ -57,7 +59,7 @@
 	  </div>
     </div>
     </#if>
-    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('goods') )>   
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('goods')) >
     <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
        <div style="background-color:white">
 	    <a href="/goods/manage" >
@@ -67,7 +69,7 @@
 	  </div>
     </div>
     </#if>
-    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('saleorder') )>
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('saleorder')) >
     <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
        <div style="background-color:white">
 	    <a href="/psaleorder/show/all" >
@@ -77,7 +79,7 @@
        </div>
     </div>
     </#if>
-    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('aftersale') )>
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('aftersale')) >
     <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
        <div style="background-color:white">
 	    <a href="/paftersale/manage/refunding" >
@@ -87,7 +89,40 @@
        </div>
     </div>
     </#if>
-    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('pstaff') )>
+    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+       <div style="background-color:white">
+	    <a href="/paftersale/manage/refunding" >
+		    <img src="/icons/投诉.png" alt="" width="90px" height="90px">
+		    <p >我要投诉</p>
+		</a>
+       </div>
+    </div>
+    </#if>
+    
+    <#if ((myPartner.pbTp)!'')=='2' >
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('aftersale')) >
+    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+       <div style="background-color:white">
+	    <a href="/paftersale/manage/refunding" >
+		    <img src="/icons/下级管理.png" alt="" width="90px" height="90px">
+		    <p >下级管理</p>
+		</a>
+       </div>
+    </div>
+    </#if>     
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('aftersale')) >
+    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+       <div style="background-color:white">
+	    <a href="/paftersale/manage/refunding" >
+		    <img src="/icons/信息审核.png" alt="" width="90px" height="90px">
+		    <p >信息审核</p>
+		</a>
+       </div>
+    </div>
+    </#if>   
+    </#if>
+    
+    <#if (myPartner.pbTp)??>     
     <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
        <div style="background-color:white">
 	    <a href="/pstaff/manage" >
@@ -95,8 +130,17 @@
 		    <p >员工管理</p>
 		</a>
        </div>
+    </div>    
+    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+       <div style="background-color:white">
+	    <a href="/pstaff/manage" >
+		    <img src="/icons/客服.png" alt="" width="90px" height="90px">
+		    <p >官方客服</p>
+		</a>
+       </div>
     </div>
-    </#if>    
+    </#if>
+       
   </div>
   <div class="row" style="margin-top:3px;vertical-align:center">
     <div class="col-xs-12">
@@ -121,6 +165,10 @@
     </div>
   </div>
 </div><!-- end of container -->
+
+<#if errmsg??>
+ <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
+</#if>
 
 <footer>
   <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 

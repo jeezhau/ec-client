@@ -218,7 +218,7 @@ containerVue.getAllAppr();
 	    </span>
 	    <p class="weui-tabbar__label">商城首页</p>
 	</a>
-    <a href="javascript:;" class="weui-tabbar__item " >
+    <a href="/shop/kfshow/${(goods.partnerId)?string('#')}" class="weui-tabbar__item " >
 	    <span style="display: inline-block;position: relative;">
 	        <img src="/icons/客服.png" alt="" class="weui-tabbar__icon">
 	    </span>

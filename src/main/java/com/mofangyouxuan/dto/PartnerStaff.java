@@ -17,12 +17,13 @@ public class PartnerStaff {
 	@NotNull(message="用户ID：不可为空！")
     private Integer userId;
 
-	@Null
+	//@Null
     private Integer partnerId;
 
 	@Size(max=30,message="内部员工ID：最长30个字符！")
     private String staffId;
 
+	@NotNull(message="员工昵称：不可为空！")
 	@Size(max=20,message="员工昵称：最长20个字符！")
     private String nickname;
 

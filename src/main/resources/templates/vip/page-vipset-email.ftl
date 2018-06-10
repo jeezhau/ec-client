@@ -18,11 +18,6 @@
     <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <link href="/css/weui.css" rel="stylesheet">
     
-    <!-- 文件上传 -->
-    <script src="/script/fileinput.min.js" type="text/javascript"></script>
-    <script src="/script/zh.js" type="text/javascript"></script>
-    <link href="/css/fileinput.min.css" rel="stylesheet">
-    
     <link href="/css/mfyx.css" rel="stylesheet">
     <script src="/script/common.js" type="text/javascript"></script>
 </head>

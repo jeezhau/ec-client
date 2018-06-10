@@ -90,8 +90,8 @@ public class NearbyMgrAction {
 			params.put("currUserLocX", lng);
 			params.put("currUserLocY", lat);
 			JSONObject sortParams = new JSONObject();
-			sortParams.put("sale", "1#1");
-			sortParams.put("dist", "2#1");
+			sortParams.put("dist", "1#1");
+			sortParams.put("sale", "2#1");
 			sortParams.put("time", "3#1");
 			
 			//{errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
@@ -103,5 +103,4 @@ public class NearbyMgrAction {
 		}
 		return jsonRet.toString();
 	}
-	
 }

@@ -2,12 +2,14 @@ package com.mofangyouxuan.wx.controller;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -22,8 +24,11 @@ import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.Category;
 import com.mofangyouxuan.dto.Goods;
 import com.mofangyouxuan.dto.PartnerBasic;
+import com.mofangyouxuan.dto.PartnerStaff;
+import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.service.PartnerMgrService;
+import com.mofangyouxuan.service.PartnerStaffService;
 import com.mofangyouxuan.wx.utils.HttpUtils;
 import com.mofangyouxuan.wx.utils.PageCond;
 
@@ -244,5 +249,89 @@ public class ShopAction {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * 获取指定合作伙伴的客服信息
+	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
+	 */
+	@RequestMapping("/kfstaff/getall/{partnerId}")
+	@ResponseBody
+	public Object getPartnerKf(@PathVariable("partnerId")Integer partnerId,
+			HttpSession session) {
+		JSONObject jsonRet = new JSONObject();
+		try {
+			JSONObject search = new JSONObject();
+			search.put("isKf", "1");
+			jsonRet = PartnerStaffService.getPartnersAll(partnerId, search, new PageCond(0,10));
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "系统异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
+	}
+	
+	/**
+	 * 获取合作伙伴的客服信息
+	 * 【权限人】
+	 * 任何人
+	 * @param partnerId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/kfshow/{partnerId}")
+	public String showPartnerKf(@PathVariable("partnerId")Integer partnerId,ModelMap map) {
+		PartnerBasic partner = PartnerMgrService.getPartnerById(partnerId);
+		if(partner == null || !"S".equals(partner.getStatus())) {
+			map.put("errmsg", "系统中没有该商户信息！");
+		}else {
+			map.put("partner", partner);
+		}
+		return "shop/page-partnerkf-show";
+	}
+	
+	/**
+	 * 头像与客服二维码显示
+	 * 保存相对路径：staff
+	 * 1、头像保存名称：[userid]_headimg.xxx；
+	 * 2、客服二维码保存名称：[userid]_kfqrcode.xxx;
+	 * @param partnerId
+	 * @param userId
+	 * @param mode
+	 * @param out
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 */
+	@RequestMapping("/kfqrcode/{partnerId}/show/{userId}")
+	public void showKFQrcode(@PathVariable("partnerId")Integer partnerId,
+			@PathVariable("userId")Integer userId,
+			OutputStream out,HttpServletRequest request,HttpServletResponse response) throws IOException {
+		String mode = "kfqrcode";
+		try {
+			File file = PartnerStaffService.showImg(partnerId, mode, userId);
+			if(file == null) {
+				return;
+			}
+			InputStream is = new FileInputStream(file);
+			String filename = file.getName();
+			response.setContentType("image/*");
+			response.addHeader("filename", filename);
+			OutputStream os = response.getOutputStream(); 
+			byte[] buff = new byte[1024];
+			int len = 0;
+			while((len=is.read(buff))>0) {
+				os.write(buff, 0, len);
+			}
+			os.flush();
+			os.close();
+			is.close();
+			file.delete();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
 	
 }

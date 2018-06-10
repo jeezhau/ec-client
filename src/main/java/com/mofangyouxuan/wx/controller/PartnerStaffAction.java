@@ -25,11 +25,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.PartnerStaff;
-import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.PartnerStaffService;
 import com.mofangyouxuan.wx.utils.PageCond;
@@ -41,7 +41,7 @@ import com.mofangyouxuan.wx.utils.PageCond;
  */
 @Controller
 @RequestMapping("/pstaff")
-@SessionAttributes({"sys_func","partnerUserTP","partnerPasswd","partnerStaff","partnerBindVip","myPartner"})
+@SessionAttributes({"sys_func"})
 public class PartnerStaffAction {
 
 	@Value("${sys.tmp-file-dir}")
@@ -54,15 +54,51 @@ public class PartnerStaffAction {
 	 * @return
 	 */
 	@RequestMapping("/manage")
-	public String getManage(ModelMap map) {
-		PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+	public String getManage(ModelMap map,HttpSession session) {
+		PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");
 		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
 			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
-			return "forward:/pstaff/manage" ;
+			return "forward:/partner/manage" ;
 		}
 		
 		map.put("sys_func", "partner-pstaff");
 		return "pstaff/page-pstaff-manage";
+	}
+	
+	/**
+	 * 获取合作伙伴员工管理页面
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/edit/{userId}")
+	public String beginEdit(@PathVariable("userId")Integer userId,
+			ModelMap map,HttpSession session) {
+		PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");
+		String partnerUserTP = (String) session.getAttribute("partnerUserTP");
+		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
+			return "forward:/partner/manage" ;
+		}
+		PartnerStaff staff = null;
+		if(!"bindVip".equals(partnerUserTP)) {//员工自己修改
+			staff = (PartnerStaff) session.getAttribute("partnerStaff");
+		}else {
+			if(userId > 0) {
+				staff = this.getStaffByUser(myPartner.getPartnerId(), userId);
+			}else {
+				staff = new PartnerStaff();
+				staff.setRecId(0l);
+				staff.setPartnerId(myPartner.getPartnerId());
+			}
+		}
+		if(staff == null) {
+			map.put("errmsg", "获取员工信息失败，请稍后再试！");
+		}else {
+			map.put("staff", staff);
+			map.put("partnerUserTP", partnerUserTP);
+		}
+		map.put("sys_func", "partner-pstaff");
+		return "pstaff/page-pstaff-edit";
 	}
 	
 	/**
@@ -78,17 +114,9 @@ public class PartnerStaffAction {
 	@RequestMapping("/saveStaff")
 	@ResponseBody
 	public Object saveStaff(@Valid PartnerStaff staff,BindingResult result,
-			@RequestParam(value="passwd",required=true)String passwd,HttpSession session) {
+			HttpSession session) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			UserBasic user = (UserBasic) session.getAttribute("userBasic");
-			PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");//我的合作伙伴
-			if(user == null || user.getUserId() == null || !"1".equals(user.getStatus()) || 
-					myPartner == null || myPartner.getPartnerId() == null) {
-				jsonRet.put("errmsg", "您当前不可进行员工管理！");
-				jsonRet.put("errcode", ErrCodes.COMMON_PARAM_ERROR);
-				return jsonRet.toString();
-			}
 			//数据验证
 			if(result.hasErrors()){
 				StringBuilder sb = new StringBuilder();
@@ -100,11 +128,32 @@ public class PartnerStaffAction {
 				jsonRet.put("errcode", ErrCodes.COMMON_PARAM_ERROR);
 				return jsonRet.toString();
 			}
-			//密码检查
-			if(passwd == null || passwd.length()<6 || passwd.length()>20) {
-				jsonRet.put("errmsg", "操作密码：长度范围【6-20字符】！");
-				jsonRet.put("errcode", ErrCodes.COMMON_PARAM_ERROR);
-				return jsonRet.toString();
+			//数据检查与权限校验
+			PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");
+			String partnerUserTP = (String)  session.getAttribute("partnerUserTP");
+			String partnerPasswd = (String)  session.getAttribute("partnerPasswd");
+			VipBasic vip = (VipBasic)  session.getAttribute("partnerBindVip");
+			PartnerStaff myStaff = (PartnerStaff)  session.getAttribute("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
+			}
+			Integer updateOpr = null;
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = vip.getVipId();
+			}else {
+				if(myStaff == null || myStaff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = myStaff.getUserId();
 			}
 			//数据处理保存
 			if(staff.getRecId() == 0) { //新增
@@ -120,8 +169,8 @@ public class PartnerStaffAction {
 				staff.setKfQrcodeUrl(null);
 				staff.setPasswd(null); 	//使用旧的密码
 			}
-			staff.setUpdateOpr(user.getUserId()); //设置当前用户为操作员
-			jsonRet = PartnerStaffService.saveStaff(myPartner.getPartnerId(), staff, passwd);
+			staff.setUpdateOpr(updateOpr); //设置当前用户为操作员
+			jsonRet = PartnerStaffService.saveStaff(myPartner.getPartnerId(), staff, partnerPasswd);
 		}catch(Exception e) {
 			e.printStackTrace();
 			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
@@ -138,8 +187,8 @@ public class PartnerStaffAction {
 	 */
 	@RequestMapping("/deleteStaff")
 	@ResponseBody
-	public String deleteStaff(@RequestParam(value="rootPasswd",required=true)String rootPasswd,
-			@RequestParam(value="userId",required=true)Integer userId,HttpSession session) {
+	public String deleteStaff(@RequestParam(value="userId",required=true)Integer userId,
+			HttpSession session) {
 		JSONObject jsonRet = new JSONObject();
 		try {
 			VipBasic vip = (VipBasic) session.getAttribute("vipBasic");
@@ -150,14 +199,9 @@ public class PartnerStaffAction {
 				jsonRet.put("errcode", ErrCodes.COMMON_PARAM_ERROR);
 				return jsonRet.toString();
 			}
-			//密码检查
-			if(rootPasswd == null || rootPasswd.length()<6 || rootPasswd.length()>20) {
-				jsonRet.put("errmsg", "会员密码：长度范围【6-20字符】！");
-				jsonRet.put("errcode", ErrCodes.COMMON_PARAM_ERROR);
-				return jsonRet.toString();
-			}
+			String partnerPasswd = (String) session.getAttribute("partnerPasswd");
 			//数据保存
-			jsonRet = PartnerStaffService.deleteStaff(myPartner.getPartnerId(), rootPasswd, userId);
+			jsonRet = PartnerStaffService.deleteStaff(myPartner.getPartnerId(), partnerPasswd, userId);
 		} catch (Exception e) {
 			e.printStackTrace();
 			jsonRet = new JSONObject();
@@ -169,25 +213,36 @@ public class PartnerStaffAction {
 	
 	/**
 	 * 超级管理人员重置密码
-	 * @param rootPasswd		超级管理人员的密码：合作伙伴绑定会员的密码
 	 * @param userId			被重设密码的员工
 	 * @param newPasswd		新密码
 	 * @return
 	 */
 	@RequestMapping("/resetpwd")
 	@ResponseBody
-	public String resetPwd(@RequestParam(value="rootPasswd",required=true)String rootPasswd,
-			@RequestParam(value="userId",required=true)Integer userId,
+	public String resetPwd(@RequestParam(value="userId",required=true)Integer userId,
 			@RequestParam(value="newPasswd",required=true)String newPasswd,HttpSession session) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			VipBasic vip = (VipBasic) session.getAttribute("vipBasic");
-			PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");//我的合作伙伴
-			if(vip == null || vip.getVipId() == null || !"1".equals(vip.getStatus()) ||
-					myPartner == null || myPartner.getPartnerId() == null) {
-				jsonRet.put("errmsg", "您当前不可进行员工管理！");
-				jsonRet.put("errcode", ErrCodes.COMMON_PARAM_ERROR);
-				return jsonRet.toString();
+			//数据检查与权限校验
+			PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");
+			String partnerUserTP = (String)  session.getAttribute("partnerUserTP");
+			String partnerPasswd = (String)  session.getAttribute("partnerPasswd");
+			VipBasic vip = (VipBasic)  session.getAttribute("partnerBindVip");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
+			}
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+			}else {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "该功能由超级管理员进行管理！");
+				return jsonRet.toJSONString();
 			}
 			if(newPasswd == null || newPasswd.length()<6 || newPasswd.length()>20) {
 				jsonRet.put("errmsg", "新操作密码：长度范围【6-20字符】！");
@@ -195,13 +250,7 @@ public class PartnerStaffAction {
 				return jsonRet.toString();
 			}
 			//超级密码检查
-			if(rootPasswd == null || rootPasswd.length()<6 || rootPasswd.length()>20) {
-				jsonRet.put("errmsg", "会员密码：长度范围【6-20字符】！");
-				jsonRet.put("errcode", ErrCodes.COMMON_PARAM_ERROR);
-				return jsonRet.toString();
-			}
-			
-			jsonRet = PartnerStaffService.resetPwd(myPartner.getPartnerId(), rootPasswd, userId, newPasswd);
+			jsonRet = PartnerStaffService.resetPwd(myPartner.getPartnerId(), partnerPasswd, userId, newPasswd);
 		} catch (Exception e) {
 			e.printStackTrace();
 			jsonRet = new JSONObject();
@@ -220,18 +269,32 @@ public class PartnerStaffAction {
 	 */
 	@RequestMapping("/updpwd")
 	@ResponseBody
-	public String updatePwd(@RequestParam(value="userId",required=true)Integer userId,
-			@RequestParam(value="oldPasswd",required=true)String oldPasswd,
-			@RequestParam(value="newPasswd",required=true)String newPasswd,HttpSession session) {
+	public String updatePwd(@RequestParam(value="oldPasswd",required=true)String oldPasswd,
+			@RequestParam(value="newPasswd",required=true)String newPasswd,
+			HttpSession session) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			UserBasic user = (UserBasic) session.getAttribute("userBasic");
-			PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");//我的合作伙伴
-			if(user == null || user.getUserId() == null || !"1".equals(user.getStatus()) ||
-					myPartner == null || myPartner.getPartnerId() == null) {
-				jsonRet.put("errmsg", "您当前不可进行员工管理！");
-				jsonRet.put("errcode", ErrCodes.COMMON_PARAM_ERROR);
-				return jsonRet.toString();
+			//数据检查与权限校验
+			PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");
+			String partnerUserTP = (String)  session.getAttribute("partnerUserTP");
+			PartnerStaff myStaff = (PartnerStaff)  session.getAttribute("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
+			}
+			Integer updateOpr = null;
+			if("bindVip".equals(partnerUserTP)) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "该功能由员工进行自我管理！");
+				return jsonRet.toJSONString();
+			}else {
+				if(myStaff == null || myStaff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = myStaff.getUserId();
 			}
 			if(newPasswd == null || newPasswd.length()<6 || newPasswd.length()>20) {
 				jsonRet.put("errmsg", "新操作密码：长度范围【6-20字符】！");
@@ -244,7 +307,7 @@ public class PartnerStaffAction {
 				return jsonRet.toString();
 			}
 			
-			jsonRet = PartnerStaffService.updatePwd(myPartner.getPartnerId(), oldPasswd, userId, newPasswd);
+			jsonRet = PartnerStaffService.updatePwd(myPartner.getPartnerId(), oldPasswd, updateOpr, newPasswd);
 		} catch (Exception e) {
 			e.printStackTrace();
 			jsonRet = new JSONObject();
@@ -266,18 +329,32 @@ public class PartnerStaffAction {
 	@RequestMapping("/upload/{mode}")
 	@ResponseBody
 	public String uploadImg(@PathVariable("mode")String mode,
-			@RequestParam(value="passwd",required=true)String passwd,
 			@RequestParam(value="image")MultipartFile image,HttpSession session) {
 		JSONObject jsonRet = new JSONObject();
 		File tmpImg = null;
 		try {
-			UserBasic user = (UserBasic) session.getAttribute("userBasic");
-			PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");//我的合作伙伴
-			if(user == null || user.getUserId() == null || !"1".equals(user.getStatus()) ||
-					myPartner == null || myPartner.getPartnerId() == null) {
-				jsonRet.put("errmsg", "您当前不可进行员工管理！");
-				jsonRet.put("errcode", ErrCodes.COMMON_PARAM_ERROR);
-				return jsonRet.toString();
+			//数据检查与权限校验
+			PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");
+			String partnerUserTP = (String)  session.getAttribute("partnerUserTP");
+			String partnerPasswd = (String)  session.getAttribute("partnerPasswd");
+			PartnerStaff myStaff = (PartnerStaff)  session.getAttribute("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
+			}
+			Integer updateOpr = null;
+			if("bindVip".equals(partnerUserTP)) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "该功能由员工进行自我管理！");
+				return jsonRet.toJSONString();
+			}else {
+				if(myStaff == null || myStaff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = myStaff.getUserId();
 			}
 			int limitSize = 3*1024*1024; //3M
 			if(!"headimg".equals(mode) && !"kfqrcode".equals(mode)) {
@@ -308,7 +385,7 @@ public class PartnerStaffAction {
 			}
 			tmpImg = new File(dir,image.getOriginalFilename()); //生成临时文件
 			FileUtils.copyInputStreamToFile(image.getInputStream(), tmpImg);
-			jsonRet = PartnerStaffService.uploadImg(myPartner.getPartnerId(), tmpImg, mode, user.getUserId(), passwd);
+			jsonRet = PartnerStaffService.uploadImg(myPartner.getPartnerId(), tmpImg, mode, updateOpr, partnerPasswd);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -327,7 +404,7 @@ public class PartnerStaffAction {
 	 * 头像与客服二维码显示
 	 * 保存相对路径：staff
 	 * 1、头像保存名称：[userid]_headimg.xxx；
-	 * 2、客服二维码保存名称：[userid]_qrcode.xxx;
+	 * 2、客服二维码保存名称：[userid]_kfqrcode.xxx;
 	 * @param partnerId
 	 * @param userId
 	 * @param mode
@@ -378,18 +455,37 @@ public class PartnerStaffAction {
 	 */
 	@RequestMapping("/getall")
 	@ResponseBody
-	public Object getAllBy(String jsonSearchParams,PageCond pageCond,HttpSession session) {
+	public Object getAll(String jsonSearchParams,PageCond pageCond,HttpSession session) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			UserBasic user = (UserBasic) session.getAttribute("userBasic");
-			PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");//我的合作伙伴
-			if(user == null || user.getUserId() == null || !"1".equals(user.getStatus()) ||
-					myPartner == null || myPartner.getPartnerId() == null) {
-				jsonRet.put("errmsg", "您当前不可进行员工查询！");
-				jsonRet.put("errcode", ErrCodes.COMMON_PARAM_ERROR);
-				return jsonRet.toString();
-			}
 			JSONObject search = JSONObject.parseObject(jsonSearchParams);
+			if(search == null) {
+				search = new JSONObject();
+			}
+			//数据检查与权限校验
+			PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");
+			String partnerUserTP = (String)  session.getAttribute("partnerUserTP");
+			VipBasic vip = (VipBasic)  session.getAttribute("partnerBindVip");
+			PartnerStaff myStaff = (PartnerStaff)  session.getAttribute("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
+			}
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+			}else {
+				if(myStaff == null || myStaff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				search.put("userId", myStaff.getUserId());
+			}
 			jsonRet = PartnerStaffService.getPartnersAll(myPartner.getPartnerId(), search, pageCond);
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -400,4 +496,23 @@ public class PartnerStaffAction {
 	}
 	
 	
+	private PartnerStaff getStaffByUser(Integer partnerId,Integer userId) {
+		JSONObject jsonRet = new JSONObject();
+		try {
+			JSONObject search = new JSONObject();
+			search.put("userId", userId);
+			jsonRet = PartnerStaffService.getPartnersAll(partnerId, search, new PageCond(0,1));
+			if(jsonRet.containsKey("datas")) {
+				List<PartnerStaff> list = JSONArray.parseArray(jsonRet.getJSONArray("datas").toJSONString(), PartnerStaff.class);
+				if(list != null && list.size()>0) {
+					return list.get(0);
+				}
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "系统异常，异常信息：" + e.getMessage());
+		}
+		return null;
+	}
 }

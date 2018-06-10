@@ -328,6 +328,7 @@ public class PostageAction {
 			//数据处理
 			String[] excludeFields = {"status","updateTime"};
 			postage.setPartnerId(myPartner.getPartnerId());
+			postage.setUpdateOpr(updateOpr);
 			Map<String,Object> params = ObjectToMap.object2Map(postage, excludeFields, true);
 			params.put("currUserId", updateOpr);
 			params.put("passwd", partnerPasswd);

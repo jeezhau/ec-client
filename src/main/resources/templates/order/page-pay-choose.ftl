@@ -134,13 +134,13 @@ var containerVue = new Vue({
 				return;
 			}
 			var payType = this.param.payType;
-			if(payType == 2){
+			/* if(payType == 2){
 				<#if (wxPubPay!'')=='1'>
 				payType = 21;
 				<#else>
 				payType = 22;
 				</#if>
-			}
+			} */
 			$.ajax({
 				url: '/order/prepay/' + this.param.orderId + '/' + payType,
 				method:'post',
@@ -153,7 +153,9 @@ var containerVue = new Vue({
 								 window.location.href = "/order/pay/use/bal/" + containerVue.param.orderId;
 							}
 							else if(startWith(jsonRet.payType,'2')){//微信支付
-								if (jsonRet.outPayUrl){
+								if(jsonRet.payType == '23'){
+									window.location.href = "/order/pay/use/wxqrcode/" + containerVue.param.orderId;
+								}else if (jsonRet.payType == '22'){//H5支付
 									window.location.href = jsonRet.outPayUrl;
 								}else if(jsonRet.payType == '21'){//公众号支付
 									WeixinJSBridge.invoke(
