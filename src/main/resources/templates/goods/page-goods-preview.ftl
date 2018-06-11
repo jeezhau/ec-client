@@ -26,7 +26,7 @@
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 <#if (goods.goodsId)??>
-<div class="container goods-container" id="container" style="oveflow:scroll">
+<div class="container goods-container" id="container" style="padding:0;oveflow:scroll">
 
   <!-- 商品名称 -->
   <div class="row" style="margin:5px 0px 3px 0px;background-color:white;padding:3px 8px;font-size:150%;font-weight:bold;">

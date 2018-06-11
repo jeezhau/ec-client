@@ -26,7 +26,7 @@
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
-<div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
+<div class="container " id="container" style="padding:0;overflow:scroll">
  <#if payRetCode?? >
  <!-- 支付结果信息 -->
   <div class="row" style="margin:5px 1px ;padding:3px 0;min-height:80px;background-color:#6699FF;" >
@@ -37,23 +37,23 @@
   </div>
   <!-- 支付明细 -->
   <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
-    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" style="text-align:cneter;padding:0 3px">
        <label class="col-xs-3" style="padding:0">订单号：</label>
        <span class="col-xs-8" style="padding:0">${order.orderId!''}</span>
     </div>
-    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" style="text-align:cneter;padding:0 3px">
         <label class="col-xs-3" style="padding:0">支付方式：</label>
         <span class="col-xs-8"  style="padding:0">{{getPayType('${payType!''}')}}</span>    
     </div>
-    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" style="text-align:cneter;padding:0 3px">
         <label class="col-xs-3"  style="padding:0">支付时间：</label>
         <span class="col-xs-8"  style="padding:0">${payTime!''}</span>
     </div>   
-    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" style="text-align:cneter;padding:0 3px">
         <label class="col-xs-3" style="padding:0">订单额¥：</label>
         <span class="col-xs-8"  style="padding:0">${amount!''}</span>
     </div>
-    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" style="text-align:cneter;padding:0 3px">
         <label class="col-xs-3"  style="padding:0">手续费¥：</label>
         <span class="col-xs-8"  style="padding:0">${fee!''}</span>
     </div>    
@@ -106,15 +106,6 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		goodsSpecArr:JSON.parse('${(order.goodsSpec)!"[]"}')
-	},
-	methods:{
-		getPayType:function(tp){
-			if('1' == tp){
-				return '余额支付';
-			}else if('2' == tp){
-				return '微信支付';
-			}
-		}
 	}
 });
 </script>

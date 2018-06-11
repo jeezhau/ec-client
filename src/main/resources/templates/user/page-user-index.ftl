@@ -192,7 +192,7 @@
 	    </div>
 	    <div class="col-xs-4" style="padding:3px;">
 	      <div style="background-color:white;">
-		    <a href="<#if vipBasic.status = '1'><#else>javascript:;</#if>" >
+		    <a href="<#if vipBasic.status = '1'>/cash/manage<#else>javascript:;</#if>" >
 			    <img alt="" src="/icons/提现.png" width="90px" height="90px">
 			    <p > 可用余额提现</p>
 			</a>

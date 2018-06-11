@@ -60,6 +60,7 @@ public class GoodsAction {
 			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
 			return "forward:/partner/manage" ;
 		}
+		@SuppressWarnings("unchecked")
 		List<Category> categories = (List<Category>) map.get("categories");
 		if(categories == null) {
 			categories = GoodsService.getCategories();
@@ -122,7 +123,9 @@ public class GoodsAction {
 	 */
 	@RequestMapping("/save")
 	@ResponseBody
-	public String saveGoods(@Valid Goods goods,BindingResult result,ModelMap map) {
+	public String saveGoods(@Valid Goods goods,BindingResult result,
+			@RequestParam(value="jsonSpecArr",required=true)String jsonSpecArr,
+			ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
 			//信息验证结果处理
@@ -137,7 +140,7 @@ public class GoodsAction {
 				return jsonRet.toString();
 			}
 			//规格检查
-			List<GoodsSpec> specList = JSONArray.parseArray(goods.getSpecDetail(), GoodsSpec.class);
+			List<GoodsSpec> specList = JSONArray.parseArray(jsonSpecArr, GoodsSpec.class);
 			if(specList == null || specList.size()<1 || specList.size()>30) {
 				jsonRet.put("errcode", ErrCodes.GOODS_PARAM_ERROR);
 				jsonRet.put("errmsg", "规格信息记录数量为1-30条！");
@@ -236,9 +239,9 @@ public class GoodsAction {
 			goods.setPartnerId(myPartner.getPartnerId());
 			goods.setUpdateOpr(updateOpr);
 			if(goods.getGoodsId() == 0) {
-				jsonRet = GoodsService.addGoods(goods,myPartner.getPartnerId(),partnerPasswd);
+				jsonRet = GoodsService.addGoods(goods,jsonSpecArr,myPartner.getPartnerId(),partnerPasswd);
 			}else {
-				jsonRet = GoodsService.updateGoods(goods,myPartner.getPartnerId(),partnerPasswd);
+				jsonRet = GoodsService.updateGoods(goods,jsonSpecArr,myPartner.getPartnerId(),partnerPasswd);
 			}
 			if(jsonRet == null) {
 				jsonRet = new JSONObject();

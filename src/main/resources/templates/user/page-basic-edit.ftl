@@ -236,7 +236,7 @@ getBasic();
 function getCities(){
 	var provCode = "";
 	for(var i=0;i<editFormVue.metadata.provinces.length;i++){
-		if(editFormVue.metadata.provinces[i].provName == editFormVue.param.province){
+		if(editFormVue.metadata.provinces[i].provName.indexOf(editFormVue.param.province)>=0){
 			provCode = editFormVue.metadata.provinces[i].provCode;
 			break;
 		}

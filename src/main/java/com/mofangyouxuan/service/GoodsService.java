@@ -150,15 +150,15 @@ public class GoodsService {
 	 * 
 	 * @param partnerId
 	 * @param goodsId
-	 * @param specDetail
+	 * @param jsonSpecArr
 	 * @return {errcode:0,errmsg:"ok"}
 	 */
-	public static JSONObject changeSpec(Integer partnerId,Long goodsId,String specDetail,Integer updateOpr,String passwd) {
+	public static JSONObject changeSpec(Integer partnerId,Long goodsId,String jsonSpecArr,Integer updateOpr,String passwd) {
 		String url = mfyxServerUrl + goodsChangeSpecUrl;
 		url = url.replace("{partnerId}", partnerId+"");
 		url = url.replace("{goodsId}", goodsId+"");
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("specDetail", specDetail);
+		params.put("jsonSpecArr", jsonSpecArr);
 		params.put("currUserId", updateOpr);
 		params.put("passwd", passwd);
 		String strRet = HttpUtils.doPost(url, params);
@@ -179,15 +179,17 @@ public class GoodsService {
 	/**
 	 * 
 	 * @param goods
+	 * @param jsonSpecArr
 	 * @return {errcode:0,errmsg:'ok',goodsId:111}
 	 */
-	public static JSONObject addGoods(Goods goods,Integer partnerId,String passwd) {
+	public static JSONObject addGoods(Goods goods,String jsonSpecArr,Integer partnerId,String passwd) {
 		String url = mfyxServerUrl + goodsAddUrl;
 		url = url.replace("{partnerId}", partnerId+"");
 		Map<String, Object> params = new HashMap<String,Object>();
 		String[] excludeFields = {"updateTime","reviewLog","reviewOpr","reviewTime","reviewResult"};
 		params = ObjectToMap.object2Map(goods,excludeFields,false);
 		params.put("passwd", passwd);
+		params.put("jsonSpecArr", jsonSpecArr);
 		String strRet = HttpUtils.doPost(url, params);
 		try {
 			JSONObject jsonRet = JSONObject.parseObject(strRet);
@@ -206,15 +208,17 @@ public class GoodsService {
 	/**
 	 * 
 	 * @param goods
+	 * @param jsonSpecArr
 	 * @return {errcode:0,errmsg:'ok',goodsId:111}
 	 */
-	public static JSONObject updateGoods(Goods goods,Integer partnerId,String passwd) {
+	public static JSONObject updateGoods(Goods goods,String jsonSpecArr,Integer partnerId,String passwd) {
 		String url = mfyxServerUrl + goodsUpdateUrl;
 		url = url.replace("{partnerId}", partnerId+"");
 		Map<String, Object> params = new HashMap<String,Object>();
 		String[] excludeFields = {"updateTime","reviewLog","reviewOpr","reviewTime","reviewResult"};
 		params = ObjectToMap.object2Map(goods,excludeFields,false);
 		params.put("passwd", passwd);
+		params.put("jsonSpecArr", jsonSpecArr);
 		String strRet = HttpUtils.doPost(url, params);
 		try {
 			JSONObject jsonRet = JSONObject.parseObject(strRet);

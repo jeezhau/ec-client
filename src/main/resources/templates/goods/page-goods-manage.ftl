@@ -34,7 +34,7 @@
 	  </li>
 	</ul>
 </header>
-<div class="container goods-container" id="container" style="overflow:scroll">
+<div class="container goods-container" id="container" style="padding:0;overflow:scroll">
 
   <div class="row" id="manageNotice" style="margin:5px 0 ;display:none;"><!-- 管理须知 -->
     <div class="col-xs-12" style="">
@@ -190,7 +190,7 @@
 			 $('#editSpecDetailModal').modal('show');
 			 editSpecDetailVue.goodsId = goodsId;
 			 editSpecDetailVue.goodsName = goodsName;
-			 editSpecDetailVue.specDetailArr = JSON.parse(specDetail);
+			 editSpecDetailVue.specDetailArr = specDetail;
 		 }
 	 }
  });

@@ -32,7 +32,7 @@
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
 <#if goods??>
-<div class="container goods-container" id="container" style="margin:0 0;overflow:scroll">
+<div class="container goods-container" id="container" style="padding:0 0;overflow:scroll">
  <div class="row" style="margin:5px 1px 1px ;" >
      <div style="margin:1px 0;padding:0 5px;background-color:white;font-size:130%;text-align:center" >
       <a href="/shop/goods/${(goods.goodsId)?string('#')}">  ${(goods.goodsName)!''} </a>
@@ -133,7 +133,7 @@
             </div>
             <div class="col-xs-3" style="vertical-algin:center;font-weight:bolder;">
               <a class="btn btn-default" href="javascript:;" @click="selectReceiver">
-               <img alt="" src="/icons/收货地址.png" width="70%" height="70%"><br>
+               <img alt="" src="/icons/收货地址.png" width="70%" height="70%" style="max-width:30px;max-height:30px"><br>
                <span style="font-size:14px">收货地址</span>
               </a>
             </div>
@@ -147,7 +147,6 @@
       <div class="row" style="text-align:right;">
         <div class="col-xs-12" style="padding-right:40px">
          <button v-if="param.flag == 0" type="button" class="btn btn-sm btn-danger" @click="checkData">请点击确认购买内容与收货信息</button>
-         <!-- <button v-if="param.flag == 1" type="button" class="btn btn-sm btn-danger" >请选择配送方式</button> -->
         </div>
       </div>
       <div class="row" style="margin:8px 15px 3px 15px;">
@@ -196,10 +195,11 @@
            </div>
          </div>        
        </div>
-       <div class="col-xs-5" style="text-align:right;padding-right:0px">
+       <div class="col-xs-5" style="text-align:center;padding-right:0px">
          <input type="hidden" name="goodsSpec" v-model="param.goodsSpec" required>
          <input type="hidden" name="dispatchMode" v-model="param.dispatchMode" required>
 	     <input type="hidden" name="postageId" v-model="param.postageId" required>
+	     <button v-if="param.flag == 1" type="button" class="btn btn-sm btn-danger" >请选择配送方式</button>
          <button v-if="param.flag == 2" type="submit" class="btn btn-sm btn-danger" style="font-size:18px;font-weight:bold" @click="submitCheck">立即下单</button>
        </div>
     </div>

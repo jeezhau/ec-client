@@ -143,3 +143,34 @@ function getChannelType(code){
 	return '未知';
 }
 
+/**
+ * 获取账户类型
+ * @param code
+ * @returns
+ */
+function getAccountType(code){
+	if('1' == code){
+		return '对私';
+	}else if('2' == code){
+		return '对公';
+	}
+	return '未知';
+}
+
+/**
+ * 获取提现状态
+ * @param code
+ * @returns
+ */
+function getCashApplyStatus(code){
+	if('0' == code){
+		return '待受理';
+	}else if('1' == code){
+		return '已受理';
+	}else if('S' == code){
+		return '提现成功到账';
+	}else if('F' == code){
+		return '提现失败';
+	}
+	return '未知';	
+}

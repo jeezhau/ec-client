@@ -28,7 +28,7 @@
 
 <div class="container " id="container" style="oveflow:scroll">
   <div class="row" style="margin:5px 0;text-align:center" >
-    <ul class="nav navbar-nav nav-tabs" style="padding:0 5px;width:100%">
+    <ul class="nav navbar-nav nav-tabs" style="width:100%">
         <li class="<#if status='all'> active </#if>" style="width:20%" @click="getOrders('all',$event)"> 
           <a href="javascript:;" style="padding:2px 3px"> 全 部 </a> 
         </li>  

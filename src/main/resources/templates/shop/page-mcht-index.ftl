@@ -88,7 +88,7 @@
      <h3 style="text-align:center;padding:5px">所有热卖商品</h3>
     </div>
     <div class="row" style="margin:3px 0">
-      <div v-for="goods in goodsList" class="col-xs-6" style="padding:3px 2px ;">
+      <div v-for="goods in goodsList" class="col-xs-6 col-sm-4 col-md-4 col-lg-3" style="padding:3px 2px ;">
 	    <div style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
 	      <a v-bind:href="'/shop/goods/' + goods.goodsId">
 	        <img alt="" :src="'/shop/gimage/' + goods.partnerId + '/' + goods.mainImgPath" style="width:90%;height:150px">

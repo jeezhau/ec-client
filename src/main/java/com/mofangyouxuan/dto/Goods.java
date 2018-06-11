@@ -46,8 +46,6 @@ public class Goods {
     
     private Integer saledCnt;
 
-    @NotNull(message=" 规格明细：不可为空！ ")
-    @Size(min=3,max=2550,message=" 规格明细：长度范围3-2550字符！ ")
     private String specDetail;
     
     private BigDecimal priceLowest;

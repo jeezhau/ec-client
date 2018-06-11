@@ -27,7 +27,7 @@
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
 <#if (order.orderId)?? >
-<div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
+<div class="container " id="container" style="padding:0;overflow:scroll">
   <#include "/common/tpl-order-partner-4fm.ftl" encoding="utf8"> 
   <#include "/common/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
 

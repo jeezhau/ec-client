@@ -142,6 +142,11 @@ mfyx:
   complain-order-delete-url: '/complain/{userId}/order/delete/{cplainId}'
   complain-partner-delete-url: '/complain/{vipId}/partner/delete/{cplainId}' 
   
+  cash-apply-url: '/cash/{vipId}/apply'
+  cash-delete-url: '/cash/{vipId}/delete'
+  cash-update-stat-url: '/cash/updateStat'
+  cash-getall-url: '/cash/getall'
+  
 ######系统参数############  
 sys:
   local-server-url: 'http://192.168.0.114:8000'

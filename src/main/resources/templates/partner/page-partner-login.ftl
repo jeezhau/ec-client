@@ -26,10 +26,10 @@
     <div class="form-group">
       <label class="col-xs-4 control-label" style="padding-right:3px">用户类型</label>	 
     	  <div class="input-group" style="padding-left:3px">
-        	<select class="form-control" name="userTp" value="bindVip" v-model="params.userTp">
+        	<select class="form-control" name="userTp" v-model="params.userTp">
         	  <option value="" disabled>请选择用户类型</option>
         	  <option value="bindVip">绑定VIP</option>
-        	  <!-- <option value="staff">员工</option> -->
+        	  <option value="staff">员工</option>
         	</select>   		
       </div>	
     	</div>

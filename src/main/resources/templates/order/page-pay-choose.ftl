@@ -26,7 +26,7 @@
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
  <#if (order.orderId)?? >
-<div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
+<div class="container " id="container" style="padding:0;overflow:scroll">
  <!-- 收货人信息 -->
   <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
     <div class="col-xs-12">

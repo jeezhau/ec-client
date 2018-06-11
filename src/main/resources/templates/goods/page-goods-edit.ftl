@@ -24,7 +24,7 @@
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
-<div class="container" id="goodsContainer" style="padding:0px 0px;oveflow:scroll">
+<div class="container" id="goodsContainer" style="padding:0;oveflow:scroll">
   <div class="row">
      <ul class="nav nav-tabs" style="margin:0 15%">
 	  <li style="width:50%" class="active" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#editGoods').show();$('#reviewInfo').hide();">
@@ -216,13 +216,13 @@ var goodsContainerVue = new Vue({
 			vender:'${(goods.vender)!''}',
 			//priceLowest:'${(goods.priceLowest)!''}',
 			//stockSum:'${(goods.stockSum)!''}',
-			specDetail:"",
 			limitedNum:'${((goods.limitedNum)!0)?string("#")}',
 			beginTime:'${(goods.beginTime)!''}',
 			endTime:'${(goods.endTime)!''}',
 			refundLimit:'${((goods.refundLimit)!7)?string("#")}',
 			postageIds:'${(goods.postageIds)!''}',
-			status:'${(goods.status)!''}'
+			status:'${(goods.status)!''}',
+			jsonSpecArr:''
 		},
 		postageIdArr:'${(goods.postageIds)!''}'.split(','),
 		specDetailArr:JSON.parse('${(goods.specDetail)!"[]"}')
@@ -457,7 +457,7 @@ var goodsContainerVue = new Vue({
 					}
 				}
 			}
-			this.param.specDetail = JSON.stringify(okSpecArr);
+			this.param.jsonSpecArr = JSON.stringify(okSpecArr);
 			$.ajax({
 				url: '/goods/save',
 				method:'post',
