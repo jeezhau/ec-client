@@ -82,7 +82,8 @@
   <!-- 退款申请信息 -->
   <div class="row" style="margin:3px 0px;background-color:white; color:red">
     <p/>
-  	<span>&nbsp;&nbsp;&nbsp;&nbsp;填写说明：请根据买家提交的退款请求尽快完成处理！如有问题，可与买家友好协商解决！！！</span>
+  	<span>&nbsp;&nbsp;&nbsp;&nbsp;同意退款后买家的付款金额将返回至买家的付款账户！买家支付的手续费与国税将由您承担！！！<br>
+  	填写说明：请根据买家提交的退款请求尽快完成处理！如有问题，可与买家友好协商解决！！！</span>
   </div>
   <div class="row" style="margin:3px 0">
     	  <label class="col-xs-3 control-label" style="padding-right:0">处理结果<span style="color:red">*</span></label>

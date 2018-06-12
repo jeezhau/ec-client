@@ -87,6 +87,10 @@ function getPayType(tp){
 		return '余额支付';
 	}else if(startWith(tp,'2')){
 		return '微信支付';
+	}else if(startWith(tp,'3')){
+		return '支付宝';
+	}else{
+		return '未知';
 	}
 }
 

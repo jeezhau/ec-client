@@ -45,7 +45,8 @@
   <!-- 退款申请信息 -->
   <div class="row" style="margin:3px 0px;background-color:white; color:red">
     <p/>
-  	<span>&nbsp;&nbsp;&nbsp;&nbsp;填写说明：退货则需要填写退货的物流信息，官方配送则名称为“摩放优选”，单号为订单号；商家自取则名称为“商家名称”，单号为订单号；
+  	<span>&nbsp;&nbsp;&nbsp;&nbsp;<br>
+  	填写说明：退货则需要填写退货的物流信息，官方配送则名称为“摩放优选”，单号为订单号；商家自取则名称为“商家名称”，单号为订单号；
   	快递配送则名称为“快递公司名称”，单号为物流公司的单号；买家送达则名称为“买家昵称”，单号为订单号；</span>
   </div>
   <#if order.status != '61'>

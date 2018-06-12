@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.apache.commons.io.FileUtils;
@@ -250,7 +252,7 @@ public class OrderAction {
 	@ResponseBody
 	public String createPrepay(@PathVariable("orderId")String orderId,
 			@PathVariable("payType")Integer payType,HttpServletRequest request,
-			ModelMap map) {
+			HttpSession session,ModelMap map) {
 		UserBasic user = (UserBasic) map.get("userBasic");
 		JSONObject jsonRet = new JSONObject();
 		try {
@@ -271,7 +273,7 @@ public class OrderAction {
 				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
 				return jsonRet.toString();
 			}
-			if(1 != payType && 2 != payType) {
+			if(1 != payType && 2 != payType && 3 != payType) {
 				jsonRet.put("errcode", ErrCodes.ORDER_PARAM_ERROR);
 				jsonRet.put("errmsg", "支付方式取值不正确！");
 				return jsonRet.toJSONString();
@@ -301,6 +303,13 @@ public class OrderAction {
 				}else {
 					payType = 23; //扫码支付
 				}
+			}else if(3 == payType) {
+				String platform = CommonUtil.getPlatform(request);
+				if("apk".equals(platform) || "ios".equals(platform)) {
+					payType = 31; //wap支付
+				}else {
+					payType = 32; //web支付
+				}
 			}
 			String ip = request.getRemoteHost();
 			ip = CommonUtil.getIpAddr(request);
@@ -309,13 +318,16 @@ public class OrderAction {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");
 				return jsonRet.toString();
-			}else if(jsonRet.containsKey("outPayUrl")) {
-				if(22 == payType) { //微信H5支付
+			}else {
+				if(jsonRet.containsKey("outPayUrl") && 22 == payType) { //微信H5支付
 					String outPayUrl = jsonRet.getString("outPayUrl");
 					String redirectUrl = this.localServerName + "/order/pay/finish/" + orderId;
 					redirectUrl = URLEncoder.encode(redirectUrl, "utf8");
 					outPayUrl = outPayUrl + "&redirect_url=" + redirectUrl;
 					jsonRet.put("outPayUrl", outPayUrl);
+				}
+				if(jsonRet.containsKey("AliPayForm") && (payType==31 || payType ==32)) {
+					session.setAttribute("AliPayForm_" + order.getOrderId(), jsonRet.getString("AliPayForm"));
 				}
 			}
 		}catch(Exception e) {
@@ -427,6 +439,53 @@ public class OrderAction {
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
 		return "order/page-pay-usewx";
+	}
+	
+	/**
+	 * 使用支付宝表单进行支付
+	 * @param orderId
+	 * @return
+	 */
+	@RequestMapping("/pay/use/aliform/{orderId}")
+	public void useAliPay(@PathVariable(value="orderId",required=true)String orderId,
+			HttpServletRequest request,HttpServletResponse response,ModelMap map,HttpSession session) {
+		try {
+			
+			UserBasic user = (UserBasic) map.get("userBasic");
+			Integer payType = null;
+			String platform = CommonUtil.getPlatform(request);
+			if("apk".equals(platform) || "ios".equals(platform)) {
+				payType = 31; //wap支付
+			}else {
+				payType = 32; //web支付
+			}
+			JSONObject jsonRet = OrderService.getOrder(true, null, null, false, true, orderId);
+			if(jsonRet == null || !jsonRet.containsKey("order")) {
+				return;
+			}
+			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+			if(!order.getUserId().equals(user.getUserId())) {
+				return;
+			}
+			if(!"10".equals(order.getStatus()) && !"12".equals(order.getStatus())) {
+				return;
+			}
+			String aliPayForm = (String) session.getAttribute("AliPayForm_" + orderId);
+			if(aliPayForm == null) {
+				jsonRet = OrderService.createPay(payType, order, user, "111");
+				if(jsonRet == null || !jsonRet.containsKey("AliPayForm")) {
+					return;
+				}
+				aliPayForm = jsonRet.getString("AliPayForm");
+			}
+			response.setContentType("text/html;charset=utf8");
+			PrintWriter pw = response.getWriter();
+			pw.write(aliPayForm);
+			pw.flush();
+			pw.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**

@@ -238,7 +238,7 @@ containerVue.getAllAppr();
      </a>
    
      <a href="/order/place/${(goods.goodsId)?string('#')}" class="weui-tabbar__item " style="background-color:red;text-align:center;">
-        <p><p class="weui-tabbar__label" style="font-size:20px;color:white;vertical-align:center;">立即下单</p>
+        <p><p class="weui-tabbar__label" style="font-size:16px;color:white;vertical-align:center;">立即下单</p>
      </a>     	
   </div>
 </footer>

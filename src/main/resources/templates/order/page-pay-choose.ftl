@@ -84,6 +84,12 @@
   
   <!-- 支付方式选择 -->
   <div class="row" style="">
+    <div class="col-xs-12 " style="margin:1px 5px ;padding:10px 25px;background-color:white" @click="choosePay(3)">
+     <img alt="" src="/icons/支付宝logo.png" width="20px" height=20px>
+     <span>支付宝</span>
+     <img alt="" src="/icons/推荐标签.png" width="50px" height=20px>
+     <span v-if="param.payType == 3" class="pull-right"><img src="/icons/选择.png" style="widht:20px;height:20px;"></span>
+    </div>
     <div class="col-xs-12 " style="margin:1px 5px ;padding:10px 25px;background-color:white" @click="choosePay(2)">
      <img alt="" src="/icons/微信支付.png" width="20px" height=20px>
      <span>微信支付</span>
@@ -95,7 +101,7 @@
      <span v-if="param.payType == 1 " class="pull-right"><img src="/icons/选择.png" style="widht:20px;height:20px;"></span>
     </div>
     <div class="col-xs-12" style="margin:1px 5px;padding:10px 25px;">
-      <p>注意：使用 [会员余额] 之外的第三方支付将收取下述交易额<span style="color:red"> 0.6%至0.9% </span>的手续费，该手续费付给第三方支付平台！下述实付金额不包含手续费，手续费将额外收取！</p>
+      <p>注意：使用 [会员余额] 之外的第三方支付将收取订单金额<span style="color:red"> 0.7%至3% </span>的手续费与国税，手续费付给第三方支付平台，国税由税局收取！下述金额不包含手续费与国税，手续费与国税将额外收取！</p>
     </div>
   </div>
   
@@ -120,7 +126,7 @@ var containerVue = new Vue({
 		goodsSpecArr:JSON.parse('${(order.goodsSpec)!"[]"}'),
 		param:{
 			orderId:'${(order.orderId)}',
-			payType:0 //支付方式:1-会员余额,21-微信公众号，22-微信H5
+			payType:0 //支付方式:1-会员余额,2-微信，3-支付宝
 		}
 	},
 	methods:{
@@ -133,16 +139,8 @@ var containerVue = new Vue({
 				alertMsg('系统提示','请先选择支付方式！');
 				return;
 			}
-			var payType = this.param.payType;
-			/* if(payType == 2){
-				<#if (wxPubPay!'')=='1'>
-				payType = 21;
-				<#else>
-				payType = 22;
-				</#if>
-			} */
 			$.ajax({
-				url: '/order/prepay/' + this.param.orderId + '/' + payType,
+				url: '/order/prepay/' + this.param.orderId + '/' + this.param.payType,
 				method:'post',
 				data: {},
 				success: function(jsonRet,status,xhr){
@@ -151,8 +149,7 @@ var containerVue = new Vue({
 						if(jsonRet.errcode === 0){//创建支付成功
 							if(jsonRet.payType == '1'){ //使用余额支付
 								 window.location.href = "/order/pay/use/bal/" + containerVue.param.orderId;
-							}
-							else if(startWith(jsonRet.payType,'2')){//微信支付
+							}else if(startWith(jsonRet.payType,'2')){//微信支付
 								if(jsonRet.payType == '23'){
 									window.location.href = "/order/pay/use/wxqrcode/" + containerVue.param.orderId;
 								}else if (jsonRet.payType == '22'){//H5支付
@@ -177,6 +174,12 @@ var containerVue = new Vue({
 									); 
 								}else{
 									alertMsg('错误提示','调用微信支付失败！');
+								}
+							}else if(startWith(jsonRet.payType,'3')){//支付宝支付
+								if(!jsonRet.AliPayForm){
+									alertMsg('错误提示','调用支付宝支付失败！');
+								}else{
+									window.location.href = "/order/pay/use/aliform/" + containerVue.param.orderId;
 								}
 							}
 						}else{//出现逻辑错误
