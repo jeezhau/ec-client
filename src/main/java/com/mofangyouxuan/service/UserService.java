@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.dto.UserBasic;
-import com.mofangyouxuan.wx.utils.HttpUtils;
+import com.mofangyouxuan.utils.HttpUtils;
 
 /**
  * 用户与会员服务，主要用于向服务中心发送请求

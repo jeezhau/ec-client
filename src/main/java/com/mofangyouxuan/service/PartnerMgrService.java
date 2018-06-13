@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.dto.PartnerBasic;
-import com.mofangyouxuan.wx.utils.HttpUtils;
-import com.mofangyouxuan.wx.utils.ObjectToMap;
+import com.mofangyouxuan.utils.HttpUtils;
+import com.mofangyouxuan.utils.ObjectToMap;
 
 /**
  * 合作伙伴管理
@@ -123,7 +123,7 @@ public class PartnerMgrService {
 	public static String create(PartnerBasic basic,String passwd) throws IllegalArgumentException, IllegalAccessException {
 		String url = mfyxServerUrl + partnerBasicCreateUrl;
 		Map<String, Object> params = new HashMap<String,Object>();
-		String[] excludeFields = {"updateTime","reviewLog","reviewOpr","reviewTime","status","certDir"};
+		String[] excludeFields = {"updateTime","reviewLog","reviewOpr","reviewTime","status","certDir","scoreLogis","scoreServ","scoreGoods"};
 		params = ObjectToMap.object2Map(basic,excludeFields,false);
 		params.put("passwd", passwd);
 	
@@ -139,7 +139,8 @@ public class PartnerMgrService {
 	public static String update(PartnerBasic basic,String passwd) {
 		String url = mfyxServerUrl + partnerBasicUpdateUrl;
 		Map<String, Object> params = new HashMap<String,Object>();
-		String[] excludeFields = {"updateTime","reviewLog","reviewOpr","reviewTime","status","certDir"};
+		String[] excludeFields = {"updateTime","reviewLog","reviewOpr","reviewTime","status","certDir","scoreLogis","scoreServ","scoreGoods"};
+		params = ObjectToMap.object2Map(basic,excludeFields,false);
 		params = ObjectToMap.object2Map(basic,excludeFields,false);
 		params.put("passwd", passwd);
 		String strRet = HttpUtils.doPost(url, params);

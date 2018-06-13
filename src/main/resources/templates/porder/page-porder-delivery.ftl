@@ -103,7 +103,7 @@ var containerVue = new Vue({
 					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//成功
-							window.location.href = "/psaleorder/show/all";
+							window.location.href = "/psaleorder/show/4delivery";
 						}else{//出现逻辑错误
 							alertMsg('错误提示',jsonRet.errmsg);
 						}

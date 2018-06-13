@@ -11,8 +11,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.SettleAccount;
 import com.mofangyouxuan.dto.VipBasic;
-import com.mofangyouxuan.wx.utils.HttpUtils;
-import com.mofangyouxuan.wx.utils.ObjectToMap;
+import com.mofangyouxuan.utils.HttpUtils;
+import com.mofangyouxuan.utils.ObjectToMap;
 
 /**
  * 会员服务，主要用于向服务中心发送请求

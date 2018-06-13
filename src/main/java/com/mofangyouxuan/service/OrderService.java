@@ -10,8 +10,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.dto.Order;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.UserBasic;
-import com.mofangyouxuan.wx.utils.HttpUtils;
-import com.mofangyouxuan.wx.utils.ObjectToMap;
+import com.mofangyouxuan.utils.HttpUtils;
+import com.mofangyouxuan.utils.ObjectToMap;
 
 
 /**
@@ -28,6 +28,7 @@ public class OrderService {
 	private static String orderCheckDataUrl;
 	private static String orderSearchUrl;
 	private static String orderCountPartiByStatus;
+	private static String orderProlongUrl;
 	private static String orderCancelUrl;
 	private static String orderPrepayUrl;
 	private static String orderPayFinishUrl;
@@ -100,6 +101,10 @@ public class OrderService {
 	@Value("${mfyx.order-count-partiby-status-url}")
 	public void setOrderCountPartiByStatusUrl(String url) {
 		OrderService.orderCountPartiByStatus = url;
+	}
+	@Value("${mfyx.order-prolong-url}")
+	public void setOrderProlongUrl(String url) {
+		OrderService.orderProlongUrl = url;
 	}
 	@Value("${mfyx.order-cancel-url}")
 	public void setOrderCancelUrl(String url) {
@@ -272,6 +277,26 @@ public class OrderService {
 		params.put("goodsId", goodsId);
 		params.put("partnerId", partnerId);
 		String strRet = HttpUtils.doPost(url, params);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * 延长订单签收
+	 * @param orderId
+	 * @param userId
+	 * @return {errcode:0,errmsg:"ok"}
+	 */
+	public static JSONObject signProlong(Order order,UserBasic user,String passwd) {
+		String url = mfyxServerUrl + orderProlongUrl;
+		url = url.replace("{userId}", order.getUserId() + "");
+		url = url.replace("{orderId}", order.getOrderId() + "");
+		String strRet = HttpUtils.doPost(url);
 		try {
 			JSONObject jsonRet = JSONObject.parseObject(strRet);
 			return jsonRet;

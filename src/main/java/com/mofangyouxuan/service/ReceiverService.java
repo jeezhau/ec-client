@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.dto.Receiver;
-import com.mofangyouxuan.wx.utils.HttpUtils;
-import com.mofangyouxuan.wx.utils.ObjectToMap;
+import com.mofangyouxuan.utils.HttpUtils;
+import com.mofangyouxuan.utils.ObjectToMap;
 
 /**
  * 收货人信息接口调用处理

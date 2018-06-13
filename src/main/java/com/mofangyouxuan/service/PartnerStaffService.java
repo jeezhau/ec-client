@@ -12,9 +12,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.PartnerStaff;
-import com.mofangyouxuan.wx.utils.HttpUtils;
-import com.mofangyouxuan.wx.utils.ObjectToMap;
-import com.mofangyouxuan.wx.utils.PageCond;
+import com.mofangyouxuan.utils.HttpUtils;
+import com.mofangyouxuan.utils.ObjectToMap;
+import com.mofangyouxuan.utils.PageCond;
 
 /**
  * 合作伙伴员工服务调用处理

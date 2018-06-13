@@ -38,9 +38,9 @@
      </div>
      <div class="col-xs-4" style="text-align:center;">
        <div style="">
-        <span>品质：10</span><br>
-        <span>物流：10</span><br>
-        <span>服务：10</span><br>
+        <span>品质：{{getAvgScore(${(mcht.scoreGoods)!'暂无'})}}</span><br>
+        <span>物流：{{getAvgScore(${(mcht.scoreLogis)!'暂无'})}}</span><br>
+        <span>服务：{{getAvgScore(${(mcht.scoreServ)!'暂无'})}}</span><br>
        </div>
      </div>
      <div class="col-xs-4" style="text-align:center;">
@@ -118,9 +118,20 @@ var containerVue = new Vue({
 	data:{
 		apprCnt:0,
 		apprList:[],
-		goodsList:[],
+		goodsList:[]
 	},
 	methods:{
+		getAvgScore: function(score){
+			if('暂无' == score){
+				return score;
+			}
+			var pattern = new RegExp(('\d+/\d+')|('\d*')) ;
+			if(!pattern.exec(score)){
+				return '暂无';
+			}
+			var avg = new Number(score).toFixed(2);
+			return avg;
+		},
 		getAllGoods: function(){
 			 containerVue.goodsList = [];
 			 $.ajax({

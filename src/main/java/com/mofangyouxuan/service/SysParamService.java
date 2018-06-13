@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.mofangyouxuan.wx.utils.HttpUtils;
+import com.mofangyouxuan.utils.HttpUtils;
 
 /**
  * 系统参数接口调用处理

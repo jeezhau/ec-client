@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
-import com.mofangyouxuan.wx.utils.HttpUtils;
+import com.mofangyouxuan.utils.HttpUtils;
 
 /**
  * 访问微信管理平台提供的服务

@@ -3,7 +3,7 @@ package com.mofangyouxuan.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.mofangyouxuan.wx.utils.HttpUtils;
+import com.mofangyouxuan.utils.HttpUtils;
 
 /**
  * 查询中国的城市信息：包括省、市、县 三级

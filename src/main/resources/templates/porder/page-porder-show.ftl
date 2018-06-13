@@ -29,19 +29,19 @@
 <div class="container " id="container" style="oveflow:scroll">
   <div class="row" style="margin:5px 0;text-align:center" >
     <ul class="nav navbar-nav nav-tabs" style="width:100%">
-        <li class="<#if status='all'> active </#if>" style="width:20%" @click="getOrders('all',$event)"> 
+        <li class="<#if status='all'> active </#if>" style="width:20%" onclick="window.location.href='/psaleorder/show/all'"> 
           <a href="javascript:;" style="padding:2px 3px"> 全 部 </a> 
         </li>  
-        <li class="<#if status='4pay'> active </#if>" style="width:20%" @click="getOrders('4pay',$event)"> 
+        <li class="<#if status='4pay'> active </#if>" style="width:20%" onclick="window.location.href='/psaleorder/show/4pay'"> 
           <a href="javascript:;" style="padding:2px 3px"> 待付款 </a> 
         </li> 
-        <li class="<#if status='4delivery'> active </#if>" style="width:20%" @click="getOrders('4delivery',$event)"> 
+        <li class="<#if status='4delivery'> active </#if>" style="width:20%" onclick="window.location.href='/psaleorder/show/4delivery'"> 
           <a href="javascript:;" style="padding:2px 3px"> 待发货 </a> 
         </li> 
-        <li class="<#if status='4sign'> active </#if>" style="width:20%" @click="getOrders('4sign',$event)"> 
+        <li class="<#if status='4sign'> active </#if>" style="width:20%" onclick="window.location.href='/psaleorder/show/4sign'"> 
           <a href="javascript:;" style="padding:2px 3px"> 待收货 </a> 
         </li> 
-        <li class="<#if status='4appraise'> active </#if>" style="width:20%" @click="getOrders('4appraise',$event)"> 
+        <li class="<#if status='4appraise'> active </#if>" style="width:20%" onclick="window.location.href='/psaleorder/show/4appraise'"> 
           <a href="javascript:;" style="padding:2px 3px"> 待评价 </a> 
         </li>                                               
      </ul>

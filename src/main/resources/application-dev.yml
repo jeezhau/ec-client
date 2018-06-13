@@ -112,6 +112,7 @@ mfyx:
   order-create-url: '/order/{userId}/create'
   order-update-url: '/order/{userId}/update'
   order-checkdata-url: '/order/{userId}/checkData' 
+  order-prolong-url: '/order/{userId}/prolong/{orderId}'
   order-cancel-url: '/order/{userId}/cancel/{orderId}'
   order-prepay-url: '/order/{userId}/createpay/{orderId}'
   order-pay-finish-url: '/order/{userId}/payfinish/{orderId}'

@@ -34,7 +34,7 @@
   </div>
   
   <!-- 物流信息 -->
-  <#if (order.sendTime)??>
+<#if (order.sendTime)??>
   <div class="row" style="margin:5px 1px 1px 1px;" >
     <div class="row" style="margin:1px 0;background-color:white;">
 	   <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">配送物流信息</span>
@@ -51,23 +51,33 @@
      </div>
     </div>
   </div>
-  <div class="row" style="margin:2px 0px 5px 0px;background-color:white;">
+  <div class="row" style="margin:2px 0px 5px 0px;">
      <#if (order.signTime)??>
-  	 <div class="col-xs-12" style="padding:0 3px">
+  	 <div class="col-xs-12" style="padding:0 3px;background-color:white;">
 	    <span class="pull-left" style="padding:0 10px;">${(order.signTime)?string('yyyy-MM-dd hh:mm:ss')}</span>
-	    <span class="pull-right" style="padding:0 10px;">签收完成</span>
+	    <span class="pull-right" style="padding:0 10px;">签收完成(${(order.signUser)!''})</span>
 	 </div>
 	 </#if>
-	 <div v-for=" item in logistics" class="col-xs-12">
-	   <span class="pull-left" style="padding:0 10px;">{{item.time}}</span>
-	   <span class="pull-right" style="padding:0 10px;">{{item.content}}</span>
+	 <div v-if="logistics.status && logistics.status != '0'" class="col-xs-12" style="margin-top:3px;background-color:white;">
+	   <span style="padding:0 10px;">{{logistics.msg}}</span>
 	 </div>
-	 <div class="col-xs-12" style="padding:0 3px">
+	 <div v-if="logistics.status === '0' && logistics.result && logistics.result.list">
+	 <div v-for=" item in logistics.result.list" class="col-xs-12" style="margin-top:1px;background-color:white;">
+	   <div class="col-xs-1" style="margin-top:-2px;padding:0;vertical-align:center;">
+	    <img alt="" src="/icons/树形线.png" style="width:80%;height:110%">
+	   </div>
+	   <div class="col-xs-11" style="padding:0">
+	     <span class="pull-left" style="padding:0 3px;">{{item.time}}</span>
+	     <span class="pull-right" style="padding:0 3px;">{{item.status}}</span>
+	   </div>
+	 </div>
+	 </div>
+	 <div class="col-xs-12" style="margin-top:1px;padding:0 3px;background-color:white;">
 	    <span class="pull-left" style="padding:0 10px;">${(order.sendTime)?string('yyyy-MM-dd hh:mm:ss')}</span>
 	    <span class="pull-right" style="padding:0 10px;">发货</span>
 	 </div>
   </div>
-  </#if>
+</#if>
   
   <#include "/common/tpl-order-buy-receiver-4fm.ftl" encoding="utf-8">
 

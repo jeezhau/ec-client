@@ -79,6 +79,8 @@ public class Order {
     private String signUser;
 
     private Date signTime;
+    
+    private Integer signProlong;
 
     private Integer scoreLogistics;
 
@@ -320,7 +322,15 @@ public class Order {
         this.signTime = signTime;
     }
 
-    public Integer getScoreLogistics() {
+    public Integer getSignProlong() {
+		return signProlong;
+	}
+
+	public void setSignProlong(Integer signProlong) {
+		this.signProlong = signProlong;
+	}
+
+	public Integer getScoreLogistics() {
         return scoreLogistics;
     }
 

@@ -91,6 +91,11 @@ public class PartnerBasic {
     private Integer distance;
     
     private Date reviewTime;
+    
+    //评分汇总
+    private String scoreLogis;
+    private String scoreServ;
+    private String scoreGoods;
 
     public Integer getPartnerId() {
 		return partnerId;
@@ -306,6 +311,30 @@ public class PartnerBasic {
 
 	public void setPbTp(String pbTp) {
 		this.pbTp = pbTp;
+	}
+
+	public String getScoreLogis() {
+		return scoreLogis;
+	}
+
+	public void setScoreLogis(String scoreLogis) {
+		this.scoreLogis = scoreLogis;
+	}
+
+	public String getScoreServ() {
+		return scoreServ;
+	}
+
+	public void setScoreServ(String scoreServ) {
+		this.scoreServ = scoreServ;
+	}
+
+	public String getScoreGoods() {
+		return scoreGoods;
+	}
+
+	public void setScoreGoods(String scoreGoods) {
+		this.scoreGoods = scoreGoods;
 	}
     
 	
