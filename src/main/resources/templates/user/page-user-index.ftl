@@ -36,9 +36,6 @@
     <!-- 基本信息管理-->
     <div class="row" id="userBasic" style="display:<#if mode='basic'>block<#else>none</#if>"> 
       <div class="row" style="padding:10px 10px;background-color:#880000">
-        <div class="row" style="margin:5px 20px 3px 20px;color:gray">
-          <span>USERID: ${(userBasic.userId)?string('#')}</span>
-        </div>
         <div class="row" style="margin:3px 25%;vertical-algin:center;text-align:center">
           <#if ((userBasic.headimgurl)!'')?starts_with('http')>
              <img alt="" src="${userBasic.headimgurl}" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" > 
@@ -48,7 +45,7 @@
         </div>
         <div class="row" style="width:60%;margin:10px 20%;color:gray">
           <span class="pull-left"><img alt="" src="<#if userBasic.sex='1'>/icons/性别-男.png<#elseif userBasic.sex='2'>/icons/性别-女.png<#else>/icons/性别-未知.png</#if>" width="20px" height="20px"> ${userBasic.nickname} </span >
-          <span class="pull-right"><img alt="" src="/icons/电话.png" width="20px" height="20px"> ${(userBasic.phone)!''} </span>
+          <span class="pull-right"><img alt="" src="/icons/id.png" width="23px" height="23px"> ${(userBasic.userId)?string('#')} </span>
         </div>
       </div>
       <div class="row" style="margin:30px 1px 15px 1px;">
@@ -119,6 +116,12 @@
            </a>
          </li>
          <li style="background-color:white" >
+           <a href="/user/setting">
+             <span class="pull-right" style="">设置 &gt;</span>
+             <img alt="" src="/icons/安全设置.png" width="20px" height="20px"> 安全设置
+           </a>
+         </li>
+         <li style="background-color:white" >
            <a href="/receiver/manage">
              <span class=" pull-right" >编辑  &gt;</span>
              <img alt="" src="/icons/地址管理.png" width="20px" height="20px"> 收货地址
@@ -162,7 +165,8 @@
     <div class="row" id="userVip" style="display:<#if mode='vip'>block<#else>none</#if>"> 
       <div class="row" style="padding:10px 10px;background-color:#880000">
         <div class="row" style="margin:5px 20px 3px 20px;color:gray">
-          <span>VIPID: ${(vipBasic.vipId)?string('#')}</span>
+          <span class="pull-left"><img alt="" src="/icons/vip.png" width="25px" height="25px"> </span>
+          <span class="pull-right">${(vipBasic.vipId)?string('#')}</span>
         </div>
         <div class="row" style="margin:5px 25%;vertical-algin:center;text-align:center">
           <#if vipBasic.status != '1'>

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,6 +54,10 @@ public class UserAction {
 	private String tmpFileDir;
 	@Value("${sys.local-server-url}")
 	private String localServerUrl;
+	
+	private String regexpPhone = "1[3-9]\\d{9}";
+	private String regexpEmail = "^[A-Za-z0-9_\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$";
+	
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
@@ -288,6 +293,362 @@ public class UserAction {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * 获取用户设置首页
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/setting")
+	public String getSettingIndex(ModelMap map) {
+		UserBasic user = (UserBasic) map.get("userBasic");
+		if(user == null || !"1".equals(user.getStatus())) {
+			map.put("errmsg", "系统中没有该用户信息！");
+		}
+		map.put("sys_func", "user");
+		return "user/page-setting-index";
+	}
+	
+	
+	/**
+	 * 获取手机设置首页
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/phone/manage")
+	public String getPhoneMgr(ModelMap map) {
+		UserBasic user = (UserBasic) map.get("userBasic");
+		if(user == null || !"1".equals(user.getStatus())) {
+			map.put("errmsg", "系统中没有该用户信息！");
+		}
+		
+		return "user/page-setting-phone";
+	}
 
 	
+	/**
+	 * 获取邮箱设置首页
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/email/manage")
+	public String getEmailMgr(ModelMap map) {
+		UserBasic user = (UserBasic) map.get("userBasic");
+		if(user == null || !"1".equals(user.getStatus())) {
+			map.put("errmsg", "系统中没有该用户信息！");
+		}
+		
+		return "user/page-setting-email";
+	}
+
+	/**
+	 * 获取密码设置首页
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/passwd/manage")
+	public String getPasswdMgr(ModelMap map) {
+		UserBasic user = (UserBasic) map.get("userBasic");
+		if(user == null || !"1".equals(user.getStatus())) {
+			map.put("errmsg", "系统中没有该用户信息！");
+		}
+		
+		return "user/page-setting-passwd";
+	}
+	
+	/**
+	 * 重置登录密码
+	 * @param pwd
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping(value="/setting/resetpwd",method=RequestMethod.POST)
+	@ResponseBody
+	public String resetPwd(@RequestParam(value="type",required=true)String type,ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		UserBasic user = (UserBasic) map.get("userBasic");
+		try {
+			//数据验证
+			type = type.trim();
+			if(!type.matches("[12]")) {
+				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+				jsonRet.put("errmsg", "密码的重置媒介类型不正确（1-手机，2-邮箱）！");
+				return jsonRet.toString();
+			}
+			if(user == null || !"1".equals(user.getStatus())) {
+				jsonRet.put("errcode", ErrCodes.USER_NO_EXISTS);
+				jsonRet.put("errmsg", "系统中没有该用户！");
+				return jsonRet.toString();
+			}
+			if("1".equals(type) && (user.getPhone() == null || user.getPhone().length()<11)){
+				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+				jsonRet.put("errmsg", "您还未绑定手机号，请先完成手机号的绑定！");
+				return jsonRet.toString();
+			}
+			if("2".equals(type) && (user.getEmail() == null || user.getEmail().length()<3)){
+				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+				jsonRet.put("errmsg", "您还未绑定邮箱，请先完成邮箱的绑定！");
+				return jsonRet.toString();
+			}
+			jsonRet = UserService.resetPwd(user.getUserId(), type);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
+				jsonRet.put("errmsg", "更新用户登录密码信息失败！");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
+	}
+
+
+	/**
+	 * 更新登录密码
+	 * @param pwd
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping(value="/setting/updpwd",method=RequestMethod.POST)
+	@ResponseBody
+	public String updPasswd(@RequestParam(value="oldPwd",required=true)String oldPwd,
+			@RequestParam(value="newPwd",required=true)String newPwd,ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		try {
+			UserBasic user = (UserBasic) map.get("userBasic");
+			if(user == null || !"1".equals(user.getStatus())) {
+				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
+				jsonRet.put("errmsg", "系统中没有该用户！");
+				return jsonRet.toJSONString();
+			}
+			oldPwd = oldPwd.trim();
+			if(oldPwd.length()<6 || oldPwd.length()>20) {
+				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+				jsonRet.put("errmsg", "原密码长度为6-20位字符！");
+				return jsonRet.toString();
+			}
+			newPwd = newPwd.trim();
+			if(newPwd.length()<6 || newPwd.length()>20) {
+				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+				jsonRet.put("errmsg", "新密码长度为6-20位字符！");
+				return jsonRet.toString();
+			}
+			jsonRet = UserService.updPwd(user.getUserId(), oldPwd, newPwd);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
+				jsonRet.put("errmsg", "更新会员密码信息失败！");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
+	}
+
+
+	/**
+	 * 更新绑定手机号
+	 * @param oldVeriCode
+	 * @param newPhone
+	 * @param newVeriCode
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping(value="/setting/updphone",method=RequestMethod.POST)
+	@ResponseBody
+	public Object updPhone(String oldVeriCode,@RequestParam(value="newPhone",required=true)String newPhone,
+			@RequestParam(value="newVeriCode",required=true)String newVeriCode,ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		try {
+			UserBasic user = (UserBasic) map.get("userBasic");
+			if(user == null || !"1".equals(user.getStatus())) {
+				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
+				jsonRet.put("errmsg", "系统中没有该用户！");
+				return jsonRet.toJSONString();
+			}
+			//数据格式验证
+			if(user.getPhone() != null && user.getPhone().length()>=11) {
+				if(oldVeriCode == null) {
+					oldVeriCode = "";
+				}
+				oldVeriCode = oldVeriCode.trim();
+				if(oldVeriCode.length() != 6 ) {
+					jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+					jsonRet.put("errmsg", "原手机号短信验证码为6位字符！");
+					return jsonRet.toString();
+				}
+			}
+			newPhone = newPhone.trim();
+			if(!newPhone.matches(regexpPhone)) {
+				jsonRet.put("errcode","-1");
+				jsonRet.put("errmsg","新手机号格式不正确！");
+				return jsonRet;
+			}
+			newVeriCode = newVeriCode.trim();
+			if(newVeriCode.length() != 6 ) {
+				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+				jsonRet.put("errmsg", "新手机号短信验证码为6位字符！");
+				return jsonRet.toString();
+			}
+			jsonRet = UserService.updPhone(user.getUserId(), oldVeriCode, newPhone, newVeriCode);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
+				jsonRet.put("errmsg", "绑定手机号失败！");
+			}else {
+				if(jsonRet.getIntValue("errcode") == 0) {
+					user.setPhone(newPhone);
+				}
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
+	}
+	
+	
+
+	/**
+	 * 更新绑定邮箱
+	 * @param oldVeriCode
+	 * @param newEmail
+	 * @param newVeriCode
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping(value="/setting/updemail",method=RequestMethod.POST)
+	@ResponseBody
+	public Object updEmail(String oldVeriCode,
+			@RequestParam(value="newEmail",required=true)String newEmail,
+			@RequestParam(value="newVeriCode",required=true)String newVeriCode,ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		try {
+			UserBasic user = (UserBasic) map.get("userBasic");
+			if(user == null || !"1".equals(user.getStatus())) {
+				jsonRet.put("errcode", ErrCodes.VIP_NO_USER);
+				jsonRet.put("errmsg", "系统中没有该用户！");
+				return jsonRet.toJSONString();
+			}
+			//数据格式验证
+			if(user.getEmail() != null && user.getEmail().length()>=3) {
+				if(oldVeriCode == null) {
+					oldVeriCode = "";
+				}
+				oldVeriCode = oldVeriCode.trim();
+				if(oldVeriCode.length() != 6 ) {
+					jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+					jsonRet.put("errmsg", "原邮箱验证码为6位字符！");
+					return jsonRet.toString();
+				}
+			}
+			newEmail = newEmail.trim();
+			if(!newEmail.matches(regexpEmail)) {
+				jsonRet.put("errcode","-1");
+				jsonRet.put("errmsg","新邮箱格式不正确！");
+				return jsonRet;
+			}
+			newVeriCode = newVeriCode.trim();
+			if(newVeriCode.length() != 6 ) {
+				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
+				jsonRet.put("errmsg", "新邮箱验证码为6位字符！");
+				return jsonRet.toString();
+			}
+			jsonRet = UserService.updEmail(user.getUserId(), oldVeriCode, newEmail, newVeriCode);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
+				jsonRet.put("errmsg", "绑定邮箱失败！");
+			}else {
+				if(jsonRet.getIntValue("errcode") == 0) {
+					user.setEmail(newEmail);
+				}
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
+	}
+	
+	/**
+	 * 申请手机短信验证码
+	 * @param phone
+	 * @return
+	 */
+	@RequestMapping(value="/vericode/phone/apply",method=RequestMethod.POST)
+	@ResponseBody
+	public Object applyPhoneVeriCode(@RequestParam(value="phone",required=true)String phone,
+			ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		try {
+			UserBasic user = (UserBasic) map.get("userBasic");
+			if(user == null || !"1".equals(user.getStatus())) {
+				jsonRet.put("errmsg", "系统中没有该用户！");
+				jsonRet.put("errcode", -1);
+				return jsonRet;
+			}
+			if(!phone.matches(regexpPhone)) {
+				jsonRet.put("errcode","-1");
+				jsonRet.put("errmsg","手机号格式不正确！");
+				return jsonRet;
+			}
+			jsonRet = UserService.getPhoneVeriCode(phone);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
+				jsonRet.put("errmsg", "获取短信验证码失败！");
+			}
+		}catch(Exception e) {
+			//数据处理
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
+	}
+	
+	/**
+	 * 申请邮箱短信验证码
+	 * @param email
+	 * @return
+	 */
+	@RequestMapping(value="/vericode/email/apply",method=RequestMethod.POST)
+	@ResponseBody
+	public Object applyEmailVeriCode(@RequestParam(value="email",required=true)String email,
+			ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		try {
+			UserBasic user = (UserBasic) map.get("userBasic");
+			if(user == null || !"1".equals(user.getStatus())) {
+				jsonRet.put("errmsg", "您当前还未开通会员账户！");
+				jsonRet.put("errcode", -1);
+				return jsonRet;
+			}
+			if(!email.matches(regexpEmail)) {
+				jsonRet.put("errcode","-1");
+				jsonRet.put("errmsg","邮箱格式不正确！");
+				return jsonRet;
+			}
+			jsonRet = UserService.getEmialVeriCode(email);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
+				jsonRet.put("errmsg", "获取邮箱验证码失败！");
+			}
+		}catch(Exception e) {
+			//数据处理
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
+	}
 }
+

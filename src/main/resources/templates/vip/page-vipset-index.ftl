@@ -30,41 +30,13 @@
  
 <ul class="list-group">
     <li class="list-group-item">
-      <span >手机设置
-        <#if (vipBasic.phone)?? && (vipBasic.phone)?length gt 10><span style="font-size:70%">(${vipBasic.phone})</span>
-        <#else>
-          <span style="font-size:70%">(未绑定)</span>
-        </#if></span>
-      <span class="pull-right" >
-       <#if (vipBasic.phone)?? && (vipBasic.phone)?length gt 10>
-       <a href="/vip/phone/mgr">修改</a>
-       <#else>
-       <a href="/vip/phone/mgr">绑定</a>
-       </#if>
-       </span>
-    </li>
-    <li class="list-group-item">
-      <span>邮箱设置
-        <#if (vipBasic.email)?? && (vipBasic.email)?length gt 3><span style="font-size:70%">(${vipBasic.email})</span>
-        <#else>
-          <span style="font-size:70%">(未绑定)</span>
-        </#if></span>
-      <span class="pull-right" >
-       <#if (vipBasic.email)?? && (vipBasic.email)?length gt 3>
-       <a href="/vip/email/mgr">修改</a>
-       <#else>
-       <a href="/vip/email/mgr">绑定</a>
-       </#if>
-       </span>
-    </li>
-    <li class="list-group-item">
       <span>会员密码</span>
       <span class="pull-right" >
        <a href="/vip/passwd/mgr">设置</a>
        </span>
     </li>    
     <li class="list-group-item">
-      <span>账户设置</span>
+      <span>账户管理</span>
       <span class="pull-right" >
        <a href="/vip/account/mgr">设置</a>
       </span>

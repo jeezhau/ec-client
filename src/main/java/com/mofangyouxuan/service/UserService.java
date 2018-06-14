@@ -30,6 +30,15 @@ public class UserService {
 	private static String userHeadimgUploadUrl;
 	private static String userHeadimgShowUrl;
 	
+	private static String userPhoneUpdUrl;
+	private static String userEmailUpdUrl;
+	private static String userPwdResetUrl;
+	private static String userPwdUpdUrl;
+	
+	private static String messmpServerUrl;
+	private static String phoneVeriCodeGetUrl;
+	private static String emailVeriCodeGetUrl;
+	
 	@Value("${sys.tmp-file-dir}")
 	public void setTmpFileDir(String url) {
 		tmpFileDir = url;
@@ -74,6 +83,40 @@ public class UserService {
 	public void setUserHeadimgShowUrl(String url) {
 		userHeadimgShowUrl = url;
 	}	
+	
+	@Value("${mfyx.user-phone-upd-url}")
+	public void setUserPhoneUpdUrl(String url) {
+		userPhoneUpdUrl = url;
+	}
+	@Value("${mfyx.user-email-upd-url}")
+	public void setUserEmailUpdUrl(String url) {
+		userEmailUpdUrl = url;
+	}
+	
+	@Value("${mfyx.user-pwd-reset-url}")
+	public void setUserPwdResetUrl(String url) {
+		userPwdResetUrl = url;
+	}
+	@Value("${mfyx.user-pwd-upd-url}")
+	public void setUserPwdUpdUrl(String url) {
+		userPwdUpdUrl = url;
+	}
+	
+	@Value("${mfyx.messmp-server-url}")
+	public void setMessmpServerUrl(String url) {
+		messmpServerUrl = url;
+	}
+	
+	@Value("${mfyx.phone-vericode-get-url}")
+	public void setPhoneVeriCodeGetUrl(String url) {
+		phoneVeriCodeGetUrl = url;
+	}
+	
+	@Value("${mfyx.email-vericode-get-url}")
+	public void setEmailVeriCodeGetUrl(String url) {
+		emailVeriCodeGetUrl = url;
+	}
+	
 	/**
 	 * 获取用户基本信息
 	 * @param openId
@@ -124,13 +167,9 @@ public class UserService {
 	 * @return
 	 */
 	public static String updateUserBasic(UserBasic basic) {
-		String registType = "2";
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("registType", registType);
-		params.put("openId", basic.getOpenId());
 		params.put("nickname", basic.getNickname());
 		params.put("birthday", basic.getBirthday());
-		params.put("phone", basic.getPhone());
 		params.put("sex", basic.getSex());
 		params.put("province", basic.getProvince());
 		params.put("city", basic.getCity());
@@ -217,4 +256,139 @@ public class UserService {
 		File file = HttpUtils.downloadFile(tmpFileDir,url);
 		return file;
 	}
+	
+	/**
+	 * 更新用户电话
+	 * @param userId
+	 * @param oldCeriCode	旧手机验证码（初始为空）
+	 * @param newPhone		新手机号码
+	 * @param newVeriCode	新手机验证码
+	 * @return {errcode:0,errmsg:"ok"} 
+	 */
+	public static JSONObject updPhone(Integer userId ,String oldVeriCode,
+			String newPhone,String newVeriCode) {
+		String url = mfyxServerUrl + userPhoneUpdUrl;
+		url = url.replace("{userId}", userId +"");
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("oldVeriCode", oldVeriCode);
+		params.put("newPhone", newPhone);
+		params.put("newVeriCode", newVeriCode);
+		String strRet = HttpUtils.doPostSSL(url, params);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 更新邮箱
+	 * @param userId
+	 * @param oldCeriCode	旧邮箱验证码（初始为空）
+	 * @param newEmail		新邮箱号码
+	 * @param newVeriCode	新邮箱验证码
+	 * @return {errcode:0,errmsg:"ok"} 
+	 */
+	public static JSONObject updEmail(Integer userId ,String oldVeriCode,
+			String newEmail,String newVeriCode) {
+		String url = mfyxServerUrl + userEmailUpdUrl;
+		url = url.replace("{userId}", userId +"");
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("oldVeriCode", oldVeriCode);
+		params.put("newEmail", newEmail);
+		params.put("newVeriCode", newVeriCode);
+		String strRet = HttpUtils.doPostSSL(url, params);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 获取邮箱验证码
+	 * @param email		邮箱
+	 * @return {errcode:0,errmsg:"ok"} 
+	 */
+	public static JSONObject getEmialVeriCode(String email) {
+		String url = messmpServerUrl + emailVeriCodeGetUrl;
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("email", email);
+		String strRet = HttpUtils.doPostSSL(url, params);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 获取手机验证码
+	 * @param phone		手机号码
+	 * @return {errcode:0,errmsg:"ok"} 
+	 */
+	public static JSONObject getPhoneVeriCode(String phone) {
+		String url = messmpServerUrl + phoneVeriCodeGetUrl;
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("phone", phone);
+		String strRet = HttpUtils.doPostSSL(url, params);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 重设用户密码（忘记或新设）
+	 * @param userId
+	 * @param type	重置媒介
+	 * @return {errcode:0,errmsg:"ok"} 
+	 */
+	public static JSONObject resetPwd(Integer userId ,String type) {
+		String url = mfyxServerUrl + userPwdResetUrl;
+		url = url.replace("{userId}", userId +"");
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("type", type);
+		String strRet = HttpUtils.doPostSSL(url, params);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 更新用户密码
+	 * @param userId
+	 * @param oldPwd		旧密码
+	 * @param newPwd		新密码
+	 * @return {errcode:0,errmsg:"ok"} 
+	 */
+	public static JSONObject updPwd(Integer userId ,String oldPwd,String newPwd) {
+		String url = mfyxServerUrl + userPwdUpdUrl;
+		url = url.replace("{userId}", userId +"");
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("oldPwd", oldPwd);
+		params.put("newPwd", newPwd);
+		String strRet = HttpUtils.doPostSSL(url, params);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 }

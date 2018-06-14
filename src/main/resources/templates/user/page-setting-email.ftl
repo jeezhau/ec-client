@@ -25,22 +25,22 @@
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
-<#if ((vipBasic.status)!'') == "1">
+<#if ((userBasic.status)!'') == "1">
 <div class="container" id="container" style="padding:0px 0px;oveflow:scroll">
   <div class="col-xs-12" style="margin-top:5px;background-color:white;">
-     <p style="color:red">&nbsp;&nbsp;&nbsp;&nbsp;手机号请确保是您在使用，因如果您忘记密码时将使用该手机号码进行找回，同时在账户提现时可能需要用到收取验证码！！！</p>
-	 <#if (vipBasic.phone)?? && (vipBasic.phone)?length gt 10>
+     <p style="color:red">&nbsp;&nbsp;&nbsp;&nbsp;邮箱请确保是您在使用，因如果您忘记密码时将可使用该邮箱进行找回，同时该邮箱将用于接收账单等信息！！！</p>
+	 <#if (userBasic.email)?? && (userBasic.email)?length gt 3>
 	  <div class="row" style="margin:3px 0">
-	    <label class="col-xs-4 control-label" style="padding-right:0">原手机号<span style="color:red">*</span></label>
+	    <label class="col-xs-4 control-label" style="padding-right:0">原邮箱<span style="color:red">*</span></label>
 	    <div class="col-xs-8" style="padding-left:0">
-	      <input type="tel" class="form-control" v-model="param.oldPhone" disabled placeholder="请输入手机号">
+	      <input type="email" class="form-control" v-model="param.oldEmail" disabled >
 	    </div>
 	  </div>	
 	  <div class="row" style="margin:3px 0">
-	    <label class="col-xs-4 control-label" style="padding-right:0">原手机验证码<span style="color:red">*</span></label>
+	    <label class="col-xs-4 control-label" style="padding-right:0">原邮箱验证码<span style="color:red">*</span></label>
 	    <div class="col-xs-8" style="padding-left:0">
 		    <div class="col-xs-7" style="padding:0">
-		      <input class="form-control" v-model="param.oldVeriCode" pattern="\d{6}"  maxLength=6 required placeholder="原手机号验证码">
+		      <input class="form-control" v-model="param.oldVeriCode" pattern="\d{6}"  maxLength=6 required placeholder="原邮箱验证码">
 		    </div>
 		    <div class="col-xs-2">
 		      <button v-if="time.oldTime==120 || time.oldTime <= 0 " type="button" class="btn btn-primary" @click="getVeriCode('old')">获取验证码</button>
@@ -50,16 +50,16 @@
 	  </div> 
 	 </#if>	
 	 <div class="row" style="margin:3px 0">
-	    <label class="col-xs-4 control-label" style="padding-right:0">新手机号<span style="color:red">*</span></label>
+	    <label class="col-xs-4 control-label" style="padding-right:0">新邮箱<span style="color:red">*</span></label>
 	    <div class="col-xs-8" style="padding-left:0">
-	      <input type="tel" class="form-control" v-model="param.newPhone" pattern="\d{11}" maxLength=11 required placeholder="新手机号">
+	      <input type="email" class="form-control" v-model="param.newEmail" maxLength=100 required placeholder="新邮箱">
 	    </div>
 	  </div>	
 	  <div class="row" style="margin:3px 0">
-	    <label class="col-xs-4 control-label" style="padding-right:0">新手机验证码<span style="color:red">*</span></label>
+	    <label class="col-xs-4 control-label" style="padding-right:0">新邮箱验证码<span style="color:red">*</span></label>
 	    <div class="col-xs-8" style="padding-left:0">
 		    <div class="col-xs-7" style="padding:0">
-		      <input class="form-control" v-model="param.newVeriCode" pattern="\d{6}"  maxLength=6 required placeholder="新手机号验证码">
+		      <input class="form-control" v-model="param.newVeriCode" pattern="\d{6}"  maxLength=6 required placeholder="新邮箱验证码">
 		    </div>
 		    <div class="col-xs-2">
 		      <button v-if="time.newTime==120 || time.newTime <= 0 " type="button" class="btn btn-primary" @click="getVeriCode('new')">获取验证码</button>
@@ -69,7 +69,7 @@
 	  </div>
 	  <div class="form-group">
          <div style="text-align:center">
-           <button type="button" class="btn btn-info"  style="margin:20px" @click="submitPhone">&nbsp;&nbsp;提 交&nbsp;&nbsp;</button>
+           <button type="button" class="btn btn-info"  style="margin:20px" @click="submit">&nbsp;&nbsp;提 交&nbsp;&nbsp;</button>
          </div>
       </div>	
   </div>
@@ -79,9 +79,9 @@
 	  el:'#container',
 	  data:{
 		  param:{
-			  oldPhone:'${(vipBasic.phone)!''}',
+			  oldEmail:'${(userBasic.email)!''}',
 			  oldVeriCode:'',
-			  newPhone:'',
+			  newEmail:'',
 			  newVeriCode:''
 		  },
   		  time:{
@@ -92,26 +92,26 @@
   		  }
 	  },
 	  methods:{
-		  submitPhone: function(){
+		  submit: function(){
 			  $("#dealingData").show();
-			  var pattern1 = /^1[3-9]\d{9}$/;
+			  var pattern1 = /^[A-Za-z0-9_\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
 			  var pattern2 = /^\d{6}$/;
-			  if(!pattern1.exec(this.param.newPhone)){
-				  alertMsg('错误提示','新手机号格式不正确！')
+			  if(!pattern1.exec(this.param.newEmail)){
+				  alertMsg('错误提示','新邮箱格式不正确！')
 				  return;
 			  }
 			  if(!pattern2.exec(this.param.newVeriCode)){
-				  alertMsg('错误提示','新手机号验证码格式不正确！')
+				  alertMsg('错误提示','新邮箱验证码格式不正确！')
 				  return;
 			  }
-			  <#if (vipBasic.phone)?? && (vipBasic.phone)?length gt 10>
+			  <#if (userBasic.email)?? && (userBasic.email)?length gt 3>
 			  if(!pattern2.exec(this.param.oldVeriCode)){
-				  alertMsg('错误提示','原手机号验证码格式不正确！')
+				  alertMsg('错误提示','原邮箱验证码格式不正确！')
 				  return;
 			  }
 			  </#if>
 			  $.ajax({
-					url: '/vip/vipset/updphone',
+					url: '/user/setting/updemail',
 					method:'post',
 					data: this.param,
 					success: function(jsonRet,status,xhr){
@@ -120,10 +120,10 @@
 							if(jsonRet.errcode !== 0){
 								alertMsg('错误提示',jsonRet.errmsg)
 							}else{
-								window.location.href = "/vip/vipset";
+								window.location.href = "/user/setting";
 							}
 						}else{
-							alertMsg('错误提示','绑定手机号失败！')
+							alertMsg('错误提示','绑定邮箱失败！')
 						}
 					},
 					failure:function(){
@@ -133,45 +133,31 @@
 				});
 		  },
 		  getVeriCode: function(flag){
-			  var phone = "";
+			  var email = "";
 			  if(flag ==='new'){
-				 phone = this.param.newPhone; 
+				  email = this.param.newEmail; 
 				 this.time.newTime = 120;
 			  }else{
-				  phone = this.param.oldPhone; 
+				  email = this.param.oldEmail; 
 				  this.time.oldTime = 120; 
 			  }
-			  var pattern = /^1[3-9]\d{9}$/;
-			  if(!pattern.exec(phone)){
-				  alertMsg('错误提示','电话号码格式不正确！')
+			  var pattern = /^[A-Za-z0-9_\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+			  if(!pattern.exec(email)){
+				  alertMsg('错误提示','邮箱格式不正确！')
 				  return;
 			  }
 			  veriCodeTime(flag);
 			  $.ajax({
-					url: '/vip/vericode/phone/apply',
+					url: '/user/vericode/email/apply',
 					method:'post',
-					data: {'phone':phone},
+					data: {'email':email},
 					success: function(jsonRet,status,xhr){
 						if(jsonRet && jsonRet.errmsg){
 							if(jsonRet.errcode !== 0){
 								alertMsg('错误提示',jsonRet.errmsg)
-								if(flag ==='new' && containerVue.time.newTimer){
-									clearTimeout(containerVue.time.newTimer);
-									containerVue.time.newTime = 120;
-								}else if(containerVue.time.oldTimer){
-									clearTimeout(containerVue.time.oldTimer);
-									containerVue.time.oldTime = 120;
-								}
 							}
 						}else{
 							alertMsg('错误提示','获取验证码失败！')
-							if(flag ==='new' && containerVue.time.newTimer){
-								clearTimeout(containerVue.time.newTimer);
-								containerVue.time.newTime = 120;
-							}else if(containerVue.time.oldTimer){
-								clearTimeout(containerVue.time.oldTimer);
-								containerVue.time.oldTime = 120;
-							}
 						}
 					},
 					dataType: 'json'
@@ -197,7 +183,6 @@
 	}
   }
   </script>
-
 </#if>  
 
 <#if errmsg??>

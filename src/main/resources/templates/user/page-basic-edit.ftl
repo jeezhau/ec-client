@@ -66,12 +66,6 @@
         </div>
       </div> 
       <div class="form-group">
-        <label class="col-xs-3 control-label">移动电话<span style="color:red">*</span></label>
-        <div class="col-xs-8">
-          <input type="tel" class="form-control" v-model="param.phone" maxLength=20 placeholder="请输入移动电话号码" >
-        </div>
-      </div> 
-      <div class="form-group">
         <label class="col-xs-3 control-label">所在省份</label>
         <div class="col-xs-8">
           <select class="form-control" v-model="param.province" v-on:change="changeProvince">
@@ -135,7 +129,6 @@ var editFormVue = new Vue({
 		param:{
 			nickname:'',
 			birthday:'',
-			phone:'',
 			sex:'',
 			province:'',
 			city:'',
@@ -321,3 +314,5 @@ $("#headimg").on("fileuploaded", function (event, data, previewId, index) {
 
 </body>
 </html>
+
+
