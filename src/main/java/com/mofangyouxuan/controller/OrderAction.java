@@ -701,7 +701,7 @@ public class OrderAction {
 					}else if("4appraise".equals(stat)) { //待初次评价
 						statCode = "40,55";
 					}else if("refund".equals(stat)) { //可申请退款与已经进行中
-						statCode = "20,21,22,30,31,40,41,50,51,52,53,54,55,56,60,61,62,63,64,65";
+						statCode = "20,21,22,30,31,40,41,50,51,52,53,54,55,56,60,61,62,63,64,65,67,DF";
 					}else if("exchange".equals(stat)) { //可申请退货与已经进行中
 						statCode = "40,41,50,51,52,53,54,55,56";
 					}
@@ -847,7 +847,7 @@ public class OrderAction {
 					map.put("errmsg", "该订单不是您的宝贝订单！");
 				}else {
 					if(!"10".equals(order.getStatus()) && !"11".equals(order.getStatus()) && !"12".equals(order.getStatus()) && 
-						!"20".equals(order.getStatus())) {
+						!"20".equals(order.getStatus()) && !"DF".equals(order.getStatus())) {
 						map.put("errmsg", "您当前不可取消订单！");
 					}else {
 						jsonRet = OrderService.getPayFlow(order, user.getUserId(), "1");
@@ -898,7 +898,7 @@ public class OrderAction {
 				return jsonRet.toString();
 			}
 			if(!"10".equals(order.getStatus()) && !"11".equals(order.getStatus()) && !"12".equals(order.getStatus()) && 
-				!"20".equals(order.getStatus())) {
+				!"20".equals(order.getStatus()) && !"DF".equals(order.getStatus())) {
 				jsonRet.put("errmsg", "您当前不可取消订单！");
 				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
 				return jsonRet.toString();

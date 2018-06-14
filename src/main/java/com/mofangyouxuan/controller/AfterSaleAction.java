@@ -128,7 +128,7 @@ public class AfterSaleAction {
 					if(!order.getStatus().startsWith("3") && !order.getStatus().startsWith("4") &&
 							!"55".equals(order.getStatus()) && !"56".equals(order.getStatus()) && 
 							!"57".equals(order.getStatus()) && !"58".equals(order.getStatus()) &&
-							!"61".equals(order.getStatus())) {
+							!"67".equals(order.getStatus()) && !"61".equals(order.getStatus()) ) {
 						map.put("errmsg", "您当前不可对该订单进行申请退款！");
 					}else {
 						jsonRet = OrderService.getPayFlow(order, user.getUserId(), "1");
@@ -191,7 +191,7 @@ public class AfterSaleAction {
 			if(!order.getStatus().startsWith("3") && !order.getStatus().startsWith("4") &&
 					!"55".equals(order.getStatus()) && !"56".equals(order.getStatus()) && 
 					!"57".equals(order.getStatus()) && !"58".equals(order.getStatus()) &&
-					!"61".equals(order.getStatus())) {
+					!"67".equals(order.getStatus()) && !"61".equals(order.getStatus())) {
 				jsonRet.put("errmsg", "您当前不可对该订单进行申请退款！");
 				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
 				return jsonRet.toString();

@@ -23,10 +23,10 @@
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <header>
   <div class="weui-navbar">
-    <div class="weui-navbar__item <#if mode='basic'>weui-bar__item_on</#if>" onclick="$(this).addClass('weui-bar__item_on');$(this).siblings().removeClass('weui-bar__item_on');$('#userBasic').show();$('#userVip').hide();">
+    <div class="weui-navbar__item <#if mode='basic'>weui-bar__item_on</#if>" onclick="window.location.href='/user/index/basic'">
 	我-基本
 	</div>
-	<div class="weui-navbar__item <#if mode='vip'>weui-bar__item_on</#if>" onclick="$(this).addClass('weui-bar__item_on');$(this).siblings().removeClass('weui-bar__item_on');$('#userBasic').hide();$('#userVip').show();">
+	<div class="weui-navbar__item <#if mode='vip'>weui-bar__item_on</#if>" onclick="window.location.href='/user/index/vip'">
     我-会员
 	</div>
   </div>

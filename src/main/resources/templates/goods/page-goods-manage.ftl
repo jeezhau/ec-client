@@ -26,10 +26,10 @@
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
 <header >
 	<ul class="nav nav-tabs" style="margin:3px 8px 3px 8px">
-	  <li onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#manageNotice').show();$('#goodsListShow').hide()">
+	  <li style="width:50%;text-align:center" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#manageNotice').show();$('#goodsListShow').hide()">
 	    <a href="javascript:;"  style="padding:10px 8px">管理须知</a>
 	  </li>
-	  <li class="active"  onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#manageNotice').hide();$('#goodsListShow').show()">
+	  <li style="width:50%;text-align:center" class="active"  onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#manageNotice').hide();$('#goodsListShow').show()">
 	    <a href="javascript:;"  style="padding:10px 8px">我的商品清单</a>
 	  </li>
 	</ul>
@@ -56,9 +56,9 @@
     </div>  
   </div>
     
-  <div class="row" id="goodsListShow" style="margin-top:5px" ><!-- 商品管理列表 -->
-    <div class="row" style="margin:1px 3px;background-color:white">
-      <div class="col-xs-6" style="padding:0 2px">
+  <div class="row" id="goodsListShow" style="" ><!-- 商品管理列表 -->
+    <div class="row" style="margin:3px 3px;padding:5px 2px;background-color:white">
+      <div class="col-xs-6" style="padding:5px 2px">
 	      <div class="form-group">
 	        <label class="col-xs-4 control-label" style="padding-right:1px">上架状态</label>
 	        <div class="col-xs-8" style="padding-left:1px">
@@ -70,7 +70,7 @@
 	        </div>
 	      </div>
       </div>
-      <div class="col-xs-6" style="padding:0 2px">
+      <div class="col-xs-6" style="padding:5px 2px">
 	      <div class="form-group">
 	        <label class="col-xs-4 control-label" style="padding-right:1px">审核状态</label>
 	        <div class="col-xs-8" style="padding-left:1px">

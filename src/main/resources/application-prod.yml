@@ -112,6 +112,7 @@ mfyx:
   order-create-url: '/order/{userId}/create'
   order-update-url: '/order/{userId}/update'
   order-checkdata-url: '/order/{userId}/checkData' 
+  order-prolong-url: '/order/{userId}/prolong/{orderId}'
   order-cancel-url: '/order/{userId}/cancel/{orderId}'
   order-prepay-url: '/order/{userId}/createpay/{orderId}'
   order-pay-finish-url: '/order/{userId}/payfinish/{orderId}'
@@ -141,11 +142,16 @@ mfyx:
   complain-partner-save-url: '/complain/{vipId}/partner/save'
   complain-order-delete-url: '/complain/{userId}/order/delete/{cplainId}'
   complain-partner-delete-url: '/complain/{vipId}/partner/delete/{cplainId}' 
-    
+  
+  cash-apply-url: '/cash/{vipId}/apply'
+  cash-delete-url: '/cash/{vipId}/delete'
+  cash-update-stat-url: '/cash/updateStat'
+  cash-getall-url: '/cash/getall'
+   
 ######系统参数############  
 sys:
   local-server-url: 'https://h5.mofangyouxuan.com'
-  tmp-file-dir: '/var/mfyx-wx/tmp/'
+  tmp-file-dir: '/var/mfyxm/tmp/'
 
   
   

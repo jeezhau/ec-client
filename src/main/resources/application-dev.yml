@@ -151,7 +151,7 @@ mfyx:
 ######系统参数############  
 sys:
   local-server-url: 'http://192.168.0.114:8000'
-  tmp-file-dir: '/Users/jeekhan/mfyx-wx/tmp/'
+  tmp-file-dir: '/Users/jeekhan/mfyxm/tmp/'
 
   
   

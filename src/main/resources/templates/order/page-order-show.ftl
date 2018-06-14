@@ -53,7 +53,7 @@
 	    <#include "/common/tpl-order-partner-4vue.ftl" encoding="utf8">
 	    <#include "/common/tpl-order-buy-content-4vue.ftl" encoding="utf8">
 		<div class="row" style="margin:1px 0;padding:0px 18px 0px 18px;background-color:white;">
-		    <a v-if="startWith(order.status,'1') || order.status == '20'" class="btn btn-default pull-right" :href="'/order/cancel/begin/'+order.orderId" style="padding:0 3px;margin:0 3px" >
+		    <a v-if="startWith(order.status,'1') || order.status == '20' || order.status == 'DF'" class="btn btn-default pull-right" :href="'/order/cancel/begin/'+order.orderId" style="padding:0 3px;margin:0 3px" >
 		      <span >取消订单</span>
 		    </a>
 		    <a v-if="order.status ==='10' || order.status ==='12'" class="btn btn-danger pull-right" :href="'/order/pay/choose/' + order.orderId" style="padding:0 3px;margin:0 3px">

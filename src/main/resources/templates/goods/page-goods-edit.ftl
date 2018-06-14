@@ -27,10 +27,10 @@
 <div class="container" id="goodsContainer" style="padding:0;oveflow:scroll">
   <div class="row">
      <ul class="nav nav-tabs" style="margin:0 15%">
-	  <li style="width:50%" class="active" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#editGoods').show();$('#reviewInfo').hide();">
+	  <li style="width:50%;text-align:center" class="active" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#editGoods').show();$('#reviewInfo').hide();">
 	    <a href="javascript:;">商品编辑</a>
 	  </li>
-	  <li style="width:50%" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#editGoods').hide();$('#reviewInfo').show();">
+	  <li style="width:50%;text-align:center" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#editGoods').hide();$('#reviewInfo').show();">
 	    <a href="javascript:;">审批进度</a>
 	  </li>
 	</ul>
@@ -42,48 +42,48 @@
     </h6>
 	<form class="form-horizontal" method ="post" autocomplete="on" enctype="multipart/form-data" role="form" >
       <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">商品名称<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
+        <label class="col-xs-4 col-sm-3 col-md-3 col-lg-2 control-label" style="padding-right:1px">商品名称<span style="color:red">*</span></label>
+        <div class="col-xs-8 col-sm-9 col-md-9 col-lg-10" style="padding-left:1px">
           <input class="form-control" v-model="param.goodsName" required maxLength="100" placeHolder="请输入商品名称2-100字符">
         </div>
       </div>         
       <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">商品分类<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
+        <label class="col-xs-4 col-sm-3 col-md-3 col-lg-2 control-label" style="padding-right:1px">商品分类<span style="color:red">*</span></label>
+        <div class="col-xs-8 col-sm-9 col-md-9 col-lg-10" style="padding-left:1px">
           <select class="form-control"  v-model="param.categoryId" required>
             <option v-for="item in metadata.categories" v-bind:value="item.categoryId">{{item.categoryName}}</option>
           </select>
         </div>
       </div> 
        <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">商品主图<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
+        <label class="col-xs-4 col-sm-3 col-md-3 col-lg-2 control-label" style="padding-right:1px">商品主图<span style="color:red">*</span></label>
+        <div class="col-xs-8 col-sm-9 col-md-9 col-lg-10" style="padding-left:1px">
           <div class="col-xs-9" style="padding-left:0"><input class="form-control"  v-model="param.mainImgPath" required readonly placeholder="请选择图片"></div>
           <div class="col-xs-3" style="padding-left:0"><button type="button" class="btn btn-info" @click="selectImage(1,'main')">选择</button></div>
         </div>
       </div> 
       <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">商品轮播图<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
+        <label class="col-xs-4 col-sm-3 col-md-3 col-lg-2 control-label" style="padding-right:1px">商品轮播图<span style="color:red">*</span></label>
+        <div class="col-xs-8 col-sm-9 col-md-9 col-lg-10" style="padding-left:1px">
            <div class="col-xs-9" style="padding-left:0"><textarea class="col-xs-9 form-control" v-model="param.carouselImgPaths" maxLength=500 rows=10 readonly placeholder="请选择图片" ></textarea></div>
            <div class="col-xs-3" style="padding-left:0"><button type="button" class="btn btn-info" @click="selectImage(10,'carousel')">选择</button></div>
         </div>
       </div>
       <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">商品产地<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
+        <label class="col-xs-4 col-sm-3 col-md-3 col-lg-2 control-label" style="padding-right:1px">商品产地<span style="color:red">*</span></label>
+        <div class="col-xs-8 col-sm-9 col-md-9 col-lg-10" style="padding-left:1px">
            <input type="text" class="form-control" v-model="param.place"  max=100 >
         </div>       
       </div>
       <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">生产企业<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
+        <label class="col-xs-4 col-sm-3 col-md-3 col-lg-2 control-label" style="padding-right:1px">生产企业<span style="color:red">*</span></label>
+        <div class="col-xs-8 col-sm-9 col-md-9 col-lg-10" style="padding-left:1px">
            <input type="text" class="form-control" v-model="param.vender"  max=100 >
         </div>       
       </div>
       <div class="form-group">
         <div class="col-xs-12" style="padding-left:1px">
-          <label class="col-xs-12 control-label" >规格明细与库存(名称唯一，所有字段必填)<span style="color:red">*</span></label>
+          <label class="col-xs-12 control-label" style="text-align:left">规格明细与库存(名称唯一，所有字段必填)<span style="color:red">*</span></label>
         </div>
         <div class="col-xs-12"  style="max-height:300px;overflow:scroll">
            <table class="table table-striped table-bordered table-condensed">
@@ -125,47 +125,47 @@
         </div>       
       </div>
       <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">限购数量(件)<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
+        <label class="col-xs-4 col-sm-3 col-md-3 col-lg-2 control-label" style="padding-right:1px">限购数量(件)<span style="color:red">*</span></label>
+        <div class="col-xs-8 col-sm-9 col-md-9 col-lg-10" style="padding-left:1px">
           <input type="number" class="form-control" v-model="param.limitedNum" min=0 max=999999 placeholder="请输入每人限购数量，0表示不限购" >
         </div>
       </div>
       <div class="form-group" v-if="param.limitedNum>0">
-        <label class="col-xs-4 control-label" style="padding-right:1px">限购开始时间<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
+        <label class="col-xs-4 col-sm-3 col-md-3 col-lg-2 control-label" style="padding-right:1px">限购开始时间<span style="color:red">*</span></label>
+        <div class="col-xs-8 col-sm-9 col-md-9 col-lg-10" style="padding-left:1px">
           <input type="date" class="form-control" v-model="param.beginTime"  maxLength=20  required placeholder="请输入限购开始时间">
         </div>
       </div>
       <div class="form-group" v-if="param.limitedNum>0">
-        <label class="col-xs-4 control-label" style="padding-right:1px">限购结束时间<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
+        <label class="col-xs-4 col-sm-3 col-md-3 col-lg-2 control-label" style="padding-right:1px">限购结束时间<span style="color:red">*</span></label>
+        <div class="col-xs-8 col-sm-9 col-md-9 col-lg-10" style="padding-left:1px">
           <input type="date" class="form-control" v-model="param.endTime"  maxLength=20  required placeholder="请输入限购开始时间">
         </div>
       </div>
       <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px" title="签收后支持多少天可退换货，0表示不支持，质量问题除外">退换货期限(天)<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
+        <label class="col-xs-4 col-sm-3 col-md-3 col-lg-2 control-label" style="padding-right:1px" title="签收后支持多少天可退换货，0表示不支持，质量问题除外">退换货期限(天)<span style="color:red">*</span></label>
+        <div class="col-xs-8 col-sm-9 col-md-9 col-lg-10" style="padding-left:1px">
           <input type="number" class="form-control" v-model="param.refundLimit" title="签收后支持多少天可退换货，0表示不支持，质量问题除外" min=0 max=999999 placeholder="签收后支持多少天可退换货，0表示不支持" >
         </div>
       </div>   
       <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">运费模版<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
+        <label class="col-xs-4 col-sm-3 col-md-3 col-lg-2 control-label" style="padding-right:1px">运费模版<span style="color:red">*</span></label>
+        <div class="col-xs-8 col-sm-9 col-md-9 col-lg-10" style="padding-left:1px">
           <select class="form-control" v-model="postageIdArr" required multiple>
             <option v-for="item in metadata.postages" v-bind:value="item.postageId">{{item.postageName}}</option>
           </select>
         </div>
       </div>
       <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">是否立即上架<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
+        <label class="col-xs-4 col-sm-3 col-md-3 col-lg-2 control-label" style="padding-right:1px">是否立即上架<span style="color:red">*</span></label>
+        <div class="col-xs-8 col-sm-9 col-md-9 col-lg-10" style="padding-left:1px">
           <label style="padding:0 5px"><input type="radio" v-model="param.status" value="0" style="display:inline-block;width:15px;height:15px">否</label>
           <label style="padding:0 5px"><input type="radio" v-model="param.status" value="1" style="display:inline-block;width:15px;height:15px">是</label>
         </div>
       </div>     
       <div class="form-group">
         <div class="col-xs-12" style="padding-left:1px">
-          <label class="col-xs-6 control-label" >商品图文描述<span style="color:red">*</span></label>
+          <label class="col-xs-12 control-label" style="text-align:left">商品图文描述<span style="color:red">*</span></label>
         </div>
         <div class="col-xs-12" >
           <input type="hidden" value="${(goods.goodsDesc)!''}" id="hiddenGoodsDesc">
