@@ -23,8 +23,6 @@
     <script src="/script/common.js" type="text/javascript"></script>
 </head>
 <body class="light-gray-bg">
-<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
-<#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
 <div class="container " id="container" style="padding:0;overflow:scroll">
  <#if payRetCode?? >

@@ -24,6 +24,7 @@
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+<#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
 
 <#if ((vipBasic.status)!'') == '1'>
 <div class="container" id="container" style="padding:0px 0px;oveflow:scroll">
@@ -92,7 +93,11 @@ var containerVue = new Vue({
 					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode !== 0){
-							alertMsg('错误提示',jsonRet.errmsg);
+							if(jsonRet.errcode === -100000){
+								$('#ajaxLoginModal').modal('show');
+							}else{
+								alertMsg('错误提示',jsonRet.errmsg);
+							}
 						}else{
 							window.location.href = "/user/setting";
 						}
@@ -154,7 +159,6 @@ var containerVue = new Vue({
 	 methods:{
 		 submit: function(){
 			 if(!this.param.type){
-				$('#resetPwdModal').modal('hide');
 				alertMsg('错误提示','请选择密码接收媒介！');
 				return;
 			 }
@@ -166,7 +170,11 @@ var containerVue = new Vue({
 						$('#resetPwdModal').modal('hide');
 						if(jsonRet && jsonRet.errmsg){
 							if(jsonRet.errcode !== 0){
-								alertMsg('错误提示',jsonRet.errmsg);
+								if(jsonRet.errcode === -100000){
+									$('#ajaxLoginModal').modal('show');
+								}else{
+									alertMsg('错误提示',jsonRet.errmsg);
+								}
 							}else{
 								var msg = '新的随机重置密码已经发送至您绑定的' + (resetPwdVue.param.type=='1'?'手机':'邮箱') +  '，请尽快完成对重置密码的修改！';
 								alertMsg('系统提示',msg);

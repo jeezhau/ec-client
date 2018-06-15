@@ -29,6 +29,7 @@
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+<#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
 
 <div class="container " style="padding:0px 0px;oveflow:scroll">
   <div class="row">
@@ -153,7 +154,11 @@ var editFormVue = new Vue({
 							getCities();
 						}
 					}else{
-						alertMsg('错误提示','获取城市数据(省份)失败！')
+						if(jsonRet && jsonRet.errcode === -100000){
+							$('#ajaxLoginModal').modal('show');
+						}else{
+							alertMsg('错误提示','获取城市数据(省份)失败！');
+						}
 					}
 				},
 				dataType: 'json'
@@ -177,7 +182,11 @@ var editFormVue = new Vue({
 						if(0 == jsonRet.errcode){
 							alertMsg('系统提示',"基本信息修改成功！")
 						}else{//出现逻辑错误
-							alertMsg('错误提示',jsonRet.errmsg);
+							if(jsonRet.errcode === -100000){
+								$('#ajaxLoginModal').modal('show');
+							}else{
+								alertMsg('错误提示',jsonRet.errmsg);
+							}
 						}
 					}else{
 						alertMsg('错误提示','系统数据访问失败！')
@@ -215,7 +224,11 @@ function getBasic(){
 					
 					editFormVue.getAllProvinces();
 				}else{//出现逻辑错误
-					alertMsg('错误提示',jsonRet.errmsg);
+					if(jsonRet.errcode === -100000){
+						$('#ajaxLoginModal').modal('show');
+					}else{
+						alertMsg('错误提示',jsonRet.errmsg);
+					}
 				}
 			}else{
 				alertMsg('错误提示','系统数据访问失败！')
@@ -245,7 +258,11 @@ function getCities(){
 					editFormVue.metadata.cities.push(jsonRet[i]);
 				}
 			}else{
-				alertMsg('错误提示','获取城市数据(地级市)失败！')
+				if(jsonRet && jsonRet.errcode === -100000){
+					$('#ajaxLoginModal').modal('show');
+				}else{
+					alertMsg('错误提示','获取城市数据(地级市)失败！');
+				}
 			}
 		},
 		dataType: 'json'
@@ -293,7 +310,11 @@ $("#headimg").on("fileuploaded", function (event, data, previewId, index) {
 		if(0 == jsonRet.errcode){
 			alertMsg('系统提示',"头像上传成功！！");
 		}else{//出现逻辑错误
-			alertMsg('错误提示',jsonRet.errmsg);
+			if(jsonRet.errcode === -100000){
+				$('#ajaxLoginModal').modal('show');
+			}else{
+				alertMsg('错误提示',jsonRet.errmsg);
+			}
 			$('#headimg').fileinput('clear');
 		}
 	}else{

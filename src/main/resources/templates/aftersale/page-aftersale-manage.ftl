@@ -26,6 +26,7 @@
 
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8"> 
+<#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
 
 <div class="container " id="container" style="oveflow:scroll">
     <ul class="nav navbar-nav nav-tabs" style="font-weight:bold;"> 
@@ -101,7 +102,11 @@ var containerVue = new Vue({
 						containerVue.pageSize = jsonRet.pageCond.pageSize;
 					}else{
 						if(jsonRet && jsonRet.errmsg){
-							//alert(jsonRet.errmsg);
+							if(jsonRet.errcode === -100000){
+								$('#ajaxLoginModal').modal('show');
+							}else{
+								//alertMsg('错误提示',jsonRet.errmsg);
+							}
 							$("#nomoreData").show();
 						}
 					}

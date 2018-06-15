@@ -21,6 +21,7 @@
 
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+
 <header>
   <div class="weui-navbar">
     <div class="weui-navbar__item <#if mode='basic'>weui-bar__item_on</#if>" onclick="window.location.href='/user/index/basic'">

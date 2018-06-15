@@ -181,18 +181,21 @@ public class UserService {
 	}
 
 	/**
-	 * 更新用户基本信息
+	 * 用户注册
 	 * @param userBasic
+	 * @param veriCode	验证码
 	 * @return
 	 */
-	public static JSONObject createUserBasic(UserBasic basic) {
-		String registType = "2";
+	public static JSONObject createUser(UserBasic basic,String veriCode) {
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("registType", registType);
+		params.put("registType", basic.getRegistType());
 		params.put("openId", basic.getOpenId());
 		params.put("nickname", basic.getNickname());
 		params.put("birthday", basic.getBirthday());
 		params.put("phone", basic.getPhone());
+		params.put("email", basic.getEmail());
+		params.put("veriCode", veriCode);
+		params.put("passwd", basic.getPasswd());
 		params.put("sex", basic.getSex());
 		params.put("province", basic.getProvince());
 		params.put("city", basic.getCity());

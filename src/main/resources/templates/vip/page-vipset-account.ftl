@@ -24,6 +24,7 @@
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+<#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
 
 <#if ((vipBasic.status)!'') == '1'>
 
@@ -96,7 +97,11 @@ var containerVue = new Vue({
 							containerVue.dataList.push(jsonRet.datas[i]);
 						}
 					}else{
-						//alertMsg('错误提示',jsonRet.errmsg)
+						if(jsonRet && jsonRet.errcode === -100000){
+							$('#ajaxLoginModal').modal('show');
+						}else{
+							//alertMsg('错误提示',jsonRet.errmsg);
+						}
 					}
 				},
 				failure:function(){
@@ -226,7 +231,11 @@ var saveAccountVue = new Vue({
 					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode !== 0){
-							alertMsg('错误提示',jsonRet.errmsg)
+							if(jsonRet.errcode === -100000){
+								$('#ajaxLoginModal').modal('show');
+							}else{
+								alertMsg('错误提示',jsonRet.errmsg);
+							}
 						}else{
 							containerVue.getAll();
 						}
@@ -257,7 +266,11 @@ var saveAccountVue = new Vue({
 					$("#dealingData").hide();
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode !== 0){
-							alertMsg('错误提示',jsonRet.errmsg)
+							if(jsonRet.errcode === -100000){
+								$('#ajaxLoginModal').modal('show');
+							}else{
+								alertMsg('错误提示',jsonRet.errmsg);
+							}
 						}else{
 							containerVue.getAll();
 						}

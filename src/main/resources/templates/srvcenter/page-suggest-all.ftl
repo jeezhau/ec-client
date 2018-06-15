@@ -22,6 +22,9 @@
     <link href="/css/mfyx.css" rel="stylesheet">
 </head>
 <body class="light-gray-bg">
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
+
 <div class="container " style="oveflow:scroll">
    <div class="row">
      <a class="col-xs-2" href="/srvcenter/index/suggest" style="vertical-algin:center;text-align:center"><img width="15px" height="15px" alt="" src="/icons/返回.png"></a>

@@ -59,7 +59,11 @@ var receiverManageVue = new Vue({
 								receiverManageVue.receiverList.push(jsonRet.datas[i]);
 							}
 						}else{//出现逻辑错误
-							alertMsg('错误提示',jsonRet.errmsg);
+							if(jsonRet.errcode === -100000){
+								$('#ajaxLoginModal').modal('show');
+							}else{
+								alertMsg('错误提示',jsonRet.errmsg);
+							}
 						}
 					}else{
 						alertMsg('错误提示','系统数据访问失败！')
@@ -78,7 +82,11 @@ var receiverManageVue = new Vue({
 						if(0 == jsonRet.errcode){
 							receiverManageVue.getAll();
 						}else{//出现逻辑错误
-							alertMsg('错误提示',jsonRet.errmsg);
+							if(jsonRet.errcode === -100000){
+								$('#ajaxLoginModal').modal('show');
+							}else{
+								alertMsg('错误提示',jsonRet.errmsg);
+							}
 						}
 					}else{
 						alertMsg('错误提示','系统数据访问失败！')
@@ -97,10 +105,14 @@ var receiverManageVue = new Vue({
 				data: {},
 				success: function(jsonRet,status,xhr){
 					if(jsonRet){
-						if(0 == jsonRet.errcode){
+						if(0 === jsonRet.errcode){
 							receiverManageVue.getAll();
 						}else{//出现逻辑错误
-							alertMsg('错误提示',jsonRet.errmsg);
+							if(jsonRet.errcode === -100000){
+								$('#ajaxLoginModal').modal('show');
+							}else{
+								alertMsg('错误提示',jsonRet.errmsg);
+							}
 						}
 					}else{
 						alertMsg('错误提示','系统数据访问失败！')
@@ -241,7 +253,11 @@ var editReceiverVue = new Vue({
 							getCities();
 						}
 					}else{
-						alertMsg('错误提示','获取城市数据(省份)失败！')
+						if(jsonRet.errcode === -100000){
+							$('#ajaxLoginModal').modal('show');
+						}else{
+							alertMsg('错误提示','获取城市数据(省份)失败！');
+						}
 					}
 				},
 				dataType: 'json'
@@ -289,11 +305,15 @@ var editReceiverVue = new Vue({
 				data: this.param,
 				success: function(jsonRet,status,xhr){
 					if(jsonRet && jsonRet.errmsg){
-						if(0 == jsonRet.errcode){
+						if(0 === jsonRet.errcode){
 							receiverManageVue.getAll();
 							$('#editReceiverModal').modal('hide');
 						}else{//出现逻辑错误
-							alert(jsonRet.errmsg);
+							if(jsonRet.errcode === -100000){
+								$('#ajaxLoginModal').modal('show');
+							}else{
+								alertMsg('错误提示',jsonRet.errmsg);
+							}
 						}
 					}else{
 						alert('系统数据访问失败！');
@@ -330,7 +350,11 @@ function getCities(){
 					getAreas();
 				}
 			}else{
-				alertMsg('错误提示','获取城市数据(地级市)失败！')
+				if(jsonRet.errcode === -100000){
+					$('#ajaxLoginModal').modal('show');
+				}else{
+					alertMsg('错误提示','获取城市数据(地级市)失败！');
+				}
 			}
 		},
 		dataType: 'json'
@@ -356,7 +380,11 @@ function getAreas(){
 					editReceiverVue.metadata.areas.push(jsonRet[i]);
 				}
 			}else{
-				alertMsg('错误提示','获取城市数据(县)失败！')
+				if(jsonRet.errcode === -100000){
+					$('#ajaxLoginModal').modal('show');
+				}else{
+					alertMsg('错误提示','获取城市数据(县)失败！');
+				}
 			}
 		},
 		dataType: 'json'

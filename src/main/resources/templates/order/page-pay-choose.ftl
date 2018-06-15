@@ -24,6 +24,7 @@
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+<#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
 
  <#if (order.orderId)?? >
 <div class="container " id="container" style="padding:0;overflow:scroll">
@@ -183,7 +184,11 @@ var containerVue = new Vue({
 								}
 							}
 						}else{//出现逻辑错误
-							alertMsg('错误提示',jsonRet.errmsg);
+							if(jsonRet.errcode === -100000){
+								$('#ajaxLoginModal').modal('show');
+							}else{
+								alertMsg('错误提示',jsonRet.errmsg);
+							}
 						}
 					}else{
 						alertMsg('错误提示','系统数据访问失败！');

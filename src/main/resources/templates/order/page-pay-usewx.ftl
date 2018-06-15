@@ -25,6 +25,7 @@
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+<#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
 
 <#if (payFlow.flowId)?? >
 <div class="container " id="container" style="padding:0;overflow:scroll">
@@ -114,6 +115,12 @@ var containerVue = new Vue({
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//创建支付成功
 							window.location.href = "/order/pay/finish/" + containerVue.param.orderId;
+						}
+					}else{
+						if(jsonRet && jsonRet.errcode === -100000){
+							$('#ajaxLoginModal').modal('show');
+						}else{
+							alertMsg('错误提示',jsonRet.errmsg);
 						}
 					}
 					setTimeout("containerVue.getPayStatus()",15000);

@@ -1,10 +1,10 @@
 
 <!-- 消息提示模态框（Modal） -->
-<div class="modal fade " id="alertMsgModal" tabindex="-1" role="dialog" aria-labelledby="alertMsgTitle" aria-hidden="false" data-backdrop="static" style="top:20%">
-	<div class="modal-dialog">
+<div id="alertMsgModal" class="weui-loadmore" style="position:fixed;left:0;top:0;right:0;bottom:0;margin:0;width:100%;display:none;z-index:100000;background:rgba(0,0,0,0.2);display:none;">
+  <div style="margin:180px 0">
   		<div class="modal-content">
      		<div class="modal-header">
-        			<button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
+        			<button type="button" class="close" onclick="$('#alertMsgModal').hide()">× </button>
         			<h4 class="modal-title" id="alertMsgTitle" style="color:red" ></h4>
      		</div>
      		<div class="modal-body">
@@ -24,6 +24,6 @@ function alertMsg(title,content){
 	}
 	$('#alertMsgTitle').html(title);
 	$('#alertMsgContent').html(content);
-	$('#alertMsgModal').modal('show');
+	$('#alertMsgModal').show();
 }
 </script>

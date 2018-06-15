@@ -50,7 +50,7 @@
 <div v-if="needRegister == true" class="templatemo-content-widget templatemo-login-widget templatemo-register-widget white-bg" >
     <div class="row">
 	  <p style="padding:3px 5px;font-weight:bold"> 
-	    <a href="#"> 官方注册</a>
+	    <a href="/register"> 官方注册</a>
 	  </p>
 	</div>	
 	<div class="row">

@@ -19,6 +19,9 @@
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
+
+
 <#if !errmsg??>
 <div class="container" id="container" style="margin:0;padding:0;overflow:scroll;margin-bottom:50px">
 	<div class="row"><!-- 投诉内容 -->
@@ -92,7 +95,11 @@ var containerVue = new Vue({
 						alertMsg('系统提示','投诉信息已成功提交！');
 						containerVue.search.count = containerVue.search.count + 1;
 					}else{
-						alertMsg('错误提示',jsonRet.errmsg);
+						if(jsonRet.errcode === -100000){
+							$('#ajaxLoginModal').modal('show');
+						}else{
+							alertMsg('错误提示',jsonRet.errmsg);
+						}
 					}
 				},
 				dataType: 'json'
@@ -115,7 +122,11 @@ var containerVue = new Vue({
 						containerVue.search.count = containerVue.search.count - 1;
 						window.location.href = "/complain/manage/order";
 					}else{
-						alertMsg('错误提示',jsonRet.errmsg);
+						if(jsonRet.errcode === -100000){
+							$('#ajaxLoginModal').modal('show');
+						}else{
+							alertMsg('错误提示',jsonRet.errmsg);
+						}
 					}
 				},
 				dataType: 'json'
@@ -139,7 +150,11 @@ var containerVue = new Vue({
 						</#if>
 						containerVue.search.count = jsonRet.pageCond.count;
 					}else{
-						alertMsg('错误提示',jsonRet.errmsg);
+						if(jsonRet.errcode === -100000){
+							$('#ajaxLoginModal').modal('show');
+						}else{
+							alertMsg('错误提示',jsonRet.errmsg);
+						}
 					}
 				},
 				dataType: 'json'

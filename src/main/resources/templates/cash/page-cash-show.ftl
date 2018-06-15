@@ -23,6 +23,7 @@
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
 
 <div class="container " id="container" style="oveflow:scroll">
    <div class="row">
@@ -95,7 +96,11 @@ var containerVue = new Vue({
 						}
 						containerVue.search.count = jsonRet.pageCond.count;
 					}else{
-						alertMsg('错误提示',jsonRet.errmsg);
+						if(jsonRet.errcode === -100000){
+							$('#ajaxLoginModal').modal('show');
+						}else{
+							alertMsg('错误提示',jsonRet.errmsg);
+						}
 					}
 				},
 				dataType: 'json'
@@ -165,7 +170,11 @@ var delCashApplyVue = new Vue({
 					if(jsonRet.errcode == 0){
 						containerVue.getAll();
 					}else{
-						alertMsg('错误提示',jsonRet.errmsg);
+						if(jsonRet.errcode === -100000){
+							$('#ajaxLoginModal').modal('show');
+						}else{
+							alertMsg('错误提示',jsonRet.errmsg);
+						}
 					}
 				},
 				dataType: 'json'

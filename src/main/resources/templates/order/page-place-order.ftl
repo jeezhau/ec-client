@@ -30,6 +30,7 @@
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+<#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
 
 <#if goods??>
 <div class="container goods-container" id="container" style="padding:0 0;overflow:scroll">
@@ -310,7 +311,7 @@ var containerVue = new Vue({
 				method:'get',
 				data: {},
 				success: function(jsonRet,status,xhr){
-					if(jsonRet.receiver){
+					if(jsonRet && jsonRet.receiver){
 						containerVue.param.recvId = jsonRet.receiver.recvId;
 						containerVue.param.recvPhone = jsonRet.receiver.phone;
 						containerVue.param.recvName = jsonRet.receiver.receiver;
@@ -320,7 +321,11 @@ var containerVue = new Vue({
 						containerVue.param.recvArea = jsonRet.receiver.area;
 						containerVue.param.recvAddr = jsonRet.receiver.addr;
 					}else{
-						//alertMsg('错误提示','获取默认收货人信息失败！')
+						if(jsonRet && jsonRet.errcode === -100000){
+							$('#ajaxLoginModal').modal('show');
+						}else{
+							//alertMsg('错误提示','获取默认收货人信息失败！');
+						}
 					}
 				},
 				dataType: 'json'
@@ -374,7 +379,11 @@ var containerVue = new Vue({
 								containerVue.param.flag = 1;
 							}
 						}else{//出现逻辑错误
-							alertMsg('错误提示',jsonRet.errmsg);
+							if(jsonRet.errcode === -100000){
+								$('#ajaxLoginModal').modal('show');
+							}else{
+								alertMsg('错误提示',jsonRet.errmsg);
+							}
 						}
 					}else{
 						alertMsg('错误提示','系统数据访问失败！')

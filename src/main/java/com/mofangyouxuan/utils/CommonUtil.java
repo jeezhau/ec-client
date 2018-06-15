@@ -46,5 +46,17 @@ public class CommonUtil {
 		}
 		return ip;
 	}
+	
+
+	/**
+	 * 判断是否为ajax请求
+	 * @param request
+	 * @return
+	 */
+	public static boolean isAjaxRequest(HttpServletRequest request){  
+	    String header = request.getHeader("X-Requested-With");  
+	    boolean isAjax = "XMLHttpRequest".equals(header) ? true:false;  
+	    return isAjax;  
+	}
 
 }

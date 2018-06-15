@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -588,12 +587,12 @@ public class UserAction {
 			ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			UserBasic user = (UserBasic) map.get("userBasic");
-			if(user == null || !"1".equals(user.getStatus())) {
-				jsonRet.put("errmsg", "系统中没有该用户！");
-				jsonRet.put("errcode", -1);
-				return jsonRet;
-			}
+//			UserBasic user = (UserBasic) map.get("userBasic");
+//			if(user == null || !"1".equals(user.getStatus())) {
+//				jsonRet.put("errmsg", "系统中没有该用户！");
+//				jsonRet.put("errcode", -1);
+//				return jsonRet;
+//			}
 			if(!phone.matches(regexpPhone)) {
 				jsonRet.put("errcode","-1");
 				jsonRet.put("errmsg","手机号格式不正确！");
@@ -625,12 +624,12 @@ public class UserAction {
 			ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
-			UserBasic user = (UserBasic) map.get("userBasic");
-			if(user == null || !"1".equals(user.getStatus())) {
-				jsonRet.put("errmsg", "您当前还未开通会员账户！");
-				jsonRet.put("errcode", -1);
-				return jsonRet;
-			}
+//			UserBasic user = (UserBasic) map.get("userBasic");
+//			if(user == null || !"1".equals(user.getStatus())) {
+//				jsonRet.put("errmsg", "您当前还未开通会员账户！");
+//				jsonRet.put("errcode", -1);
+//				return jsonRet;
+//			}
 			if(!email.matches(regexpEmail)) {
 				jsonRet.put("errcode","-1");
 				jsonRet.put("errmsg","邮箱格式不正确！");

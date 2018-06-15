@@ -11,6 +11,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import com.mofangyouxuan.common.SysParam;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
+import com.mofangyouxuan.utils.CommonUtil;
 
 
 
@@ -37,7 +38,7 @@ public class UserSessionInterceptor extends HandlerInterceptorAdapter{
 		//String agent= request.getHeader("user-agent").toLowerCase();
 		//System.out.println(uri);
 		//不需要控制session的路径
-		String[] excluceUrl = {"/login","/user/headimg/show/","/srvcenter/index/"}; 
+		String[] excluceUrl = {"/user/vericode/email/apply","/user/vericode/phone/apply","/user/headimg/show/","/srvcenter/index/"}; 
 		String isDayFresh = (String) request.getSession().getAttribute("isDayFresh");
 		String sysFunc = (String) request.getSession().getAttribute("sys_func");
 		if(isDayFresh == null) {
@@ -57,10 +58,17 @@ public class UserSessionInterceptor extends HandlerInterceptorAdapter{
 		if(vipBasic != null && vipBasic.getVipId() != null) {
 			return true;
 		}
+		
 		if(userBasic == null || userBasic.getUserId() == null) {
-			session.setAttribute("fromUrl", uri);
-			response.sendRedirect(serverName + "/login");
-			return false;
+			if(!CommonUtil.isAjaxRequest(request)) {
+				session.setAttribute("fromUrl", uri);
+				response.sendRedirect(serverName + "/login");
+				return false;
+			}else {
+				session.setAttribute("fromUrl", uri);
+				response.sendRedirect(serverName + "/login-ajax");
+				return false;
+			}
 		}
 		//保存访问日志
 		

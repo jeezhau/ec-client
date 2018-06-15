@@ -23,9 +23,10 @@
     <script src="/script/common.js"></script>
 </head>
 <body class="light-gray-bg">
-
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
+
 <div class="container" id="container" style="padding:0;oveflow:scroll">
    <div class="row">
      <h3 class="row" style="margin:5px 0;text-align:center" >商品评价({{appr.apprCnt}})</h3>
@@ -116,7 +117,11 @@ var containerVue = new Vue({
 							containerVue.param.begin = jsonRet.pageCond.begin;
 							containerVue.appr.apprCnt = jsonRet.pageCond.count;
 						}else{
-							;
+							if(jsonRet && jsonRet.errcode === -100000){
+								$('#ajaxLoginModal').modal('show');
+							}else{
+								//alertMsg('错误提示',jsonRet.errmsg);
+							}
 						}
 					},
 					failure:function(){

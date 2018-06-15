@@ -23,9 +23,9 @@
     <script src="/script/common.js"></script>
 </head>
 <body class="light-gray-bg">
-
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8"> 
+<#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
 
 <div class="container" id="container" style="margin:0;padding:0;overflow:scroll;margin-bottom:50px">
   <div class="row" >
@@ -160,7 +160,11 @@ var containerVue = new Vue({
 							}
 							containerVue.search.count = containerVue.search.count+1;
 						}else{//出现逻辑错误
-							alertMsg('错误提示',jsonRet.errmsg);
+							if(jsonRet.errcode === -100000){
+								$('#ajaxLoginModal').modal('show');
+							}else{
+								alertMsg('错误提示',jsonRet.errmsg);
+							}
 						}
 					}else{
 						alertMsg('错误提示','系统数据访问失败！')
@@ -184,7 +188,11 @@ var containerVue = new Vue({
 							containerVue.metadata.accounts.push(jsonRet.datas[i]);
 						}
 					}else{
-						//alertMsg('错误提示',jsonRet.errmsg)
+						if(jsonRet.errcode === -100000){
+							$('#ajaxLoginModal').modal('show');
+						}else{
+							//alertMsg('错误提示',jsonRet.errmsg);
+						}
 					}
 				},
 				dataType: 'json'

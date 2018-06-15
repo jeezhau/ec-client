@@ -18,10 +18,12 @@
     <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     
     <link href="/css/weui.css" rel="stylesheet">
-    
     <link href="/css/mfyx.css" rel="stylesheet">
 </head>
 <body class="light-gray-bg">
+<#include "/common/tpl-msg-alert.ftl" encoding="utf8">
+<#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
+
 <div class="container " id="container" style="oveflow:scroll">
    <div class="row">
      <a class="col-xs-2" href="/complain/manage/order" style="vertical-algin:center;text-align:center"><img width="15px" height="15px" alt="" src="/icons/返回.png"></a>
@@ -85,7 +87,11 @@ var containerVue = new Vue({
 						}
 						containerVue.search.count = jsonRet.pageCond.count;
 					}else{
-						alertMsg('错误提示',jsonRet.errmsg);
+						if(jsonRet.errcode === -100000){
+							$('#ajaxLoginModal').modal('show');
+						}else{
+							alertMsg('错误提示',jsonRet.errmsg);
+						}
 					}
 				},
 				dataType: 'json'

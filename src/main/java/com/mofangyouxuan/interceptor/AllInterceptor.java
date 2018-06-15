@@ -99,7 +99,8 @@ public class AllInterceptor extends HandlerInterceptorAdapter{
 		if(userBasic == null) {//发起注册
 			userBasic = WebAuth.getUserInfo(auth);
 			if(userBasic != null) {
-				JSONObject ret = UserService.createUserBasic(userBasic);
+				userBasic.setRegistType("2");
+				JSONObject ret = UserService.createUser(userBasic,"");
 				if(ret != null && ret.containsKey("errcode") && ret.getIntValue("errcode") ==0) {
 					//用户信息注册成功
 					;

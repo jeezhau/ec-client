@@ -9,6 +9,7 @@ package com.mofangyouxuan.common;
 public class ErrCodes {
 	
 	//通用功能码：100
+	public static int COMMON_NO_LOGIN = -100000;	//用户未登录
 	public static int COMMON_EXCEPTION = -100001; //出现系统异常
 	public static int COMMON_DB_ERROR = -100002;	//数据库处理失败
 	public static int COMMON_PARAM_ERROR = -100003;	//参数格式不正确

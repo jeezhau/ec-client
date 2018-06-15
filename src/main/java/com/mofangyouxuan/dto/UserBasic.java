@@ -53,8 +53,8 @@ public class UserBasic {
     @Size(max=20,message=" 移动电话： 最长 20 字符! ")
     private String phone;
 
-    @NotNull(message=" 注册方式：不可为空! ")
-    @Pattern(regexp="^[12]$",message=" 注册方式：取值范围[1-官方 ，2-微信]！")
+    //@NotNull(message=" 注册方式：不可为空! ")
+    //@Pattern(regexp="^[12]$",message=" 注册方式：取值范围[1-官方 ，2-微信]！")
     private String registType;
 
     private String openId;
