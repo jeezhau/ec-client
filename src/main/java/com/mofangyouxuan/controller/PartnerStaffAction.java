@@ -31,6 +31,7 @@ import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.PartnerStaff;
 import com.mofangyouxuan.dto.VipBasic;
+import com.mofangyouxuan.service.PartnerMgrService;
 import com.mofangyouxuan.service.PartnerStaffService;
 import com.mofangyouxuan.utils.PageCond;
 
@@ -41,7 +42,7 @@ import com.mofangyouxuan.utils.PageCond;
  */
 @Controller
 @RequestMapping("/pstaff")
-@SessionAttributes({"sys_func"})
+@SessionAttributes({"sys_func","SYS_PARTNERID"})
 public class PartnerStaffAction {
 
 	@Value("${sys.tmp-file-dir}")
@@ -58,7 +59,7 @@ public class PartnerStaffAction {
 		PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");
 		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
 			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
-			return "forward:/partner/manage" ;
+			return "redirect:/partner/manage" ;
 		}
 		
 		map.put("sys_func", "partner-pstaff");
@@ -77,7 +78,7 @@ public class PartnerStaffAction {
 		String partnerUserTP = (String) session.getAttribute("partnerUserTP");
 		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
 			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
-			return "forward:/partner/manage" ;
+			return "redirect:/partner/manage" ;
 		}
 		PartnerStaff staff = null;
 		if(!"bindVip".equals(partnerUserTP)) {//员工自己修改
@@ -445,7 +446,25 @@ public class PartnerStaffAction {
 		}
 	}
 	
-	
+	/**
+	 * 获取客服信息
+	 * @param partnerId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/kfshow/{partnerId}")
+	public String showKf(@PathVariable("partnerId")Integer partnerId,
+			String tagId,ModelMap map) {
+		PartnerBasic partner = PartnerMgrService.getPartnerById(partnerId);
+		if(partner == null || !"S".equals(partner.getStatus())) {
+			map.put("errmsg", "系统中没有该商户信息！");
+		}else {
+			map.put("tagId", tagId);
+			map.put("partner", partner);
+		}
+		map.put("sys_func", "partner-syskf");
+		return "pstaff/page-staffkf-show";
+	}
 	
 	/**
 	 * 查询指定查询条件、排序条件、分页条件的信息；
@@ -494,7 +513,33 @@ public class PartnerStaffAction {
 		}
 		return jsonRet.toString();
 	}
-	
+
+	/**
+	 * 获取客服人员信息
+	 * @param partnerId	合作伙伴ID
+	 * @param tagId	
+	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
+	 */
+	@RequestMapping("/getkf/{partnerId}")
+	@ResponseBody
+	public Object getAllKF(@PathVariable("partnerId")Integer partnerId,
+			String tagId,HttpSession session) {
+		JSONObject jsonRet = new JSONObject();
+		try {
+			JSONObject search = new JSONObject();
+			search.put("isKf", "1");
+			if(tagId != null && !"".equals(tagId)) {
+				search.put("tagId", tagId);
+			}
+			PageCond pageCond = new PageCond(0,20);
+			jsonRet = PartnerStaffService.getPartnersAll(partnerId, search, pageCond);
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "系统异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
+	}
 	
 	private PartnerStaff getStaffByUser(Integer partnerId,Integer userId) {
 		JSONObject jsonRet = new JSONObject();

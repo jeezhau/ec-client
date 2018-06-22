@@ -36,7 +36,7 @@
     <div style="height:50px;background-color:#E0E0E0 ;margin-bottom:0px;"></div>
     <!-- 基本信息管理-->
     <div class="row" id="userBasic" style="display:<#if mode='basic'>block<#else>none</#if>"> 
-      <div class="row" style="padding:10px 10px;background-color:#880000">
+      <div class="row" style="margin:0 1px;padding:10px 10px;background-color:#880000">
         <div class="row" style="margin:3px 25%;vertical-algin:center;text-align:center">
           <#if ((userBasic.headimgurl)!'')?starts_with('http')>
              <img alt="" src="${userBasic.headimgurl}" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" > 
@@ -129,7 +129,7 @@
            </a>
          </li>
          <li style="background-color:white" >
-           <a href="#">
+           <a href="/shop/kfshow/${SYS_PARTNERID?string('#')}?tagId=kf4common">
              <span class=" pull-right" > 联系我们  &gt;</span>
              <img alt="" src="/icons/客服.png" width="20px" height="20px"> 官方客服
            </a>
@@ -164,7 +164,7 @@
     
     <!-- 会员信息管理-->
     <div class="row" id="userVip" style="display:<#if mode='vip'>block<#else>none</#if>"> 
-      <div class="row" style="padding:10px 10px;background-color:#880000">
+      <div class="row" style="margin:0 1px;padding:10px 10px;background-color:#880000">
         <div class="row" style="margin:5px 20px 3px 20px;color:gray">
           <span class="pull-left"><img alt="" src="/icons/vip.png" width="25px" height="25px"> </span>
           <span class="pull-right">${(vipBasic.vipId)?string('#')}</span>
@@ -187,7 +187,7 @@
         </div>
       </div>
       <div class="row" style="margin:30px 1px 15px 1px;text-align:center;vertical-align:center">
-      	<div class="col-xs-4" style="padding:3px;">
+      	<div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
 	       <div style="background-color:white">
 		   <a href="<#if vipBasic.status = '1'>/vip/vipset<#else>javascript:;</#if>">
 			    <img alt="" src="/icons/账户设置.png" width="90px" height="90px"> 
@@ -195,7 +195,7 @@
 			</a>
 	       </div>
 	    </div>
-	    <div class="col-xs-4" style="padding:3px;">
+	    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
 	      <div style="background-color:white;">
 		    <a href="<#if vipBasic.status = '1'>/cash/manage<#else>javascript:;</#if>" >
 			    <img alt="" src="/icons/提现.png" width="90px" height="90px">
@@ -203,7 +203,7 @@
 			</a>
 	      </div>
 	    </div>
-	    <div class="col-xs-4" style="padding:3px;">
+	    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
 	       <div style="background-color:white">
 		    <a href="<#if vipBasic.status = '1'>/vip/flow/show<#else>javascript:;</#if>">
 			    <img alt="" src="/icons/查看明细.png" width="90px" height="90px"> 
@@ -211,15 +211,15 @@
 			</a>
 		  </div>
 	    </div>
-	    <div class="col-xs-4" style="padding:3px;">
+	    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
 	       <div style="background-color:white">
-		    <a href="<#if vipBasic.status = '1'><#else>javascript:;</#if>">
+		    <a href="<#if vipBasic.status = '1'>/shop/kfshow/${SYS_PARTNERID?string('#')}?tagId=kf4vip<#else>javascript:;</#if>">
 			    <img alt="" src="/icons/客服.png" width="90px" height="90px"> 
 			    <p >官方客服</p>
 			</a>
 	       </div>
 	    </div>
-	    <div class="col-xs-4" style="padding:3px;">
+	    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
 	       <div style="background-color:white">
 		   <a href="<#if vipBasic.status = '1'>/partner/manage<#else>javascript:;</#if>">
 			    <img alt="" src="/icons/合作伙伴.png" width="90px" height="90px"> 

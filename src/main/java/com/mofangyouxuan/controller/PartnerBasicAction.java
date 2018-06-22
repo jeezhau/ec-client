@@ -54,8 +54,8 @@ public class PartnerBasicAction {
 	@Value("${sys.tmp-file-dir}")
 	private String tmpFileDir;
 	
-	private Integer openPartnerNeedScore = 2000; //开通合作伙伴需要多少积分
-	private String[] certTypeArr = {"logo","idcard1","idcard2","licence"}; 	//当前支持的证件类型
+	private Integer openPartnerNeedScore = 1500; //开通合作伙伴需要多少积分
+	private String[] certTypeArr = {"logo","idcard1","idcard2","licence","agreement"}; 	//当前支持的证件类型
 	
 	/**
 	 * 选择合作伙伴登录
@@ -78,7 +78,7 @@ public class PartnerBasicAction {
 		map.put("userTp", userTp);
 		map.put("userId", userId);
 		map.put("partnerId", partnerId);
-
+		
 		if(!"bindVip".equals(userTp) && !"staff".equals(userTp)) {
 			map.put("errmsg", "用户类型不正确！");
 			return "partner/page-partner-login";
@@ -174,9 +174,11 @@ public class PartnerBasicAction {
 		
 		VipBasic partnerBindVip = (VipBasic) session.getAttribute("partnerBindVip");
 		PartnerStaff partnerStaff = (PartnerStaff) session.getAttribute("partnerStaff");
+		PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");
 		map.put("partnerUserTP", partnerUserTP);
 		map.put("partnerBindVip", partnerBindVip);
 		map.put("partnerStaff", partnerStaff);
+		map.put("myPartner", myPartner);
 		
 		map.put("sys_func", "partner-manage");
 		return "partner/page-partner-manage";

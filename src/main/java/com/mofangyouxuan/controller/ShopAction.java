@@ -24,8 +24,6 @@ import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.Category;
 import com.mofangyouxuan.dto.Goods;
 import com.mofangyouxuan.dto.PartnerBasic;
-import com.mofangyouxuan.dto.PartnerStaff;
-import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.service.PartnerMgrService;
 import com.mofangyouxuan.service.PartnerStaffService;
@@ -256,12 +254,16 @@ public class ShopAction {
 	 */
 	@RequestMapping("/kfstaff/getall/{partnerId}")
 	@ResponseBody
-	public Object getPartnerKf(@PathVariable("partnerId")Integer partnerId,
+	public Object getAllKf(@PathVariable("partnerId")Integer partnerId,
+			String tagId,
 			HttpSession session) {
 		JSONObject jsonRet = new JSONObject();
 		try {
 			JSONObject search = new JSONObject();
 			search.put("isKf", "1");
+			if(tagId != null && !"".equals(tagId)) {
+				search.put("tagId", tagId);
+			}
 			jsonRet = PartnerStaffService.getPartnersAll(partnerId, search, new PageCond(0,10));
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -280,14 +282,16 @@ public class ShopAction {
 	 * @return
 	 */
 	@RequestMapping("/kfshow/{partnerId}")
-	public String showPartnerKf(@PathVariable("partnerId")Integer partnerId,ModelMap map) {
+	public String showPartnerKf(@PathVariable("partnerId")Integer partnerId,
+			String tagId,ModelMap map) {
 		PartnerBasic partner = PartnerMgrService.getPartnerById(partnerId);
 		if(partner == null || !"S".equals(partner.getStatus())) {
 			map.put("errmsg", "系统中没有该商户信息！");
 		}else {
+			map.put("tagId", tagId);
 			map.put("partner", partner);
 		}
-		return "shop/page-partnerkf-show";
+		return "shop/page-kf-show";
 	}
 	
 	/**

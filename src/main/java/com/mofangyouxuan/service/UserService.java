@@ -321,7 +321,7 @@ public class UserService {
 		String url = messmpServerUrl + emailVeriCodeGetUrl;
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("email", email);
-		String strRet = HttpUtils.doPostSSL(url, params);
+		String strRet = HttpUtils.doPost(url, params);
 		try {
 			JSONObject jsonRet = JSONObject.parseObject(strRet);
 			return jsonRet;
@@ -340,7 +340,7 @@ public class UserService {
 		String url = messmpServerUrl + phoneVeriCodeGetUrl;
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("phone", phone);
-		String strRet = HttpUtils.doPostSSL(url, params);
+		String strRet = HttpUtils.doPost(url, params);
 		try {
 			JSONObject jsonRet = JSONObject.parseObject(strRet);
 			return jsonRet;

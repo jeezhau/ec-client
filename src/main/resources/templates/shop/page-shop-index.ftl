@@ -69,18 +69,16 @@ var containerVue = new Vue({
 	 getAll: function(isRefresh,isFirst){
 		 $("#loadingData").show();
 		 $("#nomoreData").hide();
-		 if(containerVue.goodsList.length>100){
-		 	containerVue.goodsList = [];
-		 }
 		 if(isRefresh){ //清空数据
 			 containerVue.goodsCnt = 0;
 			 containerVue.goodsList = [];
-		 }
-		 if(containerVue.goodsList.lenght>=300){
-			 if(isFirst){//清除后一百条
-				 containerVue.goodsList.splice(200,100);
-			 }else{
-				 containerVue.goodsList.splice(0,100); 
+		 }else{
+			 if(containerVue.goodsList.lenght >= 300){
+				 if(isFirst){//清除后一百条
+					 containerVue.goodsList.splice(200,100);
+				 }else{//清除前一百条
+					 containerVue.goodsList.splice(0,100); 
+				 }
 			 }
 		 }
 		 $.ajax({
@@ -154,14 +152,16 @@ var containerVue = new Vue({
      var pageHieght = $(document.body).height();  
      var scrollHeight = $(window).scrollTop(); //滚动条top   
      var r = (pageHieght - winHeight - scrollHeight) / winHeight;
-     if (r < 0.5) {//上拉翻页 
+     if (r>=0 && r < 0.2) {//上拉翻页 
     	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
     	 	containerVue.getAll(false,false);
      }
      if(scrollHeight<0){ //下拉翻页
-    	 	var cnt = containerVue.goodsList.length%containerVue.param.pageSize;
- 		cnt = containerVue.goodsList - cnt;
-	 	containerVue.param.begin = containerVue.param.begin - cnt;
+    	 var currPageCnt = containerVue.goodsList.length%containerVue.param.pageSize;//当前页的数量
+ 		if(currPageCnt == 0){
+ 			currPageCnt = containerVue.param.pageSize;
+ 		}
+	 	containerVue.param.begin = containerVue.param.begin - (containerVue.goodsList.length-currPageCnt);//总数据的开始
     	 	containerVue.param.begin = containerVue.param.begin - containerVue.param.pageSize;
      	if(containerVue.param.begin <= 0){
      		containerVue.param.begin = 0;

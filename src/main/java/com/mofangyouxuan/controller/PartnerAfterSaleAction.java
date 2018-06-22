@@ -38,8 +38,9 @@ public class PartnerAfterSaleAction {
 		map.put("status", status);
 		map.put("sys_func", "aftersales");
 		PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
-		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus())) ){
-			map.put("errmsg", "您还未开通合作伙伴功能或状态限制！");
+		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
+			return "redirect:/partner/manage" ;
 		}
 		
 		map.put("sys_func", "partner-aftersale");

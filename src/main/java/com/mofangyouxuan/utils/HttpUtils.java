@@ -54,7 +54,7 @@ import org.apache.http.util.EntityUtils;
 public class HttpUtils {
     private static RequestConfig requestConfig;	
     //private static String TEMP_FILE_DIR = "";			//文件临时保存目录
-    private static final int MAX_TIMEOUT = 7000;	//连接超时
+    private static final int MAX_TIMEOUT = 30000;	//连接超时
 
     static {
         RequestConfig.Builder configBuilder = RequestConfig.custom();

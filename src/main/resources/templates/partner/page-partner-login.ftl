@@ -36,13 +36,13 @@
     <div v-if="params.userTp == 'staff'" class="form-group">
       <label class="col-xs-4 control-label" style="padding-right:3px">合作伙伴ID</label>
     	  <div class="input-group" style="padding-left:3px">
-        <input class="form-control" type="text" name="partnerId" value="${partnerId!''}" v-bind:required="params.userTp == 'staff'" placeholder="合作伙伴ID">           
+        <input class="form-control" type="text" name="partnerId" value="${(partnerId!0)?string('#')}" v-bind:required="params.userTp == 'staff'" placeholder="合作伙伴ID">           
       </div>	
     	</div>
     	<div class="form-group">
     	  <label class="col-xs-4 control-label" style="padding-right:3px">用户ID</label>
     	  <div class="input-group" style="padding-left:3px">
-           <input class="form-control" type="text" name="userId" value= "${userId!''}" required placeholder="员工ID或绑定会员ID">           
+           <input class="form-control" type="text" name="userId" value= "${(userId!0)?string('#')}" required placeholder="员工ID或绑定会员ID">           
       </div>	
     	</div>
     	<div class="form-group">

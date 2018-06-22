@@ -58,7 +58,7 @@ public class GoodsAction {
 		PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
 		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
 			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
-			return "forward:/partner/manage" ;
+			return "redirect:/partner/manage" ;
 		}
 		@SuppressWarnings("unchecked")
 		List<Category> categories = (List<Category>) map.get("categories");
@@ -83,7 +83,7 @@ public class GoodsAction {
 		PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
 		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
 			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
-			return "forward:/partner/manage" ;
+			return "redirect:/partner/manage" ;
 		}
 		
 		Goods goods = null;
@@ -93,12 +93,12 @@ public class GoodsAction {
 				JSONObject ret = GoodsService.getGoods(false,goodsId,true);
 				if(ret == null || !ret.containsKey("goods")) {
 					map.put("errmsg", "没有获取到该指定商品信息！");
-					return "forward:/goods/manage";
+					return "redirect:/goods/manage";
 				}else {
 					goods = JSONObject.toJavaObject(ret.getJSONObject("goods"),Goods.class);
 					if(!goods.getPartnerId().equals(myPartner.getPartnerId())) {
 						map.put("errmsg", "您无权处理该商品信息！");
-						return "forward:/goods/manage";
+						return "redirect:/goods/manage";
 					}
 				}
 			}else {
@@ -590,7 +590,7 @@ public class GoodsAction {
 			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
 			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
 				map.put("errmsg", "您还未开通合作伙伴或状态限制！");
-				return "forward:/partner/manage" ;
+				return "redirect:/partner/manage" ;
 			}
 			JSONObject obj = GoodsService.getGoods(true,goodsId,true);
 			if(obj == null || !obj.containsKey("goods")) {

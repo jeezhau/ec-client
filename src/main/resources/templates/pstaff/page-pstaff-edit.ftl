@@ -91,28 +91,39 @@
 	    <textarea class="form-control" v-model="params.introduce" maxLength=600  placeholder="请输入员工职责介绍" ></textarea>
 	  </div>
 	</div>
-	<#if partnerUserTP=='bindVip'>
+	
 	<div class="form-group">
 	  <label class="col-xs-4 control-label" style="padding-right:1px">授予职能标签</label>
 	  <div class="col-xs-8" style="padding-left:1px">
+	    <#if partnerUserTP=='bindVip'>
 	    <select class="form-control" v-model="tagListArr" multiple placeholder="请选择授予员工的职能管理标签" >
-	      <option value="basic">合作伙伴基本信息管理</option>
+	    <#else>
+	    <select class="form-control" v-model="tagListArr" multiple disabled placeholder="请选择授予员工的职能管理标签" >
+	    </#if> 
+	      <option value="basic">基本信息管理</option>
 	      <option value="pimage">图库管理</option>
 	      <option value="postage">运费模版管理</option>
 	      <option value="goods">商品管理</option>
 	      <option value="saleorder">销售订单管理</option>
-	      <option value="saleorder">售后服务处理</option>
+	      <option value="aftersale">售后服务处理</option>
+	      <option value="mypartners">推广下级管理</option>
+	      
+	      <#if myPartner.partnerId == SYS_PARTNERID>
+	      <option value="cashapplydeal">系统处理-提现处理</option>
+	      <option value="kf4common">系统客服-用户(通用)</option>
+	      <option value="kf4vip">系统客服-VIP</option>
+	      <option value="kf4partner">系统客服-合作伙伴</option>
+	      </#if>
 	    </select>
 	  </div>
 	</div>
-	<#if (staff.recId) == 0 >
+	<#if partnerUserTP=='bindVip' &&  (staff.recId) == 0 >
 	<div class="form-group">
 	  <label class="col-xs-4 control-label" style="padding-right:1px">初始密码<span style="color:red" >*</span></label>
 	  <div class="col-xs-8" style="padding-left:1px">
 	    <input type="text" class="form-control" v-model="params.passwd" maxLength=10 required placeholder="请输入员工的初始密码" >
 	  </div>
 	</div>
-	</#if>
 	</#if>	
 	<div class="form-group">
 	  <label class="col-xs-4 control-label" style="padding-right:1px">是否客服<span style="color:red" >*</span></label>
@@ -128,13 +139,13 @@
 	</div>
 	<#if partnerUserTP=='staff'>
 	<div v-show="${(staff.isKf)!''} == '1' " class="form-group">
-	    <label class="col-xs-12 control-label" style="padding-right:1px">客服二维码<span style="color:red">*</span></label>
+	    <label class="col-xs-12 control-label" style="padding-right:1px">对外客服二维码<span style="color:red">*</span></label>
 	    <div class="col-xs-12">
 	        <input class="form-control" id="kfqrcode"  type="file" name="image" type="file" accept="image/*" class="file-loading">
 	    </div>
 	</div>
 	<div v-show="${(staff.isKf)!''} == '1' " class="form-group">
-	    <label class="col-xs-12 control-label" style="padding-right:1px">客服二维码<span style="color:red">*</span></label>
+	    <label class="col-xs-12 control-label" style="padding-right:1px">头像<span style="color:red">*</span></label>
 	    <div class="col-xs-12">
 	        <input class="form-control" id="headimg"  type="file" name="image" type="file" accept="image/*" class="file-loading">
 	    </div>
@@ -237,7 +248,7 @@ $(document).on('ready', function() {
         },
         <#if (staff.isKf=='1' && ((staff.userId)!0) gt 0) >
         initialPreview: [ //预览图片的设置
-            '<img src="/pstaff/${staff.partnerId}/show/${(staff.userId)?string("#")}/kfqrcode" alt="客服二维码照片" class="file-preview-image" style="width:96px">'
+            '<img src="/pstaff/${(staff.partnerId)?string('#')}/show/${(staff.userId)?string("#")}/kfqrcode" alt="客服二维码照片" class="file-preview-image" style="width:96px">'
         ]
         </#if>
     });
@@ -251,7 +262,7 @@ $(document).on('ready', function() {
     		var jsonRet = data.response;
     		if(jsonRet){
 			if(0 == jsonRet.errcode){
-				alertMsg('系统提示',"客服二维码文件上传成功！！");
+				//alertMsg('系统提示',"客服二维码文件上传成功！！");
 			}else{//出现逻辑错误
 				alertMsg('错误提示',jsonRet.errmsg);
 				$('#kfqrcode').fileinput('clear');
@@ -288,7 +299,7 @@ $(document).on('ready', function() {
         },
         <#if (staff.isKf=='1' && ((staff.userId)!0) gt 0) >
         initialPreview: [ //预览图片的设置
-            '<img src="/pstaff/${staff.partnerId}/show/${(staff.userId)?string("#")}/headimg" alt="员工头像" class="file-preview-image" style="width:96px">'
+            '<img src="/pstaff/${(staff.partnerId)?string('#')}/show/${(staff.userId)?string("#")}/headimg" alt="员工头像" class="file-preview-image" style="width:96px">'
         ]
         </#if>
     });
@@ -302,7 +313,7 @@ $(document).on('ready', function() {
     		var jsonRet = data.response;
     		if(jsonRet){
 			if(0 == jsonRet.errcode){
-				alertMsg('系统提示',"员工头像文件上传成功！！");
+				//alertMsg('系统提示',"员工头像文件上传成功！！");
 			}else{//出现逻辑错误
 				alertMsg('错误提示',jsonRet.errmsg);
 				$('#headimg').fileinput('clear');

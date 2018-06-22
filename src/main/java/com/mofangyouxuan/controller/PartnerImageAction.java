@@ -60,7 +60,7 @@ public class PartnerImageAction {
 		PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
 		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
 			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
-			return "forward:/partner/manage" ;
+			return "redirect:/partner/manage" ;
 		}
 		map.put("sys_func", "partner-image");
 		return "pimage/page-image-manage";

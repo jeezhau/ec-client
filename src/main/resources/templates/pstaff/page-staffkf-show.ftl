@@ -49,11 +49,11 @@ var containerVue = new Vue({
 		getAllKF: function(){
 		 	containerVue.dataList = [];
 		 	$.ajax({
-				url: '/shop/kfstaff/getall/${(partner.partnerId)?string("#")}',
+				url: '/pstaff/getkf/${SYS_PARTNERID?string("#")}',
 				method:'post',
-				data: {},
+				data: {'tagId':'kf4partner'},
 				success: function(jsonRet,status,xhr){
-					if(jsonRet && jsonRet.errcode == 0){//
+					if(jsonRet && jsonRet.datas){
 						for(var i=0;i<jsonRet.datas.length;i++){
 							containerVue.dataList.push(jsonRet.datas[i]);
 						}
@@ -68,21 +68,7 @@ containerVue.getAllKF();
 </script>
 
 <footer >
-  <div class="row" style="margin:50px 0"></div>
-  <div class="weui-tabbar" style="position:fixed;left:0px;bottom:0px">
-    	<a href="/shop/index" class="weui-tabbar__item " >
-	    <span style="display: inline-block;position: relative;">
-	        <img src="/icons/首页.png" alt="" class="weui-tabbar__icon">
-	    </span>
-	    <p class="weui-tabbar__label">商城首页</p>
-	</a>
-    <a href="/shop/mcht/${(partner.partnerId)?string('#')}" class="weui-tabbar__item " >
-	    <span style="display: inline-block;position: relative;">
-	        <img src="/icons/商家.png" alt="" class="weui-tabbar__icon">
-	    </span>
-	    <p class="weui-tabbar__label">进入商家</p>
-    </a>      	
-  </div>
+   <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
 </footer>
 </#if>
 

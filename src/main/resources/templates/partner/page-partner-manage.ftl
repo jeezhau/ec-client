@@ -24,23 +24,29 @@
 <body class="light-gray-bg">
 <div class="container" style="oveflow:scroll">
   <div class="row">
-     <h3 style="margin:10px 0;text-align:center" >我是合作伙伴</h3>
+     <h3 style="margin:10px 0;text-align:center" >
+     <#if (myPartner.partnerId)??>
+     <span>${myPartner.busiName}(ID:${(myPartner.partnerId)?string('#')})</span>
+     <#else>
+     <span>我是合作伙伴</span>
+     </#if>
+     </h3>
   </div>
-  <div class="row" style="margin:30px 10px;text-align:center;vertical-align:center">
+  <div class="row" style="margin:30px 0px;text-align:center;vertical-align:center">
     <#if (partnerUserTP=='bindVip') || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('basic') )>
-    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
       <div style="background-color:white">
 	    <a href="/partner/edit" >
 		    <img src="/icons/合作伙伴-申请开通.png" alt="" width="90px" height="90px">
-		    <p >基础信息管理</p>
+		    <p >我的信息</p>
 		</a>
       </div>
     </div>
     </#if>
     
-    <#if ((myPartner.pbTp)!'')=='1'>
+  <#if ((myPartner.pbTp)!'')=='1'>
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('pimage')) >
-    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/pimage/manage" >
 		    <img src="/icons/图库管理.png" alt="" width="90px" height="90px">
@@ -50,7 +56,7 @@
     </div>
     </#if>
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('postage')) >
-    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/postage/manage" >
 		    <img src="/icons/运费模板管理.png" alt="" width="90px" height="90px">
@@ -60,7 +66,7 @@
     </div>
     </#if>
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('goods')) >
-    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/goods/manage" >
 		    <img src="/icons/商品管理.png" alt=""  width="90px" height="90px">
@@ -70,7 +76,7 @@
     </div>
     </#if>
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('saleorder')) >
-    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/psaleorder/show/all" >
 		    <img src="/icons/销售订单.png" alt="" width="90px" height="90px">
@@ -80,7 +86,7 @@
     </div>
     </#if>
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('aftersale')) >
-    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/paftersale/manage/refunding" >
 		    <img src="/icons/售后服务.png" alt="" width="90px" height="90px">
@@ -89,29 +95,29 @@
        </div>
     </div>
     </#if>
-    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/paftersale/manage/refunding" >
 		    <img src="/icons/投诉.png" alt="" width="90px" height="90px">
-		    <p >我要投诉</p>
+		    <p >投诉上级或平台</p>
 		</a>
        </div>
     </div>
-    </#if>
+  </#if>
     
-    <#if ((myPartner.pbTp)!'')=='2' >
-    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('aftersale')) >
-    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+  <#if ((myPartner.pbTp)!'')=='2' >
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('mypartners')) >
+    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
        <div style="background-color:white">
-	    <a href="/paftersale/manage/refunding" >
+	    <a href="/mypartners/manage" >
 		    <img src="/icons/下级管理.png" alt="" width="90px" height="90px">
 		    <p >下级管理</p>
 		</a>
        </div>
     </div>
     </#if>     
-    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('aftersale')) >
-    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('review')) >
+    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/paftersale/manage/refunding" >
 		    <img src="/icons/信息审核.png" alt="" width="90px" height="90px">
@@ -120,10 +126,10 @@
        </div>
     </div>
     </#if>   
-    </#if>
+  </#if>
     
-    <#if (myPartner.pbTp)??>     
-    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+  <#if (myPartner.pbTp)??>     
+    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/pstaff/manage" >
 		    <img src="/icons/员工管理.png" alt="" width="90px" height="90px">
@@ -131,15 +137,15 @@
 		</a>
        </div>
     </div>    
-    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="padding:8px;">
+    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
        <div style="background-color:white">
-	    <a href="/pstaff/manage" >
+	    <a href="/pstaff/kfshow/${SYS_PARTNERID?string('#')}?tagId=kf4partner" >
 		    <img src="/icons/客服.png" alt="" width="90px" height="90px">
 		    <p >官方客服</p>
 		</a>
        </div>
     </div>
-    </#if>
+  </#if>
        
   </div>
   <div class="row" style="margin-top:3px;vertical-align:center">

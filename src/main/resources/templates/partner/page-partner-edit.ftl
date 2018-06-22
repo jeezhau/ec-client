@@ -100,10 +100,20 @@
          </#if>
             <option value="" disabled>请选择合作伙伴类型...</option>
             <option value="1">特约商户</option>
-            <!-- <option value="2">推广招商</option> -->
+            <option value="2">招商推广</option>
           </select>
         </div>
       </div> 
+      <div v-if="param.pbTp==='1'" class="form-group">
+        <label class="col-xs-4 control-label" style="padding-right:1px">推广上级ID<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:1px">
+         <#if !(myPartner.partnerId)??>
+          <input class="form-control"  v-model="param.upPartnerId" maxLength=11 required>
+         <#else>
+          <input class="form-control"  v-model="param.upPartnerId" disabled>
+         </#if>
+        </div>
+      </div>
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">经营名称<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
@@ -126,6 +136,7 @@
         <label class="col-xs-4 control-label" style="padding-right:1px">企业类型<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
           <select class="form-control" v-model="param.compType" required>
+            <option value="" disabled> 请选择企业类型... </option>
             <option value="1">小微商户</option>
             <option value="2">公司</option>
           </select>
@@ -154,14 +165,9 @@
         <div class="col-xs-8" style="padding-left:1px">
           <textarea class="form-control" v-model="param.introduce"  maxLength=600  rows=10 required placeholder="请输入10-600字符的企业经营简介"></textarea>
         </div>
-      </div>        
+      </div>
       <div class="form-group">
-        <div style="text-align:center">
-          <button type="button" class="btn btn-info" style="margin:20px;display:none" @click="getLocation"><span style="color:red">*</span>获取当前经营地址</button>
-        </div>
-      </div> 
-      <div class="form-group">
-	    <label class="col-xs-12 control-label" style="padding-right:1px">企业LOGO<span style="color:red">*</span></label>
+	    <label class="col-xs-12 control-label" >企业LOGO<span style="color:red">*</span></label>
 	    <div class="col-xs-12">
 	        <input class="form-control" id="logoImg"  type="file" name="image" type="file" accept="image/jpg" class="file-loading">
 	    </div>
@@ -178,9 +184,15 @@
 	      </div>
 	  </div>
 	  <div class="form-group">
-	    <label class="col-xs-12 control-label" style="padding-right:1px">公司营业执照或小微商户法人手持身份证正面照</label>
+	    <label class="col-xs-12 control-label" >公司营业执照或小微商户法人手持身份证正面照<span style="color:red" >*</span></label>
 	    <div class="col-xs-12">
 	        <input class="form-control" id="licenceImg"  type="file" name="image" type="file" accept="image/jpg" class="file-loading">
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    <label class="col-xs-12 control-label" >签约协议<span style="color:red" >*</span></label>
+	    <div class="col-xs-12">
+	        <input class="form-control" id="agreementImg"  type="file" name="image" type="file" accept="image/jpg" class="file-loading">
 	    </div>
 	  </div>
       <div class="form-group">
@@ -196,7 +208,8 @@
   	<h5 style="text-align:center">最新审批结果信息</h5>
   	<p>合作伙伴ID：{{review.partnerId}}</p>
   	<p>审批时间：{{review.reviewTime}}</p>
-  	<p>审批结果：{{getStatus()}} </p>
+  	<p>审批人：{{review.reviewOpr}}</p>
+  	<p>审批结果：{{getPartnerStatus(review.status)}} </p>
   	<p>审批意见：{{review.reviewLog}}</p>
   </div>
 </div><!-- end of container -->
@@ -207,6 +220,7 @@ var partnerContainerVue = new Vue({
 	data:{
 		initData:{
 			pbTp:'${(myPartner.pbTp)!"1"}',
+			upPartnerId:'${(myPartner.upPartnerId)!''}',
 			country:'中国',
 			province:'${(myPartner.province)!''}',
 			city:'${(myPartner.city)!''}',
@@ -229,13 +243,15 @@ var partnerContainerVue = new Vue({
 			areas:[]
 		},
 		review:{
-			partnerId:'${(myPartner.partnerId)!""}',
-			status:'${(myPartner.status)!"0"}',
+			partnerId:'<#if (myPartner.partnerId)??>${(myPartner.partnerId)?string("#")}</#if>',
+			status:'${(myPartner.status)!""}',
 			reviewTime:'${(myPartner.reviewTime)!''}' ,
+			reviewOpr:'${(myPartner.reviewOpr)!''}' ,
 			reviewLog:"${(myPartner.reviewLog)!''}"
 		},
 		param:{
 			pbTp:'${(myPartner.pbTp)!''}',
+			upPartnerId:'${(myPartner.upPartnerId)!''}',
 			country:'中国',
 			province:'${(myPartner.province)!''}',
 			city:'${(myPartner.city)!''}',
@@ -255,20 +271,6 @@ var partnerContainerVue = new Vue({
 		}
 	},
 	methods:{
-		getStatus: function(){
-    			if("0" == this.review.status) {
-    				return "待审核";
-    			}else if("1"== this.review.status) {
-    				return "严重违规关店";
-    			}else if("R" == this.review.status) {
-    				return "审核拒绝";
-    			}else if("S" == this.review.status) {
-    				return "审核通过";
-    			}else if("C" == this.review.status) {
-    				return "暂时关闭歇业";
-    			}
-        		return "其他";
-		},
 		getAllProvinces: function(){
 			$.ajax({
 				url: '/city/province/getall',
@@ -433,7 +435,7 @@ $(document).on('ready', function() {
         },
         <#if (myPartner.busiName)??>
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/logo/${(myPartner.partnerId)!''}" alt="LOGO照片" class="file-preview-image" style="width:96px">'
+            '<img src="/partner/cert/show/logo/${(myPartner.partnerId)?string('#')}" alt="LOGO照片" class="file-preview-image" style="width:96px">'
         ]
         </#if>
     });
@@ -484,7 +486,7 @@ $(document).on('ready', function() {
         },
         <#if (myPartner.busiName)??>
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/idcard1/${(myPartner.partnerId)!''}" alt="法人身份证正面" class="file-preview-image" style="width:96px">'
+            '<img src="/partner/cert/show/idcard1/${(myPartner.partnerId)?string('#')}" alt="法人身份证正面" class="file-preview-image" style="width:96px">'
         ]
         </#if>
     });
@@ -535,7 +537,7 @@ $(document).on('ready', function() {
         },
         <#if (myPartner.busiName)??>
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/idcard2/${(myPartner.partnerId)!''}" alt="法人身份证反面" class="file-preview-image" style="width:100px;height:100px">'
+            '<img src="/partner/cert/show/idcard2/${(myPartner.partnerId)?string('#')}" alt="法人身份证反面" class="file-preview-image" style="width:100px;height:100px">'
         ]
         </#if>
     });
@@ -586,7 +588,7 @@ $(document).on('ready', function() {
         },
         <#if (myPartner.busiName)??>
         initialPreview: [ //预览图片的设置
-            '<img src="/partner/cert/show/licence/${(myPartner.partnerId)!''}" alt="营业执照照片" class="file-preview-image" style="width:96px">'
+            '<img src="/partner/cert/show/licence/${(myPartner.partnerId)?string('#')}" alt="营业执照照片" class="file-preview-image" style="width:96px">'
         ]
         </#if>
     });
@@ -610,7 +612,57 @@ $(document).on('ready', function() {
 			$('#licenceImg').fileinput('clear');
 		}
     });
-     
+    
+    $("#agreementImg").fileinput({
+    	language: 'zh', //设置语言
+        uploadUrl: '/partner/cert/upload', //上传的地址
+        deleteUrl:'',
+        uploadAsync:true,
+        showUpload: true, //是否显示上传按钮
+        uploadExtraData:{'certType':'agreement'},
+        deleteExtraData:{},
+        allowedFileExtensions : ['jpg', 'png','jpeg'],//接收的文件后缀
+        dropZoneEnabled:false,
+        previewFileType: "image",
+        browseClass: "btn btn-success",
+        browseLabel: "Pick Image",
+        browseIcon: "<i class=\"glyphicon glyphicon-picture\"></i> ",
+        removeClass: "btn btn-danger",
+        removeLabel: "Delete",
+        removeIcon: "<i class=\"glyphicon glyphicon-trash\"></i> ",
+        uploadClass: "btn btn-info",
+        uploadLabel: "Upload",
+        uploadIcon: "<i class=\"glyphicon glyphicon-upload\"></i> ",
+        maxFileSize: 2024,//单位为kb，如果为0表示不限制文件大小
+        previewSettings: {
+            image: {width: "100px", height: "100px"},
+        },
+        <#if (myPartner.busiName)??>
+        initialPreview: [ //预览图片的设置
+            '<img src="/partner/cert/show/agreement/${(myPartner.partnerId)?string('#')}" alt="签约协议" class="file-preview-image" style="width:96px">'
+        ]
+        </#if>
+    });
+    //异步上传错误结果处理
+    $('#agreementImg').on('fileerror', function(event, data, msg) {
+		alertMsg('错误提示',"签约协议文件上传失败！");
+		$('#agreementImg').fileinput('clear');
+    });
+    //异步上传成功结果处理
+    $("#agreementImg").on("fileuploaded", function (event, data, previewId, index) {
+    		var jsonRet = data.response;
+    		if(jsonRet){
+			if(0 == jsonRet.errcode){
+				alertMsg('系统提示',"签约协议文件上传成功！！");
+			}else{//出现逻辑错误
+				alertMsg('错误提示',jsonRet.errmsg);
+				$('#agreementImg').fileinput('clear');
+			}
+		}else{
+			alertMsg('错误提示','系统数据访问失败！')
+			$('#agreementImg').fileinput('clear');
+		}
+    });
 });
 </script>
 <div id="showAddrMap" style="position:fixed;left:0;top:0;right:0;bottom:0;margin:0;width:100%;display:none;z-index:1000;background:rgba(0,0,0,0.2);display:none;">

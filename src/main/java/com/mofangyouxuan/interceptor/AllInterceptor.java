@@ -14,7 +14,6 @@ import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.UserService;
 import com.mofangyouxuan.service.VipService;
-import com.mofangyouxuan.utils.CommonUtil;
 import com.mofangyouxuan.wxapi.WebAuth;
 
 
@@ -39,12 +38,16 @@ public class AllInterceptor extends HandlerInterceptorAdapter{
 		HttpSession session = request.getSession();
 		String uri = request.getRequestURI();
 		//获取客户端平台
-		String clientPF = (String) session.getAttribute("clientPF");
-		if(clientPF == null || clientPF.length()<1) {
-			CommonUtil.getPlatform(request);  //客户端平台
-			session.setAttribute("clientPF", clientPF);
+//		String clientPF = (String) session.getAttribute("clientPF");
+//		if(clientPF == null || clientPF.length()<1) {
+//			CommonUtil.getPlatform(request);  //客户端平台
+//			session.setAttribute("clientPF", clientPF);
+//		}
+//		System.out.println("访问地址："+uri);
+		Integer sys_partnerid = (Integer) session.getAttribute("SYS_PARTNERID");
+		if(sys_partnerid == null) {
+			session.setAttribute("SYS_PARTNERID", SysParam.getSyspartnerId());
 		}
-		System.out.println("访问地址："+uri);
 		UserBasic userBasic = (UserBasic) session.getAttribute("userBasic");
 		VipBasic vipBasic = (VipBasic) session.getAttribute("vipBasic");
 		//微信登录
@@ -52,7 +55,7 @@ public class AllInterceptor extends HandlerInterceptorAdapter{
 			String code = request.getParameter("code");
 			String state = request.getParameter("state"); 
 			if(code != null && code.length()>0 && state != null && WebAuth.STATE.equals(state)) {//从微信访问
-				request.setAttribute("isFirstWxPage", "1"); //从微信进来的第一个页面
+				//request.setAttribute("isFirstWxPage", "1"); //从微信进来的第一个页面
 				//登录访问控制
 				
 				JSONObject auth = this.accessFromWX(code);

@@ -184,3 +184,27 @@ function getCashApplyStatus(code){
 	}
 	return '未知';	
 }
+
+/**
+ * 
+ * @returns
+ */
+function getPartnerStatus(code){
+	if("0" == code) {
+		return "待审核";
+	}else if("1"== code) {
+		return "严重违规关店";
+	}else if("R" == code) {
+		return "终审拒绝";
+	}else if("S" == code) {
+		return "终审通过";
+	}else if("C" == code) {
+		return "暂时关闭歇业";
+	}else if("RN" == code) {
+		return "初审拒绝";
+	}else if("SN" == code) {
+		return "初审通过";
+	}
+	return code;
+}
+

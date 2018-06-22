@@ -21,6 +21,12 @@ public class SysParam {
 		localServerName = serverName;
 	}
 	
+	//系统顶级合作伙伴
+	private static Integer sysParternerId = 1000;
+	public static Integer getSyspartnerId() {
+		return sysParternerId;
+	}
+	
 	/**
 	 * 获取系统配置参数
 	 * @param paramName
