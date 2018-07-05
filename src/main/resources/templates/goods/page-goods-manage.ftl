@@ -19,11 +19,12 @@
     
     <link href="/css/weui.css" rel="stylesheet">
     
-    <link href="/css/mfyx.css" rel="stylesheet">
 </head>
-<body class="light-gray-bg" >
+<body class="light-gray-bg" style="overflow:scroll">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
+
+<div class="container" id="container" style="padding:0;">
 <header >
 	<ul class="nav nav-tabs" style="margin:3px 8px 3px 8px">
 	  <li style="width:50%;text-align:center" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#manageNotice').show();$('#goodsListShow').hide()">
@@ -34,9 +35,7 @@
 	  </li>
 	</ul>
 </header>
-<div class="container goods-container" id="container" style="padding:0;overflow:scroll">
-
-  <div class="row" id="manageNotice" style="margin:5px 0 ;display:none;"><!-- 管理须知 -->
+  <div class="row" id="manageNotice" style="margin:0 ;display:none;"><!-- 管理须知 -->
     <div class="col-xs-12" style="">
 	  	<p>商品管理功能：主要用于合作伙伴对商品的整个生命周期的管理；一个商品的一生：新添加--待审核--审核通过--未上架／已上架--已下架--删除 。</p>
 	    <p>须知：<br>
@@ -50,14 +49,14 @@
 	      8、合作伙伴须保证提供以下服务：正品保证、同城急速、退货保障、极速发货；
 	    </p>
     </div>
-    <div class="col-xs-12" style="margin-top:10px;text-align:center">
+    <div class="row" style="margin:0;margin-top:10px;text-align:center">
      <a class="btn btn-primary" href="/goods/edit/0">新建商品</a>
      <p>一旦您新建商品将默认同意以上须知规则！</p>
     </div>  
   </div>
     
-  <div class="row" id="goodsListShow" style="" ><!-- 商品管理列表 -->
-    <div class="row" style="margin:3px 3px;padding:5px 2px;background-color:white">
+  <div class="row" id="goodsListShow" style="margin:0" ><!-- 商品管理列表 -->
+    <div class="row" style="margin:0;background-color:white">
       <div class="col-xs-6" style="padding:5px 2px">
 	      <div class="form-group">
 	        <label class="col-xs-4 control-label" style="padding-right:1px">上架状态</label>
@@ -76,8 +75,8 @@
 	        <div class="col-xs-8" style="padding-left:1px">
 		        <select class="form-control" v-model="param.reviewResult" required>
 		            <option value="0">待审核</option>
-		            <option value="1">通过</option>
-		            <option value="2">拒绝</option>
+		            <option value="S">通过</option>
+		            <option value="R">拒绝</option>
 	            </select>
 	        </div>
 	      </div>
@@ -88,7 +87,7 @@
         <button type="button" class="btn btn-info" @click="changeStatus('2')" >&nbsp;批量下架&nbsp;</button>   
       </div>
     </div>
-    <div class="col-xs-12"  style="height:300px;overflow:scroll">
+    <div class="row"  style="margin:0">
        <table class="table table-striped table-bordered table-condensed">
          <tr>
            <th width="8%" style="padding:2px 2px;text-align:center">选择</th>
@@ -104,7 +103,7 @@
               <a :href="'/goods/preview/' + item.goodsId">{{item.goodsName}}</a>
             </td>
             <td style="padding:2px 2px;text-align:center">
-              <button class="btn btn-primary" style="padding:2px 3px" @click="changeSpec(item.goodsId,item.goodsName,item.specDetail)">规格库存</button>
+              <button class="btn btn-primary" style="padding:2px 3px" @click="changeSpec(item.goodsId,item.goodsName,item.specDetail)">&nbsp;&nbsp;修 改&nbsp;&nbsp;</button>
             </td>
             <td style="padding:2px 2px;text-align:center">
               <a class="btn btn-success" style="padding:2px 3px" :href="'/goods/edit/' + item.goodsId" >&nbsp;&nbsp;编 辑&nbsp;&nbsp;</a>
@@ -121,7 +120,7 @@
 	 data:{
 		param:{
 			status:'1', 
-			reviewResult:'1',
+			reviewResult:'S',
 			pageSize:30,
 			begin:'0'
 		},

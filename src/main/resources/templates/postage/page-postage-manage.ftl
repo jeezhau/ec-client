@@ -26,12 +26,12 @@
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
 <header >
-	<ul class="nav nav-tabs " style="margin:3px 8px 3px 8px">
-	  <li  onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#postageNotice').show();$('#myAllPostages').hide()">
-	    <a href="javascript:;"  style="padding:10px 2px">运费模版须知</a>
+	<ul class="nav nav-tabs" style="margin:3px 8px 3px 8px">
+	  <li style="width:50%;text-align:center" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#postageNotice').show();$('#myAllPostages').hide()">
+	    <a href="javascript:;"  style="padding:10px 8px">运费模版须知</a>
 	  </li>
-	  <li class="active" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#postageNotice').hide();$('#myAllPostages').show()">
-	    <a href="javascript:;"  style="padding:10px 2px">我的所有模板</a>
+	  <li style="width:50%;text-align:center;" class="active" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');$('#postageNotice').hide();$('#myAllPostages').show()">
+	    <a href="javascript:;"  style="padding:10px 8px">我的所有模板</a>
 	  </li>
 	</ul>
 </header>

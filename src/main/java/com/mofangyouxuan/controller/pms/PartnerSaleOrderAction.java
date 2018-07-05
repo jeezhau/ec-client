@@ -1,4 +1,4 @@
-package com.mofangyouxuan.controller;
+package com.mofangyouxuan.controller.pms;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -498,7 +498,39 @@ public class PartnerSaleOrderAction {
 		return "porder/page-porder-logistics";
 	}
 	
-	
+	/**
+	 * 显示评价审核页面
+	 * @param orderId
+	 * @param map
+	 */
+	@RequestMapping("/appraise/review/{orderId}")
+	public String getApprReview(@PathVariable("orderId")String orderId,ModelMap map) {
+		Order order = null;
+		try {
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus())) ){
+				map.put("errmsg", "您还未开通合作伙伴功能！");
+				return "porder/page-review-appraise";
+			}
+			
+			JSONObject jsonRet = OrderService.getOrder(false, false, true, true, false, orderId);
+			if(jsonRet != null && jsonRet.containsKey("order")) {
+				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
+				if(null == order.getAppraiseStatus() || "0".equals(order.getAppraiseStatus())) {
+					map.put("errmsg", "该订单当前不可进行审核！");
+					return "porder/page-review-appraise";
+				}else {
+					map.put("order", order);
+				}
+			}else {
+				map.put("errmsg", "获取订单信息失败！");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return "porder/page-review-appraise";
+	}
 	
 }
 

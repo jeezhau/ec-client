@@ -1,10 +1,13 @@
-package com.mofangyouxuan.controller;
+package com.mofangyouxuan.controller.pms;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.alibaba.fastjson.JSONArray;
@@ -52,21 +56,41 @@ public class GoodsAction {
 	 * 获取商品管理首页
 	 * @param map
 	 * @return
+	 * @throws UnsupportedEncodingException 
 	 */
 	@RequestMapping("/manage")
-	public String getManageIndex(ModelMap map) {
-		PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
-		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
-			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
-			return "redirect:/partner/manage" ;
+	public String getManageIndex(@SessionAttribute("partnerUserTP")String partnerUserTP,
+			String outErrmsg,
+			HttpSession session,ModelMap map) throws UnsupportedEncodingException {
+		VipBasic partnerBindVip = (VipBasic) session.getAttribute("partnerBindVip");
+		PartnerStaff partnerStaff = (PartnerStaff) session.getAttribute("partnerStaff");
+		PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");
+		//权限检查
+		String errmsg = null;
+		if("staff".equals(partnerUserTP)) {
+			if(myPartner == null || myPartner.getPartnerId() == null || partnerStaff == null || partnerStaff.getUserId() == null
+					|| partnerStaff.getTagList() == null || !partnerStaff.getTagList().contains(PartnerStaff.TAG.goods.getValue())){
+				errmsg = "您没有权限执行该操作！！";
+				return "redirect:/partner/manage" + "?errmsg=" + URLEncoder.encode(errmsg, "utf8");
+			}
+		}else {
+			if(partnerBindVip == null || !"1".equals(partnerBindVip.getStatus())) {
+				errmsg = "您没有权限执行该操作！！";
+				return "redirect:/partner/manage" + "?errmsg=" + URLEncoder.encode(errmsg, "utf8");
+			}
 		}
+		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+			errmsg = "您的合作伙伴当前未处于正常状态！！";
+			return "redirect:/partner/manage" + "?errmsg=" + URLEncoder.encode(errmsg, "utf8");
+		}
+		
 		@SuppressWarnings("unchecked")
 		List<Category> categories = (List<Category>) map.get("categories");
 		if(categories == null) {
 			categories = GoodsService.getCategories();
 			map.put("categories", categories);
 		}
-		
+		map.put("errmsg", outErrmsg);
 		map.put("sys_func", "partner-goods");
 		return "goods/page-goods-manage";
 	}
@@ -79,26 +103,43 @@ public class GoodsAction {
 	 * @return
 	 */
 	@RequestMapping("/edit/{goodsId}")
-	public String editGoods(@PathVariable("goodsId")Long goodsId,ModelMap map) {
-		PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
-		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
-			map.put("errmsg", "您还未开通合作伙伴或状态限制！");
-			return "redirect:/partner/manage" ;
+	public String editGoods(@PathVariable("goodsId")Long goodsId,
+			@SessionAttribute("partnerUserTP")String partnerUserTP,
+			HttpSession session,ModelMap map) throws UnsupportedEncodingException {
+		VipBasic partnerBindVip = (VipBasic) session.getAttribute("partnerBindVip");
+		PartnerStaff partnerStaff = (PartnerStaff) session.getAttribute("partnerStaff");
+		PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");
+		//权限检查
+		String errmsg = null;
+		if("staff".equals(partnerUserTP)) {
+			if(myPartner == null || myPartner.getPartnerId() == null || partnerStaff == null || partnerStaff.getUserId() == null
+					|| partnerStaff.getTagList() == null || !partnerStaff.getTagList().contains(PartnerStaff.TAG.goods.getValue())){
+				errmsg = "您没有权限执行该操作！！";
+				return "redirect:/partner/manage" + "?errmsg=" + URLEncoder.encode(errmsg, "utf8");
+			}
+		}else {
+			if(partnerBindVip == null || !"1".equals(partnerBindVip.getStatus())) {
+				errmsg = "您没有权限执行该操作！！";
+				return "redirect:/partner/manage" + "?errmsg=" + URLEncoder.encode(errmsg, "utf8");
+			}
 		}
-		
+		if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+			errmsg = "您的合作伙伴当前未处于正常状态！！";
+			return "redirect:/partner/manage" + "?errmsg=" + URLEncoder.encode(errmsg, "utf8");
+		}
 		Goods goods = null;
 		try {
 			if(goodsId != 0) {
 				//获取已有指定商品
 				JSONObject ret = GoodsService.getGoods(false,goodsId,true);
 				if(ret == null || !ret.containsKey("goods")) {
-					map.put("errmsg", "没有获取到该指定商品信息！");
-					return "redirect:/goods/manage";
+					errmsg = "没有获取到该指定商品信息！";
+					return "redirect:/goods/manage"+ "?errmsg=" + URLEncoder.encode(errmsg, "utf8");
 				}else {
 					goods = JSONObject.toJavaObject(ret.getJSONObject("goods"),Goods.class);
 					if(!goods.getPartnerId().equals(myPartner.getPartnerId())) {
-						map.put("errmsg", "您无权处理该商品信息！");
-						return "redirect:/goods/manage";
+						errmsg = "您无权处理该商品信息！";
+						return "redirect:/goods/manage"+ "?errmsg=" + URLEncoder.encode(errmsg, "utf8");
 					}
 				}
 			}else {
@@ -584,7 +625,9 @@ public class GoodsAction {
 	 * @return
 	 */
 	@RequestMapping("/preview/{goodsId}")
-	public String previewGoods(@PathVariable("goodsId")Long goodsId,ModelMap map) {
+	public String previewGoods(@PathVariable("goodsId")Long goodsId,
+			String mode,
+			ModelMap map) {
 		Goods goods = null;
 		try {
 			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
@@ -598,6 +641,7 @@ public class GoodsAction {
 			}else {
 				goods = JSONObject.toJavaObject(obj.getJSONObject("goods"),Goods.class);
 				map.put("goods", goods);
+				map.put("mode", mode);
 			}
 		}catch(Exception e) {
 			e.printStackTrace();

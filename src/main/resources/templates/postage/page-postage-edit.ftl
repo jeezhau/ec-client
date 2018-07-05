@@ -39,7 +39,7 @@
         <label class="col-xs-4 control-label" style="padding-right:1px">配送模式<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
           <select class="form-control" v-model="dispModeArr" required multiple>
-            <option value="1">官方统一配送</option>
+           <!--  <option value="1">官方统一配送</option> -->
             <option value="2">商家自行配送</option>
             <option value="3">快递配送</option>
             <option value="4">客户自取</option>

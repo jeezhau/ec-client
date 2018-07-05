@@ -19,8 +19,6 @@
 </head>
 <body class="light-gray-bg" style="overflow:scroll;">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
-<#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
-
 
 <#if !errmsg??>
 <div class="container" id="container" style="padding:0;margin-bottom:50px">
@@ -28,9 +26,9 @@
 	 <form class="form-horizontal" role="form" id="complainForm">
 	   <h3 style="text-align:center;padding:3px 0 0 0;">投诉信息</h3>
 	   <div class="row" style="margin:3px 5px 3px 15px;padding:3px 3px;">
-         <label class="col-xs-3 control-label">订单ID<span style="color:red">*</span>:</label>
+         <label class="col-xs-3 control-label">上级合作伙伴ID<span style="color:red">*</span>:</label>
          <div class="col-sx-9">
-           <input type="text" class="form-control" style="width:66%" v-model="params.orderId" maxlength="30" required placeholder="请输入您要投诉的商品订单ID">
+           <input type="text" class="form-control" style="width:66%" v-model="params.partnerId" maxlength="30" required placeholder="请输入您要投诉的合作伙伴ID">
          </div>
        </div> 
        <div class="row" style="margin:3px 5px 3px 15px;padding:3px 3px;">
@@ -52,14 +50,6 @@
         </div>
 	   </form>
 	 </div>
-     <div class="row" style="margin:5px 0px 3px 0px;">
-        <div class="row" style="margin:1px 0px;background-color:white;">
-          <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">我的投诉({{search.count}})</span>
-          <span class="pull-right" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">
-            <a v-if="search.count>0" href="/complain/show">查看全部&gt;</a>
-          </span>
-        </div>
-	</div>
 	<div class="row" style="margin:5px 3px 3px 3px;background-color:white">
 	  <h5>快速通道</h5>
 	  <span style="color: red">特别提示：<br>&nbsp;&nbsp;&nbsp;&nbsp;请先填写提交了上面的投诉表单之后再联系客服，可快速获得受理！！！</span><br>
@@ -70,16 +60,16 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		newestlog:{cplanId:0},
-		oprFlag:'${oprFlag!"S"}',
+		oprFlag:'${oprFlag!"E"}',
 		search:{
-			<#if cplanId??>cplanId:'',</#if>
+			<#if cplanId??>cplanId:'${cplanId?string("#")}',</#if>
 			begin:0,
 			pageSize:1,
 			count:0
 		},
 		params:{
 			cplanId:0,
-			orderId:'',
+			partnerId:'',
 			content:'',
 			phone:''
 		}
@@ -87,13 +77,13 @@ var containerVue = new Vue({
 	methods:{
 		submit: function(){
 			$.ajax({
-				url: '/complain/save',
+				url: '/pcomplain/save',
 				method:'post',
 				data: this.params,
 				success: function(jsonRet,status,xhr){
 					if(jsonRet.errcode == 0){
 						alertMsg('系统提示','投诉信息已成功提交！');
-						containerVue.search.count = containerVue.search.count + 1;
+						window.location.href = "/pcomplain/partner/manage";
 					}else{
 						if(jsonRet.errcode === -100000){
 							$('#ajaxLoginModal').modal('show');
@@ -107,34 +97,33 @@ var containerVue = new Vue({
 		},
 		reset: function(){
 			containerVue.params.cplanId = containerVue.newestlog.cplanId;
-			containerVue.params.orderId = containerVue.newestlog.orderId;
+			containerVue.params.partnerId = containerVue.newestlog.partnerId;
 			containerVue.params.content = containerVue.newestlog.content;
 			containerVue.params.phone = containerVue.newestlog.phone;
 		},
 		delComplain: function(){
 			$.ajax({
-				url: '/complain/delete/' + this.params.cplanId,
+				url: '/pcomplain/delete/' + this.params.cplanId,
 				method:'post',
 				data: {},
 				success: function(jsonRet,status,xhr){
 					if(jsonRet.errcode == 0){
 						alertMsg('系统提示','投诉信息已成功删除！');
 						containerVue.search.count = containerVue.search.count - 1;
-						window.location.href = "/complain/manage";
+						window.location.href = "/pcomplain/partner/manage";
 					}else{
-						if(jsonRet.errcode === -100000){
-							$('#ajaxLoginModal').modal('show');
-						}else{
-							alertMsg('错误提示',jsonRet.errmsg);
-						}
+						alertMsg('错误提示',jsonRet.errmsg);
 					}
 				},
 				dataType: 'json'
 			});
 		},
 		getComplain :function(){
+			if(!this.search.cplanId){
+				return;
+			}
 			$.ajax({
-				url: '/complain/getall',
+				url: '/pcomplain/partner/getall',
 				method:'post',
 				data: this.search,
 				success: function(jsonRet,status,xhr){
@@ -143,18 +132,14 @@ var containerVue = new Vue({
 						if(jsonRet.datas){
 							containerVue.newestlog =jsonRet.datas[0];
 							containerVue.params.cplanId = containerVue.newestlog.cplanId;
-							containerVue.params.orderId = containerVue.newestlog.orderId;
+							containerVue.params.partnerId = containerVue.newestlog.partnerId;
 							containerVue.params.content = containerVue.newestlog.content;
 							containerVue.params.phone = containerVue.newestlog.phone;
 						}
 						</#if>
 						containerVue.search.count = jsonRet.pageCond.count;
 					}else{
-						if(jsonRet.errcode === -100000){
-							$('#ajaxLoginModal').modal('show');
-						}else{
-							alertMsg('错误提示',jsonRet.errmsg);
-						}
+						alertMsg('错误提示',jsonRet.errmsg);
 					}
 				},
 				dataType: 'json'
@@ -167,7 +152,7 @@ containerVue.getComplain();
 </#if>
 
 <footer>
-  <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
 </footer>
 
 <#if errmsg??>

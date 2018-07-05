@@ -6,7 +6,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.Order;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.UserBasic;
@@ -42,6 +44,7 @@ public class OrderService {
 	private static String orderGetLogisticsUrl;
 	private static String orderBalPaySubmitUrl;
 	private static String orderGetPayFlowUrl;
+	private static String orderApprReviewUrl;
 	
 	@Value("${mfyx.order-delivery-url}")
 	public void setOrderDeliveryUrl(String orderDeliveryUrl) {
@@ -131,6 +134,11 @@ public class OrderService {
 	public void setGetPayFlowUrl(String url) {
 		OrderService.orderGetPayFlowUrl = url;
 	}
+	@Value("${mfyx.order-appr-review-url}")
+	public void setApprReviewUrl(String url) {
+		OrderService.orderApprReviewUrl = url;
+	}
+	
 	/**
 	 * 根据ID获取订单信息
 	 * 
@@ -241,7 +249,7 @@ public class OrderService {
 	/**
 	 * 
 	 * @param jsonShowGroups	需要显示的字段分组:needReceiver,needLogistics,needAppr,needAfterSales,needGoodsAndUser
-	 * @param jsonSearchParams
+	 * @param jsonSearchParams {userId: ,goodsId:, partnerId: ,status:'',keywords:'',categoryId:,dispatchMode:'',postageId:,appraiseStatus:''}
 	 * @param jsonSortParams
 	 * @param jsonPageCond
 	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
@@ -655,5 +663,48 @@ public class OrderService {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	/**
+	 * 订单评价审核与抽查
+	 * 上级审批下级信息
+	 * 1、上级可对下级进行审核；
+	 * 2、顶级对所有合作伙伴进行最终审核；
+	 * 3、仅顶级审核通过后才算通过；
+	 * @param orderId	待审批商品ID
+	 * @param review 	审批意见
+	 * @param result 	审批结果：S-通过，R-拒绝
+	 * @param rewPartnerId	审核者合作伙伴ID
+	 * @param operator	审批人ID，为上级合作伙伴的员工用户ID
+	 * @param passwd		审批人操作密码
+	 * 
+	 * @return {errcode:0,errmsg:"ok"}
+	 * @throws JSONException
+	 */
+	public static JSONObject reviewAppr(String orderId,String review,String result,
+			Integer rewPartnerId,Integer operator,String passwd){
+		Map<String,Object> params = new HashMap<String,Object>();
+		JSONObject jsonRet = new JSONObject();
+		try {
+			params.put("orderId", orderId);
+			params.put("review", review);
+			params.put("result", result);
+			params.put("rewPartnerId", rewPartnerId);
+			params.put("operator", operator);
+			params.put("passwd", passwd);
+			String url = mfyxServerUrl + orderApprReviewUrl;
+			String strRet = HttpUtils.doPost(url, params);
+			jsonRet = JSONObject.parseObject(strRet);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errmsg", "系统错误：" + strRet);
+				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errmsg", "系统异常：" + e.getMessage());
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+		}
+		return jsonRet;
 	}
 }

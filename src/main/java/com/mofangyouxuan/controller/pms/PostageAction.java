@@ -1,4 +1,4 @@
-package com.mofangyouxuan.controller;
+package com.mofangyouxuan.controller.pms;
 
 import java.math.BigDecimal;
 import java.util.HashMap;

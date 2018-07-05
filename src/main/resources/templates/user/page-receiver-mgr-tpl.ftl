@@ -452,6 +452,7 @@ function getAreas(){
 		           placeSearch.setCity(e.poi.adcode);
 		           placeSearch.search(e.poi.name)
 		        });
+		        $('.amap-sug-result').css('z-index',30000);
 		      }); 
 		   
 		</script>

@@ -18,7 +18,7 @@
     <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <link href="/css/weui.css" rel="stylesheet">
     
-    <link href="/css/mfyx.css" rel="stylesheet">
+    <script src="/script/common.js" type="text/javascript"></script>
     
 </head>
 <body class="light-gray-bg">
@@ -172,7 +172,7 @@
           <textarea class="form-control" maxLength=10000  rows=30 required v-model="param.goodsDesc"
           placeholder="    请输入10-10000字符的企业经营简介。
     编辑说明：最好请在文本编辑器中编辑好之后复制粘贴于此。
-    相关格式说明：如果是一个段落请将段落内容放置于标签: <p>与</p>之间；换行则在句末添加标签：<br>；插入图片使用标签：<img href='  ' width = '100%' > ，href属性的内容来自图库中图片的链接(不是图片名称)。不清楚的话可以问问身边的做软件开发的朋友。"></textarea>
+    相关格式说明：如果是一个段落请将段落内容放置于标签: <p>与</p>之间；换行则在句末添加标签：<br>；插入图片使用标签：<img src='  ' width = '100%' > ，src属性的内容来自图库中图片的链接(不是图片名称)。不清楚的话可以问问身边的做软件开发的朋友。"></textarea>
         </div>
       </div>
       <div class="form-group">
@@ -186,9 +186,18 @@
 
   <div class="row" id="reviewInfo" style="width:100%;margin:1px 0px 0px 0px;padding:5px 8px;background-color:white;display:none">
   	<h5 style="text-align:center">最新审批结果信息</h5>
-  	<p>审批时间：{{review.reviewTime}}</p>
-  	<p>审批结果：{{getReviewResult()}} </p>
-  	<p>审批意见：{{review.reviewLog}}</p>
+  	<p>最新审批时间：{{review.reviewTime}}</p>
+  	<p>最新审批结果：{{getGoodsRewResult(review.reviewResult)}} </p>
+  	<p>审批意见：<br>
+	 <div v-for=" item in review.reviewLog" class="col-xs-12" style="margin-top:1px;">
+	   <div class="col-xs-1" style="margin-top:-2px;padding:0;vertical-align:center;">
+	    <img alt="" src="/icons/树形线.png" style="width:80%;height:110%">
+	   </div>
+	   <div class="col-xs-11" style="padding:0">
+	     <span class="pull-left" style="padding:0 3px;">{{item.time}}({{getGoodsRewResult(item.result)}})</span>
+	     <span class="pull-right" style="padding:0 3px;">{{item.content}}</span>
+	   </div>
+	 </div>
   </div>
 </div><!-- end of container -->
 
@@ -202,8 +211,8 @@ var goodsContainerVue = new Vue({
 		},
 		review:{
 			reviewResult:'${(goods.reviewResult)!"0"}',
-			reviewTime:'' ,
-			reviewLog:"${(goods.reviewLog)!''}"
+			reviewTime:'${(goods.reviewTime)!''}' ,
+			reviewLog:JSON.parse('${(goods.reviewLog)!"[]"}')
 		},
 		param:{
 			goodsId:'${((goods.goodsId)!"-1")?string("#")}',
@@ -233,16 +242,6 @@ var goodsContainerVue = new Vue({
 		}
 	},
 	methods:{
-		getReviewResult: function(){
-    			if("0" == this.review.reviewResult) {
-    				return "待审核";
-    			}else if("2" == this.review.reviewResult) {
-    				return "审核拒绝";
-    			}else if("1" == this.review.reviewResult) {
-    				return "审核通过";
-    			}
-        		return "其他";
-		},
 		addSpec:function(){
 			if(this.specDetailArr == null){
 				this.specDetailArr = [];

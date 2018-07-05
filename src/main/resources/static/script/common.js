@@ -26,8 +26,8 @@ var orderStatObj = { '10':'待付款','11':'付款成功','12':'付款失败',
 		 '40':'待评价','41':'评价完成',
 		 '50':'买家申请换货','51':'同意换货','52':'买家已发货、等待卖家收货','53':'已收到退货、核验中','54':'核验不通过、协商解决','55':'已重新发货、待收货','56':'待评价','57':'评价完成(换货结束)','58':'卖家不同意换货',
 		 '60':'买家申请退款','61':'卖家同意退货','62':'买家已发货、等待卖家收货','63':'已收到退货、核验中','64':'核验不通过、协商解决','65':'同意退款,资金回退中','66':'退款完成','67':'退款失败','68':'卖家不同意退款',
-		 'DS':'已取消完成','D0':'买家取消，退款中','DF':'买家取消，退款失败',
-		 'C':'已关闭交易(超时6月)'};
+		 'DS':'已取消完成','DR':'取消完成，退款成功','D0':'买家取消，退款中','DF':'买家取消，退款失败',
+		 'CM':'交易完成','CC':'已关闭交易(超时6月)'};
 function getOrderStatus(code){
 	var val = orderStatObj[code];
 	if(val){
@@ -61,8 +61,8 @@ function getDispatchMode(code){
  * 资金变动类型(1-可用余额来源，2','可用余额去向，3-冻结金额来源，4-解冻金额去向)
  * @returns
  */
-var flowObj = {'11':'客户退款完成','12':'系统分润','13':'平台奖励','14':'资金解冻','15':'积分兑换','16':'现金红包','17':'其他','18':'提现失败',
-		 '21':'提现申请','22':'消费','23':'资金冻结','24':'投诉罚款','25':'申请退款',
+var flowObj = {'10':'服务费','11':'客户退款完成','12':'交易奖励','13':'平台奖励','14':'资金解冻','15':'积分兑换','16':'现金红包','17':'其他','18':'提现失败',
+		 '20':'退款服务费','21':'提现申请','22':'消费','23':'资金冻结','24':'投诉罚款','25':'申请退款','26':'交易奖励',
 		 '31':'冻结交易买卖额','32':'买单投诉冻结','33':'提现冻结','34':'申请退款',
 		 '41':'恢复可用余额','42':'提现完成','43':'交易完成','44':'买家退款完成','45':'退款失败'}
 function getChangeFlowType(code){
@@ -186,7 +186,7 @@ function getCashApplyStatus(code){
 }
 
 /**
- * 
+ * 获取合作伙伴状态
  * @returns
  */
 function getPartnerStatus(code){
@@ -208,3 +208,132 @@ function getPartnerStatus(code){
 	return code;
 }
 
+/**
+ * 获取所有数据
+ * @param isRefresh	是否刷新
+ * @param isForward	是否向前插入
+ * @param url	获取数据的后台URL
+ * @param param	查询参数
+ * @param dataList	数据保存数组
+ * @param pageCond	分页信息
+ * @returns
+ */
+function getAllData(isRefresh,isForward,url,searchParam,dataList,pageCond){
+	$("#loadingData").show();
+	$("#nomoreData").hide();
+	if(isRefresh){ //清空数据
+		pageCond.count = 0;
+		dataList.splice(0,dataList.length); 
+	}else{
+		if(dataList.lenght >= 10*pageCond.pageSize){
+			if(isForward){//清除最有一页
+				dataList.splice(9*pageCond.pageSize,pageCond.pageSize);
+			}else{//清除最前一页
+				dataList.splice(0,pageCond.pageSize); 
+			}
+		}
+	}
+	$.ajax({
+		url: url,
+		method:'post',
+		data: searchParam,
+		success: function(jsonRet,status,xhr){
+			if(jsonRet && jsonRet.datas){//
+				var i=0;
+				var j = jsonRet.datas.length;
+				for(;i<jsonRet.datas.length;){
+					if(isForward){
+						dataList.unshift(jsonRet.datas[j]);
+					}else{
+						dataList.push(jsonRet.datas[i]);
+					}
+					i++;j--;
+				}
+				pageCond.begin = jsonRet.pageCond.begin;
+				pageCond.pageSize = jsonRet.pageCond.pageSize;
+				pageCond.count = jsonRet.pageCond.count;
+			}else{
+				//alert(jsonRet.errmsg);
+				//$("#nomoreData").show();
+			}
+			$("#loadingData").hide();
+		},
+		failure:function(){
+			$("#loadingData").hide();
+		},
+		dataType: 'json'
+	});	 
+}
+
+/**
+ * 滚动监测分页
+ * @param scrollElId		监测的元素ID	
+ * @param pageCond	分页信息{begin,pageSize,count}
+ * @param dataList	查询结果存储数组
+ * @param searchFun	执行的查询函数(isRefresh,isForward)，isRefresh：是否刷新已有数据，isForward：是否向前插入数据
+ * @returns
+ */
+function scrollPager(scrollElId,pageCond,dataList,searchFun){
+	var winHeight = $(window).height(); //页面可视区域高度   
+	var scrollHandler = function () {  
+		var pageHieght = $(document.body).height();  
+		var scrollHeight = $(window).scrollTop(); //滚动条top   
+		var r = (pageHieght - winHeight - scrollHeight) / winHeight;
+		if (r>=0 && r < 0.2) {//上拉翻页 
+			pageCond.begin = pageCond.begin + pageCond.pageSize;
+			searchFun(false,false);
+		}
+		if(scrollHeight<0){ //下拉翻页
+			var currPageCnt = dataList.length % pageCond.pageSize;//当前页的数量
+			if(currPageCnt == 0){
+				currPageCnt = pageCond.pageSize;
+			}
+			pageCond.begin = pageCond.begin - (dataList.length-currPageCnt);//总数据的开始
+			pageCond.begin = pageCond.begin - pageCond.pageSize;
+			if(pageCond.begin <= 0){
+				pageCond.begin = 0;
+				searchFun(true,true);
+			}else{
+				searchFun(false,true);
+			}
+		}
+	}
+	 //定义鼠标滚动事件  
+	$("#"+scrollElId).scroll(scrollHandler);
+}
+
+/**
+ * 获取商品的审核状态
+ * @param code
+ * @returns
+ */
+function getGoodsRewResult(code){
+	if("0" == code) {
+		return "待审核";
+	}else if("R" == code) {
+		return "审核拒绝";
+	}else if("S" == code) {
+		return "审核通过";
+	}
+	return code;
+}
+
+/**
+ * 获取订单评价状态
+ * @param code
+ * @returns
+ */
+function getAppraiseStatus(code){
+	if("0" == code) {
+		return "待评价";
+	}else if("1" == code) {
+		return "用户评价完成";
+	}else if("2" == code) {
+		return "商家评价完成";
+	}else if("R" == code) {
+		return "审核拒绝";
+	}else if("S" == code) {
+		return "审核通过";
+	}
+	return code;
+}

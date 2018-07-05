@@ -88,7 +88,7 @@ var containerVue = new Vue({
      		</div>
      		<div class="modal-body">
      		  <div class="row" style="text-align:center">
-       			<img src="/img/mfyx_qrcode_zfc.jpg" width="200px" height="200px"></img>
+       			<img src="/img/mfyx_qrcode_subscribe.jpg" width="200px" height="200px"></img>
        		  </div>
      		</div>
      		<div class="modal-footer">

@@ -168,6 +168,8 @@ public class UserService {
 	 */
 	public static String updateUserBasic(UserBasic basic) {
 		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("userId", basic.getUserId());
+		params.put("registType", basic.getRegistType());
 		params.put("nickname", basic.getNickname());
 		params.put("birthday", basic.getBirthday());
 		params.put("sex", basic.getSex());

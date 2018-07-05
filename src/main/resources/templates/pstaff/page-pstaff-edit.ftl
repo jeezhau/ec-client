@@ -107,9 +107,14 @@
 	      <option value="saleorder">销售订单管理</option>
 	      <option value="aftersale">售后服务处理</option>
 	      <option value="mypartners">推广下级管理</option>
+	      <option value="reviewgds">商品审核</option>
+	      <option value="reviewappr">评价审核</option>
+	      <option value="complain4p">投诉上级</option>
 	      
 	      <#if myPartner.partnerId == SYS_PARTNERID>
-	      <option value="cashapplydeal">系统处理-提现处理</option>
+	      <option value="ComplainDeal">系统处理-投诉处理</option>
+	      <option value="ComplainRevisit">系统处理-投诉回访</option>
+	      <option value="CashapplyDeal">系统处理-提现处理</option>
 	      <option value="kf4common">系统客服-用户(通用)</option>
 	      <option value="kf4vip">系统客服-VIP</option>
 	      <option value="kf4partner">系统客服-合作伙伴</option>

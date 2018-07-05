@@ -1,4 +1,4 @@
-package com.mofangyouxuan.controller;
+package com.mofangyouxuan.controller.pms;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -457,7 +457,7 @@ public class PartnerStaffAction {
 			String tagId,ModelMap map) {
 		PartnerBasic partner = PartnerMgrService.getPartnerById(partnerId);
 		if(partner == null || !"S".equals(partner.getStatus())) {
-			map.put("errmsg", "系统中没有该商户信息！");
+			map.put("errmsg", "系统中没有该合作伙伴信息！");
 		}else {
 			map.put("tagId", tagId);
 			map.put("partner", partner);

@@ -93,6 +93,7 @@ mfyx:
   goods-change-status-url: '/goods/{partnerId}/changeStatus'
   goods-change-spec-url: '/goods/{partnerId}/changeSpec/{goodsId}'
   goods-category-url: '/goods/category'
+  goods-review-url: '/goods/review'
   
   pimage-file-upload-url: '/pimage/{partnerId}/file/upload'
   pimage-file-show-url: '/pimage/{partnerId}/file/show/{filename}'
@@ -132,6 +133,7 @@ mfyx:
   order-updaftersales-url: '/order/{partnerId}/aftersales/{orderId}'
   order-balpay-submit-url: '/order/{userId}/balpay/submit/{orderId}'
   order-payflow-get-url: '/order/{userId}/payflow/{orderId}'
+  order-appr-review-url: '/order/appraise/review'
   
   collection-getall-url: '/collection/{userId}/getall'
   collection-getcnt-url: '/collection/{userId}/count'
@@ -146,9 +148,11 @@ mfyx:
   
   complain-getall-url: '/complain/getall'
   complain-order-save-url: '/complain/{userId}/order/save'
-  complain-partner-save-url: '/complain/{vipId}/partner/save'
   complain-order-delete-url: '/complain/{userId}/order/delete/{cplainId}'
-  complain-partner-delete-url: '/complain/{vipId}/partner/delete/{cplainId}' 
+  complain-partner-save-url: '/complain/{partnerId}/partner/save'
+  complain-partner-delete-url: '/complain/{partnerId}/partner/delete/{cplainId}'
+  complain-deal-url: '/complain/deal'
+  complain-revisit-url: '/complain/revisit'
   
   cash-apply-url: '/cash/{vipId}/apply'
   cash-delete-url: '/cash/{vipId}/delete'

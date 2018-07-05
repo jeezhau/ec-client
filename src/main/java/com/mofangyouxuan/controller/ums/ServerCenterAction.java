@@ -1,4 +1,4 @@
-package com.mofangyouxuan.controller;
+package com.mofangyouxuan.controller.ums;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;

@@ -32,11 +32,11 @@
 	</div>
   </div>
 </header>
-<div class="container" style="padding:1px 30px" id="container">
+<div class="container" style="padding:0" id="container">
     <div style="height:50px;background-color:#E0E0E0 ;margin-bottom:0px;"></div>
     <!-- 基本信息管理-->
-    <div class="row" id="userBasic" style="display:<#if mode='basic'>block<#else>none</#if>"> 
-      <div class="row" style="margin:0 1px;padding:10px 10px;background-color:#880000">
+    <div class="row" id="userBasic" style="margin:0;display:<#if mode='basic'>block<#else>none</#if>"> 
+      <div class="row" style="margin:0;padding:10px 10px;background-color:#880000">
         <div class="row" style="margin:3px 25%;vertical-algin:center;text-align:center">
           <#if ((userBasic.headimgurl)!'')?starts_with('http')>
              <img alt="" src="${userBasic.headimgurl}" width="99px" height="99px" style="padding:1px 1px;border-radius:50%;" > 
@@ -142,7 +142,7 @@
            </a>
          </li>
          <li style="background-color:white" >
-           <a href="/complain/manage/order">
+           <a href="/complain/manage">
              <span class="pull-right" > 订单投诉 &gt; </span>
              <img alt="" src="/icons/投诉.png" width="20px" height="20px"> 我要投诉
            </a>
@@ -163,10 +163,10 @@
     </div>
     
     <!-- 会员信息管理-->
-    <div class="row" id="userVip" style="display:<#if mode='vip'>block<#else>none</#if>"> 
-      <div class="row" style="margin:0 1px;padding:10px 10px;background-color:#880000">
+    <div class="row" id="userVip" style="margin:0;display:<#if mode='vip'>block<#else>none</#if>"> 
+      <div class="row" style="margin:0;padding:10px 10px;background-color:#880000">
         <div class="row" style="margin:5px 20px 3px 20px;color:gray">
-          <span class="pull-left"><img alt="" src="/icons/vip.png" width="25px" height="25px"> </span>
+          <span class="pull-left"><img alt="" src="/icons/会员.png" width="25px" height="25px"> </span>
           <span class="pull-right">${(vipBasic.vipId)?string('#')}</span>
         </div>
         <div class="row" style="margin:5px 25%;vertical-algin:center;text-align:center">

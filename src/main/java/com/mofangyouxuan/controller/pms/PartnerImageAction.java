@@ -1,4 +1,4 @@
-package com.mofangyouxuan.controller;
+package com.mofangyouxuan.controller.pms;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -26,7 +26,7 @@
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 <#if (goods.goodsId)??>
-<div class="container goods-container" id="container" style="padding:0;oveflow:scroll">
+<div class="container goods-container" id="container" style="padding:0;">
 
   <!-- 商品名称 -->
   <div class="row" style="margin:5px 0px 3px 0px;background-color:white;padding:3px 8px;font-size:150%;font-weight:bold;">
@@ -146,10 +146,23 @@
     </div>
   </div> 
   
-  <!-- 同类推荐 -->
-  <div class="row">
-    
-  </div> 
+  <#if (mode!'') == 'review'>
+  <div class="row" id="reviewForm" style="margin:1px 0px 0px 0px;padding:5px 8px;background-color:white;">
+  	<form class="form-horizontal" method ="post" autocomplete="on" enctype="multipart/form-data" role="form" >
+  	<h5 style="text-align:center">商品信息审核与抽查</h5>
+  	<div class="form-group">
+        <label  class="col-xs-3 control-label">审核意见<span style="color:red">*</span></label>
+        <div class="col-xs-9">
+          <textarea class="form-control" v-model="param.review" placeholder="请输入审核意见说明" rows="5" maxLength=600></textarea>
+        </div>
+    </div>
+    <div class="form-group" style="text-align:center">
+          <button type="button" class="btn btn-info" @click="review('S')" style="margin:20px">&nbsp;&nbsp;通 过&nbsp;&nbsp;</button>
+          <button type="button" class="btn btn-warning" @click="review('R')" style="margin:20px">&nbsp;&nbsp;拒 绝&nbsp;&nbsp; </button>
+    </div>
+    </form>
+  </div>
+  </#if> 
 
 </div><!-- end of container -->
 <script type="text/javascript">
@@ -159,9 +172,47 @@ var containerVue = new Vue({
 		courselImgPaths:'${(goods.carouselImgPaths)!""}'.split(','),
 		specDetailArr:JSON.parse('${(goods.specDetail)!"[]"}'),
 		apprList:[],
-		apprCnt:0
+		apprCnt:0,
+		<#if (mode!'') == 'review'>
+		param:{
+			goodsId:'${(goods.goodsId)?string("#")}',
+			review:'',
+			result:''
+		}
+		</#if>
 	},
 	methods:{
+		<#if (mode!'') == 'review'>
+		review: function(result){
+			$("#dealingData").show();
+			this.param.result = result;
+			if(!this.param.review || this.param.review.length<2 || this.param.review.length>600){
+				alertMsg('错误提示','审核意见：长度为2-600字符！');
+				return;
+			}
+			$.ajax({
+				url: '/review/submit/goods',
+				method:'post',
+				data: this.param,
+				success: function(jsonRet,status,xhr){
+					$("#dealingData").hide();
+					if(jsonRet && jsonRet.errmsg){
+						if(0 == jsonRet.errcode){
+							alertMsg('系统提示',"信息提交成功！");
+						}else{//出现逻辑错误
+							alertMsg('错误提示',jsonRet.errmsg);
+						}
+					}else{
+						alertMsg('错误提示','系统数据访问失败！')
+					}
+				},
+				failure:function(){
+					$("#dealingData").hide();
+				},
+				dataType: 'json'
+			});
+		},
+		</#if>
 		getAllAppr: function(){
 			 containerVue.apprCnt = 0;
 			 containerVue.goodsList = [];
@@ -209,33 +260,7 @@ var containerVue = new Vue({
 containerVue.getAllAppr();
 </script>
 
-<footer >
-  <div class="row" style="margin:50px 0"></div>
-  <div class="weui-tabbar" style="position:fixed;left:0px;bottom:0px">
-    	<a href="/shop/index" class="weui-tabbar__item " >
-	    <span style="display: inline-block;position: relative;">
-	        <img src="/icons/首页.png" alt="" class="weui-tabbar__icon">
-	    </span>
-	    <p class="weui-tabbar__label">商城首页</p>
-	</a>
-    <a href="/shop/mcht/${(goods.partnerId)?string('#')}" class="weui-tabbar__item " >
-	    <span style="display: inline-block;position: relative;">
-	        <img src="/icons/商家.png" alt="" class="weui-tabbar__icon">
-	    </span>
-	    <p class="weui-tabbar__label">逛商家</p>
-    </a> 	
-    <a href="javascript:;" onclick="containerVue.addCollection('2','${(goods.goodsId)?string('#')}')" class="weui-tabbar__item " >
-	    <span style="display: inline-block;position: relative;">
-	        <img src="/icons/收藏.png" alt="" class="weui-tabbar__icon">
-	    </span>
-	    <p class="weui-tabbar__label">加入收藏</p>
-     </a>
-   
-     <a href="/order/place/${(goods.goodsId)?string('#')}" class="weui-tabbar__item " style="background-color:red;text-align:center;">
-        <p><p class="weui-tabbar__label" style="font-size:20px;color:white;vertical-align:center;">立即下单</p>
-     </a>     	
-  </div>
-</footer>
+<#include "/menu/page-partner-func-menu.ftl" encoding="utf8">
 </#if>
 
 <#if errmsg??>

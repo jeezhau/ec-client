@@ -111,7 +111,7 @@ public class ShopAction {
 			}else {
 				goods = JSONObject.toJavaObject(obj.getJSONObject("goods"),Goods.class);
 				if(goods != null && "S".equals(goods.getPartner().getStatus()) && 
-						"1".equals(goods.getStatus()) && "1".equals(goods.getReviewResult())) {
+						"1".equals(goods.getStatus()) && Goods.REWSTAT.normal.getValue().equals(goods.getReviewResult())) {
 					map.put("goods", goods);
 				}else {
 					map.put("errmsg", "该商品当前不可访问！");

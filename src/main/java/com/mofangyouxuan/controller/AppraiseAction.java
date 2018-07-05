@@ -29,7 +29,7 @@ public class AppraiseAction {
 	 */
 	@RequestMapping("/show/{objNm}/{objId}")
 	public String showAll(@PathVariable("objNm")String objNm,@PathVariable("objId")Long objId,ModelMap map) {
-		if(!"goods".equals(objNm) && "partnerId".equals(objNm)) {//访问非法
+		if(!"goods".equals(objNm) && !"partner".equals(objNm)) {//访问非法
 			objNm = null;
 			objId = null;
 		}
@@ -53,8 +53,8 @@ public class AppraiseAction {
 			JSONObject params = new JSONObject();
 			
 			params.put("goodsId", goodsId);
-			params.put("status", "41,56");
-			params.put("appraiseStatus", "1");
+			params.put("status", "41,57");
+			params.put("appraiseStatus", "S");
 			
 			JSONObject sortParams = new JSONObject();
 			sortParams.put("createTime", "1#1");
@@ -97,8 +97,8 @@ public class AppraiseAction {
 			JSONObject params = new JSONObject();
 			
 			params.put("partnerId", partnerId);
-			params.put("status", "41,56");
-			params.put("appraiseStatus", "1");
+			params.put("status", "41,57");
+			params.put("appraiseStatus", "S");
 			
 			JSONObject sortParams = new JSONObject();
 			sortParams.put("createTime", "1#1");
@@ -142,8 +142,8 @@ public class AppraiseAction {
 			JSONObject params = new JSONObject();
 			
 			params.put("userId", userId);
-			params.put("status", "41,56");
-			params.put("appraiseStatus", "1");
+			params.put("status", "41,57");
+			params.put("appraiseStatus", "S");
 			
 			JSONObject sortParams = new JSONObject();
 			sortParams.put("createTime", "1#1");

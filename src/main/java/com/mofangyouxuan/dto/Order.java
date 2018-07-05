@@ -1,6 +1,7 @@
 package com.mofangyouxuan.dto;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
@@ -500,8 +501,11 @@ public class Order {
 		this.apprUser = apprUser;
 	}
 
-	public Date getApprUserTime() {
-		return apprUserTime;
+	public String getApprUserTime() {
+		if(this.appraiseTime == null) {
+			return null;
+		}
+		return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(apprUserTime);
 	}
 
 	public void setApprUserTime(Date apprUserTime) {

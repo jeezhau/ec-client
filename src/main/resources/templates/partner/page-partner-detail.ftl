@@ -110,7 +110,7 @@
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">推广上级ID  </label>
         <div class="col-xs-8" style="padding-left:1px">
-          <input class="form-control"  value="${((partner.upPartnerId)!'0')?string('#')}" disabled >
+          <input class="form-control"  value="${((partner.upPartnerId)!0)?string('#')}" disabled >
         </div>
       </div>
       </#if>

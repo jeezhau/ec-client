@@ -16,10 +16,8 @@
     <link href="/css/templatemo-style.css" rel="stylesheet">
     
     <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-    
     <link href="/css/weui.css" rel="stylesheet">
     
-    <link href="/css/mfyx.css" rel="stylesheet">
     <script src="/script/common.js" type="text/javascript"></script>
 </head>
 <body class="light-gray-bg">

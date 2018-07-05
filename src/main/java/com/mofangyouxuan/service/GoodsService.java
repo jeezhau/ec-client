@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.Category;
@@ -31,6 +32,7 @@ public class GoodsService {
 	private static String goodsChangeStatusUrl;
 	private static String goodsChangeSpecUrl;
 	private static String goodsCategoryUrl;
+	private static String goodsReviewUrl;
 	
 	@Value("${mfyx.mfyx-server-url}")
 	public void setMfyxServerUrl(String mfyxServerUrl) {
@@ -68,6 +70,10 @@ public class GoodsService {
 	@Value("${mfyx.goods-category-url}")
 	public void setGoodsCategoryUrl(String goodsCategoryUrl) {
 		GoodsService.goodsCategoryUrl = goodsCategoryUrl;
+	}
+	@Value("${mfyx.goods-review-url}")
+	public void setGoodsReviewUrl(String goodsReviewUrl) {
+		GoodsService.goodsReviewUrl = goodsReviewUrl;
 	}
 	
 	/**
@@ -236,7 +242,50 @@ public class GoodsService {
 	
 	
 	/**
+	 * 订单审核与抽查
+	 * 上级审批下级信息
+	 * 1、上级可对下级进行审核；
+	 * 2、顶级对所有合作伙伴进行最终审核；
+	 * 3、仅顶级审核通过后才算通过；
+	 * @param goodsId	待审批商品ID
+	 * @param review 	审批意见
+	 * @param result 	审批结果：S-通过，R-拒绝
+	 * @param rewPartnerId	审核者合作伙伴ID
+	 * @param operator	审批人ID，为上级合作伙伴的员工用户ID
+	 * @param passwd		审批人操作密码
 	 * 
+	 * @return {errcode:0,errmsg:"ok"}
+	 * @throws JSONException
+	 */
+	public static JSONObject review(Long goodsId,String review,String result,
+			Integer rewPartnerId,Integer operator,String passwd){
+		Map<String,Object> params = new HashMap<String,Object>();
+		JSONObject jsonRet = new JSONObject();
+		try {
+			params.put("goodsId", goodsId);
+			params.put("review", review);
+			params.put("result", result);
+			params.put("rewPartnerId", rewPartnerId);
+			params.put("operator", operator);
+			params.put("passwd", passwd);
+			String url = mfyxServerUrl + goodsReviewUrl;
+			String strRet = HttpUtils.doPost(url, params);
+			jsonRet = JSONObject.parseObject(strRet);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errmsg", "系统错误：" + strRet);
+				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errmsg", "系统异常：" + e.getMessage());
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+		}
+		return jsonRet;
+	}
+	
+	/**
+	 * 获取商品分类
 	 * @return 
 	 */
 	public static List<Category> getCategories(){

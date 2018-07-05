@@ -1,4 +1,4 @@
-package com.mofangyouxuan.controller;
+package com.mofangyouxuan.controller.ums;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

@@ -40,8 +40,8 @@
 	      </ol>
 	    </div>
     </div>
-    <div class="row">
-	    <div class="col-xs-12" style="padding:0 5px;background-color:white;margin:0 20px 0 3px;text-align:center">
+    <div class="row" style="margin:0">
+	    <div class="col-xs-12" style="padding:0 5px;background-color:white;margin:0 ;text-align:center">
 	     <a class="btn" href="javascript:;" @click="createNewFolder"><img src="/icons/新建文件夹.png" width="25px" height="25px"><br>新建文件夹</a>
 	     <a class="btn" href="javascript:;" @click="uploadImg"><img src="/icons/上传图片.png" width="25px" height="25px"><br>上传文件</a>
 	    </div>

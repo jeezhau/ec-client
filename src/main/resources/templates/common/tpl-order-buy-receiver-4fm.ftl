@@ -6,10 +6,10 @@
 	  <div class="row" style="margin:1px 1px ;padding:3px 0;background-color:white" >
 	    <div class="col-xs-12">
 	      <span>
-	        <#if (order.headimgurl)?starts_with('http')>
+	        <#if ((order.headimgurl)!'')?starts_with('http')>
 	        <img alt="头像" src="${(order.headimgurl)!''}" width="20px" height="20px" style="border-radius:50%"> 
 	        </#if>
-	        <#if !(order.headimgurl)?starts_with('http')>
+	        <#if !((order.headimgurl)!'')?starts_with('http')>
 	        <img alt="头像" src="/user/headimg/show/${(order.userId)?string('#')}" width="20px" height="20px" style="border-radius:50%"> 
 		    </#if>
 		    <span>${order.nickname}</span>

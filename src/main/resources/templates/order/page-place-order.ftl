@@ -176,7 +176,7 @@
              共<span style="color:red"> {{param.countAll}} </span>件
            </div>
            <div class="col-xs-6" style="padding:0">
-             <span style="color:red"> {{param.amount}} </span>元<br>
+             <span style="color:red"> {{new Number(param.amount).toFixed(2)}} </span>元<br>
            </div>
          </div>
           <div class="col-xs-12" style="padding:0">

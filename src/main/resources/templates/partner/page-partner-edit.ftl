@@ -105,7 +105,7 @@
         </div>
       </div> 
       <div v-if="param.pbTp==='1'" class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">推广上级ID<span style="color:red">*</span></label>
+        <label class="col-xs-4 control-label" style="padding-right:1px">推广上级ID</label>
         <div class="col-xs-8" style="padding-left:1px">
          <#if !(myPartner.partnerId)??>
           <input class="form-control"  v-model="param.upPartnerId" maxLength=11 required>
@@ -220,7 +220,11 @@ var partnerContainerVue = new Vue({
 	data:{
 		initData:{
 			pbTp:'${(myPartner.pbTp)!"1"}',
-			upPartnerId:'${(myPartner.upPartnerId)!''}',
+			<#if (myPartner.upPartnerId)??>
+			upPartnerId:'${(myPartner.upPartnerId)?string("#")}',
+			<#else>
+			upPartnerId:'',
+			</#if>
 			country:'中国',
 			province:'${(myPartner.province)!''}',
 			city:'${(myPartner.city)!''}',
@@ -251,7 +255,11 @@ var partnerContainerVue = new Vue({
 		},
 		param:{
 			pbTp:'${(myPartner.pbTp)!''}',
-			upPartnerId:'${(myPartner.upPartnerId)!''}',
+			<#if (myPartner.upPartnerId)??>
+			upPartnerId:'${(myPartner.upPartnerId)?string("#")}',
+			<#else>
+			upPartnerId:'',
+			</#if>
 			country:'中国',
 			province:'${(myPartner.province)!''}',
 			city:'${(myPartner.city)!''}',

@@ -16,10 +16,8 @@
     <link href="/css/templatemo-style.css" rel="stylesheet">
     
     <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-    
     <link href="/css/weui.css" rel="stylesheet">
     
-    <link href="/css/mfyx.css" rel="stylesheet">
 </head>
 <body class="light-gray-bg">
 <div class="container" style="oveflow:scroll">
@@ -95,18 +93,20 @@
        </div>
     </div>
     </#if>
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('complain4p')) >
     <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
        <div style="background-color:white">
-	    <a href="/paftersale/manage/refunding" >
+	    <a href="/pcomplain/partner/manage" >
 		    <img src="/icons/投诉.png" alt="" width="90px" height="90px">
-		    <p >投诉上级或平台</p>
+		    <p >向上投诉</p>
 		</a>
        </div>
     </div>
+    </#if>
   </#if>
     
   <#if ((myPartner.pbTp)!'')=='2' >
-    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('mypartners')) >
+    <#if (partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('mypartners'))) >
     <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/mypartners/manage" >
@@ -119,13 +119,23 @@
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('review')) >
     <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
        <div style="background-color:white">
-	    <a href="/paftersale/manage/refunding" >
+	    <a href="/review/manage/goods" >
 		    <img src="/icons/信息审核.png" alt="" width="90px" height="90px">
 		    <p >信息审核</p>
 		</a>
        </div>
     </div>
-    </#if>   
+    </#if> 
+    <#if myPartner.partnerId == SYS_PARTNERID && (partnerUserTP=='bindVip' || partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('Complain'))>
+     <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+       <div style="background-color:white">
+	    <a href="/pcomplain/sys/manage" >
+		    <img src="/icons/投诉.png" alt="" width="90px" height="90px">
+		    <p >投诉处理</p>
+		</a>
+       </div>
+    </div>   
+    </#if>  
   </#if>
     
   <#if (myPartner.pbTp)??>     
@@ -137,6 +147,7 @@
 		</a>
        </div>
     </div>    
+  </#if>
     <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/pstaff/kfshow/${SYS_PARTNERID?string('#')}?tagId=kf4partner" >
@@ -144,9 +155,7 @@
 		    <p >官方客服</p>
 		</a>
        </div>
-    </div>
-  </#if>
-       
+    </div>  
   </div>
   <div class="row" style="margin-top:3px;vertical-align:center">
     <div class="col-xs-12">
@@ -177,7 +186,7 @@
 </#if>
 
 <footer>
-  <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
 </footer>
 </body>
 </html>

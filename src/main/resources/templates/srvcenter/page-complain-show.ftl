@@ -26,7 +26,7 @@
 
 <div class="container " id="container" style="oveflow:scroll">
    <div class="row">
-     <a class="col-xs-2" href="/complain/manage/order" style="vertical-algin:center;text-align:center"><img width="15px" height="15px" alt="" src="/icons/返回.png"></a>
+     <a class="col-xs-2" href="/complain/manage" style="vertical-algin:center;text-align:center"><img width="15px" height="15px" alt="" src="/icons/返回.png"></a>
      <h3 class="col-xs-9" style="margin:5px 0;text-align:center" >我的投诉</h3>
    </div>
    <div class="row">
@@ -52,8 +52,8 @@
 		    </div>
 	    </div>
 	    <div class="col-xs-12" style="padding:0 10px;text-align:right">
-	       <a v-if="item.status=='0'" class="btn btn-primary" :href="'/complain/manage/order?oprFlag=S&cplanId=' + item.cplanId" style="padding:0px 8px"> 修 改 </a>
-	       <a class="btn btn-danger" :href="'/complain/manage/order?oprFlag=D&cplanId=' + item.cplanId" style="padding:0px 8px"> 删 除 </a>
+	       <a v-if="item.status=='0'" class="btn btn-primary" :href="'/complain/manage?oprFlag=S&cplanId=' + item.cplanId" style="padding:0px 8px"> 修 改 </a>
+	       <a class="btn btn-danger" :href="'/complain/manage?oprFlag=D&cplanId=' + item.cplanId" style="padding:0px 8px"> 删 除 </a>
 	    </div>
 	  </div>
   </div>  
@@ -72,7 +72,7 @@ var containerVue = new Vue({
 	methods:{
 		getComplain :function(){
 			$.ajax({
-				url: '/complain/order/getall',
+				url: '/complain/getall',
 				method:'post',
 				data: this.search,
 				success: function(jsonRet,status,xhr){

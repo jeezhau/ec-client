@@ -1,4 +1,4 @@
-package com.mofangyouxuan.controller;
+package com.mofangyouxuan.controller.pms;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -54,7 +54,7 @@ public class PartnerBasicAction {
 	@Value("${sys.tmp-file-dir}")
 	private String tmpFileDir;
 	
-	private Integer openPartnerNeedScore = 1500; //开通合作伙伴需要多少积分
+	private Integer openPartnerNeedScore = 1000; //开通合作伙伴需要多少积分
 	private String[] certTypeArr = {"logo","idcard1","idcard2","licence","agreement"}; 	//当前支持的证件类型
 	
 	/**
