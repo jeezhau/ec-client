@@ -148,9 +148,11 @@ mfyx:
   
   complain-getall-url: '/complain/getall'
   complain-order-save-url: '/complain/{userId}/order/save'
-  complain-partner-save-url: '/complain/{vipId}/partner/save'
   complain-order-delete-url: '/complain/{userId}/order/delete/{cplainId}'
-  complain-partner-delete-url: '/complain/{vipId}/partner/delete/{cplainId}' 
+  complain-partner-save-url: '/complain/{partnerId}/partner/save'
+  complain-partner-delete-url: '/complain/{partnerId}/partner/delete/{cplainId}'
+  complain-deal-url: '/complain/deal'
+  complain-revisit-url: '/complain/revisit'
   
   cash-apply-url: '/cash/{vipId}/apply'
   cash-delete-url: '/cash/{vipId}/delete'

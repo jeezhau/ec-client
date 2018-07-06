@@ -114,24 +114,25 @@ public class CashApplyService {
 	
 
 	/**
-	 * 重设员工的密码
-	 * @param partnerId
-	 * @param rootPasswd
-	 * @param userId
-	 * @param newPasswd
-	 * @return {errcode,errmsg}
+	 * 提现处理 
+	 * @param vipId
+	 * @param applyId
+	 * @param stat
+	 * @param memo
+	 * @param operator
+	 * @param passwd
+	 * @return
 	 */
-	public static JSONObject updaeStat(Integer vipId,String applyId,Long amount,
-			String stat,String memo,Integer updateOpr,String passwd) {
+	public static JSONObject updaeStat(Integer vipId,String applyId,
+			String stat,String memo,Integer operator,String passwd) {
 		String url = mfyxServerUrl + cashUpdateStatUrl;
-	
+		
 		Map<String, Object> params = new HashMap<String,Object>();
 		params.put("vipId", vipId);
 		params.put("applyId", applyId);
-		params.put("amount", amount);
 		params.put("stat", stat);
 		params.put("memo", memo);
-		params.put("updateOpr", updateOpr);
+		params.put("operator", operator);
 		params.put("passwd", passwd);
 		String strRet = HttpUtils.doPost(url, params);
 		JSONObject jsonRet = new JSONObject();

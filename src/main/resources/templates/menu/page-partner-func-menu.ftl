@@ -57,13 +57,21 @@
 	    <p class="weui-tabbar__label">审核</p>
 	</a>
 	</#if>
-	<#if myPartner.partnerId == SYS_PARTNERID && (partnerUserTP=='bindVip' || partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('Complain'))>
-	<a href="/pcomplain/sys/manage" class="weui-tabbar__item <#if (sys_func!'')=='complain'>weui-bar__item_on </#if>" >
+    <#if myPartner.partnerId == SYS_PARTNERID>
+     <#if  partnerUserTP=='bindVip' || partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('Complain')>
+     <a href="/pcomplain/sys/manage" class="weui-tabbar__item <#if (sys_func!'')=='complain'>weui-bar__item_on </#if>" >
 	    <img src="/icons/投诉.png" alt="" class="weui-tabbar__icon">
 	    <p class="weui-tabbar__label">处.诉</p>
-	</a>	
+	 </a>
+	 </#if>
+	 <#if  partnerUserTP=='bindVip' || partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('CashapplyDeal')>
+     <a href="/pcash/manage" class="weui-tabbar__item <#if (sys_func!'')=='CashapplyDeal'>weui-bar__item_on </#if>" >
+	    <img src="/icons/提现.png" alt="" class="weui-tabbar__icon">
+	    <p class="weui-tabbar__label">提现</p>
+	 </a>
+	 </#if>	
 	</#if>	
-  </#if>   
+  </#if>  
 	
   <#if (myPartner.pbTp)??>
 	<a href="/pstaff/manage" class="weui-tabbar__item <#if (sys_func!'')=='partner-pstaff'>weui-bar__item_on </#if>" >

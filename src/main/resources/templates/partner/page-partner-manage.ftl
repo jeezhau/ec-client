@@ -126,7 +126,8 @@
        </div>
     </div>
     </#if> 
-    <#if myPartner.partnerId == SYS_PARTNERID && (partnerUserTP=='bindVip' || partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('Complain'))>
+    <#if myPartner.partnerId == SYS_PARTNERID>
+     <#if  partnerUserTP=='bindVip' || partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('Complain')>
      <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/pcomplain/sys/manage" >
@@ -134,8 +135,19 @@
 		    <p >投诉处理</p>
 		</a>
        </div>
-    </div>   
-    </#if>  
+     </div>   
+     </#if> 
+     <#if  partnerUserTP=='bindVip' || partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('CashapplyDeal')>
+     <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+       <div style="background-color:white">
+	    <a href="/pcash/manage" >
+		    <img src="/icons/提现.png" alt="" width="90px" height="90px">
+		    <p >提现处理</p>
+		</a>
+       </div>
+     </div>   
+     </#if>     
+    </#if> 
   </#if>
     
   <#if (myPartner.pbTp)??>     

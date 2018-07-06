@@ -153,11 +153,11 @@ containerVue.getAll();
 		  <div class="form-group">
 		    <label class="col-xs-3 control-label" style="padding-right:0">通道类型<span style="color:red">*</span></label>
 		    <div class="col-xs-8">
-		       <select v-model="param.channelType" :disabled="oprFlag == 0 || oprFlag ==3">
+		       <select v-model="param.channelType" :disabled="oprFlag == 0 || oprFlag ==3" @change="changeChl">
 		        <option value="" disabled> 请选择通道类型... </option>
 		        <option value="1">银行</option>
-		        <!-- <option value="2">微信</option>
-		        <option value="3">支付宝</option> -->
+		        <!-- <option value="2">微信</option> -->
+		        <option value="3">支付宝</option>
 		      </select>
 		    </div>
 		  </div>		  
@@ -219,6 +219,13 @@ var saveAccountVue = new Vue({
 		}
 	},
 	methods:{
+		changeChl:function(){
+			if(this.param.channelType=='2'){
+				this.param.accountBank='微信';
+			}else if(this.param.channelType=='3'){
+				this.param.accountBank='支付宝';
+			}
+		},
 		submit: function(){
 			delete this.param.updateTime;
 			delete this.param.vipId;

@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
+import com.mofangyouxuan.common.SysParam;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.PartnerStaff;
 import com.mofangyouxuan.dto.VipBasic;
@@ -29,6 +31,7 @@ import com.mofangyouxuan.utils.PageCond;
  */
 @Controller
 @RequestMapping("/pcomplain")
+@SessionAttributes({"sys_func"})
 public class PartnerComplainAction {
 	
 	/**
@@ -52,8 +55,9 @@ public class PartnerComplainAction {
 			return "redirect:/partner/manage" + "?errmsg=" + URLEncoder.encode(errmsg, "utf8") ;
 		}
 		if("sys".equals(mode) ) {
-			if("staff".equals(partnerUserTP) && (partnerStaff == null || partnerStaff.getTagList() == null || 
-					(!partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainDeal.getValue()) && !partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainRevisit.getValue())))){
+			if(!myPartner.getPartnerId().equals(SysParam.getSyspartnerId()) || "bindVip".equals(partnerUserTP) || 
+					("staff".equals(partnerUserTP) && (partnerStaff == null || partnerStaff.getTagList() == null || 
+					(!partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainDeal.getValue()) && !partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainRevisit.getValue())))) ){
 				errmsg = "您没有权限执行该操作！！";
 				return "redirect:/partner/manage" + "?errmsg=" + URLEncoder.encode(errmsg, "utf8") ;
 			}
@@ -99,8 +103,9 @@ public class PartnerComplainAction {
 			return "redirect:/partner/manage" + "?errmsg=" + URLEncoder.encode(errmsg, "utf8") ;
 		}
 		if("deal".equals(mode) || "revisit".equals(mode)) {
-			if("staff".equals(partnerUserTP) && (partnerStaff == null || partnerStaff.getTagList() == null || 
-					(!partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainDeal.getValue()) && !partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainRevisit.getValue())))){
+			if(!myPartner.getPartnerId().equals(SysParam.getSyspartnerId()) || "bindVip".equals(partnerUserTP) || 
+					("staff".equals(partnerUserTP) && (partnerStaff == null || partnerStaff.getTagList() == null || 
+					(!partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainDeal.getValue()) && !partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainRevisit.getValue())))) ){
 				errmsg = "您没有权限执行该操作！！";
 				return "redirect:/partner/manage" + "?errmsg=" + URLEncoder.encode(errmsg, "utf8") ;
 			}
@@ -149,9 +154,9 @@ public class PartnerComplainAction {
 			
 			Integer updateOpr = null;
 			//权限检查
-			if(myPartner == null || (!"S".equals(myPartner.getStatus()) && !"C".equals(myPartner.getStatus()))) {
+			if(myPartner == null || !myPartner.getPartnerId().equals(SysParam.getSyspartnerId())) {
 				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
-				jsonRet.put("errmsg", "您的合作伙伴未处于正常状态！！");
+				jsonRet.put("errmsg", "您没有权限执行该操作！！");
 				return jsonRet;
 			}
 			if("staff".equals(partnerUserTP)) {
@@ -212,9 +217,9 @@ public class PartnerComplainAction {
 			
 			Integer updateOpr = null;
 			//权限检查
-			if(myPartner == null || (!"S".equals(myPartner.getStatus()) && !"C".equals(myPartner.getStatus()))) {
+			if(myPartner == null || !myPartner.getPartnerId().equals(SysParam.getSyspartnerId())) {
 				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
-				jsonRet.put("errmsg", "您的合作伙伴未处于正常状态！！");
+				jsonRet.put("errmsg", "您没有权限执行该操作！！");
 				return jsonRet;
 			}
 			if("staff".equals(partnerUserTP)) {
@@ -418,8 +423,9 @@ public class PartnerComplainAction {
 			}
 			
 			if("sys".equals(mode)) {
-				if("staff".equals(partnerUserTP) && (partnerStaff == null || 
-						(!partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainDeal.getValue()) && !partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainRevisit.getValue()))) ){
+				if(!myPartner.getPartnerId().equals(SysParam.getSyspartnerId()) || "bindVip".equals(partnerUserTP) || 
+						("staff".equals(partnerUserTP) && (partnerStaff == null || partnerStaff.getTagList() == null || 
+						(!partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainDeal.getValue()) && !partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainRevisit.getValue())))) ){
 					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
 					jsonRet.put("errmsg", "您没有权限执行该该操作！");
 					return jsonRet;
@@ -452,7 +458,6 @@ public class PartnerComplainAction {
 		}
 		return jsonRet.toString();
 	}
-	
 	
 	
 }

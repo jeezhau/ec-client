@@ -51,6 +51,8 @@ public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter{
 	    partnerSessionReg.addPathPatterns("/mypartners/**");
 	    partnerSessionReg.addPathPatterns("/review/**");
 	    partnerSessionReg.addPathPatterns("/pcomplain/**");
+	    partnerSessionReg.addPathPatterns("/pcash/**");
+	   
         super.addInterceptors(registry);
     }
 }
