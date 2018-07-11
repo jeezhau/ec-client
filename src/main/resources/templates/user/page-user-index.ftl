@@ -221,7 +221,7 @@
 	    </div>
 	    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
 	       <div style="background-color:white">
-		   <a href="<#if vipBasic.status = '1'>/partner/manage<#else>javascript:;</#if>">
+		   <a href="/partner/manage">
 			    <img alt="" src="/icons/合作伙伴.png" width="90px" height="90px"> 
 			    <p >合作伙伴 </p>
 			</a>

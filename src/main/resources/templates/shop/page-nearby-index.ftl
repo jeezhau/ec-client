@@ -53,7 +53,7 @@
         </div>
 	    <div style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
 	      <a v-bind:href="'/shop/goods/' + goods.goodsId">
-	        <img alt="" :src="'/shop/gimage/' + goods.partnerId + '/' + goods.mainImgPath" style="width:90%;max-width:200px;height:150px">
+	        <img alt="" :src="'/shop/gimage/' + goods.partnerId + '/' + goods.mainImgPath" style="max-height:160px;max-width:100%">
 	      </a>
 	    </div>
 	    <div style="margin:1px 1px;" >

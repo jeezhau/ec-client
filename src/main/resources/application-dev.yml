@@ -12,6 +12,7 @@ server:
 logging:
   level:
     com.jeekhan.wx: DEBUG
+  path: /Users/jeekhan/log/mfyxm
     
 spring:
   servlet:
@@ -33,13 +34,13 @@ wx:
   
  #微信管理平台访问 
 wxmp:
-  wxmp-server-url: 'http://127.0.0.1:9000'
+  wxmp-server-url: 'http://192.168.0.101:9000'
   jsapi-sign-url: '/jsapi/sign' 
   
 ######业务参数-摩放优选服务中心访问############
 mfyx:
-  mfyx-server-url: 'http://127.0.0.1:8080'
-  messmp-server-url: 'http://127.0.0.1:8888'
+  mfyx-server-url: 'http://192.168.0.101:8080'
+  messmp-server-url: 'http://192.168.0.101:8888'
   
   phone-vericode-get-url: '/sms/vericode/send'
   email-vericode-get-url: '/email/vericode/send'
@@ -161,7 +162,7 @@ mfyx:
   
 ######系统参数############  
 sys:
-  local-server-url: 'http://127.0.0.1:8000'
+  local-server-url: 'http://192.168.0.101:8000'
   tmp-file-dir: '/Users/jeekhan/mfyxm/tmp/'
 
   

@@ -6,12 +6,7 @@
 	    <p class="weui-tabbar__label">首页</p>
 	</a>
   <#if ((myPartner.pbTp)!'')=='1'>
-	<#if (partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('goods')) )>
-	<a href="/goods/manage" class="weui-tabbar__item <#if (sys_func!'')=='partner-goods'>weui-bar__item_on </#if>" >
-	    <img src="/icons/商品管理.png" alt="" class="weui-tabbar__icon">
-	    <p class="weui-tabbar__label">商品</p>
-	</a>
-	</#if>
+
 	<#if (partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('postage')) )>
 	<a href="/postage/manage" class="weui-tabbar__item <#if (sys_func!'')=='partner-postage'>weui-bar__item_on </#if>" >
 	    <img src="/icons/运费模板管理.png" alt="" class="weui-tabbar__icon">
@@ -22,6 +17,12 @@
 	<a href="/pimage/manage" class="weui-tabbar__item <#if (sys_func!'')=='partner-image'>weui-bar__item_on </#if>" >
 	    <img src="/icons/图库管理.png" alt="" class="weui-tabbar__icon">
 	    <p class="weui-tabbar__label">图库</p>
+	</a>
+	</#if>
+	<#if (partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('goods')) )>
+	<a href="/goods/manage" class="weui-tabbar__item <#if (sys_func!'')=='partner-goods'>weui-bar__item_on </#if>" >
+	    <img src="/icons/商品管理.png" alt="" class="weui-tabbar__icon">
+	    <p class="weui-tabbar__label">商品</p>
 	</a>
 	</#if>
 	<#if (partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('saleorder')) )>

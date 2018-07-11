@@ -579,7 +579,7 @@ public class GoodsAction {
 	public String getCategories(ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		List<Category> categories = (List<Category>) map.get("categories");
-		if(categories == null) {
+		if(categories == null || categories.size()<1) {
 			categories = GoodsService.getCategories();
 		}
 		jsonRet.put("errcode", 0);

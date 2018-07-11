@@ -294,20 +294,17 @@ public class PartnerImageAction {
 	 * @param filename
 	 * @return
 	 */
-	@RequestMapping("/file/show/{partnerId}/{filename}")
-	public void showFile(@PathVariable(value="partnerId",required=true)Integer partnerId,
-			@PathVariable(value="filename",required=true)String filename,
+	@RequestMapping("/file/show/{filename}")
+	public void showFile(@PathVariable(value="filename",required=true)String filename,
 			OutputStream out,HttpServletRequest request,HttpServletResponse response,ModelMap map) {
 		try {
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
 			//数据检查
-			if(partnerId == null || partnerId < 1 ) {
-				return;
-			}
 			if("undefined".equals(filename)) {
 				return;
 			}
 			String url = this.mfyxServerUrl + this.imageShowFileurl; 
-			url = url.replace("{partnerId}",partnerId + "");
+			url = url.replace("{partnerId}",myPartner.getPartnerId() + "");
 			url = url.replace("{filename}",filename);	
 			File file = HttpUtils.downloadFile(this.tmpFileDir,url);
 			InputStream is = new FileInputStream(file);

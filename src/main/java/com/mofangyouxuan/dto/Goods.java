@@ -245,7 +245,7 @@ public class Goods {
 		if(this.updateTime == null) {
 			return null;
 		}
-		return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(updateTime);
+		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(updateTime);
     }
 
     public void setUpdateTime(Date updateTime) {
@@ -280,7 +280,7 @@ public class Goods {
     		if(this.reviewTime == null) {
     			return null;
     		}
-        return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(reviewTime);
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(reviewTime);
     }
 
     public void setReviewTime(Date reviewTime) {

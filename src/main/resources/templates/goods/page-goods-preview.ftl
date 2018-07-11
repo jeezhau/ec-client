@@ -41,14 +41,12 @@
     <!-- 轮播（Carousel）项目 -->
     <div class="carousel-inner">
         <div  v-bind:class="[{active:(index===0)}, 'item']" v-for="imgpath,index in courselImgPaths" >
-            <img :src="'/pimage/file/show/${((goods.partnerId)!'')?string('#')}/' + imgpath" >
+            <img :src="'/shop/gimage/${((goods.partnerId)!'')?string('#')}/' + imgpath"  style="max-width:100%;max-height:600px">
         </div>
     </div>
     <!-- 轮播（Carousel）导航 -->
-    <a class="carousel-control left" href="#myCarousel" 
-       data-slide="prev"> <span _ngcontent-c3="" aria-hidden="true" class="glyphicon glyphicon-chevron-right"></span></a>
-    <a class="carousel-control right" href="#myCarousel" 
-       data-slide="next">&rsaquo;</a>
+    <a class="carousel-control left" href="#myCarousel" data-slide="prev"><span _ngcontent-c3="" aria-hidden="true" class="glyphicon glyphicon-chevron-left"></span></a>
+    <a class="carousel-control right" href="#myCarousel" data-slide="next"><span _ngcontent-c3="" aria-hidden="true" class="glyphicon glyphicon-chevron-right"></span></a>
   </div>
   
   <!-- 售卖信息 -->

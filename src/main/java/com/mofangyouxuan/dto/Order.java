@@ -505,7 +505,7 @@ public class Order {
 		if(this.appraiseTime == null) {
 			return null;
 		}
-		return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(apprUserTime);
+		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(apprUserTime);
 	}
 
 	public void setApprUserTime(Date apprUserTime) {

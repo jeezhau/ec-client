@@ -19,7 +19,7 @@
     <link href="/css/weui.css" rel="stylesheet">
     
     <script src="/script/common.js" type="text/javascript"></script>
-    
+    <script src="/ckeditor/ckeditor.js"></script>
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
@@ -168,11 +168,8 @@
           <label class="col-xs-12 control-label" style="text-align:left">商品图文描述<span style="color:red">*</span></label>
         </div>
         <div class="col-xs-12" >
-          <input type="hidden" value="${(goods.goodsDesc)!''}" id="hiddenGoodsDesc">
-          <textarea class="form-control" maxLength=10000  rows=30 required v-model="param.goodsDesc"
-          placeholder="    请输入10-10000字符的企业经营简介。
-    编辑说明：最好请在文本编辑器中编辑好之后复制粘贴于此。
-    相关格式说明：如果是一个段落请将段落内容放置于标签: <p>与</p>之间；换行则在句末添加标签：<br>；插入图片使用标签：<img src='  ' width = '100%' > ，src属性的内容来自图库中图片的链接(不是图片名称)。不清楚的话可以问问身边的做软件开发的朋友。"></textarea>
+          <div id="hiddenGoodsDesc" style="display:none">${(goods.goodsDesc)!''}"</div>
+          <textarea class="form-control ckeditor" id="content" maxLength=10000  rows=30 required ></textarea>
         </div>
       </div>
       <div class="form-group">
@@ -212,7 +209,11 @@ var goodsContainerVue = new Vue({
 		review:{
 			reviewResult:'${(goods.reviewResult)!"0"}',
 			reviewTime:'${(goods.reviewTime)!''}' ,
+			<#if ((goods.reviewLog)!'') != ''>
 			reviewLog:JSON.parse('${(goods.reviewLog)!"[]"}')
+			<#else>
+			reviewLog:JSON.parse('[]')
+			</#if>
 		},
 		param:{
 			goodsId:'${((goods.goodsId)!"-1")?string("#")}',
@@ -388,6 +389,7 @@ var goodsContainerVue = new Vue({
 		},
 		submit: function(){
 			$('#dealingData').show();
+			this.param.goodsDesc = CKEDITOR.instances.content.getData();
 			//组织规格数据
 			var okSpecArr = [];
 			//var stockSum = 0;
@@ -490,7 +492,49 @@ goodsContainerVue.getPostages();
 if(goodsContainerVue.specDetailArr.length == 0){
 	goodsContainerVue.addSpec();	
 }
-goodsContainerVue.param.goodsDesc = $('#hiddenGoodsDesc').val();
+//goodsContainerVue.param.goodsDesc = $('#hiddenGoodsDesc').html();
+
+//页面初始化
+var editor = CKEDITOR.replace( 'content' );	//修改 #content 的显示方式为 CKEDITOR
+var contentObj = CKEDITOR.instances['content'];
+contentObj.setData($('#hiddenGoodsDesc').html()); 
+function addUploadButton(editor){
+    CKEDITOR.on('dialogDefinition', function( ev ){
+        var dialogName = ev.data.name;
+        var dialogDefinition = ev.data.definition;
+        if ( dialogName == 'image' ){
+            var infoTab = dialogDefinition.getContents( 'info' );
+            infoTab.add({
+                type : 'button',
+                id : 'upload_image',
+                align : 'center',
+                label : '选择',
+                onClick : function( evt ){
+                    var thisDialog = this.getDialog();
+                    var txtUrlObj = thisDialog.getContentElement('info', 'txtUrl');
+                    var txtUrlId = txtUrlObj.getInputElement().$.id;
+                    addUploadImage(txtUrlId);
+                }
+            }, 'browse'); //place front of the browser button
+        }
+    });
+}
+ 
+function addUploadImage(theURLElementId){
+    var imgUrl = '/shop/gimage/${(goods.partnerId)?string('#')}/'; 
+  	//选择商品的图片
+	$('#imageGalleryShowModal').modal('show');
+	$('#imageGalleryShowModal').css('z-index',100000);
+	imageGalleryShowVue.selectCntLimit = 1;
+	imageGalleryShowVue.selectedImages = [];
+	imageGalleryShowVue.callbackFun = function(images){
+		var urlObj = $('#'+theURLElementId);
+	    urlObj.val(imgUrl + images);
+	    urlObj.change(); //触发url文本框的onchange事件，以便预览图片
+	}
+}
+addUploadButton(editor);
+
 </script>
 
 <#include "/pimage/page-image-show-tpl.ftl" encoding="utf8">

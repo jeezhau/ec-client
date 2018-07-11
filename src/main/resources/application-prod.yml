@@ -11,7 +11,8 @@ server:
 
 logging:
   level:
-    com.jeekhan.wx: DEBUG
+    com.jeekhan.wx: INFO
+  path: /var/log/mfyxm
     
 spring:
   servlet:

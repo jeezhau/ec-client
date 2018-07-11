@@ -36,9 +36,9 @@
      </div>
      <div class="col-xs-4" style="text-align:center;">
        <div style="">
-        <span>品质：{{getAvgScore(${(mcht.scoreGoods)!'暂无'})}}</span><br>
-        <span>物流：{{getAvgScore(${(mcht.scoreLogis)!'暂无'})}}</span><br>
-        <span>服务：{{getAvgScore(${(mcht.scoreServ)!'暂无'})}}</span><br>
+        <span>品质：{{getAvgScore("${(mcht.scoreGoods)!'暂无'}")}}</span><br>
+        <span>物流：{{getAvgScore("${(mcht.scoreLogis)!'暂无'}")}}</span><br>
+        <span>服务：{{getAvgScore("${(mcht.scoreServ)!'暂无'}")}}</span><br>
        </div>
      </div>
      <div class="col-xs-4" style="text-align:center;">
@@ -89,7 +89,7 @@
       <div v-for="goods in goodsList" class="col-xs-6 col-sm-4 col-md-4 col-lg-3" style="padding:3px 2px ;">
 	    <div style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
 	      <a v-bind:href="'/shop/goods/' + goods.goodsId">
-	        <img alt="" :src="'/shop/gimage/' + goods.partnerId + '/' + goods.mainImgPath" style="width:90%;height:150px">
+	        <img alt="" :src="'/shop/gimage/' + goods.partnerId + '/' + goods.mainImgPath" style="max-height:160px;max-width:100%">
 	      </a>
 	    </div>
 	    <div class="row" style="margin:1px 1px;" >
@@ -133,7 +133,7 @@ var containerVue = new Vue({
 		getAllGoods: function(){
 			 containerVue.goodsList = [];
 			 $.ajax({
-					url: '/shop/mcht/getall/${mcht.partnerId}',
+					url: '/shop/mcht/getall/${(mcht.partnerId)?string("#")}',
 					method:'post',
 					data: {},
 					success: function(jsonRet,status,xhr){
@@ -155,7 +155,7 @@ var containerVue = new Vue({
 		 getAllAppr: function(){
 			 containerVue.goodsList = [];
 			 $.ajax({
-					url: '/appraise/getall/partner/${mcht.partnerId}',
+					url: '/appraise/getall/partner/${(mcht.partnerId)?string("#")}',
 					method:'post',
 					data: {'begin':0,'pageSize':3},
 					success: function(jsonRet,status,xhr){

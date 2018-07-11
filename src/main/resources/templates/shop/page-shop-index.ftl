@@ -32,7 +32,7 @@
     <div v-for="goods in goodsList" class="col-xs-6 col-sm-4 col-md-4 col-lg-3" style="padding:3px 2px;">
 	    <div style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
 	      <a v-bind:href="'/shop/goods/' + goods.goodsId"  target="_blank">
-	        <img alt="" :src="'/shop/gimage/' + goods.partnerId + '/' + goods.mainImgPath" style="width:90%;max-width:200px;height:150px">
+	        <img alt="" :src="'/shop/gimage/' + goods.partnerId + '/' + goods.mainImgPath" style="max-height:160px;max-width:100%">
 	      </a>
 	    </div>
 	    <div class="row" style="margin:1px 1px;" >
@@ -44,8 +44,8 @@
 	      	<span class="pull-right ">销量: <span>{{goods.saledCnt}}</span>件</span>
 	      </div>
 	      <div class="row" style="margin:1px 0px 2px 0;padding:0 5px 3px 5px;background-color:white;text-align:center" >
-	        <a class="btn btn-danger " style="padding:3px 5px" :href="'/order/place/'+ goods.goodsId" target="_blank"><span style="color:white">立即下单</span></a>
-	        <a class="btn btn-primary" style="padding:3px 5px" href="javascript:;" @click="addCollection('2',goods.goodsId)" target="_blank"><span style="color:white">加入收藏</span></a>
+	        <a class="btn btn-danger " style="padding:3px 3px" :href="'/order/place/'+ goods.goodsId" target="_blank"><span style="color:white">立即下单</span></a>
+	        <a class="btn btn-primary" style="padding:3px 3px" href="javascript:;" @click="addCollection('2',goods.goodsId)" target="_blank"><span style="color:white">加入收藏</span></a>
 	      </div>
 	    </div>
     </div> 

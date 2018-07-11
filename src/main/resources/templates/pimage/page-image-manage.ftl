@@ -50,7 +50,7 @@
       <ul class="list-group" style="padding:0 5px;background-color:white;">
         <li v-for="item in files" class="list-group-item">
           <a v-if="isFileOrDir(item)===false" href="javascript:;" @click="listFiles(folder.join('/') + '/' + item)"><img alt="文件夹" width=20px height=20px src="/icons/文件夹.png">&nbsp;&nbsp;&nbsp;{{item}}</a>
-          <span v-if="isFileOrDir(item)===true"><img alt="" width=20px height=20px  v-bind:src="'/pimage/file/show/${(myPartner.partnerId)?string('#')}/' + item"><span>&nbsp;&nbsp;&nbsp; {{item}}</span></span>
+          <span v-if="isFileOrDir(item)===true"><img alt="" width=20px height=20px  v-bind:src="'/pimage/file/show/' + item"><span>&nbsp;&nbsp;&nbsp; {{item}}</span></span>
         </li>
       </ul>
     </div>

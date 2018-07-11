@@ -206,24 +206,6 @@ var containerVue = new Vue({
 </script>
 </#if>
 
-<!-- 微信支付返回提示 -->
-<div class="modal fade " id="payFinishTipModal" tabindex="-1" role="dialog" aria-labelledby="payFinishTipTitle" aria-hidden="false" data-backdrop="static" style="top:30%">
-	<div class="modal-dialog">
-  		<div class="modal-content">
-     		<div class="modal-header">
-        			<h5 class="modal-title" id="payFinishTipTitle" style="text-align:center">请确认微信支付是否已完成</h5>
-     		</div>
-     		<div class="modal-body">
-       			<p style="text-align:center;color:red" onclick="window.location.href='/order/pay/finish/${(order.orderId)}'"> 已经支付完成 <p/>
-     		</div>
-     		<div class="modal-footer">
-     		   <div class="row"  style="text-align:center;color:gray">
-     			<span onclick="$('#payFinishTipModal').modal('hide')">支付遇到问题，重新支付</span>
-     		   </div>
-     		</div>
-  		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
 
 <#if errmsg??>
  <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">

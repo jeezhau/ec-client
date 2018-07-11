@@ -27,25 +27,25 @@
 
 <div class="container " id="container" style="padding:0px 0px;oveflow:scroll">
   <div class="row" style="margin:0">
-    <div v-for="item in dataList"  class="col-xs-12 col-sm-12 col-md-6 col-lg-6" style="padding:3px;">
+    <div v-for="item in dataList"  class="col-xs-6 col-sm-6 col-md-4 col-lg-4" style="padding:3px;">
 	  <div v-if="item.collType == '2'" class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
 	     <div class="col-xs-12" style="text-align:center;background-color:white;">
-	       <a class="pull-left" :href="'/partner/mcht/'+item.goodsPartnerId">
-		      <img alt="头像" :src="'/partner/cert/show/logo/'+ item.goodsPartnerId" width="20px" height="20px" style="border-radius:50%"> 
+	       <a class="pull-left" :href="'/shop/mcht/'+item.goodsPartnerId">
+		      <img alt="头像" :src="'/shop/pcert/logo/'+ item.goodsPartnerId" width="20px" height="20px" style="border-radius:50%"> 
 		      <span>{{item.partnerBusiName}}</span>
 		   </a>
 	     </div>
 	      <div class="col-xs-12" style="text-align:center;">
 	        <div><span>{{item.goodsName}}</span></div>
 	        <div>
-	          <a :href="'/goods/show/' + item.relId">
-	           <img alt="" :src="'/image/file/show/' + item.goodsVipId + '/' + item.goodsMainImg" style="width:90%;max-width:200px;height:180px">
+	          <a :href="'/shop/goods/' + item.relId">
+	           <img alt="" :src="'/shop/gimage/' + item.goodsPartnerId + '/' + item.goodsMainImg" style="max-width:200px;max-height:180px">
 	          </a>
 	        </div>
 	      </div>
 	      <div class="col-xs-12" style="text-align:center;padding:3px;background-color:white;">
-	        <a class="btn btn-danger pull-right" style="padding:3px 3px" :href="'/order/place/'+ item.relId"> &nbsp; &nbsp;立即下单 &nbsp; &nbsp; </a>
-	        <button class="btn btn-primary pull-left" style="padding:3px 3px" @click="deleteColl(item)"> &nbsp; &nbsp;删 除 &nbsp; &nbsp; </button>
+	        <a class="btn btn-danger pull-right" style="padding:3px 3px" :href="'/order/place/'+ item.relId"> 立即下单 </a>
+	        <button class="btn btn-primary pull-left" style="padding:3px 3px" @click="deleteColl(item)"> &nbsp;删 除 &nbsp;</button>
 	      </div>
 	   </div>
 	   <div v-if="item.collType == '1'" class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >

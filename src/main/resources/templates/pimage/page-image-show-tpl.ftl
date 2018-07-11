@@ -25,7 +25,7 @@
 		            <img alt="文件夹" width=20px height=20px src="/icons/文件夹.png">&nbsp;&nbsp;&nbsp;{{item}}
 		          </a>
 		          <span v-if="isFileOrDir(item)===true">
-		            <img alt="" width=20px height=20px  v-bind:src="'/pimage/file/show/${(myPartner.partnerId)?string('#')}/' + item">
+		            <img alt="" width=20px height=20px  v-bind:src="'/pimage/file/show/' + item">
 		            <span>&nbsp;&nbsp;&nbsp; {{item}}</span>
 		            <input type="checkbox" style="display:inline-block;margin-left:10px;width:20px;height:20px" v-bind:value="item" v-model="selectedImages">
 		          </span>
