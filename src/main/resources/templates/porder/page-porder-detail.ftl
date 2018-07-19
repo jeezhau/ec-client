@@ -82,13 +82,13 @@
     </div>
   </div> 
   </#if> 
-  <#if (order.appraiseTime)?? >
+  <#if (apprMcht)?? >
   <!-- 买家评价信息 -->
   <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
     <div class="row" style="margin:1px 0px;background-color:white;">
       <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">买家评价</span>
     </div>
-    <div v-for="appr in appraiseInfo" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
+    <div v-for="appr in apprMcht" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
      <div class="row">
        <span class="pull-left">{{appr.time}}</span>
      </div>
@@ -98,7 +98,7 @@
     </div>
   </div> 
   </#if>
-  <#if (order.apprUserTime)??>
+  <#if (apprUser)??>
   <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
     <div class="row" style="margin:1px 0px;background-color:white;">
       <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">卖家评价</span>
@@ -133,8 +133,8 @@ var containerVue = new Vue({
 		goodsSpecArr: JSON.parse('${(order.goodsSpec)!"[]"}'),
 		aftersalesReason: JSON.parse('${(order.aftersalesReason)!"[]"}'),
 		aftersalesResult: JSON.parse('${(order.aftersalesResult)!"[]"}'),
-		appraiseInfo: JSON.parse('${(order.appraiseInfo)!"[]"}'),
-		apprUser: JSON.parse('${(order.apprUser)!"[]"}'),
+		apprMcht: JSON.parse('${(apprMcht.content)!"[]"}'),
+		apprUser: JSON.parse('${(apprUser.content)!"[]"}'),
 	},
 	methods:{
 		

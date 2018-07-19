@@ -30,12 +30,14 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
+import com.mofangyouxuan.dto.Appraise;
 import com.mofangyouxuan.dto.Goods;
 import com.mofangyouxuan.dto.GoodsSpec;
 import com.mofangyouxuan.dto.Order;
 import com.mofangyouxuan.dto.PayFlow;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
+import com.mofangyouxuan.service.AppraiseService;
 import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.service.OrderService;
 import com.mofangyouxuan.service.VipService;
@@ -216,7 +218,7 @@ public class OrderAction {
 		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
-			JSONObject jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
+			JSONObject jsonRet = OrderService.getOrder( orderId);
 			
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
@@ -256,7 +258,7 @@ public class OrderAction {
 		UserBasic user = (UserBasic) map.get("userBasic");
 		JSONObject jsonRet = new JSONObject();
 		try {
-			jsonRet = OrderService.getOrder(true, null, null, false, true, orderId);
+			jsonRet = OrderService.getOrder(orderId);
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
 				jsonRet.put("errmsg", "系统中没有该订单信息！");
 				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
@@ -353,7 +355,7 @@ public class OrderAction {
 		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
-			JSONObject jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
+			JSONObject jsonRet = OrderService.getOrder(orderId);
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
 				//response.sendRedirect("/show/all"); //重定向至订单显示
 				return;
@@ -412,7 +414,7 @@ public class OrderAction {
 		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
-			JSONObject jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
+			JSONObject jsonRet = OrderService.getOrder(orderId);
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
 				if(!user.getUserId().equals(order.getUserId())) {
@@ -459,7 +461,7 @@ public class OrderAction {
 			}else {
 				payType = 32; //web支付
 			}
-			JSONObject jsonRet = OrderService.getOrder(true, null, null, false, true, orderId);
+			JSONObject jsonRet = OrderService.getOrder(orderId);
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
 				return;
 			}
@@ -504,7 +506,7 @@ public class OrderAction {
 			}else if(vip.getPasswd() == null || vip.getPasswd().length()<10) {
 				map.put("errmsg", "您还未设置会员操作密码，不可使用余额支付！");
 			}else {
-				JSONObject jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
+				JSONObject jsonRet = OrderService.getOrder(orderId);
 				if(jsonRet != null && jsonRet.containsKey("order")) {
 					order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
 					if(!user.getUserId().equals(order.getUserId())) {
@@ -585,7 +587,7 @@ public class OrderAction {
 		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
-			JSONObject jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
+			JSONObject jsonRet = OrderService.getOrder(orderId);
 			
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
@@ -629,7 +631,7 @@ public class OrderAction {
 		JSONObject jsonRet = new JSONObject();
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
-			JSONObject jsonOrder = OrderService.getOrder(true, null, null, null, true, orderId);
+			JSONObject jsonOrder = OrderService.getOrder(orderId);
 			if(jsonOrder != null && jsonOrder.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonOrder.getJSONObject("order"),Order.class);
 				if(!user.getUserId().equals(order.getUserId())) {
@@ -805,7 +807,7 @@ public class OrderAction {
 				map.put("errmsg", "您没有权限查询该订单信息！");
 				return "";
 			}
-			JSONObject jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+			JSONObject jsonRet = OrderService.getOrder(orderId);
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
 				map.put("errmsg", "系统中没有该订单信息！");
 				return "";
@@ -839,7 +841,7 @@ public class OrderAction {
 		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
-			JSONObject jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
+			JSONObject jsonRet = OrderService.getOrder(orderId);
 			
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
@@ -884,7 +886,7 @@ public class OrderAction {
 		UserBasic user = (UserBasic) map.get("userBasic");
 		JSONObject jsonRet = new JSONObject();
 		try {
-			jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+			jsonRet = OrderService.getOrder( orderId);
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
 				jsonRet.put("errmsg", "系统中没有该订单信息！");
 				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
@@ -933,7 +935,7 @@ public class OrderAction {
 		UserBasic user = (UserBasic) map.get("userBasic");
 		JSONObject jsonRet = new JSONObject();
 		try {
-			jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+			jsonRet = OrderService.getOrder(orderId);
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
 				jsonRet.put("errmsg", "系统中没有该订单信息！");
 				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
@@ -1014,8 +1016,8 @@ public class OrderAction {
 		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
-			JSONObject jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
-			
+			JSONObject jsonRet = OrderService.getOrder(orderId);
+			JSONObject jsonRetAppr = AppraiseService.getAppraise(orderId, "1");
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
 				if(!user.getUserId().equals(order.getUserId())) {
@@ -1026,11 +1028,10 @@ public class OrderAction {
 							!"54".equals(order.getStatus()) && !"55".equals(order.getStatus()) && !"56".equals(order.getStatus())) {
 						map.put("errmsg", "您当前不可对订单进行评价！");
 					}else {
-//						jsonRet = OrderService.getPayFlow(order, user.getUserId(), "1");
-//						if(jsonRet != null && jsonRet.containsKey("payFlow")) {
-//							PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
-//							map.put("payFlow", payFlow);
-//						}
+						if(jsonRetAppr != null && jsonRetAppr.containsKey("appraise")) {
+							Appraise appraise = JSONObject.toJavaObject(jsonRetAppr.getJSONObject("appraise"), Appraise.class);
+							map.put("appraise", appraise);
+						}
 						map.put("order", order);
 					}
 				}
@@ -1059,7 +1060,7 @@ public class OrderAction {
 		UserBasic user = (UserBasic) map.get("userBasic");
 		JSONObject jsonRet = new JSONObject();
 		try {
-			jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+			jsonRet = OrderService.getOrder(orderId);
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
 				jsonRet.put("errmsg", "系统中没有该订单信息！");
 				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
@@ -1080,7 +1081,7 @@ public class OrderAction {
 				return jsonRet.toString();
 			}
 			//发送请求
-			jsonRet = OrderService.appr2Mcht(user, order, scoreLogistics, scoreMerchant, scoreGoods, content);
+			jsonRet = AppraiseService.appr2Mcht(user, order, scoreLogistics, scoreMerchant, scoreGoods, content);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");

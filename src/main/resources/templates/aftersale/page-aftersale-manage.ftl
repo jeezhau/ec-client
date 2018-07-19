@@ -22,14 +22,15 @@
     <link href="/css/mfyx.css" rel="stylesheet">
     <script src="/script/common.js"></script>
 </head>
-<body class="light-gray-bg">
+<body class="light-gray-bg" style="oveflow:scroll">
 
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8"> 
 <#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
 
-<div class="container " id="container" style="oveflow:scroll">
-    <ul class="nav navbar-nav nav-tabs" style="font-weight:bold;"> 
+<div class="container " id="container" style="padding:0">
+  <div class="row" style="text-align:center">
+    <ul class="nav navbar-nav nav-tabs" style="font-weight:bold;width:100%;padding:0 5px"> 
         <li class="<#if status='4refund'> active </#if>" style="width:25%" @click="getOrders('4refund',$event)"> 
           <a href="javascript:;"> 可退款 </a> 
         </li>  
@@ -43,8 +44,8 @@
           <a href="javascript:;" > 换货中 </a> 
         </li>                       
      </ul>
-  
-  <div class="row"><!-- 所有订单之容器 -->
+  </div>
+  <div class="row" style="margin:0"><!-- 所有订单之容器 -->
   
 	  <div v-for="order in orders" class="col-xs-12 col-sm-12 col-md-6 col-lg-4" style="padding:3px ">
 	    <#include "/common/tpl-order-partner-4vue.ftl" encoding="utf8">

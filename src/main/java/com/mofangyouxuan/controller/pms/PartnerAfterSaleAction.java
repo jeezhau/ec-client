@@ -129,7 +129,7 @@ public class PartnerAfterSaleAction {
 				return "paftersale/page-paftersale-refund-deal";
 			}
 			
-			JSONObject jsonRet = OrderService.getOrder(true, null, true, true, true, orderId);
+			JSONObject jsonRet = OrderService.getOrder(orderId);
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
 				if(!myPartner.getPartnerId().equals(order.getPartnerId())) {
@@ -209,7 +209,7 @@ public class PartnerAfterSaleAction {
 				}
 				updateOpr = staff.getUserId();
 			}
-			jsonRet = OrderService.getOrder(null, null, null, null, true, orderId);
+			jsonRet = OrderService.getOrder( orderId);
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
 				jsonRet.put("errmsg", "系统中没有该订单信息！");
 				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
@@ -280,7 +280,7 @@ public class PartnerAfterSaleAction {
 				return "paftersale/page-paftersale-refund-deal";
 			}
 			
-			JSONObject jsonRet = OrderService.getOrder(true, null, true, true, true, orderId);
+			JSONObject jsonRet = OrderService.getOrder(orderId);
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
 				if(!myPartner.getPartnerId().equals(order.getPartnerId())) {
@@ -376,7 +376,7 @@ public class PartnerAfterSaleAction {
 				}
 				updateOpr = staff.getUserId();
 			}
-			jsonRet = OrderService.getOrder(null, null, null, null, true, orderId);
+			jsonRet = OrderService.getOrder(orderId);
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
 				jsonRet.put("errmsg", "系统中没有该订单信息！");
 				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);

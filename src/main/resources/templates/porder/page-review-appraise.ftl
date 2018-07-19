@@ -26,14 +26,14 @@
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
-<#if (order.appraiseTime)?? && (order.appraiseInfo)??>
+<#if (appraise)??>
 <div class="container " id="container" style="padding:0;">
    <#include "/common/tpl-order-buy-content-bigimg-4fm.ftl" encoding="utf-8">
    <div class="row" style="margin:1px 2px;padding:3px 10px;background-color:white;">
-       <span class="pull-left"><img alt="头像" :src="headimgurl" width="20px" height="20px" style="border-radius:50%">${(order.nickname)!''}</span>
-       <span class="pull-right">${(order.appraiseTime)?string('yyyy-MM-dd hh:mm:ss')}</span>
+       <span class="pull-left"><img alt="头像" :src="headimgurl" width="20px" height="20px" style="border-radius:50%">${(appraise.nickname)!''}</span>
+       <span class="pull-right">${(appraise.updateTime)?string('yyyy-MM-dd hh:mm:ss')}</span>
     </div>
-    <div v-for="appr in appraiseInfo" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
+    <div v-for="appr in content" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
      <div class="row">
        <span class="pull-left">{{appr.time}}</span>
      </div>
@@ -66,9 +66,9 @@ var containerVue = new Vue({
 			result:'',
 			review:''
 		},
-		headimgurl : startWith('${(order.headimgurl)!""}','http')?'${(order.headimgurl)!""}':('/user/headimg/show/${(order.userId)?string("#")}'),
-		goodsSpecArr: JSON.parse('${(order.goodsSpec)!"[]"}'),
-		appraiseInfo: JSON.parse('${(order.appraiseInfo)!"[]"}'),
+		headimgurl : startWith('${(appraise.headimgurl)!""}','http')?'${(appraise.headimgurl)!""}':('/user/headimg/show/${(appraise.userId)?string("#")}'),
+		goodsSpecArr: JSON.parse('${(appraise.goodsSpec)!"[]"}'),
+		content: JSON.parse('${(appraise.content)!"[]"}'),
 	},
 	methods:{
 		submit: function(result){

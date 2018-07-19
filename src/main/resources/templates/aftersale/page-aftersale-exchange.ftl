@@ -22,13 +22,13 @@
     <link href="/css/mfyx.css" rel="stylesheet">
     <script src="/script/common.js" type="text/javascript"></script>
 </head>
-<body class="light-gray-bg">
+<body class="light-gray-bg" style="overflow:scroll">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 <#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
 
 <#if (order.orderId)?? >
-<div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
+<div class="container " id="container" style="padding:0;overflow:scroll">
   <#include "/common/tpl-order-partner-4fm.ftl" encoding="utf8"> 
   <#include "/common/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
 
@@ -38,8 +38,8 @@
   </#if>
   <!-- 商家 -->
   <div class="row" style="margin:3px 0px;padding:5px 10px;background-color:white">
-      <a class="pull-left" href="/shop/mcht/${order.partnerId}">
-        <img alt="头像" src="/shop/pcert/logo/${order.partnerId}" width="20px" height="20px" style="border-radius:50%"> 
+      <a class="pull-left" href="/shop/mcht/${(order.partnerId)?string('#')}">
+        <img alt="头像" src="/shop/pcert/logo/${(order.partnerId)?string('#')}" width="20px" height="20px" style="border-radius:50%"> 
         ${order.partnerBusiName}
       </a>
   </div>

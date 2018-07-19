@@ -6,9 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
-import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.Order;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.UserBasic;
@@ -38,13 +36,10 @@ public class OrderService {
 	private static String orderDeliveryUrl;
 	private static String orderApplyRefundUrl;
 	private static String orderExchangeUrl;
-	private static String orderAppr2MchtUrl;
-	private static String orderAppr2UserUrl;
 	private static String orderAfterSalesUrl;
 	private static String orderGetLogisticsUrl;
 	private static String orderBalPaySubmitUrl;
 	private static String orderGetPayFlowUrl;
-	private static String orderApprReviewUrl;
 	
 	@Value("${mfyx.order-delivery-url}")
 	public void setOrderDeliveryUrl(String orderDeliveryUrl) {
@@ -57,14 +52,6 @@ public class OrderService {
 	@Value("${mfyx.order-exchange-url}")
 	public void setOrderExchangeUrl(String orderExchangeUrl) {
 		OrderService.orderExchangeUrl = orderExchangeUrl;
-	}
-	@Value("${mfyx.order-appr2mcht-url}")
-	public void setOrderAppr2MchtUrl(String orderAppr2MchtUrl) {
-		OrderService.orderAppr2MchtUrl = orderAppr2MchtUrl;
-	}
-	@Value("${mfyx.order-appr2user-url}")
-	public void setOrderAppr2UserUrl(String orderAppr2UserUrl) {
-		OrderService.orderAppr2UserUrl = orderAppr2UserUrl;
 	}
 	@Value("${mfyx.order-updaftersales-url}")
 	public void setOrderAfterSalesUrl(String orderAfterSalesUrl) {
@@ -134,32 +121,17 @@ public class OrderService {
 	public void setGetPayFlowUrl(String url) {
 		OrderService.orderGetPayFlowUrl = url;
 	}
-	@Value("${mfyx.order-appr-review-url}")
-	public void setApprReviewUrl(String url) {
-		OrderService.orderApprReviewUrl = url;
-	}
 	
 	/**
 	 * 根据ID获取订单信息
 	 * 
-	 * @param needReceiver
-	 * @param needLogistics
-	 * @param needAppr
-	 * @param needAfterSales
-	 * @param needGoodsAndUser
 	 * @param orderId
 	 * @return {"errcode":-1,"errmsg":"错误信息",order:{...}} 
 	 */
-	public static JSONObject getOrder(Boolean needReceiver,Boolean needLogistics,Boolean needAppr,
-			Boolean needAfterSales,Boolean needGoodsAndUser,String orderId) {
+	public static JSONObject getOrder(String orderId) {
 		String url = mfyxServerUrl + orderGetUrl;
 		url = url.replace("{orderId}", orderId+"") ;
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("needReceiver", needReceiver);
-		params.put("needLogistics", needLogistics);
-		params.put("needAppr", needAppr);
-		params.put("needAfterSales", needAfterSales);
-		params.put("needGoodsAndUser", needGoodsAndUser);
 		String strRet = HttpUtils.doPost(url,params);
 		JSONObject jsonRet = null;
 		try {
@@ -522,37 +494,7 @@ public class OrderService {
 		return null;
 	}
 	
-	/**
-	 * 买家评价商家
-	 * @param user
-	 * @param order
-	 * @param scoreLogistics		物流评分
-	 * @param scoreMerchangt		商家服务评分
-	 * @param scoreGoods		商品描述评分
-	 * @param content	评价内容
-	 * @return {errcode,errmsg}
-	 */
-	public static JSONObject appr2Mcht(UserBasic user,Order order,
-			Integer scoreLogistics,Integer scoreMerchant,Integer scoreGoods,String content) {
-		JSONObject jsonRet = new JSONObject();
-		Map<String,Object> params = new HashMap<String,Object>();
-		//向服务中心发送申请
-		String url = mfyxServerUrl + orderAppr2MchtUrl;
-		url = url.replace("{userId}", user.getUserId() + "");
-		url = url.replace("{orderId}", order.getOrderId() + "");
-		params.put("scoreLogistics", scoreLogistics);
-		params.put("scoreMerchant", scoreMerchant);
-		params.put("scoreGoods", scoreGoods);
-		params.put("content", content);
-		String strRet = HttpUtils.doPost(url, params);
-		try {
-			jsonRet = JSONObject.parseObject(strRet);
-			return jsonRet;
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+	
 	
 	/**
 	 * 卖家更新售后信息
@@ -636,75 +578,6 @@ public class OrderService {
 		return null;
 		
 	}
-	/**
-	 * 卖家对买家评价
-	 * @param partner
-	 * @param order
-	 * @param score		评分
-	 * @param content	评价内容
-	 * @return {errcode,errmsg}
-	 */
-	public static JSONObject appr2User(PartnerBasic partner,String orderId,Integer score,String content,Integer updateOpr,String passwd) {
-		JSONObject jsonRet = new JSONObject();
-		Map<String,Object> params = new HashMap<String,Object>();
-		//向服务中心发送申请
-		String url = mfyxServerUrl + orderAppr2UserUrl;
-		url = url.replace("{partnerId}", partner.getPartnerId() + "");
-		url = url.replace("{orderId}", orderId);
-		params.put("passwd", passwd);
-		params.put("currUserId", updateOpr);
-		params.put("score", score);
-		params.put("content", content);
-		String strRet = HttpUtils.doPost(url, params);
-		try {
-			jsonRet = JSONObject.parseObject(strRet);
-			return jsonRet;
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 	
-	/**
-	 * 订单评价审核与抽查
-	 * 上级审批下级信息
-	 * 1、上级可对下级进行审核；
-	 * 2、顶级对所有合作伙伴进行最终审核；
-	 * 3、仅顶级审核通过后才算通过；
-	 * @param orderId	待审批商品ID
-	 * @param review 	审批意见
-	 * @param result 	审批结果：S-通过，R-拒绝
-	 * @param rewPartnerId	审核者合作伙伴ID
-	 * @param operator	审批人ID，为上级合作伙伴的员工用户ID
-	 * @param passwd		审批人操作密码
-	 * 
-	 * @return {errcode:0,errmsg:"ok"}
-	 * @throws JSONException
-	 */
-	public static JSONObject reviewAppr(String orderId,String review,String result,
-			Integer rewPartnerId,Integer operator,String passwd){
-		Map<String,Object> params = new HashMap<String,Object>();
-		JSONObject jsonRet = new JSONObject();
-		try {
-			params.put("orderId", orderId);
-			params.put("review", review);
-			params.put("result", result);
-			params.put("rewPartnerId", rewPartnerId);
-			params.put("operator", operator);
-			params.put("passwd", passwd);
-			String url = mfyxServerUrl + orderApprReviewUrl;
-			String strRet = HttpUtils.doPost(url, params);
-			jsonRet = JSONObject.parseObject(strRet);
-			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
-				jsonRet = new JSONObject();
-				jsonRet.put("errmsg", "系统错误：" + strRet);
-				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-			jsonRet.put("errmsg", "系统异常：" + e.getMessage());
-			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
-		}
-		return jsonRet;
-	}
+	
 }

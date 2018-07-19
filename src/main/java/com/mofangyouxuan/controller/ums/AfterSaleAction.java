@@ -113,12 +113,12 @@ public class AfterSaleAction {
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/refund/apply/begin/{orderId}")
+	@RequestMapping("/refund/begin/{orderId}")
 	public String refundBegin(@PathVariable("orderId")String orderId,ModelMap map) {
 		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
-			JSONObject jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+			JSONObject jsonRet = OrderService.getOrder(orderId);
 			
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
@@ -176,7 +176,7 @@ public class AfterSaleAction {
 		JSONObject jsonRet = new JSONObject();
 		try {
 			//数据与权限验证
-			jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+			jsonRet = OrderService.getOrder(orderId);
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
 				jsonRet.put("errmsg", "系统中没有该订单信息！");
 				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
@@ -261,7 +261,7 @@ public class AfterSaleAction {
 		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
-			JSONObject jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+			JSONObject jsonRet = OrderService.getOrder(orderId);
 			
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
@@ -304,7 +304,7 @@ public class AfterSaleAction {
 		UserBasic user = (UserBasic) map.get("userBasic");
 		JSONObject jsonRet = new JSONObject();
 		try {
-			jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+			jsonRet = OrderService.getOrder(orderId);
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
 				jsonRet.put("errmsg", "系统中没有该订单信息！");
 				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);

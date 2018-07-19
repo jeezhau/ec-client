@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
+import com.mofangyouxuan.dto.Appraise;
 import com.mofangyouxuan.dto.Order;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.PartnerStaff;
 import com.mofangyouxuan.dto.PayFlow;
 import com.mofangyouxuan.dto.VipBasic;
+import com.mofangyouxuan.service.AppraiseService;
 import com.mofangyouxuan.service.OrderService;
 import com.mofangyouxuan.utils.PageCond;
 
@@ -175,7 +177,7 @@ public class PartnerSaleOrderAction {
 				}
 				//updateOpr = staff.getUserId();
 			}
-			jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
+			jsonRet = OrderService.getOrder( orderId);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
@@ -216,7 +218,7 @@ public class PartnerSaleOrderAction {
 				map.put("errmsg", "您还未开通合作伙伴功能或状态限制！");
 				return "porder/page-porder-delivery";
 			}
-			JSONObject jsonRet = OrderService.getOrder(true, null, null, null, true, orderId);
+			JSONObject jsonRet = OrderService.getOrder(orderId);
 			
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
@@ -326,8 +328,8 @@ public class PartnerSaleOrderAction {
 				return "porder/page-porder-appraise";
 			}
 			
-			JSONObject jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
-			
+			JSONObject jsonRet = OrderService.getOrder(orderId);
+			JSONObject jsonRetAppr = AppraiseService.getAppraise(orderId, "2");
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
 				if(!myPartner.getPartnerId().equals(order.getPartnerId())) {
@@ -338,6 +340,10 @@ public class PartnerSaleOrderAction {
 							!"54".equals(order.getStatus()) && !"55".equals(order.getStatus()) && !"56".equals(order.getStatus())) {
 						map.put("errmsg", "您当前不可对订单进行评价！");
 					}else {
+						if(jsonRetAppr != null && jsonRetAppr.containsKey("appraise")) {
+							Appraise appraise = JSONObject.toJavaObject(jsonRetAppr.getJSONObject("appraise"), Appraise.class);
+							map.put("appraise", appraise);
+						}
 						map.put("order", order);
 					}
 				}
@@ -411,7 +417,7 @@ public class PartnerSaleOrderAction {
 //				return jsonRet.toString();
 //			}
 			//发送请求
-			jsonRet = OrderService.appr2User(myPartner, orderId, score, content,updateOpr,partnerPasswd);
+			jsonRet = AppraiseService.appr2User(myPartner, orderId, score, content,updateOpr,partnerPasswd);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");
@@ -440,7 +446,7 @@ public class PartnerSaleOrderAction {
 				map.put("errmsg", "您没有权限查询该订单信息！");
 				return "";
 			}
-			JSONObject jsonRet = OrderService.getOrder(true, true, true, true, true, orderId);
+			JSONObject jsonRet = OrderService.getOrder(orderId);
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
 				map.put("errmsg", "系统中没有该订单信息！");
 				return "";
@@ -505,7 +511,6 @@ public class PartnerSaleOrderAction {
 	 */
 	@RequestMapping("/appraise/review/{orderId}")
 	public String getApprReview(@PathVariable("orderId")String orderId,ModelMap map) {
-		Order order = null;
 		try {
 			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
 			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus())) ){
@@ -513,14 +518,14 @@ public class PartnerSaleOrderAction {
 				return "porder/page-review-appraise";
 			}
 			
-			JSONObject jsonRet = OrderService.getOrder(false, false, true, true, false, orderId);
-			if(jsonRet != null && jsonRet.containsKey("order")) {
-				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
-				if(null == order.getAppraiseStatus() || "0".equals(order.getAppraiseStatus())) {
-					map.put("errmsg", "该订单当前不可进行审核！");
+			JSONObject jsonRet = AppraiseService.getAppraise(orderId, "1");
+			if(jsonRet != null && jsonRet.containsKey("appraise")) {
+				Appraise appraise = JSONObject.toJavaObject(jsonRet.getJSONObject("appraise"), Appraise.class);
+				if(null == appraise || "0".equals(appraise.getStatus())) {
+					map.put("errmsg", "该订单评价当前不可进行审核！");
 					return "porder/page-review-appraise";
 				}else {
-					map.put("order", order);
+					map.put("appraise", appraise);
 				}
 			}else {
 				map.put("errmsg", "获取订单信息失败！");

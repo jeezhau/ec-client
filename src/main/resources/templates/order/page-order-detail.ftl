@@ -40,7 +40,7 @@
   <#include "/order/tpl-order-payflow-4fm.ftl" encoding="utf8"> 
   </#if>
   
-  <#if (order.aftersalesReason)??>
+  <#if (aftersale.applyTime)??>
   <!-- 买家售后申请信息 -->
   <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
     <div class="row" style="margin:1px 0px;background-color:white;">
@@ -60,7 +60,7 @@
     </div>
   </div>
   </#if>
-  <#if (order.aftersalesResult)??>
+  <#if (aftersale.dealTime)??>
   <!-- 卖家售后回复信息 -->
   <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
     <div class="row" style="margin:1px 0px;background-color:white;">
@@ -80,7 +80,7 @@
     </div>
   </div> 
   </#if> 
-  <#if (order.appraiseTime)?? >
+  <#if (appraise)?? >
   <!-- 买家评价信息 -->
   <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
     <div class="row" style="margin:1px 0px;background-color:white;">
@@ -114,9 +114,9 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		goodsSpecArr: JSON.parse('${(order.goodsSpec)!"[]"}'),
-		aftersalesReason: JSON.parse('${(order.aftersalesReason)!"[]"}'),
-		aftersalesResult: JSON.parse('${(order.aftersalesResult)!"[]"}'),
-		appraiseInfo: JSON.parse('${(order.appraiseInfo)!"[]"}'),
+		aftersalesReason: JSON.parse('${(aftersale.applyReason)!"[]"}'),
+		aftersalesResult: JSON.parse('${(aftersale.dealResult)!"[]"}'),
+		appraiseInfo: JSON.parse('${(appraise.content)!"[]"}'),
 	},
 	methods:{
 		

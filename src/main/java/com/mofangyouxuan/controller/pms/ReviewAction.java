@@ -14,11 +14,12 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
+import com.mofangyouxuan.common.SysParam;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.PartnerStaff;
 import com.mofangyouxuan.dto.VipBasic;
+import com.mofangyouxuan.service.AppraiseService;
 import com.mofangyouxuan.service.GoodsService;
-import com.mofangyouxuan.service.OrderService;
 import com.mofangyouxuan.utils.PageCond;
 
 /**
@@ -105,22 +106,19 @@ public class ReviewAction {
 		}
 		try {
 			JSONObject params = new JSONObject();
-			params.put("upPartnerId", myPartner.getPartnerId());
-			if("4review".equals(reviewStatus)) {//待审核
-				params.put("appraiseStatus", "1,2");
-			}else if("normal".equals(reviewStatus)){
-				params.put("appraiseStatus", "S");
-			}else if("refuse".equals(reviewStatus)){
-				params.put("appraiseStatus", "R");
-			}else {
-				params.put("appraiseStatus", "1,2,S,R");
+			if(!SysParam.getSyspartnerId().equals(myPartner.getPartnerId())) {
+				params.put("upPartnerId", myPartner.getPartnerId());
 			}
-			JSONObject sortParams = new JSONObject();
-			sortParams.put("appraiseTime", "1#0");
-			JSONObject showGroups = new JSONObject();
-			showGroups.put("needAppr", false);
-			showGroups.put("needGoodsAndUser", true);
-			jsonRet = OrderService.searchOrders(showGroups.toJSONString(),params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
+			if("4review".equals(reviewStatus)) {//待审核
+				params.put("status", "0");
+			}else if("normal".equals(reviewStatus)){
+				params.put("status", "S");
+			}else if("refuse".equals(reviewStatus)){
+				params.put("status", "R");
+			}else {
+				params.put("status", "0,S,R");
+			}
+			jsonRet = AppraiseService.searchApprs(params.toJSONString(),JSONObject.toJSONString(pageCond));
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
@@ -171,7 +169,9 @@ public class ReviewAction {
 		}
 		try {
 			JSONObject params = new JSONObject();
-			params.put("upPartnerId", myPartner.getPartnerId());
+			if(!SysParam.getSyspartnerId().equals(myPartner.getPartnerId())) {
+				params.put("upPartnerId", myPartner.getPartnerId());
+			}
 			params.put("isSelf", true);
 			if("4review".equals(reviewStatus)) {//待审核
 				params.put("reviewResult", "0");
@@ -258,7 +258,7 @@ public class ReviewAction {
 	}
 	
 	/**
-	 * 评价商品
+	 * 审核订单评价
 	 * 
 	 * @param orderId	被审核的订单评价
 	 * @param result 	审核结果
@@ -307,7 +307,7 @@ public class ReviewAction {
 				}
 				updateOpr = partnerBindVip.getVipId();
 			}
-			jsonRet = OrderService.reviewAppr(orderId, review, result, myPartner.getPartnerId(), updateOpr, partnerPasswd);
+			jsonRet = AppraiseService.reviewAppr(orderId, review, result, myPartner.getPartnerId(), updateOpr, partnerPasswd);
 		
 		}catch(Exception e) {
 			//数据处理

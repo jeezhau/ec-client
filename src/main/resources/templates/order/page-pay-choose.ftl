@@ -113,8 +113,8 @@
     	<span class="weui-tabbar__item " >
 	    <span class="weui-tabbar__label" >金额(含运费) <span style="color:red;font-size:18px">¥ ${order.amount}</span></span>
 	</span>   
-     <a href="javascript:;" class="weui-tabbar__item " style='background-color:red;text-align:center;vertical-align:center;'>
-	    <span class="weui-tabbar__label" style="font-size:20px;color:white" @click="prepay">立即支付</span>
+     <a href="javascript:;" class="weui-tabbar__item " style='background-color:red;text-align:center;vertical-align:center;' @click="prepay">
+	    <span class="weui-tabbar__label" style="font-size:20px;color:white">立即支付</span>
      </a>     	
   </div>
 </footer>

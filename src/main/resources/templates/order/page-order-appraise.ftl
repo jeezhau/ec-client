@@ -45,7 +45,7 @@
   	<span>&nbsp;&nbsp;&nbsp;&nbsp;填写说明：如果您已经收到购买的商品，请即时提交您的签收评价！</span>
   </div>
   <div class="row" style="margin:3px 0; background-color:white">
-    <#if !(order.appraiseTime)??>
+    <#if !(appraise)??>
     <div class="row" style="margin:5px 0;">
     	   <label class="col-xs-5 control-label" style="padding-right:0">物流服务得分<span style="color:red">*</span></label>
        <div class="col-xs-7" style="padding-left:0">
@@ -82,7 +82,7 @@
     <div class="row" style="margin:1px 0px;background-color:white;">
       <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">历史评价</span>
     </div>
-    <div v-for="item in order.appraiseInfo" class="row" style="margin:1px 1px ;padding:3px 0;background-color:white" >
+    <div v-for="item in apprHist" class="row" style="margin:1px 1px ;padding:3px 0;background-color:white" >
       <div class="col-xs-12">
        <span class="pull-left">{{item.time}}</span>
       </div>
@@ -100,8 +100,8 @@ var containerVue = new Vue({
 		order:{
 			status:'${order.status}',
 			goodsSpec:JSON.parse('${(order.goodsSpec)!"[]"}'),
-			appraiseInfo: JSON.parse('${(order.appraiseInfo)!"[]"}'),
 		},
+		apprHist: JSON.parse('${(appraise.content)!"[]"}'),
 		param:{
 			orderId:'${order.orderId}',
 			<#if !(order.appraiseTime)??>

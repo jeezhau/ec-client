@@ -44,7 +44,7 @@
   	<span>&nbsp;&nbsp;&nbsp;&nbsp;填写说明：如果客户已经签收评价，请您也完成对客户的评价！</span>
   </div>
   <div class="row" style="margin:3px 0; background-color:white">
-    <#if !(order.apprUserTime)??>
+    <#if !(appraise)??>
     <div class="row" style="margin:5px 0;">
     	   <label class="col-xs-4 control-label" style="padding-right:0">客户得分<span style="color:red">*</span></label>
        <div class="col-xs-7" style="padding-left:0">
@@ -85,7 +85,7 @@ var containerVue = new Vue({
 		order:{
 			status:'${order.status}',
 			goodsSpec:JSON.parse('${(order.goodsSpec)!"[]"}'),
-			apprUser: JSON.parse('${(order.apprUser)!"[]"}'),
+			apprUser: JSON.parse('${(appraise.content)!"[]"}'),
 		},
 		param:{
 			orderId:'${order.orderId}',

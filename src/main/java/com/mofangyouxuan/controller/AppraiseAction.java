@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
-import com.mofangyouxuan.service.OrderService;
+import com.mofangyouxuan.service.AppraiseService;
 import com.mofangyouxuan.utils.PageCond;
 
 /**
@@ -53,21 +53,9 @@ public class AppraiseAction {
 			JSONObject params = new JSONObject();
 			
 			params.put("goodsId", goodsId);
-			params.put("status", "41,57");
-			params.put("appraiseStatus", "S");
+			params.put("status", "S");
 			
-			JSONObject sortParams = new JSONObject();
-			sortParams.put("createTime", "1#1");
-			
-			JSONObject showGroups = new JSONObject();
-			//needReceiver,needLogistics,needAppr,needAfterSales,needGoodsAndUser
-			//showGroups.put("needReceiver", true);
-			//showGroups.put("needLogistics", true);
-			showGroups.put("needAppr", true);
-			//showGroups.put("needAfterSales", true);
-			showGroups.put("needGoodsAndUser", true);
-			
-			jsonRet = OrderService.searchOrders(showGroups.toJSONString(),params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
+			jsonRet = AppraiseService.searchApprs(params.toJSONString(),JSONObject.toJSONString(pageCond));
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
@@ -97,21 +85,9 @@ public class AppraiseAction {
 			JSONObject params = new JSONObject();
 			
 			params.put("partnerId", partnerId);
-			params.put("status", "41,57");
-			params.put("appraiseStatus", "S");
+			params.put("status", "S");
 			
-			JSONObject sortParams = new JSONObject();
-			sortParams.put("createTime", "1#1");
-			
-			JSONObject showGroups = new JSONObject();
-			//needReceiver,needLogistics,needAppr,needAfterSales,needGoodsAndUser
-			//showGroups.put("needReceiver", true);
-			//showGroups.put("needLogistics", true);
-			showGroups.put("needAppr", true);
-			//showGroups.put("needAfterSales", true);
-			showGroups.put("needGoodsAndUser", true);
-			
-			jsonRet = OrderService.searchOrders(showGroups.toJSONString(),params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
+			jsonRet = AppraiseService.searchApprs(params.toJSONString(), JSONObject.toJSONString(pageCond));
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
@@ -142,21 +118,9 @@ public class AppraiseAction {
 			JSONObject params = new JSONObject();
 			
 			params.put("userId", userId);
-			params.put("status", "41,57");
-			params.put("appraiseStatus", "S");
+			params.put("status", "S");
 			
-			JSONObject sortParams = new JSONObject();
-			sortParams.put("createTime", "1#1");
-			
-			JSONObject showGroups = new JSONObject();
-			//needReceiver,needLogistics,needAppr,needAfterSales,needGoodsAndUser
-			//showGroups.put("needReceiver", true);
-			//showGroups.put("needLogistics", true);
-			showGroups.put("needAppr", true);
-			//showGroups.put("needAfterSales", true);
-			showGroups.put("needGoodsAndUser", true);
-			
-			jsonRet = OrderService.searchOrders(showGroups.toJSONString(),params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
+			jsonRet = AppraiseService.searchApprs(params.toJSONString(), JSONObject.toJSONString(pageCond));
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);

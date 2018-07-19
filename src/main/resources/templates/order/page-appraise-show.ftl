@@ -32,10 +32,10 @@
      <h3 class="row" style="margin:5px 0;text-align:center" >商品评价({{appr.apprCnt}})</h3>
    </div>
    <div class="row" style="margin:1px 0px;">
-     <div class="row" v-for="order in appr.apprList" style="margin:1px 0;background-color:white;">
+     <div class="row" v-for="item in appr.apprList" style="margin:1px 0;background-color:white;">
        <div class="row" style="margin:1px 2px;padding:3px 10px">
-         <span class="pull-left"><img alt="头像" :src="order.headimgurl" width="20px" height="20px" style="border-radius:50%">{{order.nickname}}</span>
-         <span class="pull-right">{{order.appraiseTime}}</span>
+         <span class="pull-left"><img alt="头像" :src="item.headimgurl" width="20px" height="20px" style="border-radius:50%">{{item.nickname}}</span>
+         <span class="pull-right">{{item.updateTime}}</span>
        </div>
        <#include "/common/tpl-order-buy-content-4vue.ftl" encoding="utf8">
        <div class="row" style="margin:1px 0">
