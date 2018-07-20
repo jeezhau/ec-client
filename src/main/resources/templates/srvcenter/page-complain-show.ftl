@@ -102,5 +102,9 @@ var containerVue = new Vue({
 containerVue.getComplain();
 </script>
 
+<footer>
+  <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
+</footer>
+
 </body>
 </html>

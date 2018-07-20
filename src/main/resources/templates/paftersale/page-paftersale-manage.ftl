@@ -22,14 +22,14 @@
     <link href="/css/mfyx.css" rel="stylesheet">
     <script src="/script/common.js"></script>
 </head>
-<body class="light-gray-bg">
+<body class="light-gray-bg" style="oveflow:scroll">
 
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8"> 
 
-<div class="container " id="container" style="oveflow:scroll">
+<div class="container " id="container" style="padding:0">
   <div class="row" style="margin:5px ;text-align:center" >
-    <ul class="nav navbar-nav nav-tabs" style="padding:0 5px;font-size:18px;font-weight:bold;">  
+    <ul class="nav navbar-nav nav-tabs" style="width:100%;padding:0 5px;font-size:18px;font-weight:bold;">  
         <li class="<#if status='refunding'> active </#if>" style="width:50%" @click="getOrders('refunding',$event)"> 
           <a href="javascript:;"> 退款 </a> 
         </li> 
@@ -38,8 +38,7 @@
         </li>                      
      </ul>
   </div>
-  <div class="row"><!-- 所有订单之容器 -->
-  
+  <div class="row" style="margin:0"><!-- 所有订单之容器 -->
 	  <div v-for="order in orders" class="col-xs-12 col-sm-12 col-md-6 col-lg-4" style="padding:3px ">
 	    <#include "/porder/tpl-porder-buy-user-4vue.ftl" encoding="utf8">
 	    <#include "/common/tpl-order-buy-content-4vue.ftl" encoding="utf8">
@@ -48,7 +47,7 @@
 		    
 		    <a v-if="param.status=='refunding' && ( order.status==='60' || order.status==='62' || order.status==='63' )" class="btn btn-primary pull-right" :href="'/paftersale/refund/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >处理退款</span></a>
 		    
-		    <a v-if="param.status=='exchanging' && (order.status==='50' || order.status==='52' || order.status==='53')" class="btn btn-primary pull-right" :href="'/paftersales/exchange/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >处理换货</span></a>
+		    <a v-if="param.status=='exchanging' && (order.status==='50' || order.status==='52' || order.status==='53')" class="btn btn-primary pull-right" :href="'/paftersale/exchange/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >处理换货</span></a>
 		    
 		</div>
 	  </div>

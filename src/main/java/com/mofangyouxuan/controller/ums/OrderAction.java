@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
+import com.mofangyouxuan.dto.Aftersale;
 import com.mofangyouxuan.dto.Appraise;
 import com.mofangyouxuan.dto.Goods;
 import com.mofangyouxuan.dto.GoodsSpec;
@@ -37,6 +38,7 @@ import com.mofangyouxuan.dto.Order;
 import com.mofangyouxuan.dto.PayFlow;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
+import com.mofangyouxuan.service.AftersaleService;
 import com.mofangyouxuan.service.AppraiseService;
 import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.service.OrderService;
@@ -808,16 +810,27 @@ public class OrderAction {
 				return "";
 			}
 			JSONObject jsonRet = OrderService.getOrder(orderId);
+			JSONObject jsonApprMcht = AppraiseService.getAppraise(orderId, "1");
+			//JSONObject jsonApprUser = AppraiseService.getAppraise(orderId, "2");
 			if(jsonRet == null || !jsonRet.containsKey("order")) {
 				map.put("errmsg", "系统中没有该订单信息！");
 				return "";
 			}
 			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+			JSONObject jsonaf = AftersaleService.getAftersale(orderId);
 			if(order.getUserId().equals(user.getUserId())) {
 				jsonRet = OrderService.getPayFlow(order, user.getUserId(), null);
 				if(jsonRet != null && jsonRet.containsKey("payFlow")) {
 					PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
 					map.put("payFlow", payFlow);
+				}
+				if(jsonApprMcht != null && jsonApprMcht.containsKey("appraise")) {
+					Appraise appraise = JSONObject.toJavaObject(jsonApprMcht.getJSONObject("appraise"), Appraise.class);
+					map.put("appraise", appraise);
+				}
+				if(jsonaf != null && jsonaf.containsKey("aftersale")) {
+					Aftersale aftersale = JSONObject.toJavaObject(jsonaf.getJSONObject("aftersale"), Aftersale.class);
+					map.put("aftersale", aftersale);
 				}
 				map.put("order", order);
 			}else {

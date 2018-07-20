@@ -170,6 +170,7 @@ public class PartnerBasicAction {
 	 */
 	@RequestMapping("/manage")
 	public String getManage(@SessionAttribute("partnerUserTP")String partnerUserTP,
+			String errmsg,
 			HttpSession session,ModelMap map) {
 		
 		VipBasic partnerBindVip = (VipBasic) session.getAttribute("partnerBindVip");
@@ -179,7 +180,9 @@ public class PartnerBasicAction {
 		map.put("partnerBindVip", partnerBindVip);
 		map.put("partnerStaff", partnerStaff);
 		map.put("myPartner", myPartner);
-		
+		if(errmsg != null && errmsg.length()>0) {
+			map.put("errmsg", errmsg);
+		}
 		map.put("sys_func", "partner-manage");
 		return "partner/page-partner-manage";
 	}

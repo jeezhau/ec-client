@@ -104,7 +104,7 @@ var containerVue = new Vue({
 		apprHist: JSON.parse('${(appraise.content)!"[]"}'),
 		param:{
 			orderId:'${order.orderId}',
-			<#if !(order.appraiseTime)??>
+			<#if !(appraise)??>
 			scoreLogistics: 10, 
 			scoreMerchant: 10, 
 			scoreGoods: 10, 
@@ -119,7 +119,7 @@ var containerVue = new Vue({
 				alertMsg('错误提示','评价内容不可多于600个字符！');
 				return;
 			}
-			<#if !(order.appraiseTime)??>
+			<#if !(appraise)??>
 			this.param.scoreLogistics = $("#scoreLogistics").slider().val();
 			this.param.scoreMerchant = $("#scoreMerchant").slider().val();
 			this.param.scoreGoods = $("#scoreGoods").slider().val();

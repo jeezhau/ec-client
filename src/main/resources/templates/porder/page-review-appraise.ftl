@@ -31,7 +31,7 @@
    <#include "/common/tpl-order-buy-content-bigimg-4fm.ftl" encoding="utf-8">
    <div class="row" style="margin:1px 2px;padding:3px 10px;background-color:white;">
        <span class="pull-left"><img alt="头像" :src="headimgurl" width="20px" height="20px" style="border-radius:50%">${(appraise.nickname)!''}</span>
-       <span class="pull-right">${(appraise.updateTime)?string('yyyy-MM-dd hh:mm:ss')}</span>
+       <span class="pull-right">${(appraise.updateTime)}</span>
     </div>
     <div v-for="appr in content" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
      <div class="row">
@@ -87,7 +87,7 @@ var containerVue = new Vue({
 					if(jsonRet && jsonRet.errmsg){
 						if(0 == jsonRet.errcode){
 							alertMsg('系统提示',"信息提交成功！");
-							//window.location.href = '/review/manage/appraise';
+							window.close();
 						}else{//出现逻辑错误
 							alertMsg('错误提示',jsonRet.errmsg);
 						}
@@ -107,7 +107,8 @@ var containerVue = new Vue({
 </#if>
 
 <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
-<#include "/menu/page-bottom-menu.ftl" encoding="utf8">
+
+<#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
 
 </body>
 </html>

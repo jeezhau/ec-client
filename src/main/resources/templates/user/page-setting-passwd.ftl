@@ -26,7 +26,7 @@
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 <#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
 
-<#if ((vipBasic.status)!'') == '1'>
+<#if ((userBasic.status)!'') == '1'>
 <div class="container" id="container" style="padding:0px 0px;oveflow:scroll">
   <div class="row" style="width:100%;margin:0px 0px 0px 0px;padding:5px 8px;background-color:white;" >
     <p style="color:red">&nbsp;&nbsp;&nbsp;&nbsp;该密码为系统登录凭证，请谨慎设置和保管，不要向任何人透露，我们的工作人员绝不会以任何理由要求您提供您的密码！！！初始设置请使用忘记密码！</p>

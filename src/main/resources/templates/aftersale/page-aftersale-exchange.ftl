@@ -43,7 +43,13 @@
         ${order.partnerBusiName}
       </a>
   </div>
-  
+  <!-- 售后信息 -->
+  <#if (aftersale.applyTime)??>
+   <#include "/common/tpl-aftersale-apply-4fm.ftl" encoding="utf8"> 
+  </#if>
+  <#if (aftersale.dealResult)??>
+   <#include "/common/tpl-aftersale-deal-4fm.ftl" encoding="utf8"> 
+  </#if> 
   <!-- 退款申请信息 -->
   <div class="row" style="margin:3px 0px;background-color:white; color:red">
     <p/>
@@ -100,11 +106,12 @@
 var containerVue = new Vue({
 	el:'#container',
 	data:{
+		aftersaleReason: JSON.parse('${(aftersale.applyReason)!"[]"}'),
+		aftersaleResult: JSON.parse('${(aftersale.dealResult)!"[]"}'),
 		order:{
 			status:'${order.status}',
 			goodsSpec:JSON.parse('${(order.goodsSpec)!"[]"}'),
 		},
-		
 		param:{
 			orderId:'${order.orderId}',
 			passwd:'',
@@ -160,7 +167,7 @@ var containerVue = new Vue({
 				success: function(jsonRet,status,xhr){
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//成功
-							window.location.href = "/aftersale/mgr/exchange";
+							window.location.href = "/aftersale/manage/exchanging";
 						}else{//出现逻辑错误
 							if(jsonRet.errcode === -100000){
 								$('#ajaxLoginModal').modal('show');

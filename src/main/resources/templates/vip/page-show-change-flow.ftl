@@ -62,7 +62,7 @@
 	 </div>
 	 <div class="col-xs-12">
 	   <label class="col-xs-3" style="padding:0">是否已经入帐</label>
-	   <span class="col-xs-9" style="padding:0">{{flow.sumFlag == '1'?'是':'否'}}</span>
+	   <span class="col-xs-9" style="padding:0">{{flow.sumFlag == 'S'?'是':'否'}}</span>
 	 </div>
 	</div>
   </div>

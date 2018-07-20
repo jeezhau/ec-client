@@ -103,6 +103,16 @@
        </div>
     </div>
     </#if>
+    <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('preceiver')) >
+    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+       <div style="background-color:white">
+	    <a href="/preceiver/manage" >
+		    <img src="/icons/地址管理.png" alt="" width="90px" height="90px">
+		    <p >收货信息</p>
+		</a>
+       </div>
+    </div>
+    </#if>
   </#if>
     
   <#if ((myPartner.pbTp)!'')=='2' >

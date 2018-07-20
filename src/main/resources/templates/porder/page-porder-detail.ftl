@@ -22,11 +22,11 @@
     <link href="/css/mfyx.css" rel="stylesheet">
     <script src="/script/common.js"></script>
 </head>
-<body class="light-gray-bg">
+<body class="light-gray-bg" style="overflow:scroll">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
-<div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
+<div class="container " id="container" style="padding:0;">
  <#if (order.orderId)?? >
   <div class="row" style="margin:5px 1px ;padding:3px 5px;background-color:white" >
     <span>订单ID：${order.orderId}</span><br>
@@ -42,46 +42,14 @@
   <#include "/porder/tpl-porder-payflow-4fm.ftl" encoding="utf8"> 
   </#if>
   
-  <#if (order.aftersalesReason)??>
-  <!-- 买家售后申请信息 -->
-  <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
-    <div class="row" style="margin:1px 0px;background-color:white;">
-      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">买家售后</span>
-    </div>
-    <div v-for="reason in aftersalesReason" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
-     <div class="row">
-       <span class="pull-right">{{reason.type}}</span>
-       <span class="pull-left">{{reason.time}}</span>
-     </div>
-     <div class="row">
-       <p>{{reason.content.reason}}</p>
-       <p v-if="reason.type.indexOf('退货')">
-       {{getDispatchMode(reason.content.dispatchMode)}} {{reason.content.logisticsComp}} {{reason.content.logisticsNo}}
-       </p>
-     </div>
-    </div>
-  </div>
+  <!-- 售后信息 -->
+  <#if (aftersale.applyTime)??>
+   <#include "/common/tpl-aftersale-apply-4fm.ftl" encoding="utf8"> 
   </#if>
-  <#if (order.aftersalesResult)??>
-  <!-- 卖家售后回复信息 -->
-  <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
-    <div class="row" style="margin:1px 0px;background-color:white;">
-      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">卖家售后</span>
-    </div>
-    <div v-for="reason in aftersalesResult" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
-     <div class="row">
-       <span class="pull-right">{{reason.type}}</span>
-       <span class="pull-left">{{reason.time}}</span>
-     </div>
-     <div class="row">
-       <p>{{reason.content.reason}}</p>
-       <p v-if="reason.content.dispatchMode">
-       {{getDispatchMode(reason.content.dispatchMode)}} {{reason.content.dispatchMode.logisticsComp}} {{reason.content.dispatchMode.logisticsNo}}
-       </p>
-     </div>
-    </div>
-  </div> 
-  </#if> 
+  <#if (aftersale.dealResult)??>
+   <#include "/common/tpl-aftersale-deal-4fm.ftl" encoding="utf8"> 
+  </#if>
+  
   <#if (apprMcht)?? >
   <!-- 买家评价信息 -->
   <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
@@ -131,8 +99,8 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		goodsSpecArr: JSON.parse('${(order.goodsSpec)!"[]"}'),
-		aftersalesReason: JSON.parse('${(order.aftersalesReason)!"[]"}'),
-		aftersalesResult: JSON.parse('${(order.aftersalesResult)!"[]"}'),
+		aftersaleReason: JSON.parse('${(aftersale.applyReason)!"[]"}'),
+		aftersaleResult: JSON.parse('${(aftersale.dealResult)!"[]"}'),
 		apprMcht: JSON.parse('${(apprMcht.content)!"[]"}'),
 		apprUser: JSON.parse('${(apprUser.content)!"[]"}'),
 	},
@@ -145,7 +113,9 @@ var containerVue = new Vue({
 
 <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
 
-<#include "/menu/page-bottom-menu.ftl" encoding="utf8">
+<footer>
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
+</footer>
 
 </body>
 </html>

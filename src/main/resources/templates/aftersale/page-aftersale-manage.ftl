@@ -31,22 +31,21 @@
 <div class="container " id="container" style="padding:0">
   <div class="row" style="text-align:center">
     <ul class="nav navbar-nav nav-tabs" style="font-weight:bold;width:100%;padding:0 5px"> 
-        <li class="<#if status='4refund'> active </#if>" style="width:25%" @click="getOrders('4refund',$event)"> 
+        <li class="<#if status='4refund'> active </#if>" style="width:25%" @click="window.location.href='/aftersale/manage/4refund'"> 
           <a href="javascript:;"> 可退款 </a> 
         </li>  
-        <li class="<#if status='refunding'> active </#if>" style="width:25%" @click="getOrders('refunding',$event)"> 
+        <li class="<#if status='refunding'> active </#if>" style="width:25%" @click="window.location.href='/aftersale/manage/refunding'">  
           <a href="javascript:;"> 退款中 </a> 
         </li> 
-        <li class="<#if status='4exchange'> active </#if>" style="width:25%" @click="getOrders('4exchange',$event)"> 
+        <li class="<#if status='4exchange'> active </#if>" style="width:25%" @click="window.location.href='/aftersale/manage/4exchange'"> 
           <a href="javascript:;" > 可换货 </a> 
         </li>
-        <li class="<#if status='exchanging'> active </#if>" style="width:25%" @click="getOrders('exchanging',$event)"> 
+        <li class="<#if status='exchanging'> active </#if>" style="width:25%" @click="window.location.href='/aftersale/manage/exchanging'">  
           <a href="javascript:;" > 换货中 </a> 
         </li>                       
      </ul>
   </div>
   <div class="row" style="margin:0"><!-- 所有订单之容器 -->
-  
 	  <div v-for="order in orders" class="col-xs-12 col-sm-12 col-md-6 col-lg-4" style="padding:3px ">
 	    <#include "/common/tpl-order-partner-4vue.ftl" encoding="utf8">
 	    <#include "/common/tpl-order-buy-content-4vue.ftl" encoding="utf8">
@@ -57,9 +56,12 @@
 		    <a v-if="startWith(order.status,'3') ||  startWith(order.status,'4') || startWith(order.status,'5')" class="btn btn-default pull-right" :href="'/order/logistics/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >查看物流</span></a>
 		    
 		    <a v-if="param.status=='4refund' && (startWith(order.status,'3') ||  startWith(order.status,'4') || order.status==='55' || order.status==='56' || order.status==='57' || order.status==='58')" class="btn btn-primary pull-right" :href="'/aftersale/refund/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >申请退款</span></a>
-		    <a v-if="param.status=='4refund' && (order.status==='61')" class="btn btn-primary pull-right" :href="'/aftersale/refund/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >提交退货物流</span></a>
+		    <a v-if="param.status=='refunding' && order.status==='61'" class="btn btn-primary pull-right" :href="'/aftersale/refund/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >提交退货物流</span></a>
 		    <a v-if="param.status=='4exchange' && (order.status==='40' || order.status==='41')" class="btn btn-primary pull-right" :href="'/aftersale/exchange/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >申请换货</span></a>
-		    <a v-if="param.status=='4exchange' && (order.status==='51')" class="btn btn-primary pull-right" :href="'/aftersale/exchange/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >提交退货物流</span></a>		    
+		    <a v-if="param.status=='exchanging' && order.status==='51'" class="btn btn-primary pull-right" :href="'/aftersale/exchange/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >提交退货物流</span></a>		    
+		    <a v-if="param.status=='exchanging' && (order.status==='55')" class="btn btn-primary pull-right" :href="'/order/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >签收评价</span></a>
+		    <a v-if="param.status=='exchanging' && (order.status==='56')" class="btn btn-primary pull-right" :href="'/order/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >追加评价</span></a>
+		   
 		</div>
 	  </div>
   </div>
@@ -70,7 +72,7 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		param:{
-			status:"${status!'refund'}",
+			status:"${status!'refunding'}",
 			begin:0,
 			pageSize:100
 		},
@@ -121,7 +123,7 @@ var containerVue = new Vue({
 		}
 	}
 });
-containerVue.getOrders("${status!'refund'}");
+containerVue.getOrders("${status!'refunding'}");
 </script>
 
 

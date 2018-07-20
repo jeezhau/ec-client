@@ -23,19 +23,19 @@
     <link href="/css/mfyx.css" rel="stylesheet">
     <script src="/script/common.js" type="text/javascript"></script>
 </head>
-<body class="light-gray-bg">
+<body class="light-gray-bg" style="overflow:scroll">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
 <#if (order.orderId)?? >
-<div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
+<div class="container " id="container" style="padding:0;">
   <#include "/porder/tpl-porder-buy-user-4fm.ftl" encoding="utf8"> 
   <#include "/common/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
 
   <!-- 商家 -->
   <div class="row" style="margin:3px 0px;padding:5px 10px;background-color:white">
-      <a class="pull-left" href="/partner/mcht/${order.partnerId}">
-        <img alt="头像" src="/partner/cert/show/logo/${order.partnerId}" width="20px" height="20px" style="border-radius:50%"> 
+      <a class="pull-left" href="/partner/mcht/${(order.partnerId)?string('#')}">
+        <img alt="头像" src="/partner/cert/show/logo/${(order.partnerId)?string('#')}" width="20px" height="20px" style="border-radius:50%"> 
         ${order.partnerBusiName}
       </a>
   </div>
@@ -67,7 +67,7 @@
     <div class="row" style="margin:1px 0px;background-color:white;">
       <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">历史评价</span>
     </div>
-    <div v-for="item in order.apprUser" class="row" style="margin:1px 1px ;padding:3px 0;background-color:white" >
+    <div v-for="item in apprUser" class="row" style="margin:1px 1px ;padding:3px 0;background-color:white" >
       <div class="col-xs-12">
        <span class="pull-left">{{item.time}}</span>
       </div>
@@ -85,11 +85,11 @@ var containerVue = new Vue({
 		order:{
 			status:'${order.status}',
 			goodsSpec:JSON.parse('${(order.goodsSpec)!"[]"}'),
-			apprUser: JSON.parse('${(appraise.content)!"[]"}'),
 		},
+		apprUser: JSON.parse('${(appraise.content)!"[]"}'),
 		param:{
 			orderId:'${order.orderId}',
-			<#if !(order.apprUserTime)??>
+			<#if !(appraise)??>
 			score: 10, 
 			</#if>
 			content:''
@@ -102,7 +102,7 @@ var containerVue = new Vue({
 				alertMsg('错误提示','评价内容不可多于600个字符！');
 				return;
 			}
-			<#if !(order.apprUserTime)??>
+			<#if !(appraise)??>
 			this.param.score = $("#score").slider().val();
 			</#if>
 			$.ajax({
@@ -138,7 +138,9 @@ $("#score").slider({ min: 0, max: 10, value: 10, focus: true });
  <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
 </#if>
 
-<#include "/menu/page-bottom-menu.ftl" encoding="utf8">
+<footer>
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
+</footer>
 
 </body>
 </html>

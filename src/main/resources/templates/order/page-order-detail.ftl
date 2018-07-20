@@ -40,46 +40,14 @@
   <#include "/order/tpl-order-payflow-4fm.ftl" encoding="utf8"> 
   </#if>
   
+  <!-- 售后信息 -->
   <#if (aftersale.applyTime)??>
-  <!-- 买家售后申请信息 -->
-  <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
-    <div class="row" style="margin:1px 0px;background-color:white;">
-      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">买家售后</span>
-    </div>
-    <div v-for="reason in aftersalesReason" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
-     <div class="row">
-       <span class="pull-right">{{reason.type}}</span>
-       <span class="pull-left">{{reason.time}}</span>
-     </div>
-     <div class="row">
-       <p>{{reason.content.reason}}</p>
-       <p v-if="reason.type.indexOf('退货')">
-       {{getDispatchMode(reason.content.dispatchMode)}} {{reason.content.logisticsComp}} {{reason.content.logisticsNo}}
-       </p>
-     </div>
-    </div>
-  </div>
+   <#include "/common/tpl-aftersale-apply-4fm.ftl" encoding="utf8"> 
   </#if>
-  <#if (aftersale.dealTime)??>
-  <!-- 卖家售后回复信息 -->
-  <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
-    <div class="row" style="margin:1px 0px;background-color:white;">
-      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">卖家售后</span>
-    </div>
-    <div v-for="reason in aftersalesResult" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
-     <div class="row">
-       <span class="pull-right">{{reason.type}}</span>
-       <span class="pull-left">{{reason.time}}</span>
-     </div>
-     <div class="row">
-       <p>{{reason.content.reason}}</p>
-       <p v-if="reason.content.dispatchMode">
-       {{getDispatchMode(reason.content.dispatchMode)}} {{reason.content.dispatchMode.logisticsComp}} {{reason.content.dispatchMode.logisticsNo}}
-       </p>
-     </div>
-    </div>
-  </div> 
-  </#if> 
+  <#if (aftersale.dealResult)??>
+   <#include "/common/tpl-aftersale-deal-4fm.ftl" encoding="utf8"> 
+  </#if>
+  
   <#if (appraise)?? >
   <!-- 买家评价信息 -->
   <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
@@ -114,8 +82,8 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		goodsSpecArr: JSON.parse('${(order.goodsSpec)!"[]"}'),
-		aftersalesReason: JSON.parse('${(aftersale.applyReason)!"[]"}'),
-		aftersalesResult: JSON.parse('${(aftersale.dealResult)!"[]"}'),
+		aftersaleReason: JSON.parse('${(aftersale.applyReason)!"[]"}'),
+		aftersaleResult: JSON.parse('${(aftersale.dealResult)!"[]"}'),
 		appraiseInfo: JSON.parse('${(appraise.content)!"[]"}'),
 	},
 	methods:{

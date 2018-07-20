@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
+import com.mofangyouxuan.dto.Aftersale;
 import com.mofangyouxuan.dto.Appraise;
 import com.mofangyouxuan.dto.Order;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.PartnerStaff;
 import com.mofangyouxuan.dto.PayFlow;
 import com.mofangyouxuan.dto.VipBasic;
+import com.mofangyouxuan.service.AftersaleService;
 import com.mofangyouxuan.service.AppraiseService;
 import com.mofangyouxuan.service.OrderService;
 import com.mofangyouxuan.utils.PageCond;
@@ -335,9 +337,7 @@ public class PartnerSaleOrderAction {
 				if(!myPartner.getPartnerId().equals(order.getPartnerId())) {
 					map.put("errmsg", "该订单不是您的销售订单！");
 				}else {
-					if(!"30".equals(order.getStatus()) && !"31".equals(order.getStatus()) && 
-							!"40".equals(order.getStatus()) && !"41".equals(order.getStatus()) && 
-							!"54".equals(order.getStatus()) && !"55".equals(order.getStatus()) && !"56".equals(order.getStatus())) {
+					if(!"41".equals(order.getStatus()) && !"57".equals(order.getStatus())) {
 						map.put("errmsg", "您当前不可对订单进行评价！");
 					}else {
 						if(jsonRetAppr != null && jsonRetAppr.containsKey("appraise")) {
@@ -452,11 +452,26 @@ public class PartnerSaleOrderAction {
 				return "";
 			}
 			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+			JSONObject jsonApprMcht = AppraiseService.getAppraise(orderId, "1");
+			JSONObject jsonApprUser = AppraiseService.getAppraise(orderId, "2");
+			JSONObject jsonaf = AftersaleService.getAftersale(orderId);
 			if(myPartner.getPartnerId().equals(order.getPartnerId())) {
 				jsonRet = OrderService.getPayFlow(order, order.getUserId(), null);
 				if(jsonRet != null && jsonRet.containsKey("payFlow")) {
 					PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
 					map.put("payFlow", payFlow);
+				}
+				if(jsonApprMcht != null && jsonApprMcht.containsKey("appraise")) {
+					Appraise apprMcht = JSONObject.toJavaObject(jsonApprMcht.getJSONObject("appraise"), Appraise.class);
+					map.put("apprMcht", apprMcht);
+				}
+				if(jsonApprUser != null && jsonApprUser.containsKey("appraise")) {
+					Appraise apprUser = JSONObject.toJavaObject(jsonApprUser.getJSONObject("appraise"), Appraise.class);
+					map.put("apprUser", apprUser);
+				}
+				if(jsonaf != null && jsonaf.containsKey("aftersale")) {
+					Aftersale aftersale = JSONObject.toJavaObject(jsonaf.getJSONObject("aftersale"), Aftersale.class);
+					map.put("aftersale", aftersale);
 				}
 				map.put("order", order);
 			}else {
@@ -517,14 +532,16 @@ public class PartnerSaleOrderAction {
 				map.put("errmsg", "您还未开通合作伙伴功能！");
 				return "porder/page-review-appraise";
 			}
-			
+			JSONObject jsonOrder = OrderService.getOrder(orderId);
 			JSONObject jsonRet = AppraiseService.getAppraise(orderId, "1");
-			if(jsonRet != null && jsonRet.containsKey("appraise")) {
+			if(jsonRet != null && jsonRet.containsKey("appraise") && jsonOrder != null && jsonOrder.containsKey("order")) {
 				Appraise appraise = JSONObject.toJavaObject(jsonRet.getJSONObject("appraise"), Appraise.class);
-				if(null == appraise || "0".equals(appraise.getStatus())) {
+				if(null == appraise) {
 					map.put("errmsg", "该订单评价当前不可进行审核！");
 					return "porder/page-review-appraise";
 				}else {
+					Order order = JSONObject.toJavaObject(jsonOrder.getJSONObject("order"), Order.class);
+					map.put("order", order);
 					map.put("appraise", appraise);
 				}
 			}else {

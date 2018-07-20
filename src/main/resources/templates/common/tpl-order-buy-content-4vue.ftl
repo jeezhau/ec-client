@@ -29,7 +29,7 @@
 		       </table>
 		     </div>
 		    </div>
-		   <div class="row" style="margin:1px 0px;padding:1px 3px;background-color:white;">
+		   <div v-if="order.amount" class="row" style="margin:1px 0px;padding:1px 3px;background-color:white;">
 		  	  <span class="pull-left"> 金额¥：{{order.amount}}</span> 
 		  	  <span class="pull-right">配送方式：{{getDispatchMode(order.dispatchMode)}}</span>
 		  </div>

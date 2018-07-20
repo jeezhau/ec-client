@@ -22,11 +22,11 @@
     <link href="/css/mfyx.css" rel="stylesheet">
     <script src="/script/common.js"></script>
 </head>
-<body class="light-gray-bg">
+<body class="light-gray-bg" style="oveflow:scroll">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
 
-<div class="container " id="container" style="oveflow:scroll">
+<div class="container " id="container" style="padding:0;">
   <div class="row" style="margin:5px 0;text-align:center" >
     <ul class="nav navbar-nav nav-tabs" style="width:100%">
         <li class="<#if status='all'> active </#if>" style="width:20%" onclick="window.location.href='/psaleorder/show/all'"> 
@@ -63,8 +63,7 @@
 		    
 		    <a v-if="order.status==='30' " class="btn btn-default pull-right" :href="'/psaleorder/logistics/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >查看物流</span></a>
 		    
-		    <a v-if="order.status==='30' || order.status==='31' || order.status==='40' || order.status==='55' || order.status==='56'" class="btn btn-primary pull-right" :href="'/psaleorder/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >立即评价</span></a>
-		    <a v-if="order.status==='41' || order.status==='57' " class="btn btn-primary pull-right" :href="'/psaleorder/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span >追加评价</span></a>
+		    <a v-if="order.status==='41' || order.status==='57' " class="btn btn-primary pull-right" :href="'/psaleorder/appraise/begin/' + order.orderId" style="padding:0 3px;margin:0 3px"><span > 评 价 </span></a>
 		    
       </div>
 	</div>

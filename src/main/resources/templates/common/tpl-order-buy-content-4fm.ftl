@@ -29,9 +29,11 @@
 	       </table>
 	     </div>
 	    </div>
+	   <#if (order.amount)??>
 	   <div class="row" style="margin:1px 0px;padding:1px 3px;background-color:white;">
 	  	  <span class="pull-left"> 金额¥：${order.amount}</span> 
 	  	  <span class="pull-right">配送方式：{{getDispatchMode('${order.dispatchMode}')}}</span>
 	  </div>
+	  </#if>
 	</div>
 	

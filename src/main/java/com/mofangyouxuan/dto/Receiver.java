@@ -15,6 +15,8 @@ public class Receiver {
 
 	//@NotNull(message=" 拥有者ID：不可为空！")
     private Integer userId;
+    
+    private String recvType;
 
 	@NotNull(message=" 国家：不可为空！")
 	@Size(min=2,max=100,message=" 国家：长度为2-100字符！")
@@ -68,7 +70,16 @@ public class Receiver {
         this.userId = userId;
     }
 
-    public String getCountry() {
+    
+    public String getRecvType() {
+		return recvType;
+	}
+
+	public void setRecvType(String recvType) {
+		this.recvType = recvType;
+	}
+
+	public String getCountry() {
         return country;
     }
 

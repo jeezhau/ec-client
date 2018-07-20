@@ -141,7 +141,6 @@
             <input type="text" class="form-control" name="recvAddr" v-model="param.recvAddr" disabled placeholder="收货人地址" required>
           </div>
         </div>
-
       </div> 
       <div class="row" style="text-align:right;">
         <div class="col-xs-12" style="padding-right:40px">
@@ -403,7 +402,7 @@ var containerVue = new Vue({
 containerVue.getDefaultReceiver();
 </script>
 
-<!-- 图库显示Model -->
+<!-- 收货人显示Model -->
 <div class="modal fade " style="height:450px;overflow:scroll" id="selectReceiverModal" tabindex="-1" role="dialog" aria-labelledby="selectReceiverModalLabel" aria-hidden="true" data-backdrop="static">
    <div class="modal-dialog">
       <div class="modal-content">

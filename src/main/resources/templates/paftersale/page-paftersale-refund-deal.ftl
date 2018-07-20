@@ -16,18 +16,22 @@
     <link href="/css/templatemo-style.css" rel="stylesheet">
     
     <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-    
     <link href="/css/weui.css" rel="stylesheet">
     
-    <link href="/css/mfyx.css" rel="stylesheet">
     <script src="/script/common.js" type="text/javascript"></script>
+    
+    <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css"/>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.6&key=2b12c05334ea645bd934b55c8e46f6ea"></script>
+    <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
+    <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main.css"/>
 </head>
-<body class="light-gray-bg">
+<body class="light-gray-bg" style="overflow:scroll;">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
 <#if (order.orderId)?? >
-<div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll;">
+<div class="container " id="container" style="margin-bottom:80px;padding:0;overflow:scroll;">
   <#include "/porder/tpl-porder-buy-user-4fm.ftl" encoding="utf8"> 
   <#include "/common/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
 
@@ -39,46 +43,15 @@
   <div class="row" style="margin:3px 0px;padding:5px 10px;background-color:white">
       <span>买家联系电话：</span> <span>${(order.userPhone)!''}</span>
   </div>
-  <#if (order.aftersalesReason)??>
-  <!-- 买家售后申请信息 -->
-  <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
-    <div class="row" style="margin:1px 0px;background-color:white;">
-      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">买家售后申请</span>
-    </div>
-    <div v-for="reason in order.aftersalesReason" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
-     <div class="row">
-       <span class="pull-right">{{reason.type}}</span>
-       <span class="pull-left">{{reason.time}}</span>
-     </div>
-     <div class="row">
-       <p>{{reason.content.reason}}</p>
-       <p v-if="reason.type.indexOf('退货')">
-       {{getDispatchMode(reason.content.dispatchMode)}} {{reason.content.logisticsComp}} {{reason.content.logisticsNo}}
-       </p>
-     </div>
-    </div>
-  </div>
+  <#include "/common/tpl-order-buy-receiver-4fm.ftl" encoding="utf-8">
+  
+  <!-- 售后信息 -->
+  <#if (aftersale.applyTime)??>
+   <#include "/common/tpl-aftersale-apply-4fm.ftl" encoding="utf8"> 
   </#if>
-  <#if (order.aftersalesResult)??>
-  <!-- 卖家售后回复信息 -->
-  <div class="row" style="margin:8px 0px 3px 0px;" onclick="">
-    <div class="row" style="margin:1px 0px;background-color:white;">
-      <span class="pull-left" style="padding:0 10px;font-weight:bolder;font-size:120%;color:gray">卖家售后处理</span>
-    </div>
-    <div v-for="reason in order.aftersalesResult" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
-     <div class="row">
-       <span class="pull-right">{{reason.type}}</span>
-       <span class="pull-left">{{reason.time}}</span>
-     </div>
-     <div class="row">
-       <p>{{reason.content.reason}}</p>
-       <p v-if="reason.content.dispatchMode">
-       {{getDispatchMode(reason.content.dispatchMode)}} {{reason.content.dispatchMode.logisticsComp}} {{reason.content.dispatchMode.logisticsNo}}
-       </p>
-     </div>
-    </div>
-  </div> 
-  </#if> 
+  <#if (aftersale.dealResult)??>
+   <#include "/common/tpl-aftersale-deal-4fm.ftl" encoding="utf8"> 
+  </#if>
   <!-- 退款申请信息 -->
   <div class="row" style="margin:3px 0px;background-color:white; color:red">
     <p/>
@@ -107,6 +80,47 @@
          </select>
        </div>
   </div>
+  <#if order.status == '60'>
+   <div v-if="param.result=='61'" class="row" style="margin:3px 0;padding:5px 3px;" id="receiverAddr">
+        <label class="col-xs-12 control-label" style="vertical-algin:center;">退货地址<span style="color:red">*</span>:</label>
+        <div class="col-xs-12">
+          <div class="row">
+            <div class="col-xs-9" style="padding:0;font-weight:bolder">
+              <div class="row" style="margin:0">
+	              <div class="col-xs-6" style="padding:0">
+	                <input type="hidden" name="recvId" v-model="param.recvId">
+	                <input type="text" class="form-control" name="recvName" v-model="param.recvName" disabled style="width:100%;" placeholder="收货人姓名" required>
+	              </div>
+	              <div class="col-xs-6" style="padding:0">
+	                <input type="text" class="form-control" name="recvPhone" v-model="param.recvPhone" disabled style="width:100%" placeholder="联系电话" required>
+	              </div>
+              </div>
+              <div class="row" style="margin:0;font-weight:bolder">
+              	<div class="col-xs-3" style="padding:0 ">
+              	 <input type="hidden" name="recvCountry" v-model="param.recvCountry">
+                  <input type="text" class="form-control" name="recvProvince" v-model="param.recvProvince" disabled placeholder="省份" required>
+                 </div>
+              	<div class="col-xs-4" style="padding:0">
+                  <input type="text" class="form-control" name="recvCity" v-model="param.recvCity" disabled placeholder="市" required>
+                 </div>
+              	<div class="col-xs-5" style="padding:0">
+                  <input type="text" class="form-control" name="recvArea" v-model="param.recvArea" disabled placeholder="区县" required>
+                 </div>                                  
+              </div>
+            </div>
+            <div class="col-xs-3" style="vertical-algin:center;font-weight:bolder;">
+              <a class="btn btn-default" href="javascript:;" @click="selectReceiver">
+               <img alt="" src="/icons/收货地址.png" width="70%" height="70%" style="max-width:30px;max-height:30px"><br>
+               <span style="font-size:14px">收货地址</span>
+              </a>
+            </div>
+          </div>
+          <div class="row" style="font-weight:bolder">
+            <input type="text" class="form-control" name="recvAddr" v-model="param.recvAddr" disabled placeholder="收货人地址" required>
+          </div>
+        </div>
+     </div>
+  </#if>
   <div class="row" style="margin:3px 0">
     	  <label class="col-xs-3 control-label" style="padding-right:0">处理明细<span style="color:red">*</span></label>
        <div class="col-xs-9" style="padding-left:0">
@@ -127,17 +141,71 @@ var containerVue = new Vue({
 		order:{
 			status:'${order.status}',
 			goodsSpec:JSON.parse('${(order.goodsSpec)!"[]"}'),
-			aftersalesReason: JSON.parse('${(order.aftersalesReason)!"[]"}'),
-			aftersalesResult: JSON.parse('${(order.aftersalesResult)!"[]"}'),
 		},
-		
+		aftersaleReason: JSON.parse('${(aftersale.applyReason)!"[]"}'),
+		aftersaleResult: JSON.parse('${(aftersale.dealResult)!"[]"}'),
 		param:{
 			orderId:'${order.orderId}',
 			result:'',
-			reason:''
+			reason:'',
+			recvId:'',
+			recvName:'',
+			recvPhone:'',
+			recvAddr:'',
+			recvCountry:'',
+			recvProvince:'',
+			recvCity:'',
+			recvArea:''
 		}
 	},
 	methods:{
+		getDefaultReceiver:function(){
+			$.ajax({
+				url: '/preceiver/getdefault',
+				method:'get',
+				data: {},
+				success: function(jsonRet,status,xhr){
+					if(jsonRet && jsonRet.receiver){
+						containerVue.param.recvId = jsonRet.receiver.recvId;
+						containerVue.param.recvPhone = jsonRet.receiver.phone;
+						containerVue.param.recvName = jsonRet.receiver.receiver;
+						containerVue.param.recvCountry = jsonRet.receiver.country;
+						containerVue.param.recvProvince = jsonRet.receiver.province;
+						containerVue.param.recvCity =  jsonRet.receiver.city;
+						containerVue.param.recvArea = jsonRet.receiver.area;
+						containerVue.param.recvAddr = jsonRet.receiver.addr;
+					}else{
+						if(jsonRet && jsonRet.errcode === -100000){
+							$('#ajaxLoginModal').modal('show');
+						}else{
+							//alertMsg('错误提示','获取默认收货人信息失败！');
+						}
+					}
+				},
+				dataType: 'json'
+			});
+		},
+		selectReceiver:function(){
+			$('#selectReceiverModal').modal('show');
+			receiverManageVue.useFlag = 1 ;
+			receiverManageVue.callBackFun = function(receiver){
+				containerVue.param.recvId = receiver.recvId;
+				containerVue.param.recvPhone = receiver.phone;
+				containerVue.param.recvName = receiver.receiver;
+				containerVue.param.recvCountry = receiver.country;
+				containerVue.param.recvProvince = receiver.province;
+				containerVue.param.recvCity =  receiver.city;
+				containerVue.param.recvArea = receiver.area;
+				containerVue.param.recvAddr = receiver.addr;
+				$('#selectReceiverModal').modal('hide');
+				containerVue.param.flag = 0;//重新检查
+				containerVue.dispatchMatchs = [];
+				containerVue.param.carrage = 0;
+				containerVue.param.dispatchMode = '';
+				containerVue.param.postageId = '';
+				containerVue.param.postageIdAndMode = '';
+			}
+		},
 		submit:function(){
 			if(!this.param.result ){
 				alertMsg('错误提示','处理结果不可为空！');
@@ -147,7 +215,14 @@ var containerVue = new Vue({
 				alertMsg('错误提示','处理明细不可少于3个字符！');
 				return;
 			}
-			
+			if(this.param.result == '61'){
+				if(!this.param.recvId ){
+					alertMsg('错误提示','退货地址：不可为空！');
+					return;
+				}else{
+					this.param.recvAddr = this.param.recvProvince + this.param.recvCity + this.param.recvArea + this.param.recvAddr;
+				}
+			}
 			$.ajax({
 				url: '/paftersale/refund/submit/' + this.param.orderId ,
 				method:'post',
@@ -168,15 +243,34 @@ var containerVue = new Vue({
 		}
 	}
 });
-
+<#if order.status == '60'>
+containerVue.getDefaultReceiver();
+</#if>
 </script>
+
+<!-- 收货人显示Model -->
+<div class="modal fade " style="height:450px;overflow:scroll" id="selectReceiverModal" tabindex="-1" role="dialog" aria-labelledby="selectReceiverModalLabel" aria-hidden="true" data-backdrop="static">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
+            <h4 class="modal-title" id="selectReceiverModalLabel">收货人选择</h4>
+         </div>
+         <div class="modal-body">
+ 			<#include "/preceiver/page-preceiver-tpl.ftl" encoding="utf8"> 
+		</div>
+     </div>
+   </div>
+</div><!-- end of modal -->
+
 </#if> 
 
 <#if errmsg??>
  <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
 </#if>
-
-<#include "/menu/page-partner-func-menu.ftl" encoding="utf8">
+<footer>
+ <#include "/menu/page-partner-func-menu.ftl" encoding="utf8">
+</footer>
 
 </body>
 </html>

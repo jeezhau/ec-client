@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
+import com.mofangyouxuan.dto.Aftersale;
 import com.mofangyouxuan.dto.Order;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.PartnerStaff;
 import com.mofangyouxuan.dto.PayFlow;
 import com.mofangyouxuan.dto.VipBasic;
+import com.mofangyouxuan.service.AftersaleService;
 import com.mofangyouxuan.service.OrderService;
 import com.mofangyouxuan.utils.PageCond;
 
@@ -57,7 +59,7 @@ public class PartnerAfterSaleAction {
 	 */
 	@RequestMapping("/getall/{status}")
 	@ResponseBody
-	public String getAllOrder(@PathVariable(value="status", required=true)String status,
+	public String getAll(@PathVariable(value="status", required=true)String status,
 			PageCond pageCond,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
@@ -172,6 +174,9 @@ public class PartnerAfterSaleAction {
 	public String refundDealSubmit(@PathVariable("orderId")String orderId,
 			@RequestParam(value="result",required=true)String result,
 			@RequestParam(value="reason",required=true)String reason,
+			@RequestParam(value="recvAddr",required=false)String recvAddr,
+			@RequestParam(value="recvName",required=false)String recvName,
+			@RequestParam(value="recvPhone",required=false)String recvPhone,
 			ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
@@ -181,6 +186,13 @@ public class PartnerAfterSaleAction {
 				jsonRet.put("errmsg", "处理理由明细不可少于3个字符！");
 				jsonRet.put("errcode", ErrCodes.ORDER_PARAM_ERROR);
 				return jsonRet.toString();
+			}
+			if("61".equals(result)) {
+				if(recvAddr == null || recvName == null || recvPhone == null) {
+					jsonRet.put("errmsg", "退货地址：不可为空！");
+					jsonRet.put("errcode", ErrCodes.ORDER_PARAM_ERROR);
+					return jsonRet.toString();
+				}
 			}
 			//数据检查与权限校验
 			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
@@ -249,7 +261,12 @@ public class PartnerAfterSaleAction {
 			//发送请求
 			JSONObject params = new JSONObject();
 			params.put("reason", reason);
-			jsonRet = OrderService.updAfterSales(myPartner, order, result+"", params,partnerPasswd,updateOpr);
+			if("61".equals(result)) {
+				params.put("recvAddr", recvAddr);
+				params.put("recvName", recvName);
+				params.put("recvPhone", recvPhone);
+			}
+			jsonRet = AftersaleService.updAfterSales(myPartner, order, result+"", params,partnerPasswd,updateOpr);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");
@@ -281,7 +298,8 @@ public class PartnerAfterSaleAction {
 			}
 			
 			JSONObject jsonRet = OrderService.getOrder(orderId);
-			if(jsonRet != null && jsonRet.containsKey("order")) {
+			JSONObject jsonaf = AftersaleService.getAftersale(orderId);
+			if(jsonRet != null && jsonRet.containsKey("order") && jsonaf != null && jsonaf.containsKey("aftersale")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
 				if(!myPartner.getPartnerId().equals(order.getPartnerId())) {
 					map.put("errmsg", "该订单不是您的销售订单！");
@@ -295,6 +313,8 @@ public class PartnerAfterSaleAction {
 							PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
 							map.put("payFlow", payFlow);
 						}
+						Aftersale aftersale = JSONObject.toJavaObject(jsonaf.getJSONObject("aftersale"), Aftersale.class);
+						map.put("aftersale", aftersale);
 						map.put("order", order);
 					}
 				}
@@ -305,7 +325,7 @@ public class PartnerAfterSaleAction {
 			e.printStackTrace();
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
-		return "paftersale/page-paftersale-refund-deal";
+		return "paftersale/page-paftersale-exchange-deal";
 	}
 	
 	/**
@@ -318,6 +338,9 @@ public class PartnerAfterSaleAction {
 	@ResponseBody
 	public String exchangeDealSubmit(@PathVariable("orderId")String orderId,
 			@RequestParam(value="result",required=true)String result,
+			@RequestParam(value="recvAddr",required=false)String recvAddr,
+			@RequestParam(value="recvName",required=false)String recvName,
+			@RequestParam(value="recvPhone",required=false)String recvPhone,
 			@RequestParam(value="dispatchMode",required=false)Integer dispatchMode,
 			@RequestParam(value="logisticsComp",required=false)String logisticsComp,
 			@RequestParam(value="logisticsNo",required=false)String logisticsNo, 
@@ -328,9 +351,16 @@ public class PartnerAfterSaleAction {
 			//数据校验
 			reason = reason.trim();
 			if(reason == null || reason.length()<3) {
-				jsonRet.put("errmsg", "处理理由明细不可少于3个字符！");
+				jsonRet.put("errmsg", "处理理由明细：不可少于3个字符！");
 				jsonRet.put("errcode", ErrCodes.ORDER_PARAM_ERROR);
 				return jsonRet.toString();
+			}
+			if("51".equals(result)) {
+				if(recvAddr == null || recvName == null || recvPhone == null) {
+					jsonRet.put("errmsg", "退货地址：不可为空！");
+					jsonRet.put("errcode", ErrCodes.ORDER_PARAM_ERROR);
+					return jsonRet.toString();
+				}
 			}
 			if("55".equals(result)) {
 				if(null == dispatchMode || dispatchMode < 1 || dispatchMode > 4) {
@@ -416,12 +446,16 @@ public class PartnerAfterSaleAction {
 			//发送请求
 			JSONObject params = new JSONObject();
 			params.put("reason", reason);
-			if("55".equals(result)) {
+			if("51".equals(result)) {
+				params.put("recvAddr", recvAddr);
+				params.put("recvName", recvName);
+				params.put("recvPhone", recvPhone);
+			}else if("55".equals(result)) {
 				params.put("dispatchMode", dispatchMode);
 				params.put("logisticsComp", logisticsComp);
 				params.put("logisticsNo", logisticsNo);
 			}
-			jsonRet = OrderService.updAfterSales(myPartner, order, result+"", params,partnerPasswd,updateOpr);
+			jsonRet = AftersaleService.updAfterSales(myPartner, order, result+"", params,partnerPasswd,updateOpr);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");

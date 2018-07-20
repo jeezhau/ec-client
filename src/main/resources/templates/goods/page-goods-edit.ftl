@@ -521,7 +521,7 @@ function addUploadButton(editor){
 }
  
 function addUploadImage(theURLElementId){
-    var imgUrl = '/shop/gimage/${(goods.partnerId)?string('#')}/'; 
+    var imgUrl = '/shop/gimage/${((goods.partnerId)!0)?string("#")}/'; 
   	//选择商品的图片
 	$('#imageGalleryShowModal').modal('show');
 	$('#imageGalleryShowModal').css('z-index',100000);

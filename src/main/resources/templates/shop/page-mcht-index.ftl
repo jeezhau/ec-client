@@ -72,10 +72,10 @@
        <span class="pull-left">
          <img alt="头像" :src="appr.headimgurl" width="20px" height="20px" style="border-radius:50%">{{appr.nickname}}
        </span>
-       <span class="pull-right">{{appr.appraiseInfo[0].time}}</span>
+       <span class="pull-right">{{appr.content[0].time}}</span>
      </div>
      <div class="row">
-       {{appr.appraiseInfo[0].content}}
+       {{appr.content[0].content}}
      </div>
     </div>    
   </div>
@@ -162,10 +162,10 @@ var containerVue = new Vue({
 						if(jsonRet && jsonRet.errcode == 0){//
 							for(var i=0;i<jsonRet.datas.length;i++){
 								var appr = jsonRet.datas[i];
-								if(appr.appraiseInfo){//有评价内容
-									appr.appraiseInfo = JSON.parse(appr.appraiseInfo);
+								if(appr.content){//有评价内容
+									appr.content = JSON.parse(appr.content);
 								}else{
-									appr.appraiseInfo = {'time':appr.appraiseTime,'content':"卖家太懒，啥也没留下！！！"}
+									appr.content = {'time':appr.updateTime,'content':"卖家太懒，啥也没留下！！！"}
 								}
 								appr.headimgurl = startWith(appr.headimgurl,'http')?appr.headimgurl:('/user/headimg/show/'+appr.userId)
 								containerVue.apprList.push(appr);

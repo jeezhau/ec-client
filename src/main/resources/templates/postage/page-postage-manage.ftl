@@ -71,9 +71,7 @@
     </div>
   </div>
 </div><!-- end of container -->
-<footer>
-  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
-</footer>
+
 <script>
 var containerVue = new Vue({
 	el:'#container',
@@ -143,6 +141,10 @@ var containerVue = new Vue({
 });
 containerVue.getAll();
 </script>
+
+<footer>
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
+</footer>
 
 </body>
 </html>

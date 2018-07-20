@@ -22,11 +22,11 @@
     <link href="/css/mfyx.css" rel="stylesheet">
     <script src="/script/common.js"></script>
 </head>
-<body class="light-gray-bg">
+<body class="light-gray-bg" style="overflow:scroll">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
-<div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
+<div class="container " id="container" style="padding:0;">
  <#if (order.orderId)?? >
   <div class="row" style="margin:5px 1px ;padding:3px 5px;background-color:white" >
     <span>订单ID：${order.orderId}</span><br>
@@ -103,7 +103,9 @@ var containerVue = new Vue({
 
 <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
 
-<#include "/menu/page-bottom-menu.ftl" encoding="utf8">
+<footer>
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
+</footer>
 
 </body>
 </html>

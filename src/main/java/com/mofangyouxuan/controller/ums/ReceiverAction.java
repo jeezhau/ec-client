@@ -53,7 +53,7 @@ public class ReceiverAction {
 		JSONObject jsonRet = new JSONObject();
 		UserBasic user = (UserBasic)map.get("userBasic");
 		try {
-			jsonRet = ReceiverService.getDefault(user.getUserId());
+			jsonRet = ReceiverService.getDefault(user.getUserId(),"1");
 			if(jsonRet == null) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
@@ -78,7 +78,7 @@ public class ReceiverAction {
 		JSONObject jsonRet = new JSONObject();
 		UserBasic user = (UserBasic)map.get("userBasic");
 		try {
-			jsonRet = ReceiverService.getByUser(user.getUserId());
+			jsonRet = ReceiverService.getByUser(user.getUserId(),"1");
 			if(jsonRet == null) {
 				jsonRet = new JSONObject();
 				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
@@ -142,6 +142,7 @@ public class ReceiverAction {
 				return jsonRet.toString();
 			}
 			receiver.setUserId(user.getUserId());
+			receiver.setRecvType("1");
 			jsonRet = ReceiverService.save(receiver);
 			if(jsonRet == null) {
 				jsonRet = new JSONObject();

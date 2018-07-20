@@ -176,7 +176,7 @@ public class ReviewAction {
 			if("4review".equals(reviewStatus)) {//待审核
 				params.put("reviewResult", "0");
 			}else if("normal".equals(reviewStatus)){
-				params.put("reviewResult", "1");
+				params.put("reviewResult", "S");
 			}else if("refuse".equals(reviewStatus)){
 				params.put("reviewResult", "R");
 			}

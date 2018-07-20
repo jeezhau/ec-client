@@ -22,12 +22,12 @@
     <link href="/css/mfyx.css" rel="stylesheet">
     <script src="/script/common.js" type="text/javascript"></script>
 </head>
-<body class="light-gray-bg">
+<body class="light-gray-bg" style="overflow:scroll">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
 <#if (order.orderId)?? >
-<div class="container " id="container" style="margin:0 0;padding:0;overflow:scroll">
+<div class="container " id="container" style="padding:0;">
   <#include "/porder/tpl-porder-buy-user-4fm.ftl" encoding="utf8"> 
   <#include "/common/tpl-order-buy-content-4fm.ftl" encoding="utf8"> 
 
@@ -139,7 +139,9 @@ if('3' != '${order.dispatchMode}'){
  <#include "/error/tpl-error-msg-modal.ftl" encoding="utf8">
 </#if>
 
-<#include "/menu/page-bottom-menu.ftl" encoding="utf8">
+<footer>
+  <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 
+</footer>
 
 </body>
 </html>

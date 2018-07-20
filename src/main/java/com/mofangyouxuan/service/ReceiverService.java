@@ -58,9 +58,10 @@ public class ReceiverService {
 	 * @param userId
 	 * @return {errcode:0,errmsg:"ok",receiver:{...}}
 	 */
-	public static JSONObject getDefault(Integer userId) {
+	public static JSONObject getDefault(Integer userId,String recvType) {
 		String url = mfyxServerUrl + receiverGetDefaultUrl;
 		url = url.replace("{userId}", userId+"");
+		url = url.replace("{recvType}", recvType);
 		String strRet = HttpUtils.doGet(url);
 		JSONObject jsonRet = null;
 		try {
@@ -76,9 +77,10 @@ public class ReceiverService {
 	 * @param userId
 	 * @return {errcode:0,errmsg:"ok",datas:[{...},{...},...]}
 	 */
-	public static JSONObject getByUser(Integer userId) {
+	public static JSONObject getByUser(Integer userId,String recvType) {
 		String url = mfyxServerUrl + receiverGetByUserUrl;
 		url = url.replace("{userId}", userId+"");
+		url = url.replace("{recvType}", recvType);
 		String strRet = HttpUtils.doGet(url);
 		JSONObject jsonRet = null;
 		try {

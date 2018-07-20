@@ -44,6 +44,14 @@
       </a>
   </div>
   
+  <!-- 售后信息 -->
+  <#if (aftersale.applyTime)??>
+   <#include "/common/tpl-aftersale-apply-4fm.ftl" encoding="utf8"> 
+  </#if>
+  <#if (aftersale.dealResult)??>
+   <#include "/common/tpl-aftersale-deal-4fm.ftl" encoding="utf8"> 
+  </#if>
+   
   <!-- 退款申请信息 -->
   <div class="row" style="margin:3px 0px;background-color:white; color:red">
     <p/>
@@ -51,7 +59,7 @@
   	填写说明：退货则需要填写退货的物流信息，官方配送则名称为“摩放优选”，单号为订单号；商家自取则名称为“商家名称”，单号为订单号；
   	快递配送则名称为“快递公司名称”，单号为物流公司的单号；买家送达则名称为“买家昵称”，单号为订单号；</span>
   </div>
-  <#if order.status != '61'>
+  <#if !(order.status)?starts_with('6')>
   <div class="row" style="margin:3px 0">
     	  <label class="col-xs-3 control-label" style="padding-right:0">退款类型<span style="color:red">*</span></label>
        <div class="col-xs-9" style="padding-left:0">
@@ -72,7 +80,6 @@
        </div>
   </div>
   <#if order.status == '61'>
-  <div v-if="param.type == '3'" >
   <div class="row" style="margin:3px 0">
     	  <label class="col-xs-3 control-label" style="padding-right:0">配送类型<span style="color:red">*</span></label>
        <div class="col-xs-9" style="padding-left:0">
@@ -96,7 +103,6 @@
          <input type="text" class="form-control" v-model="param.logisticsNo" required maxlength="100">
        </div>
    </div>
-   </div>
    </#if>
   <#if ((vipBasic.status)!'') == '1'>
   <div class="row" style="margin:3px 0">
@@ -115,6 +121,8 @@
 var containerVue = new Vue({
 	el:'#container',
 	data:{
+		aftersaleReason: JSON.parse('${(aftersale.applyReason)!"[]"}'),
+		aftersaleResult: JSON.parse('${(aftersale.dealResult)!"[]"}'),
 		order:{
 			status:'${order.status}',
 			goodsSpec:JSON.parse('${(order.goodsSpec)!"[]"}'),
@@ -184,7 +192,7 @@ var containerVue = new Vue({
 				success: function(jsonRet,status,xhr){
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode === 0){//成功
-							window.location.href = "/aftersale/manage/refund";
+							window.location.href = "/aftersale/manage/refunding";
 						}else{//出现逻辑错误
 							if(jsonRet.errcode === -100000){
 								$('#ajaxLoginModal').modal('show');

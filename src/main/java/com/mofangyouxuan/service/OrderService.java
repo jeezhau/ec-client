@@ -34,9 +34,6 @@ public class OrderService {
 	private static String orderPayFinishUrl;
 	private static String orderReadyUrl;
 	private static String orderDeliveryUrl;
-	private static String orderApplyRefundUrl;
-	private static String orderExchangeUrl;
-	private static String orderAfterSalesUrl;
 	private static String orderGetLogisticsUrl;
 	private static String orderBalPaySubmitUrl;
 	private static String orderGetPayFlowUrl;
@@ -44,18 +41,6 @@ public class OrderService {
 	@Value("${mfyx.order-delivery-url}")
 	public void setOrderDeliveryUrl(String orderDeliveryUrl) {
 		OrderService.orderDeliveryUrl = orderDeliveryUrl;
-	}
-	@Value("${mfyx.order-refund-url}")
-	public void setOrderApplyRefundUrl(String orderApplyRefundUrl) {
-		OrderService.orderApplyRefundUrl = orderApplyRefundUrl;
-	}
-	@Value("${mfyx.order-exchange-url}")
-	public void setOrderExchangeUrl(String orderExchangeUrl) {
-		OrderService.orderExchangeUrl = orderExchangeUrl;
-	}
-	@Value("${mfyx.order-updaftersales-url}")
-	public void setOrderAfterSalesUrl(String orderAfterSalesUrl) {
-		OrderService.orderAfterSalesUrl = orderAfterSalesUrl;
 	}
 	@Value("${mfyx.order-logistics-url}")
 	public void setOrderGetLogisticsUrl(String orderGetLogisticsUrl) {
@@ -418,35 +403,7 @@ public class OrderService {
 		
 	}
 	
-	/**
-	 * 买家申请退款，并退货
-	 * @param user
-	 * @param order
-	 * @param type		退款类型(1-未收到货，3-签收退款：品质与描述问题或无理由退货)
-	 * @param content	退款理由，签收退货包含快递信息{reason,dispatchMode,logisticsComp,logisticsNo}
-	 * @param passwd		会员操作密码
-	 * @return
-	 */
-	public static JSONObject applyRefund(UserBasic user,Order order,
-			String type,JSONObject content,String passwd) {
-		JSONObject jsonRet = new JSONObject();
-		Map<String,Object> params = new HashMap<String,Object>();
-		//向服务中心发送申请
-		String url = mfyxServerUrl + orderApplyRefundUrl;
-		url = url.replace("{userId}", user.getUserId() + "");
-		url = url.replace("{orderId}", order.getOrderId() + "");
-		params.put("type", type);
-		params.put("content", content.toJSONString());
-		params.put("passwd", passwd);
-		String strRet = HttpUtils.doPost(url, params);
-		try {
-			jsonRet = JSONObject.parseObject(strRet);
-			return jsonRet;
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+	
 	
 	/**
 	 * 查询订单的物流信息
@@ -469,62 +426,7 @@ public class OrderService {
 		return null;
 	}
 	
-	/**
-	 * 买家申请换货，并退货
-	 * @param user
-	 * @param order
-	 * @param content		换货理由，包含快递信息{reason,dispatchMode,logisticsComp,logisticsNo}
-	 * @return {errcode,errmsg}
-	 */
-	public static JSONObject exchange(UserBasic user,Order order,JSONObject content) {
-		JSONObject jsonRet = new JSONObject();
-		Map<String,Object> params = new HashMap<String,Object>();
-		//向服务中心发送申请
-		String url = mfyxServerUrl + orderExchangeUrl;
-		url = url.replace("{userId}", user.getUserId() + "");
-		url = url.replace("{orderId}", order.getOrderId() + "");
-		params.put("content", content.toJSONString());
-		String strRet = HttpUtils.doPost(url, params);
-		try {
-			jsonRet = JSONObject.parseObject(strRet);
-			return jsonRet;
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 	
-	
-	
-	/**
-	 * 卖家更新售后信息
-	 * @param partner
-	 * @param order
-	 * @param nextStat	下一个状态／处理结果（52:已收到退货、核验中，53:核验不通过、协商解决，54:已重新发货、待收货，62：已收到退货、核验中，63:核验不通过、协商解决，64:同意退款，申请资金回退）
-	 * @param content	评价内容，json格式{reason,dispatchMode,logisticsComp,logisticsNo}
-	 * @return {errcode,errmsg}
-	 */
-	public static JSONObject updAfterSales(PartnerBasic partner,Order order,
-			String nextStat,JSONObject content,String passwd,Integer updateOpr) {
-		JSONObject jsonRet = new JSONObject();
-		Map<String,Object> params = new HashMap<String,Object>();
-		//向服务中心发送申请
-		String url = mfyxServerUrl + orderAfterSalesUrl;
-		url = url.replace("{partnerId}", partner.getPartnerId() + "");
-		url = url.replace("{orderId}", order.getOrderId() + "");
-		params.put("nextStat", nextStat);
-		params.put("content", content.toJSONString());
-		params.put("passwd", passwd);
-		params.put("currUserId", updateOpr);
-		String strRet = HttpUtils.doPost(url, params);
-		try {
-			jsonRet = JSONObject.parseObject(strRet);
-			return jsonRet;
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 	/**
 	 * 卖家发货设置物流信息：快递公司、单号
 	 * @param partner

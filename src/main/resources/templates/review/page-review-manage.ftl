@@ -116,9 +116,9 @@
          </tr>
 	     <tr v-for="item in dataList" >
             <td style="padding:2px 2px">{{item.orderId}}</td>
-            <td style="padding:2px 2px">{{item.appraiseTime}}</td>
+            <td style="padding:2px 2px">{{item.updateTime}}</td>
             <td style="padding:2px 2px;text-align:center">
-              <a target="_blank" :href="'/psaleorder/appraise/review/' + item.orderId">{{getAppraiseStatus(item.appraiseStatus)}}</a>
+              <a target="_blank" :href="'/psaleorder/appraise/review/' + item.orderId">{{getAppraiseStatus(item.status)}}</a>
             </td>
 	    </tr>
 	  </table>

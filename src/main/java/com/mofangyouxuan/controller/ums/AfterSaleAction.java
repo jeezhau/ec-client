@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
+import com.mofangyouxuan.dto.Aftersale;
 import com.mofangyouxuan.dto.Order;
 import com.mofangyouxuan.dto.PayFlow;
 import com.mofangyouxuan.dto.UserBasic;
+import com.mofangyouxuan.service.AftersaleService;
 import com.mofangyouxuan.service.OrderService;
 import com.mofangyouxuan.utils.PageCond;
 
@@ -29,7 +31,7 @@ public class AfterSaleAction {
 	@RequestMapping("/manage/{status}")
 	public String getManage(@PathVariable("status")String status,ModelMap map) {
 		if(!"4refund".equals(status) && !"4exchange".equals(status) &&
-				!"refunding".equals(status) && !"exchangeing".equals(status)) {
+				!"refunding".equals(status) && !"exchanging".equals(status)) {
 			status = "refunding";
 		}
 		map.put("status", status);
@@ -49,7 +51,7 @@ public class AfterSaleAction {
 	 */
 	@RequestMapping("/getall/{status}")
 	@ResponseBody
-	public String getAllOrder(@PathVariable(value="status", required=true)String status,
+	public String getAll(@PathVariable(value="status", required=true)String status,
 			PageCond pageCond,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		UserBasic user = (UserBasic) map.get("userBasic");
@@ -90,8 +92,6 @@ public class AfterSaleAction {
 			JSONObject showGroups = new JSONObject();
 			showGroups.put("needReceiver", false);
 			showGroups.put("needLogistics", false);
-			showGroups.put("needAppr", false);
-			showGroups.put("needAfterSales", false);
 			showGroups.put("needGoodsAndUser", true);
 			jsonRet = OrderService.searchOrders(showGroups.toJSONString(),params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
@@ -119,7 +119,7 @@ public class AfterSaleAction {
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
 			JSONObject jsonRet = OrderService.getOrder(orderId);
-			
+			JSONObject jsonaf = AftersaleService.getAftersale(orderId);
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
 				if(!user.getUserId().equals(order.getUserId())) {
@@ -135,6 +135,10 @@ public class AfterSaleAction {
 						if(jsonRet != null && jsonRet.containsKey("payFlow")) {
 							PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
 							map.put("payFlow", payFlow);
+						}
+						if(jsonaf != null && jsonaf.containsKey("aftersale")) {
+							Aftersale aftersale = JSONObject.toJavaObject(jsonaf.getJSONObject("aftersale"), Aftersale.class);
+							map.put("aftersale", aftersale);
 						}
 						map.put("order", order);
 					}
@@ -234,7 +238,7 @@ public class AfterSaleAction {
 				params.put("logisticsNo", logisticsNo);
 				type = 3;
 			}
-			jsonRet = OrderService.applyRefund(user, order, type+"", params, passwd);
+			jsonRet = AftersaleService.applyRefund(user, order, type+"", params, passwd);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");
@@ -262,7 +266,7 @@ public class AfterSaleAction {
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
 			JSONObject jsonRet = OrderService.getOrder(orderId);
-			
+			JSONObject jsonaf = AftersaleService.getAftersale(orderId);
 			if(jsonRet != null && jsonRet.containsKey("order")) {
 				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
 				if(!user.getUserId().equals(order.getUserId())) {
@@ -272,6 +276,10 @@ public class AfterSaleAction {
 							!"51".equals(order.getStatus())) {
 						map.put("errmsg", "您当前不可对该订单进行申请换货！");
 					}else {
+						if(jsonaf != null && jsonaf.containsKey("aftersale")) {
+							Aftersale aftersale = JSONObject.toJavaObject(jsonaf.getJSONObject("aftersale"), Aftersale.class);
+							map.put("aftersale", aftersale);
+						}
 						map.put("order", order);
 					}
 				}
@@ -352,7 +360,7 @@ public class AfterSaleAction {
 				return jsonRet.toString();
 			}
 			params.put("reason", reason);
-			jsonRet = OrderService.exchange(user, order, params);
+			jsonRet = AftersaleService.exchange(user, order, params);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");

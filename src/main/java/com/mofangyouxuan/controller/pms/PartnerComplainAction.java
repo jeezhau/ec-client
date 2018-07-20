@@ -55,7 +55,7 @@ public class PartnerComplainAction {
 			return "redirect:/partner/manage" + "?errmsg=" + URLEncoder.encode(errmsg, "utf8") ;
 		}
 		if("sys".equals(mode) ) {
-			if(!myPartner.getPartnerId().equals(SysParam.getSyspartnerId()) || "bindVip".equals(partnerUserTP) || 
+			if(!myPartner.getPartnerId().equals(SysParam.getSyspartnerId()) ||
 					("staff".equals(partnerUserTP) && (partnerStaff == null || partnerStaff.getTagList() == null || 
 					(!partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainDeal.getValue()) && !partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainRevisit.getValue())))) ){
 				errmsg = "您没有权限执行该操作！！";
@@ -103,7 +103,7 @@ public class PartnerComplainAction {
 			return "redirect:/partner/manage" + "?errmsg=" + URLEncoder.encode(errmsg, "utf8") ;
 		}
 		if("deal".equals(mode) || "revisit".equals(mode)) {
-			if(!myPartner.getPartnerId().equals(SysParam.getSyspartnerId()) || "bindVip".equals(partnerUserTP) || 
+			if(!myPartner.getPartnerId().equals(SysParam.getSyspartnerId()) || 
 					("staff".equals(partnerUserTP) && (partnerStaff == null || partnerStaff.getTagList() == null || 
 					(!partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainDeal.getValue()) && !partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainRevisit.getValue())))) ){
 				errmsg = "您没有权限执行该操作！！";
@@ -423,7 +423,7 @@ public class PartnerComplainAction {
 			}
 			
 			if("sys".equals(mode)) {
-				if(!myPartner.getPartnerId().equals(SysParam.getSyspartnerId()) || "bindVip".equals(partnerUserTP) || 
+				if(!myPartner.getPartnerId().equals(SysParam.getSyspartnerId()) || 
 						("staff".equals(partnerUserTP) && (partnerStaff == null || partnerStaff.getTagList() == null || 
 						(!partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainDeal.getValue()) && !partnerStaff.getTagList().contains(PartnerStaff.TAG.ComplainRevisit.getValue())))) ){
 					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
