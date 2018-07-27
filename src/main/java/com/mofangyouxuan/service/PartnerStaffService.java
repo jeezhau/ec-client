@@ -87,7 +87,7 @@ public class PartnerStaffService {
 		Map<String, Object> params = new HashMap<String,Object>();
 		String[] excludeFields = {"updateTime","status"};
 		params = ObjectToMap.object2Map(staff,excludeFields,false);
-		params.put("passwd", passwd);
+		params.put("password", passwd);
 		String strRet = HttpUtils.doPost(url, params);
 		JSONObject jsonRet = new JSONObject();
 		try {

@@ -168,7 +168,7 @@
           <label class="col-xs-12 control-label" style="text-align:left">商品图文描述<span style="color:red">*</span></label>
         </div>
         <div class="col-xs-12" >
-          <div id="hiddenGoodsDesc" style="display:none">${(goods.goodsDesc)!''}"</div>
+          <div id="hiddenGoodsDesc" style="display:none">${(goods.goodsDesc)!''}</div>
           <textarea class="form-control ckeditor" id="content" maxLength=10000  rows=30 required ></textarea>
         </div>
       </div>

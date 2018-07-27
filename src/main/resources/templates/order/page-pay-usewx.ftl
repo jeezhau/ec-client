@@ -34,7 +34,7 @@
     <div class="col-xs-12" style="text-align:center;">${order.goodsName}</div>
     <div class="col-xs-12" style="text-align:center;">
       <a href="/shop/goods/${(order.goodsId)?string('#')}">
-       <img alt="" src="/shop/gimage/${(order.partnerId)?string('#')}/${(order.goodsMainImgPath)!''}" style="width:99%;height:150px;">
+       <img alt="" src="/shop/gimage/${(order.partnerId)?string('#')}/${(order.goodsMainImgPath)!''}" style="max-width:99%;max-height:150px;">
       </a>
     </div>
     <div class="col-xs-12" style="padding:0px 3px">

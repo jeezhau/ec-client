@@ -115,9 +115,19 @@
         </div>
       </div>
       <div class="form-group">
+        <label class="col-xs-4 control-label" style="padding-right:1px">企业类型<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:1px">
+          <select class="form-control" v-model="param.compType" required>
+            <option value="" disabled> 请选择企业类型... </option>
+            <option value="1">小微个人</option>
+            <option value="2">公司</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">经营名称<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <input class="form-control" v-model="param.busiName"  maxLength=30  placeholder="经营名称，一般为公司名称的简写" >
+          <input class="form-control" v-model="param.busiName"  maxLength=30  placeholder="经营名称，一般为小微个体姓名或公司名称的简写" >
         </div>
       </div> 
       <div class="form-group">
@@ -133,25 +143,17 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">企业类型<span style="color:red">*</span></label>
-        <div class="col-xs-8" style="padding-left:1px">
-          <select class="form-control" v-model="param.compType" required>
-            <option value="" disabled> 请选择企业类型... </option>
-            <option value="1">小微商户</option>
-            <option value="2">公司</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">企业名称<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <input class="form-control" v-model="param.compName"  maxLength=100  required placeholder="请输入个体户或公司名称">
+          <input class="form-control" v-model="param.compName"  maxLength=100  required placeholder="请输入个体户姓名或公司名称全称">
         </div>
       </div>
       <div class="form-group">
-        <label class="col-xs-4 control-label" style="padding-right:1px">营业执照号码<span style="color:red">*</span></label>
+        <label v-if="!param.compType" class="col-xs-4 control-label" style="padding-right:1px">证件号码<span style="color:red">*</span></label>
+        <label v-if="param.compType=='1'" class="col-xs-4 control-label" style="padding-right:1px">身份证号码<span style="color:red">*</span></label>
+        <label v-if="param.compType=='2'" class="col-xs-4 control-label" style="padding-right:1px">营业执照号码<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <input class="form-control" v-model="param.licenceNo"  maxLength=50 placeholder="请输入营业执照号码">
+          <input class="form-control" v-model="param.licenceNo"  maxLength=50 placeholder="请输入证件号码">
         </div>
       </div>
       <div class="form-group">
@@ -184,7 +186,9 @@
 	      </div>
 	  </div>
 	  <div class="form-group">
-	    <label class="col-xs-12 control-label" >公司营业执照或小微商户法人手持身份证正面照<span style="color:red" >*</span></label>
+	    <label v-if="!param.compType" class="col-xs-12 control-label" >公司营业执照或小微商户法人手持身份证正面照<span style="color:red" >*</span></label>
+	    <label v-if="param.compType=='1'" class="col-xs-12 control-label" >手持身份证正面照<span style="color:red" >*</span></label>
+	    <label v-if="param.compType=='2'" class="col-xs-12 control-label" >公司营业执照<span style="color:red" >*</span></label>
 	    <div class="col-xs-12">
 	        <input class="form-control" id="licenceImg"  type="file" name="image" type="file" accept="image/jpg" class="file-loading">
 	    </div>

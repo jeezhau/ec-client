@@ -141,7 +141,8 @@ var containerVue = new Vue({
       </div>
       <div class="modal-footer">
      	<div style="text-align:center">
-           <button type="button" class="btn btn-info"  @click="submit">&nbsp;&nbsp;提 交&nbsp;&nbsp;</button>
+           <button v-if="isSending == 0" type="button" class="btn btn-info"  @click="submit">&nbsp;&nbsp;提 交&nbsp;&nbsp;</button>
+           <button v-if="isSending == 1" type="button" class="btn btn-info"  >发送中...</button>
          </div>
       </div>
   </div><!-- /.modal-content -->
@@ -151,6 +152,7 @@ var containerVue = new Vue({
  var resetPwdVue = new Vue({
 	 el:'#resetPwdModal',
 	 data:{
+		 isSending:0,
 		 param:{
 			 type:'',
 		 }
@@ -161,11 +163,13 @@ var containerVue = new Vue({
 				alertMsg('错误提示','请选择密码接收媒介！');
 				return;
 			 }
+			 this.isSending = 1;
 			 $.ajax({
 					url: '/vip/vipset/resetpwd',
 					method:'post',
 					data: this.param,
 					success: function(jsonRet,status,xhr){
+						resetPwdVue.isSending = 0;
 						$('#resetPwdModal').modal('hide');
 						if(jsonRet && jsonRet.errmsg){
 							if(jsonRet.errcode !== 0){

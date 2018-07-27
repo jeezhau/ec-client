@@ -26,4 +26,9 @@ function alertMsg(title,content){
 	$('#alertMsgContent').html(content);
 	$('#alertMsgModal').show();
 }
+function hideAlertMsg(){
+	if($("#dealingData")){
+		$("#dealingData").hide();
+	}
+}
 </script>

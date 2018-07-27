@@ -18,24 +18,23 @@
     <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <link href="/css/weui.css" rel="stylesheet">
     
-    <link href="/css/mfyx.css" rel="stylesheet">
     <!-- 文件上传 -->
     <script src="/script/fileinput.min.js" type="text/javascript"></script>
     <script src="/script/fileinput_locale_zh.js" type="text/javascript"></script>
     <link href="/css/fileinput.min.css" rel="stylesheet">
 </head>
-<body class="light-gray-bg">
+<body class="light-gray-bg" style="oveflow:scroll">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
-<div class="container" id="container" style="oveflow:scroll">
-  <div class="row" style="margin-top:0px;">
+<div class="container" id="container" style="padding:0;">
+  <div class="row" style="margin:0px;">
     <div class="row">
 	    <div class="col-xs-12" style="padding:0 15px">
 	      <ol class="breadcrumb " style="margin-bottom:1px;background-color:white">
 	        <span>当前文件夹：</span>
-	        <li v-for="(item,index) in folder" @click="listFiles(getFolderPath(index))">
-	          <a href="javascript:;">{{item}}</a>
+	        <li v-for="item in currUpPathArr" @click="listFiles(item.folderId,item.folderName)">
+	          <a href="javascript:;">{{item.folderName}}</a>
 	        </li>
 	      </ol>
 	    </div>
@@ -44,15 +43,35 @@
 	    <div class="col-xs-12" style="padding:0 5px;background-color:white;margin:0 ;text-align:center">
 	     <a class="btn" href="javascript:;" @click="createNewFolder"><img src="/icons/新建文件夹.png" width="25px" height="25px"><br>新建文件夹</a>
 	     <a class="btn" href="javascript:;" @click="uploadImg"><img src="/icons/上传图片.png" width="25px" height="25px"><br>上传文件</a>
+	     <a class="btn" href="javascript:;" @click="showMode='list'"><img src="/icons/列表-1.png" width="25px" height="25px"><br>显示</a>
+	     <a class="btn" href="javascript:;" @click="showMode='image'"><img src="/icons/列表.png" width="25px" height="25px"><br>显示</a>
 	    </div>
     </div>
-    <div class="row" style="margin:3px 0">
+    <div v-if="showMode=='list'" class="row" style="margin:3px 0">
       <ul class="list-group" style="padding:0 5px;background-color:white;">
         <li v-for="item in files" class="list-group-item">
-          <a v-if="isFileOrDir(item)===false" href="javascript:;" @click="listFiles(folder.join('/') + '/' + item)"><img alt="文件夹" width=20px height=20px src="/icons/文件夹.png">&nbsp;&nbsp;&nbsp;{{item}}</a>
-          <span v-if="isFileOrDir(item)===true"><img alt="" width=20px height=20px  v-bind:src="'/pimage/file/show/' + item"><span>&nbsp;&nbsp;&nbsp; {{item}}</span></span>
+          <a v-if="item.isDir==='1'" href="javascript:;" @click="listFiles(item.imgId,item.fileName)"><img alt="文件夹" width=20px height=20px src="/icons/文件夹.png">&nbsp;&nbsp;&nbsp;{{item.fileName}}</a>
+          <span v-if="item.isDir==='0'"><img alt="" width=20px height=20px  v-bind:src="'/pimage/file/show/' + item.imgId"><span>&nbsp;&nbsp;&nbsp; {{item.fileName}}.{{item.imgType}}</span></span>
         </li>
       </ul>
+    </div>
+    <div v-if="showMode=='image'" class="row" style="margin:3px 0">
+      <div v-for="item,index in files" class="col-xs-6 col-sm-4 col-md-3 col-lg-3" style="padding:3px 3px">
+        <div style="position:relative;text-align:center;background-color:white;padding:2px">
+          <a v-if="item.isDir==='1'" href="javascript:;" @click="listFiles(item.imgId,item.fileName)"><img alt="文件夹" style="height:160px;max-width:100%" src="/icons/文件夹.png"></a>
+          <img v-if="item.isDir==='0'" alt="" style="height:160px;max-width:100%"  v-bind:src="'/pimage/file/show/' + item.imgId">
+          <img v-if="item.usingCnt>0" alt="引用" style="position:absolute;right:3px;top:3px;height:15px;width:15px" src="/icons/引用.png">
+        </div>
+        <div style="text-align:center;background-color:white;padding:2px">
+         <span>{{item.fileName}}<span v-if="item.isDir==='0'">.{{item.imgType}}</span></span>
+        </div>
+        <div style="text-align:center;background-color:white;padding:2px">
+         <button type="button" class="btn btn-info" style="padding:0;margin:1px 0px"  @click="renameFile(index,item)"> 重命名</button>
+         <button v-if="item.usingCnt<=0" type="button" class="btn btn-danger" style="padding:0;margin:1px 0px"  @click="deleteImg(index,item)">&nbsp;删除&nbsp;</button>
+         <button v-if="item.isDir==='0'" type="button" class="btn btn-primary" style="padding:0;margin:1px 0px" @click="replaceImg(item.imgId,item.fileName)">&nbsp;替换&nbsp;</button>
+         <button type="button" class="btn btn-default" style="padding:0;margin:1px 0px">&nbsp;迁移&nbsp;</button>
+        </div>
+      </div>
     </div>
   </div>
  
@@ -62,12 +81,10 @@
 var containerVue = new Vue({
 	el:'#container',
 	data:{
-		folder:['Home'],
+		currUpPathArr:[], //[{'folderId':'','folderName':'Home'}]
+		currFolder:{}, //{'folderId':'','folderName':'Home/','fileName':''}
 		showMode:"list", //显示方式 list 、image
-		files:[],
-		cacheFiles:{
-			
-		}
+		files:[]
 	},
 	methods:{
 		getFolderPath: function(index){
@@ -78,44 +95,42 @@ var containerVue = new Vue({
 			folderPath = folderPath.substring(0,folderPath.length-1);
 			return folderPath;
 		},
-		listFiles: function(folderPath){
-			//查询缓存数据
-			if(containerVue.cacheFiles[folderPath] && containerVue.cacheFiles[folderPath].length>0){ //缓存查找
-				containerVue.files = [];
-				var cache = containerVue.cacheFiles[folderPath];
-				for(var i=0;i<cache.length;i++){
-					containerVue.files.push(cache[i]);
+		listFiles: function(folderImgId,folderName){
+			//查询路径组更新层级目录
+			var fullFolderName = '';
+			var index = 0;
+			for(;index<this.currUpPathArr.length;index++){
+				fullFolderName += "/" + this.currUpPathArr[index].folderName;
+				if(this.currUpPathArr[index].folderId == folderImgId){
+					break;
 				}
-				//更新层级目录
-				var arr = folderPath.split("/");
-				containerVue.folder = [];
-				for(var i=0;i<arr.length;i++){
-					containerVue.folder.push(arr[i]);
-				}
-				return;
 			}
+			if(index == this.currUpPathArr.length-1){
+				return;
+			}else if(index < this.currUpPathArr.length-1){
+				this.currUpPathArr.splice(index+1,this.currUpPathArr.length-(index+1));
+			}else{
+				this.currUpPathArr.push({'folderId':folderImgId,'folderName':folderName});
+				fullFolderName += "/" + folderName;
+			}
+			fullFolderName = fullFolderName.substring(1);
+			this.currFolder.folderId = this.currUpPathArr[index].folderId;
+			this.currFolder.fullFolderName = fullFolderName;
+			this.currFolder.folderName = this.currUpPathArr[index].fileName;
 			$.ajax({
 				url: '/pimage/folder/list',
 				method:'post',
-				data: {'folderPath':folderPath},
+				data: {'folderImgId':folderImgId},
 				success: function(jsonRet,status,xhr){
-					if(jsonRet ){
-						if(jsonRet.files){
-							containerVue.files = [];
-							containerVue.cacheFiles[folderPath] = [];
-							for(var i=0;i<jsonRet.files.length;i++){
-								containerVue.files.push(jsonRet.files[i]);
-								containerVue.cacheFiles[folderPath].push(jsonRet.files[i]);
-							}
-							//更新层级目录
-							var arr = folderPath.split("/");
-							containerVue.folder = [];
-							for(var i=0;i<arr.length;i++){
-								containerVue.folder.push(arr[i]);
-							}
+					containerVue.files = [];
+					if(jsonRet && jsonRet.files){
+						for(var i=0;i<jsonRet.files.length;i++){
+							containerVue.files.push(jsonRet.files[i]);
 						}
 					}else{
-						alertMsg('错误提示','获取数据失败！')
+						if(jsonRet && jsonRet.errcode !==0 ){
+							alertMsg('错误提示','获取数据失败！')
+						}
 					}
 				},
 				dataType: 'json'
@@ -123,47 +138,77 @@ var containerVue = new Vue({
 		},
 		createNewFolder: function(){
 			$("#createDirModal").modal('show');
-			createDirVue.params.upFolderPath = this.folder.join("/");
-			createDirVue.params.folderName = '';
+			createDirVue.params.upFolderImgId = this.currFolder.folderId;
+			createDirVue.params.upFolderName = this.currFolder.fullFolderName;
+			createDirVue.params.fileName = '';
+			createDirVue.params.title = '新建文件夹';
+		},
+		renameFile: function(index,file){
+			$("#createDirModal").modal('show');
+			createDirVue.params.imgId = file.imgId;
+			createDirVue.params.index = index;
+			createDirVue.params.upFolderName = file.fileName;
+			createDirVue.params.fileName = '';
+			createDirVue.params.title = '文件重命名';
+		},
+		replaceImg: function(imgId,fileName){
+			$("#uploadImgModal").modal('show');
+			$('#uploadFolderName').val(this.currFolder.fullFolderName);
+			initFileUpload('replace',1,imgId);
 		},
 		uploadImg: function(){
 			$("#uploadImgModal").modal('show');
-			$('#uploadFolderPath').val(this.folder.join("/"));
-			initFileUpload(this.folder.join("/"));
-		},		
-		isFileOrDir: function(filename){
-			if(filename.lastIndexOf(".")>0){//普通文件
-				return true;
-			}else{	//目录
-				return false;
+			$('#uploadFolderName').val(this.currFolder.fullFolderName);
+			initFileUpload('upload',10,this.currFolder.folderId);
+		},
+		deleteImg: function(index,file){
+			if(file.usingCnt >0){
+				alertMsg('错误提示','该文件正在被引用中，不可删除！');
+				return;
 			}
+			$.ajax({
+				url: '/pimage/delete',
+				method:'post',
+				data: {'imgId':file.imgId},
+				success: function(jsonRet,status,xhr){
+					if(jsonRet && jsonRet.errcode ==0){
+						containerVue.files.splice(index,1);
+						alertMsg('系统提示','文件删除成功！');
+					}else{
+						alertMsg('错误提示',jsonRet.errmsg);
+					}
+				},
+				dataType: 'json'
+			});
 		}
 	}
 });
-containerVue.listFiles('Home');
+containerVue.listFiles('Home','Home');
 </script>
-<!-- 新建文件夹（Modal） -->
+<!-- 新建文件夹以及文件重命名（Modal） -->
 <div class="modal fade " id="createDirModal" tabindex="-1" role="dialog" aria-labelledby="createDirModalLabel" aria-hidden="true" data-backdrop="static">
    <div class="modal-dialog">
       <div class="modal-content">
          <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal"  aria-hidden="true">× </button>
-            <h4 class="modal-title" id="createDirModalLabel">新建文件夹</h4>
+            <h4 class="modal-title" id="createDirModalLabel">{{params.title}}</h4>
          </div>
          <div class="modal-body">
             <form class="form-horizontal" method ="post" action="add" role="form" >
                <div class="form-group">
                </div>
 			   <div class="form-group">
-			      <label class="col-xs-4 control-label" style="padding-right:1px">上级目录<span style="color:red" >*</span></label>
+			      <label v-if="params.title=='文件重命名'" class="col-xs-4 control-label" style="padding-right:1px">原文件名<span style="color:red" >*</span></label>
+			      <label v-if="params.title=='新建文件夹'" class="col-xs-4 control-label" style="padding-right:1px">上级目录<span style="color:red" >*</span></label>
 			      <div class="col-xs-8" style="padding-left:1px">
-			         <input type="text" class="form-control" v-model="params.upFolderPath" readonly disabled >
+			         <input type="text" class="form-control" v-model="params.upFolderName" readonly disabled >
 			      </div>
 			   </div>
 			   <div class="form-group">
-			      <label class="col-xs-4 control-label" style="padding-right:1px">新建文件夹名<span style="color:red" >*</span></label>
+			      <label v-if="params.title=='新建文件夹'" class="col-xs-4 control-label" style="padding-right:1px">文件夹名<span style="color:red" >*</span></label>
+			      <label v-if="params.title=='文件重命名'" class="col-xs-4 control-label" style="padding-right:1px">新文件名<span style="color:red" >*</span></label>
 			      <div class="col-xs-8" style="padding-left:1px">
-			         <input type="text" class="form-control" v-model="params.folderName" maxLength=10 required placeholder="请输入新建文件夹名(2-10字母数字汉字)..." >
+			         <input type="text" class="form-control" v-model="params.fileName" maxLength=10 required placeholder="请输入文件名(2-10字母数字汉字)..." >
 			      </div>
 			   </div>
 			</form>
@@ -180,36 +225,45 @@ var createDirVue = new Vue({
 	el:'#createDirModal',
 	data:{
 		params:{
-			upFolderPath:'',
-			folderName:''
+			index:'',
+			title:'',
+			imgId:'',
+			upFolderImgId:'',
+			upFolderName:'',
+			fileName:''
 		}
 	},
 	methods:{
 		submit:function(){
 			$("#dealingData").show();
 			var patt = new RegExp('^[a-zA-Z0-9_\u4e00-\u9fa5]{2,10}$');
-			if(!patt.test(this.folderName)){
-				alertMsg('错误提示',"新建文件夹名为(2-10字母数字汉字)！");
+			if(!patt.test(this.fileName)){
+				alertMsg('错误提示',"文件名为(2-10字母数字汉字)！");
 				return false;
 			}
+			var param = {};
+			var url = '';
+			if(this.params.title =='新建文件夹'){
+				param = {'upFolderImgId':this.params.upFolderImgId,'fileName':this.params.fileName};
+				url = '/pimage/folder/create';
+			}else{
+				param = {'imgId':this.params.imgId,'fileName':this.params.fileName};
+				url = '/pimage/rename';
+			}
 			$.ajax({
-				url: '/pimage/folder/create',
-				data: this.params,
+				url: url,
+				data: param,
+				method:'post',
 				success: function(jsonRet,status,xhr){
 					$("#dealingData").hide();
-					if(jsonRet){
-						if(0 == jsonRet.errcode){
-							containerVue.files.push(createDirVue.params.folderName);
-							if(!containerVue.cacheFiles[createDirVue.params.upFolderPath]){//还没有缓存
-								containerVue.cacheFiles[createDirVue.params.upFolderPath] = [];
-							}
-							var cache = containerVue.cacheFiles[createDirVue.params.upFolderPath];
-							cache.push(createDirVue.params.folderName);
-						}else{//出现逻辑错误
-							alertMsg('错误提示',jsonRet.errmsg);
-						}
+					if(createDirVue.params.title == '新建文件夹' && jsonRet.image){
+						containerVue.files.unshift(jsonRet.image);
+					}else if(createDirVue.params.title == '文件重命名' && jsonRet.errcode ==0){//出现逻辑错误
+						var old = containerVue.files[createDirVue.params.index];
+						old.fileName = createDirVue.params.fileName;
+						containerVue.files.splice(createDirVue.params.index,1,old);
 					}else{
-						alertMsg('错误提示','系统数据访问失败！');
+						alertMsg('错误提示',jsonRet.errmsg);
 					}
 					$("#createDirModal").modal('hide');
 				},
@@ -237,7 +291,7 @@ var createDirVue = new Vue({
 			   <div class="form-group">
 			      <label class="col-xs-4 control-label" style="padding-right:1px">图片归属目录<span style="color:red" >*</span></label>
 			      <div class="col-xs-8" style="padding-left:1px">
-			         <input type="text" class="form-control" id="uploadFolderPath" readonly disabled >
+			         <input type="text" class="form-control" id="uploadFolderName" readonly disabled >
 			      </div>
 			   </div>
                <div class="form-group">
@@ -255,18 +309,22 @@ var createDirVue = new Vue({
    </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 <script type="text/javascript">
-function initFileUpload(folderPath){
+function initFileUpload(mode,imgCntLimit,imgId){
+	
 	$("#upFile").fileinput({
 		language: 'zh', //设置语言
-	    uploadUrl: '/pimage/file/upload', //上传的地址
+	    uploadUrl: '/pimage/file/' + mode, //上传的地址
 	    deleteUrl:'',
 	    uploadAsync:true,
 	    showUpload: true, //是否显示上传按钮
-	    uploadExtraData:{'folderPath':folderPath},
+	    uploadExtraData:function(){ 
+	    		return {'imgId':imgId}
+	    	},
 	    deleteExtraData:{},
 	    allowedFileExtensions : ['jpg', 'png','jpeg'],//接收的文件后缀
 	    dropZoneEnabled:false,
-	    maxFileCount: 10, //表示允许同时上传的最大文件个数
+	    maxFileCount: imgCntLimit, //表示允许同时上传的最大文件个数
+	    autoReplace:true,
 	    enctype: 'multipart/form-data',
 	    msgFilesTooMany: "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
 	    previewFileType: "image",
@@ -279,11 +337,12 @@ function initFileUpload(folderPath){
 	    uploadClass: "btn btn-info",
 	    uploadLabel: "Upload",
 	    uploadIcon: "<i class=\"glyphicon glyphicon-upload\"></i> ",
-	    maxFileSize: 3036,//单位为kb，如果为0表示不限制文件大小
+	    maxFileSize: 1024,//单位为kb，如果为0表示不限制文件大小
 	    previewSettings: {
 	        image: {width: "100px", height: "100px"},
 	    }
 	});
+	$('#upFile').fileinput('refresh',{uploadExtraData:{'imgId':imgId},uploadUrl:'/pimage/file/' + mode, maxFileCount:imgCntLimit});
 	//异步上传错误结果处理
 	$('#upFile').on('fileerror', function(event, data, msg) {
 		alertMsg('错误提示',"照片文件上传失败！");
@@ -293,29 +352,34 @@ function initFileUpload(folderPath){
 	//异步上传成功结果处理
 	$("#upFile").on("fileuploaded", function (event, data, previewId, index) {
 		var jsonRet = data.response;
-		if(jsonRet){
-			if(0 == jsonRet.errcode){
-				var folderPath = $('#uploadFolderPath').val();
-				var filename = jsonRet.filename;//返回的文件名
-				if(containerVue.files[containerVue.files.length-1] != filename){
-					containerVue.files.push(filename);
+		if(jsonRet && jsonRet.image){
+			if(mode == 'upload'){
+				for(var i=0;i<containerVue.files.length;i++){
+					if(containerVue.files[i].imgId == jsonRet.image.imgId){
+						containerVue.files.splice(i,1,jsonRet.image);
+						break;
+					}
 				}
-				if(!containerVue.cacheFiles[folderPath]){//还没有缓存
-					containerVue.cacheFiles[folderPath] = [];
+				if(i==containerVue.files.length){
+					containerVue.files.push(jsonRet.image);
 				}
-				var cache = containerVue.cacheFiles[folderPath];
-				if(cache[cache.length-1] != filename){
-					cache.push(filename);
-				}
-				$("#uploadImgModal").modal('hide');
-			}else{//出现逻辑错误
-				alertMsg('错误提示',jsonRet.errmsg);
-				$("#uploadImgModal").modal('hide');
+			}else{
+				alertMsg('系统提示',"执行页面刷新即可显示新图片！");
+				/* for(var i=0;i<containerVue.files.length;i++){
+					if(containerVue.files[i].imgId == jsonRet.image.imgId){
+						containerVue.files.splice(i,1,jsonRet.image);
+						break;
+					}
+				} */
 			}
 		}else{
-			alertMsg('错误提示','系统数据访问失败！')
-			$("#uploadImgModal").modal('hide');
+			if(jsonRet && jsonRet.errmsg){
+				alertMsg('错误提示',jsonRet.errmsg);
+			}else{
+				alertMsg('错误提示','系统数据访问失败！');
+			}
 		}
+		$("#uploadImgModal").modal('hide');
 	});
 }
 </script>

@@ -36,9 +36,9 @@
      </div>
      <div class="col-xs-4" style="text-align:center;">
        <div style="">
-        <span>品质：{{getAvgScore("${(mcht.scoreGoods)!'暂无'}")}}</span><br>
-        <span>物流：{{getAvgScore("${(mcht.scoreLogis)!'暂无'}")}}</span><br>
-        <span>服务：{{getAvgScore("${(mcht.scoreServ)!'暂无'}")}}</span><br>
+        <span>品质：{{getAvgScore(${(mcht.scoreGoods)!'暂无'})}}</span><br>
+        <span>物流：{{getAvgScore(${(mcht.scoreLogis)!'暂无'})}}</span><br>
+        <span>服务：{{getAvgScore(${(mcht.scoreServ)!'暂无'})}}</span><br>
        </div>
      </div>
      <div class="col-xs-4" style="text-align:center;">
@@ -89,7 +89,7 @@
       <div v-for="goods in goodsList" class="col-xs-6 col-sm-4 col-md-4 col-lg-3" style="padding:3px 2px ;">
 	    <div style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
 	      <a v-bind:href="'/shop/goods/' + goods.goodsId">
-	        <img alt="" :src="'/shop/gimage/' + goods.partnerId + '/' + goods.mainImgPath" style="max-height:160px;max-width:100%">
+	        <img alt="" :src="'/shop/gimage/' + goods.partnerId + '/' + goods.mainImgPath" style="height:160px;max-width:100%">
 	      </a>
 	    </div>
 	    <div class="row" style="margin:1px 1px;" >
@@ -100,7 +100,7 @@
 	      	<span class="pull-left ">惠¥: <span>{{goods.priceLowest}}</span>元</span>
 	      	<span class="pull-right ">库存: <span>{{goods.stockSum}}</span>件</span>
 	      </div>
-	      <div class="row" style="margin:1px 0px 2px 0;padding:0 5px 3px 5px;background-color:white;text-align:center" >
+	      <div class="row" style="margin:1px 0 2px 0;background-color:white;text-align:center" >
 	        <a class="btn btn-danger " style="padding:3px 5px" :href="'/order/place/'+ goods.goodsId"><span style="color:white">立即下单</span></a>
 	        <a class="btn btn-primary" style="padding:3px 5px" :href="'/order/order/begin/' + goods.goodsId"><span style="color:white">加入收藏</span></a>
 	      </div>
@@ -137,8 +137,8 @@ var containerVue = new Vue({
 					method:'post',
 					data: {},
 					success: function(jsonRet,status,xhr){
-						if(jsonRet ){
-							if(jsonRet.errcode == 0){//
+						if(jsonRet && jsonRet.errmsg){
+							if(jsonRet.datas){//
 								for(var i=0;i<jsonRet.datas.length;i++){
 									containerVue.goodsList.push(jsonRet.datas[i]);
 								}
@@ -159,7 +159,7 @@ var containerVue = new Vue({
 					method:'post',
 					data: {'begin':0,'pageSize':3},
 					success: function(jsonRet,status,xhr){
-						if(jsonRet && jsonRet.errcode == 0){//
+						if(jsonRet && jsonRet.datas){//
 							for(var i=0;i<jsonRet.datas.length;i++){
 								var appr = jsonRet.datas[i];
 								if(appr.content){//有评价内容

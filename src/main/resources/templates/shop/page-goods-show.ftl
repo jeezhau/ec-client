@@ -39,8 +39,8 @@
         <li v-for="item,index in courselImgPaths" data-target="#myCarousel" :data-slide-to="index" v-bind:class="{ active: index===0 }"></li>
     </ol>   
     <!-- 轮播（Carousel）项目 -->
-    <div class="carousel-inner" style="text-align:center">
-        <div  v-bind:class="[{active:(index===0)}, 'item']" v-for="imgpath,index in courselImgPaths" style="text-align:center;vertical-align:center">
+    <div class="carousel-inner" style="width:100%;text-align:center">
+        <div  v-bind:class="[{active:(index===0)}, 'item']" v-for="imgpath,index in courselImgPaths" style="width:100%;text-align:center;vertical-align:center">
             <img :src="'/shop/gimage/${((goods.partnerId)!'')?string('#')}/' + imgpath" style="max-width:100%;max-height:600px;">
         </div>
     </div>
@@ -168,7 +168,7 @@ var containerVue = new Vue({
 					method:'post',
 					data: {'begin':0,'pageSize':3},
 					success: function(jsonRet,status,xhr){
-						if(jsonRet && jsonRet.errcode == 0){//
+						if(jsonRet && jsonRet.datas){//
 							for(var i=0;i<jsonRet.datas.length;i++){
 								var appr = jsonRet.datas[i];
 								if(appr.content){//有评价内容
@@ -194,6 +194,9 @@ var containerVue = new Vue({
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode !==0){
 							alertMsg('错误提示',jsonRet.errmsg);
+						}else{
+							alertMsg('系统提示','收藏成功！');
+							setTimeout("hideAlertMsg()",1000);
 						}
 					}else{
 						alertMsg('错误提示','系统失败！');
@@ -205,6 +208,33 @@ var containerVue = new Vue({
 	}
 });
 containerVue.getAllAppr();
+
+//获取界面上轮播图容器
+var $carousels = $('#myCarousel');
+var startX,endX;
+// 在滑动的一定范围内，才切换图片
+var offset = 50;
+// 注册滑动事件
+$carousels.on('touchstart',function (e) {
+    // 手指触摸开始时记录一下手指所在的坐标x
+    startX = e.originalEvent.touches[0].clientX;
+
+});
+$carousels.on('touchmove',function (e) {
+    // 目的是：记录手指离开屏幕一瞬间的位置 ，用move事件重复赋值
+    endX = e.originalEvent.touches[0].clientX;
+});
+$carousels.on('touchend',function (e) {
+    //console.log(endX);
+    //结束触摸一瞬间记录手指最后所在坐标x的位置 endX
+    //比较endX与startX的大小，并获取每次运动的距离，当距离大于一定值时认为是有方向的变化
+    var distance = Math.abs(startX - endX);
+    if (distance > offset){
+        //说明有方向的变化
+        //根据获得的方向 判断是上一张还是下一张出现
+        $(this).carousel(startX > endX ? 'next':'prev');
+    }
+});
 </script>
 
 <footer >

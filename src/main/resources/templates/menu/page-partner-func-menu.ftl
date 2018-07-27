@@ -1,6 +1,6 @@
  <!-- 合作伙伴相关功能底部主菜单--> 
   <div class="row" style="height:80px"></div>
-  <div class="weui-tabbar" style="position:fixed;left:0px;bottom:0px">
+  <div class="weui-tabbar" style="position:fixed;left:0px;bottom:0px;height:60px">
     	<a href="/partner/manage" class="weui-tabbar__item <#if (sys_func!'')=='partner-index'>weui-bar__item_on </#if>" >
 	    <img src="/icons/合作伙伴-申请开通.png" alt="" class="weui-tabbar__icon">
 	    <p class="weui-tabbar__label">首页</p>
@@ -43,13 +43,19 @@
 	    <p class="weui-tabbar__label">投诉</p>
 	</a>	
 	</#if>
+	<#if (partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('preceiver')) )>
+	<a href="/preceiver/manage" class="weui-tabbar__item <#if (sys_func!'')=='preceiver'>weui-bar__item_on </#if>" >
+	    <img src="/icons/地址管理.png" alt="" class="weui-tabbar__icon">
+	    <p class="weui-tabbar__label">地址</p>
+	</a>	
+	</#if>
    </#if>
 
   <#if ((myPartner.pbTp)!'')=='2'>
 	<#if (partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('mypartners')) )>
 	<a href="/mypartners/manage" class="weui-tabbar__item <#if (sys_func!'')=='mypartners'>weui-bar__item_on </#if>" >
 	    <img src="/icons/下级管理.png" alt="" class="weui-tabbar__icon">
-	    <p class="weui-tabbar__label">下级</p>
+	    <p class="weui-tabbar__label">推·商</p>
 	</a>
 	</#if>
 	<#if (partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('review')) )>
@@ -62,7 +68,7 @@
      <#if  partnerUserTP=='bindVip' || partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('Complain')>
      <a href="/pcomplain/sys/manage" class="weui-tabbar__item <#if (sys_func!'')=='complain'>weui-bar__item_on </#if>" >
 	    <img src="/icons/投诉.png" alt="" class="weui-tabbar__icon">
-	    <p class="weui-tabbar__label">处.诉</p>
+	    <p class="weui-tabbar__label">处·诉</p>
 	 </a>
 	 </#if>
 	 <#if  partnerUserTP=='bindVip' || partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('CashapplyDeal')>

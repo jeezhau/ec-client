@@ -100,25 +100,37 @@
 	    <#else>
 	    <select class="form-control" v-model="tagListArr" multiple disabled placeholder="请选择授予员工的职能管理标签" >
 	    </#if> 
+	     <optgroup label="------通用------">
 	      <option value="basic">基本信息管理</option>
+	     </optgroup>
+	    <#if myPartner.pbTp == '1'>
+	   	 <optgroup label="------商家合作伙伴专用------">
 	      <option value="pimage">图库管理</option>
 	      <option value="postage">运费模版管理</option>
 	      <option value="goods">商品管理</option>
 	      <option value="saleorder">销售订单管理</option>
 	      <option value="aftersale">售后服务处理</option>
-	      <option value="mypartners">推广下级管理</option>
-	      <option value="reviewgds">商品审核</option>
-	      <option value="reviewappr">评价审核</option>
 	      <option value="complain4p">投诉上级</option>
-	      
-	      <#if myPartner.partnerId == SYS_PARTNERID>
+	      <option value="preceiver">退换货地址管理</option>
+	     </optgroup>
+	     </#if>
+	     <#if myPartner.pbTp == '2'>
+	     <optgroup label="------推广合作伙伴专用------">
+	      <option value="reviewgds">商品审核</option>
+	      <option value="mypartners">推广下级管理</option>
+	      <option value="reviewappr">评价审核</option>
+	      </optgroup>
+	     </#if>
+	     <#if myPartner.partnerId == SYS_PARTNERID>
+	     <optgroup label="------系统专用------">
 	      <option value="ComplainDeal">系统处理-投诉处理</option>
 	      <option value="ComplainRevisit">系统处理-投诉回访</option>
 	      <option value="CashapplyDeal">系统处理-提现处理</option>
 	      <option value="kf4common">系统客服-用户(通用)</option>
 	      <option value="kf4vip">系统客服-VIP</option>
 	      <option value="kf4partner">系统客服-合作伙伴</option>
-	      </#if>
+	      </optgroup>
+	     </#if>
 	    </select>
 	  </div>
 	</div>

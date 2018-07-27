@@ -16,21 +16,17 @@
     <link href="/css/templatemo-style.css" rel="stylesheet">
     
     <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-    
     <link href="/css/weui.css" rel="stylesheet">
-    
-    <link href="/css/mfyx.css" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css"/>
     <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.6&key=2b12c05334ea645bd934b55c8e46f6ea"></script>
     <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main.css"/>
 </head>
-<body class="light-gray-bg" >
-
+<body class="light-gray-bg" style="overflow:scroll">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 
-<div class="container goods-container" id="container" style="padding:0 1px;overflow:scroll">
+<div class="container" id="container" style="padding:0 1px;overflow:scroll;">
   <header >
     <#include "/menu/page-category-menu.ftl" encoding="utf8"> 
   </header>
@@ -51,27 +47,27 @@
 	        <span class="pull-right">{{goods.partner.area}}{{getShortAddr(goods.partner.addr)}}</span>
 	      </div>
         </div>
-	    <div style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
+	    <div class="row" style="margin:2px 1px;background-color:white;text-align:center;vertical-align:center" >
 	      <a v-bind:href="'/shop/goods/' + goods.goodsId">
-	        <img alt="" :src="'/shop/gimage/' + goods.partnerId + '/' + goods.mainImgPath" style="max-height:160px;max-width:100%">
+	        <img alt="" :src="'/shop/gimage/' + goods.partnerId + '/' + goods.mainImgPath" style="height:160px;max-width:100%">
 	      </a>
 	    </div>
-	    <div style="margin:1px 1px;" >
-	      <div style="margin:1px 0;padding:0 5px;background-color:white" >
+	    <div class="row" style="margin:1px 1px;" >
+	      <div class="row" style="margin:1px 0;padding:0 5px;background-color:white" >
 		        {{goods.goodsName}}
 	      </div>
-	      <div style="margin:1px 0px;padding:0 5px;background-color:white;color:red" >
+	      <div class="row" style="margin:1px 0px;padding:0 5px;background-color:white;color:red" >
 	      	<span class="pull-left ">售价: <span>{{goods.priceLowest}}</span>元</span>
 	      	<span class="pull-right ">销量: <span>{{goods.saledCnt}}</span>件</span>
 	      </div>
-	      <div class="row" style="margin:1px 0px 2px 0;padding:0 5px 3px 5px;background-color:white;text-align:center" >
+	      <div class="row" style="margin:1px 0 2px 0;background-color:white;text-align:center" >
 	        <a class="btn btn-danger " style="padding:3px 5px" :href="'/order/place/'+ goods.goodsId"><span style="color:white">立即下单</span></a>
 	        <a class="btn btn-primary" style="padding:3px 5px" href="javascript:;" @click="addCollection('2',goods.goodsId)"><span style="color:white">加入收藏</span></a>
 	      </div>
 	    </div>
     </div>
   </div>
-  <div class="row" style="margin:10px 20px 80px 20px;">
+  <div class="row" style="margin:10px 20px 100px 20px;">
       <p style="color:gray">没有更多数据了....</p>
   </div>
 </div><!-- end of container -->
@@ -169,6 +165,9 @@ var containerVue = new Vue({
 					if(jsonRet && jsonRet.errmsg){
 						if(jsonRet.errcode !==0){
 							alertMsg('错误提示',jsonRet.errmsg);
+						}else{
+							alertMsg('系统提示','收藏成功！');
+							setTimeout("hideAlertMsg()",1000);
 						}
 					}else{
 						alertMsg('错误提示','系统失败！');
@@ -258,16 +257,9 @@ mapObj.plugin('AMap.Geolocation', function () {
 <div id="mapContainer" style="top:10px;width:100%;height:500px;"></div>
 <div id="myPageTop" style="left:10px">
     <table style="width:100%;text-align:right">
-        <tr style="width:100%">
-            <td class="column1"><label><a onclick="$('#showAddrMap').hide();">关闭</a></label></td>
-        </tr>
-        <tr>
-            <td class="column1"><input type="text" style="width:90%" readonly id="lnglat" placeholder="点击地图选择地点"></td>
-        </tr>		        
-        <tr>
-            <td class="column1"><input type="text" id="keyword" name="keyword" value="请输入关键字：(选定后搜索)" style="width:90%" onfocus='this.value=""'/></td> 
-        </tr>
-        
+        <tr style="width:100%"><td class="column1"><label><a onclick="$('#showAddrMap').hide();">关闭</a></label></td></tr>
+        <tr><td class="column1"><input type="text" style="width:90%" readonly id="lnglat" placeholder="点击地图选择地点"></td></tr>		        
+        <tr><td class="column1"><input type="text" id="keyword" name="keyword" value="请输入关键字：(选定后搜索)" style="width:90%" onfocus='this.value=""'/></td> </tr>
     </table>
 </div>
 <script type="text/javascript">

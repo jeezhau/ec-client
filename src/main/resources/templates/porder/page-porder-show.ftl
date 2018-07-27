@@ -46,7 +46,7 @@
         </li>                                               
      </ul>
   </div>
-  <div class="row"><!-- 所有订单之容器 --> 
+  <div class="row" style="margin:0"><!-- 所有订单之容器 --> 
   
     <div v-for="order in orders" class="row" style="margin:8px 0;padding:0 0">
       <#include "/porder/tpl-porder-buy-user-4vue.ftl" encoding="utf8"> 

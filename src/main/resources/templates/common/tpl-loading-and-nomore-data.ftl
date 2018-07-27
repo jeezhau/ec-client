@@ -12,6 +12,6 @@
   </div>
 </div>
 
-<div id="nomoreData" class="weui-loadmore weui-loadmore_line" style="margin-top:180px;position:fixed;left:0;top:0;right:0;bottom:0;z-index:10000;display:none">
+<div id="nomoreData" class="weui-loadmore weui-loadmore_line" style="margin-top:200px;position:fixed;left:0;top:0;right:0;bottom:0;z-index:10000;display:none">
     <span class="weui-loadmore__tips">暂无数据</span>
 </div>

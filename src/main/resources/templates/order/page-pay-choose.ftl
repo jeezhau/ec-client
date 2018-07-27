@@ -49,7 +49,7 @@
     <div class="col-xs-12" style="text-align:center;">${order.goodsName}</div>
     <div class="col-xs-12" style="text-align:center;">
       <a href="/shop/goods/${(order.goodsId)?string('#')}">
-       <img alt="" src="/shop/gimage/${(order.partnerId)?string('#')}/${(order.goodsMainImgPath)!''}" style="width:99%;height:150px;">
+       <img alt="" src="/shop/gimage/${(order.partnerId)?string('#')}/${(order.goodsMainImgPath)!''}" style="max-width:99%;max-height:160px;">
       </a>
     </div>
     <div class="col-xs-12" style="padding:0px 3px">
@@ -102,7 +102,7 @@
      <span v-if="param.payType == 1 " class="pull-right"><img src="/icons/选择.png" style="widht:20px;height:20px;"></span>
     </div>
     <div class="col-xs-12" style="margin:1px 5px;padding:10px 25px;">
-      <p>注意：使用 [会员余额] 之外的第三方支付将收取订单金额<span style="color:red"> 0.7%至3% </span>的手续费与国税，手续费付给第三方支付平台，国税由税局收取！下述金额不包含手续费与国税，手续费与国税将额外收取！</p>
+      <p>注意：使用 [会员余额] 之外的第三方支付将收取订单金额<span style="color:red"> 0.7%至3% </span>的手续费，手续费付给第三方支付平台！下述金额不包含手续费，手续费将额外收取！</p>
     </div>
   </div>
   

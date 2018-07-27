@@ -19,7 +19,7 @@
     <link href="/css/weui.css" rel="stylesheet">
 </head>
 
-<body class="light-gray-bg">
+<body class="light-gray-bg" style="position:relative">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 
 <header>
@@ -270,6 +270,10 @@ containerVue.getOrderCounts();
 </script>
 
 <footer>
+  <div class="row" style="position:absolute;left:0px;right:0px;bottom:60px;height:40px;text-align:center;background-color:#D0D0D0">
+	<span style="display:inline-block; margin:0 10px;">|</span>
+	Copyright <font style="font-family:'微软雅黑';">©</font> 2017-2020 昆明摩放优选科技服务有限责任公司 <a href="http://www.miitbeian.gov.cn/" target="_blank" rel="nofollow">滇ICP备18002601号-1</a> 
+  </div>
   <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
 </footer>
 
