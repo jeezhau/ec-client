@@ -1,29 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-	<title>摩放优选</title>
-	<!-- Bootstrap -->
-	<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <!--Vue -->
-    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <!-- -->
-    <link href="/css/font-awesome.min.css" rel="stylesheet">
-    <link href="/css/templatemo-style.css" rel="stylesheet">
-    
-    <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-    <link href="/css/weui.css" rel="stylesheet">
-    
-    <script src="/script/common.js" type="text/javascript"></script>
-    <script src="/ckeditor/ckeditor.js"></script>
+    <#include "/head/page-common-head.ftl" encoding="utf8">
+    <#include "/head/page-ckeditor-head.ftl" encoding="utf8">
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
+
 <div class="container" id="goodsContainer" style="padding:0;oveflow:scroll">
   <div class="row">
      <ul class="nav nav-tabs" style="margin:0 15%">
@@ -516,12 +500,26 @@ function addUploadButton(editor){
                     addUploadImage(txtUrlId);
                 }
             }, 'browse'); //place front of the browser button
+            var widthTipTab = dialogDefinition.getContents( 'info' );
+            widthTipTab.add({
+                type : 'button',
+                id : 'width_tip',
+                align : 'center',
+                label : '宽度可用百分数，表占距页面的宽度比，如 100%，也可用像素值！',
+            }, 'width'); //place front of the browser button
+            var heightTipTab = dialogDefinition.getContents( 'info' );
+            heightTipTab.add({
+                type : 'button',
+                id : 'height_tip',
+                align : 'center',
+                label : '高度则一般使用像数值，如500px！！！',
+            }, 'width'); //place front of the browser button
         }
     });
 }
  
 function addUploadImage(theURLElementId){
-    var imgUrl = '/shop/gimage/${((goods.partnerId)!0)?string("#")}/'; 
+    var imgUrl = '/shop/gimage/${(myPartner.partnerId)?string("#")}/'; 
   	//选择商品的图片
 	$('#imageGalleryShowModal').modal('show');
 	$('#imageGalleryShowModal').css('z-index',100000);
@@ -529,9 +527,12 @@ function addUploadImage(theURLElementId){
 	imageGalleryShowVue.selectedImages = [];
 	imageGalleryShowVue.callbackFun = function(images){
 		var urlObj = $('#'+theURLElementId);
+		 urlObj.trigger('blur'); //触发url文本框的事件，以便预览图片
 	    urlObj.val(imgUrl + images);
-	    urlObj.change(); //触发url文本框的onchange事件，以便预览图片
-	}
+	    urlObj.trigger('blur'); //触发url文本框的事件，以便预览图片
+	    urlObj.blur();
+	    urlObj.trigger('keyup'); //触发url文本框的事件，以便预览图片
+	};
 }
 addUploadButton(editor);
 

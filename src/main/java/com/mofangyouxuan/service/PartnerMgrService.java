@@ -11,6 +11,7 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.PartnerBasic;
+import com.mofangyouxuan.dto.PartnerSettle;
 import com.mofangyouxuan.utils.HttpUtils;
 import com.mofangyouxuan.utils.ObjectToMap;
 import com.mofangyouxuan.utils.PageCond;
@@ -90,21 +91,33 @@ public class PartnerMgrService {
 	/**
 	 * 根据绑定会员获取合作伙伴信息
 	 * @param vipId
-	 * @return
+	 * @return {errcode,errmsg,partner,settle}
 	 */
-	public static PartnerBasic getPartnerByVip(Integer vipId) {
+	public static JSONObject getPartnerByVip(Integer vipId) {
 		String strRet = HttpUtils.doGet(mfyxServerUrl + partnerBasicGetByVipUrl + vipId);
-		PartnerBasic partner = null;
 		try {
 			JSONObject jsonRet = JSONObject.parseObject(strRet);
-			if(jsonRet.containsKey("partner")) {//成功
-				partner = JSONObject.toJavaObject(jsonRet.getJSONObject("partner"), PartnerBasic.class);
-				return partner;
-			}
+			return jsonRet;
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		return partner;
+		return null;
+	}
+	
+	/**
+	 * 根据ID获取合作伙伴信息
+	 * @param partnerId
+	 * @return
+	 */
+	public static JSONObject getPartnerSettleById(Integer partnerId) {
+		String strRet = HttpUtils.doGet(mfyxServerUrl + partnerBasicGetByIdUrl + partnerId);
+		try {
+			JSONObject jsonRet = JSONObject.parseObject(strRet);
+			return jsonRet;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	/**
@@ -114,17 +127,16 @@ public class PartnerMgrService {
 	 */
 	public static PartnerBasic getPartnerById(Integer partnerId) {
 		String strRet = HttpUtils.doGet(mfyxServerUrl + partnerBasicGetByIdUrl + partnerId);
-		PartnerBasic partner = null;
 		try {
 			JSONObject jsonRet = JSONObject.parseObject(strRet);
-			if(jsonRet.containsKey("partner")) {//成功
-				partner = JSONObject.toJavaObject(jsonRet.getJSONObject("partner"), PartnerBasic.class);
+			if(jsonRet.containsKey("partner")) {
+				PartnerBasic partner = JSONObject.toJavaObject(jsonRet.getJSONObject("partner"), PartnerBasic.class);
 				return partner;
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		return partner;
+		return null;
 	}
 
 	/**
@@ -134,14 +146,19 @@ public class PartnerMgrService {
 	 * @throws IllegalAccessException 
 	 * @throws IllegalArgumentException 
 	 */
-	public static String create(PartnerBasic basic,String passwd) throws IllegalArgumentException, IllegalAccessException {
+	public static String create(PartnerBasic basic,PartnerSettle settle,String passwd) throws IllegalArgumentException, IllegalAccessException {
 		String url = mfyxServerUrl + partnerBasicCreateUrl;
-		Map<String, Object> params = new HashMap<String,Object>();
-		String[] excludeFields = {"updateTime","reviewLog","reviewOpr","reviewTime","status","certDir","scoreLogis","scoreServ","scoreGoods"};
-		params = ObjectToMap.object2Map(basic,excludeFields,false);
-		params.put("passwd", passwd);
-	
-		String strRet = HttpUtils.doPost(url, params);
+		Map<String, Object> params1 = new HashMap<String,Object>();
+		String[] excludeFields1 = {"updateTime","freviewLog","freviewOpr","freviewTime","lreviewLog","lreviewOpr","lreviewTime","status","certDir","scoreLogis","scoreServ","scoreGoods"};
+		params1 = ObjectToMap.object2Map(basic,excludeFields1,false);
+		params1.put("passwd", passwd);
+		String[] excludeFields2 = {"serviceFeeRate","shareProfitRate"};
+		Map<String, Object> params2 = new HashMap<String,Object>();
+		params2 = ObjectToMap.object2Map(settle,excludeFields2,false);
+		params1.putAll(params2);
+		
+		params1.put("passwd", passwd);
+		String strRet = HttpUtils.doPost(url, params1);
 		return strRet;
 	}
 	
@@ -150,14 +167,19 @@ public class PartnerMgrService {
 	 * @param basic
 	 * @return {errcode:0,errmsg:"ok"}
 	 */
-	public static String update(PartnerBasic basic,String passwd) {
+	public static String update(PartnerBasic basic,PartnerSettle settle,String passwd) {
 		String url = mfyxServerUrl + partnerBasicUpdateUrl;
-		Map<String, Object> params = new HashMap<String,Object>();
-		String[] excludeFields = {"updateTime","reviewLog","reviewOpr","reviewTime","status","certDir","scoreLogis","scoreServ","scoreGoods"};
-		params = ObjectToMap.object2Map(basic,excludeFields,false);
-		params = ObjectToMap.object2Map(basic,excludeFields,false);
-		params.put("passwd", passwd);
-		String strRet = HttpUtils.doPost(url, params);
+		Map<String, Object> params1 = new HashMap<String,Object>();
+		String[] excludeFields1 = {"updateTime","freviewLog","freviewOpr","freviewTime","lreviewLog","lreviewOpr","lreviewTime","status","certDir","scoreLogis","scoreServ","scoreGoods"};
+		params1 = ObjectToMap.object2Map(basic,excludeFields1,false);
+		params1.put("passwd", passwd);
+		String[] excludeFields2 = {"serviceFeeRate","shareProfitRate"};
+		Map<String, Object> params2 = new HashMap<String,Object>();
+		params2 = ObjectToMap.object2Map(settle,excludeFields2,false);
+		params1.putAll(params2);
+		
+		params1.put("passwd", passwd);
+		String strRet = HttpUtils.doPost(url, params1);
 		return strRet;
 	}
 	

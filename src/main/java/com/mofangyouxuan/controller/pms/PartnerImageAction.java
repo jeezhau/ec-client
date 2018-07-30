@@ -55,6 +55,8 @@ public class PartnerImageAction {
 	private String imageRenameUrl;
 	@Value("${mfyx.pimage-delete-url}")
 	private String imageDeleteUrl;
+	@Value("${mfyx.pimage-move-url}")
+	private String imageMoveUrl;
 	
 	/**
 	 * 获取图库管理首页
@@ -384,9 +386,9 @@ public class PartnerImageAction {
 	}
 	
 	/**
-	 * 删除文件
-	 * 1、有文件的文件夹不可删除
+	 * 文件重命名
 	 * @param imgId	文件ID
+	 * @param fileName 新文件名
 	 * @return
 	 */
 	@RequestMapping("/rename")
@@ -458,6 +460,68 @@ public class PartnerImageAction {
 		return jsonRet.toString();
 	}
 	
+	/**
+	 * 文件移动
+	 * @param imgId	文件ID
+	 * @param tagertParentId	目标父文件ID
+	 * @return
+	 */
+	@RequestMapping("/move")
+	@ResponseBody
+	public Object move(@RequestParam(value="imgId",required=true)String imgId,
+			@RequestParam(value="targetParentId",required=true)String targetParentId,
+			ModelMap map){
+		JSONObject jsonRet = new JSONObject();
+		try {
+			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
+			String partnerUserTP = (String) map.get("partnerUserTP");
+			String partnerPasswd = (String) map.get("partnerPasswd");
+			VipBasic vip = (VipBasic) map.get("partnerBindVip");
+			PartnerStaff staff = (PartnerStaff) map.get("partnerStaff");
+			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus()))) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+				jsonRet.put("errmsg", "您还未开通合作伙伴或状态限制！");
+				return jsonRet.toJSONString();
+			}
+			Integer updateOpr = null;
+			if("bindVip".equals(partnerUserTP)) {
+				if(vip == null || !"1".equals(vip.getStatus())) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的会员信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = vip.getVipId();
+			}else {
+				if(staff == null || staff.getPartnerId() == null) {
+					jsonRet.put("errcode", ErrCodes.COMMON_PRIVILEGE_ERROR);
+					jsonRet.put("errmsg", "系统获取您的员工信息失败！");
+					return jsonRet.toJSONString();
+				}
+				updateOpr = staff.getUserId();
+			}
+			//数据处理
+			String url = this.mfyxServerUrl + this.imageMoveUrl;
+			url = url.replace("{partnerId}",myPartner.getPartnerId() + "");
+			Map<String,Object> params = new HashMap<String,Object>();
+			params.put("srcImgId", imgId);
+			params.put("targetParentId", targetParentId);
+			params.put("currUserId", "" + updateOpr);
+			params.put("passwd", partnerPasswd);
+			String strRet = HttpUtils.doPost(url, params);
+			jsonRet = JSONObject.parseObject(strRet);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet = new JSONObject();
+				jsonRet.put("errcode", -1);
+				jsonRet.put("errmsg", strRet);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			jsonRet = new JSONObject();
+			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "系统异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toString();
+	}
 	/**
 	 * 列出文件夹下的所有文件
 	 * @param folderName

@@ -169,25 +169,25 @@ public class ShopAction {
 	 * @param filename
 	 * @return
 	 */
-	@RequestMapping("/gimage/{partnerId}/{filename}")
+	@RequestMapping("/gimage/{partnerId}/{imgId}")
 	public void showGoodsFile(@PathVariable(value="partnerId",required=true)Integer partnerId,
-			@PathVariable(value="filename",required=true)String filename,
+			@PathVariable(value="imgId",required=true)String imgId,
 			OutputStream out,HttpServletRequest request,HttpServletResponse response,ModelMap map) {
 		try {
 			//数据检查
 			if(partnerId == null || partnerId < 1 ) {
 				return;
 			}
-			if("undefined".equals(filename)) {
+			if("undefined".equals(imgId)) {
 				return;
 			}
 			String url = this.mfyxServerUrl + this.imageShowFileurl; 
 			url = url.replace("{partnerId}",partnerId + "");
-			url = url.replace("{filename}",filename);	
+			url = url.replace("{imgId}",imgId);	
 			File file = HttpUtils.downloadFile(this.tmpFileDir,url);
 			InputStream is = new FileInputStream(file);
 			response.setContentType("image/*");
-			response.addHeader("filename", filename);
+			response.addHeader("filename", file.getName());
 			OutputStream os = response.getOutputStream(); 
 			byte[] buff = new byte[1024];
 			int len = 0;

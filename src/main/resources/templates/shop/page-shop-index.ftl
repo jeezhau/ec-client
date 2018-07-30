@@ -1,23 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-	<title>摩放优选</title>
-	<!-- Bootstrap -->
-	<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <!--Vue -->
-    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <!-- -->
-    <link href="/css/font-awesome.min.css" rel="stylesheet">
-    <link href="/css/templatemo-style.css" rel="stylesheet">
-    
-    <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-    <link href="/css/weui.css" rel="stylesheet">
-    
+   <#include "/head/page-common-head.ftl" encoding="utf8">
 </head>
 <body class="light-gray-bg" style="position:relative;overflow:scroll;min-height:100%;">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
@@ -180,8 +164,9 @@ var containerVue = new Vue({
 
 
 <footer >
-  <div class="row" style="position:absolute;left:0px;right:0px;bottom:60px;height:40px;text-align:center;background-color:#D0D0D0">
-	<span style="display:inline-block; margin:0 10px;">|</span>
+  <div class="row" style="position:absolute;left:0px;right:0px;bottom:60px;height:100px;text-align:center;background-color:#D0D0D0">
+	<p>&nbsp;</p>
+	<span style="display:inline-block; margin:0 10px;"></span>
 	Copyright <font style="font-family:'微软雅黑';">©</font> 2017-2020 昆明摩放优选科技服务有限责任公司 <a href="http://www.miitbeian.gov.cn/" target="_blank" rel="nofollow">滇ICP备18002601号-1</a> 
   </div>
   <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 

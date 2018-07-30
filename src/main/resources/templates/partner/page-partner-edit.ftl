@@ -1,37 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-	<title>摩放优选</title>
-	<!-- Bootstrap -->
-	<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <!--Vue -->
-    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <!-- -->
-    <link href="/css/font-awesome.min.css" rel="stylesheet">
-    <link href="/css/templatemo-style.css" rel="stylesheet">
-    
-    <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-    <link href="/css/weui.css" rel="stylesheet">
-    
-    <!-- 文件上传 -->
-    <script src="/script/fileinput.min.js" type="text/javascript"></script>
-    <script src="/script/fileinput_locale_zh.js" type="text/javascript"></script>
-    <link href="/css/fileinput.min.css" rel="stylesheet">
-    
-    <link href="/css/mfyx.css" rel="stylesheet">
-    <script src="/script/common.js" type="text/javascript"></script>
-    <script src="https://cache.amap.com/lbs/static/es5.min.js"></script>
-    
-	<link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css"/>
-    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.6&key=2b12c05334ea645bd934b55c8e46f6ea"></script>
-    <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
-    <script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
-    <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main.css"/>
+    <#include "/head/page-common-head.ftl" encoding="utf8">
+    <#include "/head/page-fileinput-head.ftl" encoding="utf8">
+    <#include "/head/page-ckeditor-head.ftl" encoding="utf8">
+    <#include "/head/page-map-head.ftl" encoding="utf8">
 </head>
 <body class="light-gray-bg">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
@@ -199,6 +172,14 @@
 	        <input class="form-control" id="agreementImg"  type="file" name="image" type="file" accept="image/jpg" class="file-loading">
 	    </div>
 	  </div>
+	  <!-- 分割线 -->
+	  <div class="form-group" title="指是否在买家签收评价完成后，在交易资金结算时是否将买家付款时支付的手续费退给买家！">
+        <label class="col-xs-4 control-label" style="padding-right:1px">是否退支付手续费<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:1px">
+          <label><input class="form-control" type="radio" v-model="param.isRetfee" value="0" required style="display:inline-block">否</label>
+          <label><input class="form-control" type="radio" v-model="param.isRetfee" value="1" required style="display:inline-block">是</label>
+        </div>
+      </div>
       <div class="form-group">
          <div style="text-align:center">
            <button type="button" class="btn btn-info" id="save" style="margin:20px" @click="submit">&nbsp;&nbsp;提 交&nbsp;&nbsp;</button>
@@ -211,10 +192,13 @@
   <div class="row" id="reviewInfo" style="width:100%;margin:1px 0px 0px 0px;padding:5px 8px;background-color:white;display:none">
   	<h5 style="text-align:center">最新审批结果信息</h5>
   	<p>合作伙伴ID：{{review.partnerId}}</p>
-  	<p>审批时间：{{review.reviewTime}}</p>
-  	<p>审批人：{{review.reviewOpr}}</p>
   	<p>审批结果：{{getPartnerStatus(review.status)}} </p>
-  	<p>审批意见：{{review.reviewLog}}</p>
+  	<p>初审  时间：{{review.freviewTime}}</p>
+  	<p>初审审批人：{{review.freviewOpr}}</p>
+  	<p>初审 意见：{{review.freviewLog}}</p>
+  	<p>终审 时间：{{review.lreviewTime}}</p>
+  	<p>终审审批人：{{review.lreviewOpr}}</p>
+  	<p>终审  意见：{{review.lreviewLog}}</p>
   </div>
 </div><!-- end of container -->
 
@@ -243,7 +227,8 @@ var partnerContainerVue = new Vue({
 			phone:'${(myPartner.phone)!''}',
 			introduce:`${(myPartner.introduce)!''} `,
 			locationX:'${(myPartner.locationX)!''}',
-			locationY:'${(myPartner.locationY)!''}'
+			locationY:'${(myPartner.locationY)!''}',
+			isRetfee:'${(mySettle.isRetfee)!"0"}'
 		},	//初始化的数据
 		metadata:{
 			provinces:[],
@@ -253,9 +238,12 @@ var partnerContainerVue = new Vue({
 		review:{
 			partnerId:'<#if (myPartner.partnerId)??>${(myPartner.partnerId)?string("#")}</#if>',
 			status:'${(myPartner.status)!""}',
-			reviewTime:'${(myPartner.reviewTime)!''}' ,
-			reviewOpr:'${(myPartner.reviewOpr)!''}' ,
-			reviewLog:"${(myPartner.reviewLog)!''}"
+			freviewTime:'${(myPartner.freviewTime)!''}' ,
+			freviewOpr:'${(myPartner.freviewOpr)!''}' ,
+			freviewLog:"${(myPartner.freviewLog)!''}"
+			lreviewTime:'${(myPartner.lreviewTime)!''}' ,
+			lreviewOpr:'${(myPartner.lreviewOpr)!''}' ,
+			lreviewLog:"${(myPartner.lreviewLog)!''}"
 		},
 		param:{
 			pbTp:'${(myPartner.pbTp)!''}',
@@ -279,7 +267,8 @@ var partnerContainerVue = new Vue({
 			introduce: `${(myPartner.introduce)!''}`,
 			locationX:'${(myPartner.locationX)!''}',
 			locationY:'${(myPartner.locationY)!''}',
-			canUpdAdd:false
+			canUpdAdd: false,
+			isRetfee:'${(mySettle.isRetfee)!"0"}'
 		}
 	},
 	methods:{

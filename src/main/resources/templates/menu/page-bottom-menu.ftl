@@ -1,5 +1,5 @@
  <!-- 商城管理底部主菜单-->
-  <div class="row" style="min-height:80px"></div> 
+  <div class="row" style="min-height:160px"></div> 
   <div class="weui-tabbar" style="position:fixed;left:0px;bottom:0px;height:60px">
     	<a href="/shop/index" class="weui-tabbar__item <#if (sys_func!'shop')=='shop'>weui-bar__item_on </#if>" >
 	    <span style="display: inline-block;position: relative;">

@@ -1,5 +1,5 @@
  <!-- 合作伙伴相关功能底部主菜单--> 
-  <div class="row" style="height:80px"></div>
+  <div class="row" style="height:120px"></div>
   <div class="weui-tabbar" style="position:fixed;left:0px;bottom:0px;height:60px">
     	<a href="/partner/manage" class="weui-tabbar__item <#if (sys_func!'')=='partner-index'>weui-bar__item_on </#if>" >
 	    <img src="/icons/合作伙伴-申请开通.png" alt="" class="weui-tabbar__icon">

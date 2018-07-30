@@ -1,28 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-	<title>摩放优选</title>
-	<!-- Bootstrap -->
-	<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <!--Vue -->
-    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <!-- -->
-    <link href="/css/font-awesome.min.css" rel="stylesheet">
-    <link href="/css/templatemo-style.css" rel="stylesheet">
-    
-    <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-    <link href="/css/weui.css" rel="stylesheet">
-    
+    <#include "/head/page-common4-head.ftl" encoding="utf8">
 </head>
 <body class="light-gray-bg" style="position:relative">
 <div class="container" style="oveflow:scroll">
-  <div class="row">
-     <h3 style="margin:10px 0;text-align:center" >
+  <div class="row" style="justify-content:center">
+     <h3 style="margin:10px 0;text-align:center;justify-content:center" >
      <#if (myPartner.partnerId)??>
      <span>${myPartner.busiName}(ID:${(myPartner.partnerId)?string('#')})</span>
      <#else>
@@ -30,9 +14,9 @@
      </#if>
      </h3>
   </div>
-  <div class="row" style="margin:30px 0px;text-align:center;vertical-align:center">
+  <div class="row" style="margin:30px 0px;text-align:center;justify-content:center;vertical-align:center">
     <#if (partnerUserTP=='bindVip') || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('basic') )>
-    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+    <div class="col-4 col-sm-4 col-md-3 col-lg-3 col-xl-2" style="padding:3px;">
       <div style="background-color:white">
 	    <a href="/partner/edit" >
 		    <img src="/icons/合作伙伴-申请开通.png" alt="" width="90px" height="90px">
@@ -44,7 +28,7 @@
     
   <#if ((myPartner.pbTp)!'')=='1'>
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('pimage')) >
-    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+    <div class="col-4 col-sm-4 col-md-3 col-lg-3 col-xl-2" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/pimage/manage" >
 		    <img src="/icons/图库管理.png" alt="" width="90px" height="90px">
@@ -54,7 +38,7 @@
     </div>
     </#if>
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('postage')) >
-    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+    <div class="col-4 col-sm-4 col-md-3 col-lg-3 col-xl-2" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/postage/manage" >
 		    <img src="/icons/运费模板管理.png" alt="" width="90px" height="90px">
@@ -64,7 +48,7 @@
     </div>
     </#if>
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('goods')) >
-    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+    <div class="col-4 col-sm-4 col-md-3 col-lg-3 col-xl-2" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/goods/manage" >
 		    <img src="/icons/商品管理.png" alt=""  width="90px" height="90px">
@@ -74,7 +58,7 @@
     </div>
     </#if>
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('saleorder')) >
-    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+    <div class="col-4 col-sm-4 col-md-3 col-lg-3 col-xl-2" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/psaleorder/show/all" >
 		    <img src="/icons/销售订单.png" alt="" width="90px" height="90px">
@@ -84,7 +68,7 @@
     </div>
     </#if>
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('aftersale')) >
-    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+    <div class="col-4 col-sm-4 col-md-3 col-lg-3 col-xl-2" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/paftersale/manage/refunding" >
 		    <img src="/icons/售后服务.png" alt="" width="90px" height="90px">
@@ -94,7 +78,7 @@
     </div>
     </#if>
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('complain4p')) >
-    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+    <div class="col-4 col-sm-4 col-md-3 col-lg-3 col-xl-2" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/pcomplain/partner/manage" >
 		    <img src="/icons/投诉.png" alt="" width="90px" height="90px">
@@ -104,7 +88,7 @@
     </div>
     </#if>
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('preceiver')) >
-    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+    <div class="col-4 col-sm-4 col-md-3 col-lg-3 col-xl-2" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/preceiver/manage" >
 		    <img src="/icons/地址管理.png" alt="" width="90px" height="90px">
@@ -117,7 +101,7 @@
     
   <#if ((myPartner.pbTp)!'')=='2' >
     <#if (partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('mypartners'))) >
-    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+    <div class="col-4 col-sm-4 col-md-3 col-lg-3 col-xl-2" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/mypartners/manage" >
 		    <img src="/icons/下级管理.png" alt="" width="90px" height="90px">
@@ -127,7 +111,7 @@
     </div>
     </#if>     
     <#if partnerUserTP=='bindVip' || (partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('review')) >
-    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+    <div class="col-4 col-sm-4 col-md-3 col-lg-3 col-xl-2" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/review/manage/goods" >
 		    <img src="/icons/信息审核.png" alt="" width="90px" height="90px">
@@ -138,7 +122,7 @@
     </#if> 
     <#if myPartner.partnerId == SYS_PARTNERID>
      <#if  partnerUserTP=='bindVip' || partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('Complain')>
-     <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+     <div class="col-4 col-sm-4 col-md-3 col-lg-3 col-xl-2" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/pcomplain/sys/manage" >
 		    <img src="/icons/投诉.png" alt="" width="90px" height="90px">
@@ -148,7 +132,7 @@
      </div>   
      </#if> 
      <#if  partnerUserTP=='bindVip' || partnerUserTP=='staff' && ((partnerStaff.tagList)!'')?contains('CashapplyDeal')>
-     <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+     <div class="col-4 col-sm-4 col-md-3 col-lg-3 col-xl-2" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/pcash/manage" >
 		    <img src="/icons/提现.png" alt="" width="90px" height="90px">
@@ -161,7 +145,7 @@
   </#if>
     
   <#if (myPartner.pbTp)??>     
-    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+    <div class="col-4 col-sm-4 col-md-3 col-lg-3 col-xl-2" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/pstaff/manage" >
 		    <img src="/icons/员工管理.png" alt="" width="90px" height="90px">
@@ -170,7 +154,7 @@
        </div>
     </div>    
   </#if>
-    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3" style="padding:3px;">
+    <div class="col-4 col-sm-4 col-md-3 col-lg-3 col-xl-2" style="padding:3px;">
        <div style="background-color:white">
 	    <a href="/pstaff/kfshow/${SYS_PARTNERID?string('#')}?tagId=kf4partner" >
 		    <img src="/icons/客服.png" alt="" width="90px" height="90px">
@@ -179,27 +163,21 @@
        </div>
     </div>  
   </div>
-  <div class="row" style="margin-top:3px;vertical-align:center">
-    <div class="col-xs-12">
-      <div style=";text-align:center;padding:8px 2px;background-color:white">
+  <div class="row" style="margin:3px 0;width:100%;text-align:center;justify-content:center;">
+      <div style="width:100%;text-align:center;justify-content:center;padding:8px 2px;background-color:white">
         <p>诚信用心有爱！</p>
         <p>优选品质，健康你我ta，福乐一家！</p>
       </div> 
-    </div>
   </div>
-  <div class="row" style="margin-top:3px;vertical-align:center">
-    <div class="col-xs-12">
-      <div style=";text-align:center;padding:8px 2px;background-color:white">
+  <div class="row" style="margin:3px 0;width:100%;text-align:center;justify-content:center;">
+      <div style="width:100%;text-align:center;justify-content:center;padding:8px 2px;background-color:white">
         <p>欢迎您加入我们！</p>
         <p>这里将是你我的未来！</p>
       </div> 
-    </div>
   </div>  
   
-  <div class="row" style="margin:30px 0">
-    <div class="col-xs-12" style="text-align:center">
-      <a class="btn btn-danger" style="padding:8px 20px;width:80%" href="/partner/logout">退出登录</a>
-    </div>
+  <div class="row" style="margin:30px 0;width:100%;text-align:center;justify-content:center;">
+     <a class="btn btn-danger" style="padding:8px 20px;width:80%" href="/partner/logout">退出登录</a>
   </div>
 </div><!-- end of container -->
 
@@ -208,8 +186,9 @@
 </#if>
 
 <footer>
-  <div class="row" style="position:absolute;left:0px;right:0px;bottom:60px;height:40px;text-align:center;background-color:#D0D0D0">
-	<span style="display:inline-block; margin:0 10px;">|</span>
+  <div class="row" style="position:absolute;left:0px;right:0px;bottom:60px;height:100px;text-align:center;justify-content:center;background-color:#D0D0D0">
+	<p>&nbsp;&nbsp;</p>
+	<span style="display:inline-block; margin:0 10px;"></span>
 	Copyright <font style="font-family:'微软雅黑';">©</font> 2017-2020 昆明摩放优选科技服务有限责任公司 <a href="http://www.miitbeian.gov.cn/" target="_blank" rel="nofollow">滇ICP备18002601号-1</a> 
   </div>
   <#include "/menu/page-partner-func-menu.ftl" encoding="utf8"> 

@@ -97,9 +97,13 @@ mfyx:
   goods-review-url: '/goods/review'
   
   pimage-file-upload-url: '/pimage/{partnerId}/file/upload'
-  pimage-file-show-url: '/pimage/{partnerId}/file/show/{filename}'
+  pimage-file-replace-url: '/pimage/{partnerId}/file/replace'
+  pimage-file-show-url: '/pimage/{partnerId}/file/show/{imgId}'
   pimage-folder-create-url: '/pimage/{partnerId}/folder/create'
   pimage-folder-list-url: '/pimage/{partnerId}/folder/list'
+  pimage-move-url: '/pimage/{partnerId}/move'
+  pimage-rename-url: '/pimage/{partnerId}/rename'
+  pimage-delete-url: '/pimage/{partnerId}/delete'
   
   postage-get-url: '/postage/{partnerId}/get/{postageId}'
   postage-getbypartner-url: '/postage/{partnerId}/getall'

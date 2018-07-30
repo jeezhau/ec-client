@@ -32,6 +32,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.common.SysParam;
 import com.mofangyouxuan.dto.PartnerBasic;
+import com.mofangyouxuan.dto.PartnerSettle;
 import com.mofangyouxuan.dto.PartnerStaff;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
@@ -99,22 +100,38 @@ public class PartnerBasicAction {
 			try {
 				String signPwd = SignUtils.encodeSHA256Hex(passwd);
 				if("bindVip".equals(userTp)) {
-					PartnerBasic myPartner = PartnerMgrService.getPartnerByVip(userId);
-					if(signPwd.equals(vipBasic.getPasswd())) {
-						session.setAttribute("myPartner", myPartner); //保存session
-						session.setAttribute("partnerBindVip", vipBasic); //保存session
-						session.setAttribute("partnerUserTP", userTp); //保存session
-						session.setAttribute("partnerPasswd", passwd); //保存session
-						return "redirect:" + localServerUrl + "/partner/manage";
+					JSONObject jsonRet = PartnerMgrService.getPartnerByVip(userId);
+					if(!jsonRet.containsKey("partner")) {
+						//map.put("errmsg", "系统中没有该会员绑定的合作伙伴信息！");
+						//return "partner/page-partner-login";
 					}else {
-						map.put("errmsg", "会员ID与密码不正确！");
-						return "partner/page-partner-login";
+						PartnerBasic myPartner = JSONObject.toJavaObject(jsonRet.getJSONObject("partner"), PartnerBasic.class);
+						PartnerSettle mySettle = null;
+						if(jsonRet.containsKey("settle")) {
+							mySettle = JSONObject.toJavaObject(jsonRet.getJSONObject("settle"), PartnerSettle.class);
+						}
+						if(signPwd.equals(vipBasic.getPasswd())) {
+							session.setAttribute("myPartner", myPartner); //保存session
+							session.setAttribute("mySettle", mySettle); //保存session
+							session.setAttribute("partnerBindVip", vipBasic); //保存session
+							session.setAttribute("partnerUserTP", userTp); //保存session
+							session.setAttribute("partnerPasswd", passwd); //保存session
+							return "redirect:" + localServerUrl + "/partner/manage";
+						}else {
+							map.put("errmsg", "会员ID与密码不正确！");
+							return "partner/page-partner-login";
+						}
 					}
 				}else {//员工
-					PartnerBasic myPartner = PartnerMgrService.getPartnerById(partnerId);
-					if(myPartner == null) {
+					JSONObject jsonRet = PartnerMgrService.getPartnerSettleById(partnerId);
+					if(!jsonRet.containsKey("partner")) {//成功
 						map.put("errmsg", "系统中没有该合作伙伴信息！");
 						return "partner/page-partner-login";
+					}
+					PartnerBasic myPartner = JSONObject.toJavaObject(jsonRet.getJSONObject("partner"), PartnerBasic.class);
+					PartnerSettle mySettle = null;
+					if(jsonRet.containsKey("settle")) {
+						mySettle = JSONObject.toJavaObject(jsonRet.getJSONObject("settle"), PartnerSettle.class);
 					}
 					PartnerStaff staff = PartnerStaffService.getStaffByUserId(partnerId, userId);
 					if(staff == null) {
@@ -125,8 +142,9 @@ public class PartnerBasicAction {
 						map.put("errmsg", "用户ID与密码不正确！");
 						return "partner/page-partner-login";
 					}
-					session.setAttribute("partnerStaff", staff); //保存session
 					session.setAttribute("myPartner", myPartner); //保存session
+					session.setAttribute("mySettle", mySettle); //保存session
+					session.setAttribute("partnerStaff", staff); //保存session
 					session.setAttribute("partnerUserTP", userTp); //保存session
 					session.setAttribute("partnerPasswd", passwd); //保存session
 					
@@ -198,6 +216,7 @@ public class PartnerBasicAction {
 		VipBasic partnerBindVip = (VipBasic) session.getAttribute("partnerBindVip");
 		PartnerStaff partnerStaff = (PartnerStaff) session.getAttribute("partnerStaff");
 		PartnerBasic myPartner = (PartnerBasic) session.getAttribute("myPartner");
+		PartnerSettle mySettle = (PartnerSettle) session.getAttribute("mySettle");
 		if("bindVip".equals(partnerUserTP) && myPartner == null) {
 			String needScore = SysParam.getSysParam("partner_open_need_socre");
 			try {
@@ -214,7 +233,7 @@ public class PartnerBasicAction {
 		map.put("partnerBindVip", partnerBindVip);
 		map.put("partnerStaff", partnerStaff);
 		map.put("myPartner", myPartner);
-		
+		map.put("mySettle", mySettle);
 		map.put("sys_func", "partner-index");
 		return "partner/page-partner-edit";
 	}
@@ -232,7 +251,8 @@ public class PartnerBasicAction {
 	@RequestMapping(value="/save",method=RequestMethod.POST)
 	@ResponseBody
 	public String saveBasic(@SessionAttribute("partnerUserTP")String partnerUserTP,@SessionAttribute("partnerPasswd")String partnerPasswd,
-			@Valid PartnerBasic basic,BindingResult result,
+			@Valid PartnerBasic basic,BindingResult result1,
+			@Valid PartnerSettle settle,BindingResult result2,
 			HttpSession session,ModelMap map) {
 		VipBasic partnerBindVip = (VipBasic) session.getAttribute("partnerBindVip");
 		PartnerStaff partnerStaff = (PartnerStaff) session.getAttribute("partnerStaff");
@@ -240,20 +260,26 @@ public class PartnerBasicAction {
 		
 		JSONObject jsonRet = new JSONObject();
 		try {
-			//用户信息验证结果处理
-			if(result.hasErrors()){
-				StringBuilder sb = new StringBuilder();
-				List<ObjectError> list = result.getAllErrors();
+			//信息验证结果处理
+			StringBuilder errSb = new StringBuilder();
+			if(result1.hasErrors()){
+				List<ObjectError> list = result1.getAllErrors();
 				for(ObjectError e :list){
-					sb.append(e.getDefaultMessage());
+					errSb.append(e.getDefaultMessage());
 				}
-				jsonRet.put("errmsg", sb.toString());
+			}
+			if(result2.hasErrors()){
+				List<ObjectError> list = result2.getAllErrors();
+				for(ObjectError e :list){
+					errSb.append(e.getDefaultMessage());
+				}
+			}
+			if(errSb.length()>0) {
+				jsonRet.put("errmsg", errSb.toString());
 				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-				return jsonRet.toString();
 			}
 			
 			basic.setPartnerId(null);
-			
 			Integer updateOpr = null;
 			//权限检查
 			if("staff".equals(partnerUserTP)) {
@@ -276,16 +302,19 @@ public class PartnerBasicAction {
 			}
 			basic.setUpdateOpr(updateOpr);
 			basic.setUpdateTime(new Date());
-			basic.setReviewLog("");
-			basic.setReviewOpr(null);
-			basic.setReviewTime(null);
+			basic.setFreviewOpr(null);
+			basic.setFreviewTime(null);
+			basic.setFreviewLog(null);
+			basic.setLreviewLog(null);
+			basic.setLreviewOpr(null);
+			basic.setLreviewTime(null);
 			String strRet = "";
 			if(myPartner == null || myPartner.getPartnerId() == null) {
 				basic.setPartnerId(null);
-				strRet = PartnerMgrService.create(basic,partnerPasswd);
+				strRet = PartnerMgrService.create(basic,settle,partnerPasswd);
 			}else {
 				basic.setPartnerId(myPartner.getPartnerId());
-				strRet = PartnerMgrService.update(basic,partnerPasswd);
+				strRet = PartnerMgrService.update(basic,settle,partnerPasswd);
 			}
 			JSONObject retObj = JSONObject.parseObject(strRet);
 			if(retObj.containsKey("errcode") && retObj.getIntValue("errcode") == 0) {//更新成功

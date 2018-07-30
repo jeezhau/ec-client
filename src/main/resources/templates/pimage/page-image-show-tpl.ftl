@@ -8,29 +8,43 @@
          </div>
          <div class="modal-body">
 		  <div class="row" style="margin-top:10px;">
+		    <div class="row" style="margin:0">
+			    <div class="col-xs-12" style="padding:0 5px;background-color:white;margin:0 ;text-align:center">
+			     <a class="btn" href="javascript:;" @click="showMode='list'"><img src="/icons/列表-1.png" width="25px" height="25px"><br>显示</a>
+			     <a class="btn" href="javascript:;" @click="showMode='image'"><img src="/icons/列表.png" width="25px" height="25px"><br>显示</a>
+			    </div>
+		    </div>
 		    <div class="row">
 			    <div class="col-xs-12" style="padding:0 15px">
 			      <ol class="breadcrumb " style="margin-bottom:1px;background-color:white">
 			        <span>当前文件夹：</span>
-			        <li v-for="(item,index) in folder" @click="listFiles(getFolderPath(index))">
-			          <a href="javascript:;">{{item}}</a>
-			        </li>
+			        <li v-for="item in currUpPathArr" @click="listFiles(item.folderId,item.folderName)">
+	                  <a href="javascript:;">{{item.folderName}}</a>
+	                </li>
 			      </ol>
 			    </div>
-		    </div>
-		    <div class="row" style="max-height:500px;overflow:scroll">
-		      <ul class="list-group" style="padding:0 5px;background-color:white;margin:0 20px 0 20px;">
+		    </div>		    
+		    <div v-if="showMode=='list'" class="row" style="margin:3px 0">
+		      <ul class="list-group" style="padding:0 5px;background-color:white;">
 		        <li v-for="item in files" class="list-group-item">
-		          <a v-if="isFileOrDir(item)===false" href="javascript:;" @click="listFiles(folder.join('/') + '/' + item)">
-		            <img alt="文件夹" width=20px height=20px src="/icons/文件夹.png">&nbsp;&nbsp;&nbsp;{{item}}
-		          </a>
-		          <span v-if="isFileOrDir(item)===true">
-		            <img alt="" width=20px height=20px  v-bind:src="'/pimage/file/show/' + item">
-		            <span>&nbsp;&nbsp;&nbsp; {{item}}</span>
-		            <input type="checkbox" style="display:inline-block;margin-left:10px;width:20px;height:20px" v-bind:value="item" v-model="selectedImages">
-		          </span>
+		          <input v-if="item.isDir=='0'" type="checkbox" style="display:inline-block;margin-left:10px;width:20px;height:20px" v-bind:value="item.imgId" v-model="selectedImages">
+		          <a v-if="item.isDir==='1'" href="javascript:;" @click="listFiles(item.imgId,item.fileName)"><img alt="文件夹" width=20px height=20px src="/icons/文件夹.png">&nbsp;&nbsp;&nbsp;{{item.fileName}}</a>
+		          <span v-if="item.isDir==='0'"><img alt="" width=20px height=20px  v-bind:src="'/pimage/file/show/' + item.imgId"><span>&nbsp;&nbsp;&nbsp; {{item.fileName}}.{{item.imgType}}</span> ({{item.imgId}})</span>
 		        </li>
 		      </ul>
+		    </div>
+		    <div v-if="showMode=='image'" class="row" style="margin:3px 0">
+		      <div v-for="item,index in files" class="col-xs-6 col-sm-4 col-md-3 col-lg-3" style="padding:3px 3px">
+		        <div style="position:relative;text-align:center;background-color:white;padding:2px">
+		          <a v-if="item.isDir==='1'" href="javascript:;" @click="listFiles(item.imgId,item.fileName)"><img alt="文件夹" style="height:160px;max-width:100%" src="/icons/文件夹.png"></a>
+		          <img v-if="item.isDir==='0'" alt="" style="height:160px;max-width:100%"  v-bind:src="'/pimage/file/show/' + item.imgId">
+		          <img v-if="item.usingCnt>0" alt="引用" style="position:absolute;right:3px;top:3px;height:15px;width:15px" src="/icons/引用.png">
+		        </div>
+		        <div style="text-align:center;background-color:white;padding:2px">
+		         <input v-if="item.isDir=='0'" type="checkbox" style="display:inline-block;margin-left:10px;width:20px;height:20px" v-bind:value="item.imgId" v-model="selectedImages">
+		         <span>{{item.fileName}}<span v-if="item.isDir==='0'">.{{item.imgType}}</span> ({{item.imgId}})</span>
+		        </div>
+		      </div>
 		    </div>
 		  </div>
 		  <div class="row" style="margin-top:15px;text-align:center">
@@ -40,6 +54,7 @@
      </div>
    </div>
 </div><!-- end of modal -->
+<#include "/pimage/page-image-listfiles.ftl" encoding="utf8">
 <script>
 var imageGalleryShowVue = new Vue({
 	el:'#imageGalleryShowModal',
@@ -47,72 +62,15 @@ var imageGalleryShowVue = new Vue({
 		selectCntLimit: 1, 	//选择限制数量
 		targetElId: '',		//显示选择图片的元素ID
 		selectedImages:[], 	//已选择的图片
-		
-		
-		folder:['Home'],
+		currUpPathArr:[], //[{'folderId':'','folderName':'Home'}]
+		currFolder:{}, //{'folderId':'','folderName':'Home/','fileName':''}
 		showMode:"list", 	//显示方式 list 、image
 		files:[],
-		cacheFiles:{}
 	},
 	methods:{
 		callbackFun:null,	//确认回调函数
-		getFolderPath: function(index){
-			var folderPath = "";
-			for(var i = 0;i<=index;i++){
-				folderPath += this.folder[i] + "/";
-			}
-			folderPath = folderPath.substring(0,folderPath.length-1);
-			return folderPath;
-		},
-		listFiles: function(folderPath){
-			//查询缓存数据
-			if(imageGalleryShowVue.cacheFiles[folderPath] && imageGalleryShowVue.cacheFiles[folderPath].length>0){ //缓存查找
-				imageGalleryShowVue.files = [];
-				var cache = imageGalleryShowVue.cacheFiles[folderPath];
-				for(var i=0;i<cache.length;i++){
-					imageGalleryShowVue.files.push(cache[i]);
-				}
-				//更新层级目录
-				var arr = folderPath.split("/");
-				imageGalleryShowVue.folder = [];
-				for(var i=0;i<arr.length;i++){
-					imageGalleryShowVue.folder.push(arr[i]);
-				}
-				return;
-			}
-			$.ajax({
-				url: '/pimage/folder/list',
-				method:'post',
-				data: {'folderPath':folderPath},
-				success: function(jsonRet,status,xhr){
-					if(jsonRet ){
-						if(jsonRet.files){
-							imageGalleryShowVue.files = [];
-							imageGalleryShowVue.cacheFiles[folderPath] = [];
-							for(var i=0;i<jsonRet.files.length;i++){
-								imageGalleryShowVue.files.push(jsonRet.files[i]);
-								imageGalleryShowVue.cacheFiles[folderPath].push(jsonRet.files[i]);
-							}
-							//更新层级目录
-							var arr = folderPath.split("/");
-							imageGalleryShowVue.folder = [];
-							for(var i=0;i<arr.length;i++){
-								imageGalleryShowVue.folder.push(arr[i]);
-							}
-						}
-					}else{
-						alertMsg('错误提示','获取数据失败！')
-					}
-				},
-				dataType: 'json'
-			});
-		},		
-		isFileOrDir: function(filename){
-			if(filename.lastIndexOf(".")>0){//普通文件
-				return true;
-			}else{	//目录
-				return false;
-			}
+		listFiles: function(folderImgId,folderName){
+			getFolderFiles(folderImgId,folderName,this.files,this.currFolder,this.currUpPathArr);
 		},
 		confirm : function(){
 			if(this.selectCntLimit == 1 && this.selectedImages.length != 1){
@@ -130,6 +88,6 @@ var imageGalleryShowVue = new Vue({
 		}
 	}
 });
-imageGalleryShowVue.listFiles('Home');
+imageGalleryShowVue.listFiles('Home','Home');
 </script>
 

@@ -101,6 +101,7 @@ mfyx:
   pimage-file-show-url: '/pimage/{partnerId}/file/show/{imgId}'
   pimage-folder-create-url: '/pimage/{partnerId}/folder/create'
   pimage-folder-list-url: '/pimage/{partnerId}/folder/list'
+  pimage-move-url: '/pimage/{partnerId}/move'
   pimage-rename-url: '/pimage/{partnerId}/rename'
   pimage-delete-url: '/pimage/{partnerId}/delete'
   

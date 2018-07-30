@@ -1,25 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-	<title>摩放优选</title>
-	<!-- Bootstrap -->
-	<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <!--Vue -->
-    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <!-- -->
-    <link href="/css/font-awesome.min.css" rel="stylesheet">
-    <link href="/css/templatemo-style.css" rel="stylesheet">
-    
-    <script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-    <link href="/css/weui.css" rel="stylesheet">
-    
-    <script src="/script/common.js" type="text/javascript"></script>
-    
+    <#include "/head/page-common-head.ftl" encoding="utf8">
 </head>
 <body class="light-gray-bg" style="overflow-y:scroll;overflow-x:hidden">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
@@ -28,7 +10,8 @@
 <div class="container" id="container" style="padding:0;">
   <div class="row" style="margin:0" >  <!-- 管理列表 -->
     <div class="row" style="margin:0;padding:5px 2px;background-color:white">
-      <div class="col-xs-6" style="padding:5px 2px">
+      <div class="row">
+        <div class="col-xs-6" style="padding:5px 2px">
 	      <div class="form-group">
 	        <label class="col-xs-4 control-label" style="padding-right:1px">状态</label>
 	        <div class="col-xs-8" style="padding-left:1px">
@@ -40,15 +23,17 @@
 	        </div>
 	      </div>
 	    </div>
-	    <div class="col-xs-6" style="padding:5px 2px">
-      	  <div class="form-group" style="padding:0 20px">
+	  </div>
+	  <div class="row" style="margin:0">
+      	 <div class="form-group" style="padding:0 20px">
         		<button type="button" class="btn btn-primary" @click="getAll(true,false)">&nbsp;&nbsp;查&nbsp;&nbsp;询&nbsp;&nbsp; </button>
         		<#if (mode!'')=='partner'>
         		<a type="button" class="btn btn-info" href="/pcomplain/edit/0?oprFlag=E">&nbsp;&nbsp;新&nbsp;&nbsp;建&nbsp;&nbsp; </a>
         		</#if>
-      	  </div>
       	</div>
+      </div>
     </div>
+
     <div class="row" style="margin:0">
        <table class="table table-striped table-bordered table-condensed">
          <tr>
