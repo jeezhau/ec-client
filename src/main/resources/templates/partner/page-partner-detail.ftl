@@ -34,7 +34,6 @@
   <div class="row" style="margin:0">
   <div class="row" id="partnerDetail" style="width:100%;margin:1px 0px 0px 0px;padding:5px 8px;background-color:white;">
     <h5 style="text-align:center">合作伙伴基本信息</h5>
-
 	<form class="form-horizontal" method ="post" autocomplete="on" enctype="multipart/form-data" role="form" >
       <div class="form-group">
         <label class="col-xs-4 control-label" style="padding-right:1px">合作伙伴ID  </label>
@@ -169,28 +168,77 @@
 	    </div>
 	  </div>
 	  
+	  <!-- 分割线 -->
+	  <#if ((partner.pbTp)!'')=='1' >
+	  <div class="form-group" title="指是否在买家签收评价完成后，在交易资金结算时是否将买家付款时支付的手续费退给买家！">
+        <label class="col-xs-4 control-label" style="padding-right:1px">是否退支付手续费<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:1px">
+          <#if ((settle.isRetfee)!'0')=='0'><label><input type="radio" value="0" checked style="display:inline-block" disabled> 否 </label></#if>
+          <#if ((settle.isRetfee)!'0')=='1'><label><input type="radio" value="1" checked style="display:inline-block"  disabled> 是 </label></#if>
+        </div>
+      </div>
+      <div class="form-group">
+        <label  class="col-xs-4 control-label" style="padding-right:3px">平台服务费费率(%)<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:3px">
+          <input type="number" class="form-control" value="${(settle.serviceFeeRate)!''}" style="width:100px;display:inline-block" disabled>
+          <span>%</span>
+        </div>
+      </div>
+      </#if>
+      <#if ((partner.pbTp)!'')=='2' >
+      <div class="form-group">
+        <label  class="col-xs-4 control-label" style="padding-right:3px">推广奖励比例(%)<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:3px">
+          <input type="number" class="form-control" value="${(settle.shareProfitRate)!''}" style="width:100px;display:inline-block" disabled>
+          <span>%</span>
+        </div>
+      </div>
+      </#if>     
 	</form>
   </div>
+  
   <#if (mode!'') == 'show'>
   <div class="row" id="reviewInfo" style="width:100%;margin:1px 0px 0px 0px;padding:5px 8px;background-color:white;display:none">
   	<h5 style="text-align:center">最新审批结果信息</h5>
   	<p>合作伙伴ID：${(partner.partnerId)?string('#')}</p>
-  	<p>审批时间：${(partner.reviewTime)!''}</p>
-  	<p>审批人：${(partner.reviewOpr)!''}</p>
   	<p>审批结果：{{getPartnerStatus('${(partner.status)!''}')}} </p>
-  	<p>审批意见：${(partner.reviewLog)!''}</p>
+  	<p>初审时间：<#if (partner.freviewTime)??>${(partner.freviewTime)?string('yyyy-MM-dd HH:mm:ss')}</#if></p>
+  	<p>初 审 人：${(partner.freviewOpr)!''}</p>
+  	<p>初审意见：${(partner.freviewLog)!''}</p>
+  	<p>终审时间：<#if (partner.lreviewTime)??>${(partner.lreviewTime)?string('yyyy-MM-dd HH:mm:ss')}</#if></p>
+  	<p>终 审 人：${(partner.lreviewOpr)!''}</p>
+  	<p>终审意见：${(partner.lreviewLog)!''}</p>
   </div>
   </#if>
+  
   <#if (mode!'') == 'review'>
   <div class="row" id="changeUpForm" style="width:100%;margin:1px 0px 0px 0px;padding:5px 8px;background-color:white;display:none">
   	<form class="form-horizontal" method ="post" autocomplete="on" enctype="multipart/form-data" role="form" >
   	<h5 style="text-align:center">合作伙伴审批与抽查</h5>
   	<div class="form-group">
-        <label  class="col-xs-3 control-label">合作伙伴ID</label>
-        <div class="col-xs-9">
+        <label  class="col-xs-4 control-label" style="padding-right:3px">合作伙伴ID</label>
+        <div class="col-xs-8" style="padding-left:3px">
           <input class="form-control" value="${(partner.partnerId)?string('#')}" disabled>
         </div>
     </div>
+    <#if ((partner.pbTp)!'')=='1' >
+    <div class="form-group">
+        <label  class="col-xs-4 control-label" style="padding-right:3px">平台服务费费率(%)<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:3px">
+          <input type="number" class="form-control" v-model="param.serviceFeeRate" style="width:100px;display:inline-block" required min=1.2 max=10>
+          <span>%(1.2-10)</span>
+        </div>
+    </div>
+    </#if>
+    <#if (myPartner.partnerId) == SYS_PARTNERID && ((partner.pbTp)!'')=='2' >
+    <div class="form-group">
+        <label  class="col-xs-4 control-label" style="padding-right:3px">推广奖励比例(%)<span style="color:red">*</span></label>
+        <div class="col-xs-8" style="padding-left:3px">
+          <input type="number" class="form-control" v-model="param.shareProfitRate" style="width:100px;display:inline-block" required  min=0 max=70>
+          <span>%(0-70)</span>
+        </div>
+    </div>
+    </#if>
   	<div class="form-group">
         <label  class="col-xs-3 control-label">审核意见<span style="color:red">*</span></label>
         <div class="col-xs-9">
@@ -204,6 +252,7 @@
     </form>
   </div>
   </#if>
+  
   <#if (mode!'') == 'changeUp'>
   <div class="row" id="changeUpForm" style="width:100%;margin:1px 0px 0px 0px;padding:5px 8px;background-color:white;display:none">
   	<form class="form-horizontal" method ="post" autocomplete="on" enctype="multipart/form-data" role="form" >
@@ -247,7 +296,9 @@ var partnerContainerVue = new Vue({
 			newUpId:'',
 			<#else>
 			review:'',
-			result:''
+			result:'',
+			shareProfitRate: ${(settle.shareProfitRate)!3},
+			serviceFeeRate: ${(settle.serviceFeeRate)!3}
 			</#if>
 		}
 	},
@@ -294,72 +345,6 @@ var partnerContainerVue = new Vue({
 });
 
 </script>
-
-<div id="showAddrMap" style="position:fixed;left:0;top:0;right:0;bottom:0;margin:0;width:100%;display:none;z-index:1000;background:rgba(0,0,0,0.2);display:none;">
-<div id="mapContainer" style="top:10px;width:100%;height:500px;"></div>
-<div id="myPageTop" style="left:10px">
-    <table style="width:100%;text-align:right">
-        <tr style="width:100%">
-            <td class="column1"><label><a onclick="$('#showAddrMap').hide();">关闭</a></label></td>
-        </tr>
-        <tr>
-            <td class="column1"><input type="text" style="width:90%" readonly id="lnglat" placeholder="点击地图选择地点"></td>
-        </tr>	        
-        <tr>
-            <td class="column1"><input type="text" id="keyword" name="keyword" value="请输入关键字：(选定后搜索)" style="width:90%" onfocus='this.value=""'/></td> 
-        </tr>
-        
-    </table>
-</div>
-<script type="text/javascript">
-var windowsArr = [];
-   var marker = [];
-    var map = new AMap.Map("mapContainer", {
-        resizeEnable: true,
-        zoom: 13,
-    });
-    AMap.plugin('AMap.Geocoder',function(){
-        var geocoder = new AMap.Geocoder({
-            city: "010"//城市，默认：“全国”
-        });
-        var marker = new AMap.Marker({
-            map:map,
-            bubble:true
-        })
-        map.on('click',function(e){
-            marker.setPosition(e.lnglat);
-            geocoder.getAddress(e.lnglat,function(status,result){
-              if(status=='complete'){
-                var addr = result.regeocode;
-                partnerContainerVue.getLocation(addr.addressComponent.province,addr.addressComponent.city,
-                		addr.addressComponent.district,addr.formattedAddress,e.lnglat.getLng(),e.lnglat.getLat());
-                document.getElementById("lnglat").value = addr.formattedAddress;
-              }else{
-                 alertMsg('系统提示','无法获取地址');
-              }
-            });
-        })
-    });
-     AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],function(){
-        var autoOptions = {
-          city: "昆明", //城市，默认全国
-          input: "keyword",//使用联想输入的input的id
-          
-        };
-        autocomplete= new AMap.Autocomplete(autoOptions);
-        var placeSearch = new AMap.PlaceSearch({
-              city:'昆明',
-              map:map
-        });
-        AMap.event.addListener(autocomplete, "select", function(e){
-           //TODO 针对选中的poi实现自己的功能
-           placeSearch.setCity(e.poi.adcode);
-           placeSearch.search(e.poi.name)
-        });
-      }); 
-   
-</script>
-</div>
 
 </#if>
 

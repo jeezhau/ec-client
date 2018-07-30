@@ -282,12 +282,12 @@ public class PartnerMgrService {
 	 * @param rewPartnerId	审核者合作伙伴ID
 	 * @param operator	审批人ID，为上级合作伙伴的员工用户ID
 	 * @param passwd		审批人操作密码
-	 * 
+	 * @param settle		设置的结算信息
 	 * @return {errcode:0,errmsg:"ok"}
 	 * @throws JSONException
 	 */
 	public static JSONObject review(Integer partnerId,String review,String result,
-			Integer rewPartnerId,Integer operator,String passwd){
+			Integer rewPartnerId,Integer operator,String passwd,PartnerSettle settle){
 		Map<String,Object> params = new HashMap<String,Object>();
 		JSONObject jsonRet = new JSONObject();
 		try {
@@ -297,6 +297,10 @@ public class PartnerMgrService {
 			params.put("rewPartnerId", rewPartnerId);
 			params.put("operator", operator);
 			params.put("passwd", passwd);
+			String[] excludeFields2 = {"isRetFee"};
+			Map<String, Object> params2 = new HashMap<String,Object>();
+			params2 = ObjectToMap.object2Map(settle,excludeFields2,false);
+			params.putAll(params2);
 			String url = mfyxServerUrl + partnerReviewUrl;
 			String strRet = HttpUtils.doPost(url, params);
 			jsonRet = JSONObject.parseObject(strRet);

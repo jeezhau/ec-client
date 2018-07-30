@@ -173,11 +173,25 @@
 	    </div>
 	  </div>
 	  <!-- 分割线 -->
-	  <div class="form-group" title="指是否在买家签收评价完成后，在交易资金结算时是否将买家付款时支付的手续费退给买家！">
+	  <div v-if="param.pbTp =='1'" class="form-group" title="指是否在买家签收评价完成后，在交易资金结算时是否将买家付款时支付的手续费退给买家！">
         <label class="col-xs-4 control-label" style="padding-right:1px">是否退支付手续费<span style="color:red">*</span></label>
         <div class="col-xs-8" style="padding-left:1px">
-          <label><input class="form-control" type="radio" v-model="param.isRetfee" value="0" required style="display:inline-block">否</label>
-          <label><input class="form-control" type="radio" v-model="param.isRetfee" value="1" required style="display:inline-block">是</label>
+          <label><input type="radio" v-model="param.isRetfee" value="0" required style="display:inline-block"> 否 </label>&nbsp;&nbsp;
+          <label><input type="radio" v-model="param.isRetfee" value="1" required style="display:inline-block"> 是 </label>
+        </div>
+      </div>
+      <div v-if="param.pbTp =='1'" class="form-group" >
+        <label class="col-xs-4 control-label" style="padding-right:1px">平台服务费费率(%)</label>
+        <div class="col-xs-8" style="padding-left:1px">
+          <input type="number" class="form-control" value="${(mySettle.serviceFeeRate)!''}" style="width:100px;display:inline-block" disabled>
+          <span>%</span>
+        </div>
+      </div>
+      <div v-if="param.pbTp =='2'" class="form-group" >
+        <label class="col-xs-4 control-label" style="padding-right:1px">推广奖励比例(%)</label>
+        <div class="col-xs-8" style="padding-left:1px">
+          <input type="number" class="form-control" value="${(mySettle.shareProfitRate)!''}" style="width:100px;display:inline-block" disabled>
+          <span>%</span>
         </div>
       </div>
       <div class="form-group">
@@ -193,12 +207,12 @@
   	<h5 style="text-align:center">最新审批结果信息</h5>
   	<p>合作伙伴ID：{{review.partnerId}}</p>
   	<p>审批结果：{{getPartnerStatus(review.status)}} </p>
-  	<p>初审  时间：{{review.freviewTime}}</p>
-  	<p>初审审批人：{{review.freviewOpr}}</p>
-  	<p>初审 意见：{{review.freviewLog}}</p>
-  	<p>终审 时间：{{review.lreviewTime}}</p>
-  	<p>终审审批人：{{review.lreviewOpr}}</p>
-  	<p>终审  意见：{{review.lreviewLog}}</p>
+  	<p>初审  时间：<#if (myPartner.freviewTime)??>${(myPartner.freviewTime)?string("yyyy-MM-dd HH:mm:ss")}</#if></p>
+  	<p>初审审批人：${(review.freviewOpr)!''}</p>
+  	<p>初审 意见：${(review.freviewLog)!''}</p>
+  	<p>终审 时间：<#if (myPartner.lreviewTime)??>${(myPartner.lreviewTime)?string("yyyy-MM-dd HH:mm:ss")}</#if></p>
+  	<p>终审审批人：${(review.lreviewOpr)!''}</p>
+  	<p>终审  意见：${(review.lreviewLog)!''}</p>
   </div>
 </div><!-- end of container -->
 
@@ -237,13 +251,7 @@ var partnerContainerVue = new Vue({
 		},
 		review:{
 			partnerId:'<#if (myPartner.partnerId)??>${(myPartner.partnerId)?string("#")}</#if>',
-			status:'${(myPartner.status)!""}',
-			freviewTime:'${(myPartner.freviewTime)!''}' ,
-			freviewOpr:'${(myPartner.freviewOpr)!''}' ,
-			freviewLog:"${(myPartner.freviewLog)!''}"
-			lreviewTime:'${(myPartner.lreviewTime)!''}' ,
-			lreviewOpr:'${(myPartner.lreviewOpr)!''}' ,
-			lreviewLog:"${(myPartner.lreviewLog)!''}"
+			status:'${(myPartner.status)!""}'
 		},
 		param:{
 			pbTp:'${(myPartner.pbTp)!''}',

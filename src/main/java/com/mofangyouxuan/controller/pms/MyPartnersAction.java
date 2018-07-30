@@ -1,22 +1,29 @@
 package com.mofangyouxuan.controller.pms;
 
+import java.util.List;
+
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.common.SysParam;
 import com.mofangyouxuan.dto.PartnerBasic;
+import com.mofangyouxuan.dto.PartnerSettle;
 import com.mofangyouxuan.dto.PartnerStaff;
 import com.mofangyouxuan.dto.VipBasic;
 import com.mofangyouxuan.service.PartnerMgrService;
@@ -29,6 +36,7 @@ import com.mofangyouxuan.utils.PageCond;
  */
 @Controller
 @RequestMapping("/mypartners")
+@SessionAttributes({"SYS_PARTNERID"})
 public class MyPartnersAction {
 	@Value("${sys.local-server-url}")
 	private String localServerUrl;
@@ -85,14 +93,19 @@ public class MyPartnersAction {
 			mode = "show";
 		}
 		map.put("mode",  mode);
-		PartnerBasic partner = PartnerMgrService.getPartnerById(partnerId);
-		if(partner == null) {
+		JSONObject jsonRet = PartnerMgrService.getPartnerSettleById(partnerId);
+		if(jsonRet == null || !jsonRet.containsKey("partner")) {
 			map.put("errmsg", "系统中没有该合作伙伴信息！");
 		}else {
+			PartnerBasic partner = JSONObject.toJavaObject(jsonRet.getJSONObject("partner"), PartnerBasic.class);
 			if(!myPartner.getPartnerId().equals(partner.getUpPartnerId()) && 
 					!myPartner.getPartnerId().equals(SysParam.getSyspartnerId()) ){
 				map.put("errmsg", "您没有权限查看该合作伙伴信息！");
 			}else {
+				if(jsonRet.containsKey("settle")) {
+					PartnerSettle settle = JSONObject.toJavaObject(jsonRet.getJSONObject("settle"), PartnerSettle.class);
+					map.put("settle", settle);
+				}
 				map.put("partner", partner);
 			}
 		}
@@ -117,6 +130,7 @@ public class MyPartnersAction {
 			@RequestParam(value="partnerId",required=true)Integer partnerId,
 			@RequestParam(value="review",required=true)String review,
 			@RequestParam(value="result",required=true)String result,
+			@Valid PartnerSettle settle,BindingResult br,
 			HttpSession session) {
 		VipBasic partnerBindVip = (VipBasic) session.getAttribute("partnerBindVip");
 		PartnerStaff partnerStaff = (PartnerStaff) session.getAttribute("partnerStaff");
@@ -133,6 +147,18 @@ public class MyPartnersAction {
 				jsonRet.put("errcode", ErrCodes.PARTNER_PARAM_ERROR);
 				jsonRet.put("errmsg", "审批意见：长度2-600字符！");
 				return jsonRet.toString();
+			}
+			//信息验证结果处理
+			StringBuilder errSb = new StringBuilder();
+			if(br.hasErrors()){
+				List<ObjectError> list = br.getAllErrors();
+				for(ObjectError e :list){
+					errSb.append(e.getDefaultMessage());
+				}
+			}
+			if(errSb.length()>0) {
+				jsonRet.put("errmsg", errSb.toString());
+				jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
 			}
 			Integer updateOpr = null;
 			//权限检查
@@ -152,7 +178,7 @@ public class MyPartnersAction {
 				}
 				updateOpr = partnerBindVip.getVipId();
 			}
-			jsonRet = PartnerMgrService.review(partnerId, review, result, myPartner.getPartnerId(), updateOpr, partnerPasswd);
+			jsonRet = PartnerMgrService.review(partnerId, review, result, myPartner.getPartnerId(), updateOpr, partnerPasswd,settle);
 		
 		}catch(Exception e) {
 			//数据处理

@@ -321,6 +321,7 @@ public class PartnerBasicAction {
 				basic.setStatus("0");
 				basic.setPartnerId(retObj.getInteger("partnerId"));
 				session.setAttribute("myPartner", basic); //更新session
+				session.setAttribute("mySettle", settle);
 			}
 			return strRet;
 		}catch(Exception e) {

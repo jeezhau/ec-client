@@ -15,8 +15,8 @@
 		            <option value="0">待审核</option>
 		            <option value="R">终审拒绝</option>
 		            <option value="S">终审通过</option>
-		            <option value="RN">初审拒绝</option>
-		            <option value="SN">初审通过</option>
+		            <option value="A">初审拒绝</option>
+		            <option value="B">初审通过</option>
 		            <option value="C">暂时关闭歇业</option>
 		            <option value="1">严重违规关店</option>
 	            </select>
