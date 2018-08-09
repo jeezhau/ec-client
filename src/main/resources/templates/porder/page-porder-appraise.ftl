@@ -2,6 +2,8 @@
 <html lang="zh-CN">
 <head>
     <#include "/head/page-common-head.ftl" encoding="utf8">
+    <link href="/css/bootstrap-slider.min.css" rel="stylesheet">
+    <script src="/script/bootstrap-slider.min.js"></script>
 </head>
 <body class="light-gray-bg" style="overflow:scroll">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">

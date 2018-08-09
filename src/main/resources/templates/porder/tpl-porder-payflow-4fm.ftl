@@ -26,7 +26,11 @@
 	    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
 	        <label class="col-xs-3"  style="padding:0">支付状态：</label>
 	        <span class="col-xs-8"  style="padding:0">{{getPayStatus('${payFlow.status}')}}</span>
-	    </div>   
+	    </div>
+	    <div class="col-xs-12" style="text-align:cneter;padding:0 3px">
+	        <label class="col-xs-3"  style="padding:0">对账状态：</label>
+	        <span class="col-xs-8"  style="padding:0">{{getOBalStatus('${(orderBalStat!"")}')}}</span>
+	    </div>
     </div>
   </div>
   

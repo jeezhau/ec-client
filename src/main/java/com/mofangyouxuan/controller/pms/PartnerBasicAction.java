@@ -34,13 +34,10 @@ import com.mofangyouxuan.common.SysParam;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.PartnerSettle;
 import com.mofangyouxuan.dto.PartnerStaff;
-import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
+import com.mofangyouxuan.service.LoginService;
 import com.mofangyouxuan.service.PartnerMgrService;
-import com.mofangyouxuan.service.PartnerStaffService;
-import com.mofangyouxuan.service.UserService;
-import com.mofangyouxuan.service.VipService;
-import com.mofangyouxuan.utils.SignUtils;
+import com.mofangyouxuan.utils.CommonUtil;
 
 /**
  * 合作伙伴基础信息管理
@@ -81,83 +78,54 @@ public class PartnerBasicAction {
 		map.put("partnerId", partnerId);
 		
 		if(!"bindVip".equals(userTp) && !"staff".equals(userTp)) {
-			map.put("errmsg", "用户类型不正确！");
+			map.put("errmsg", "用户类型：不正确！");
 			return "partner/page-partner-login";
 		}
 		if("staff".equals(userTp) && partnerId == null) {
-			map.put("errmsg", "合作伙伴不可为空！");
+			map.put("errmsg", "合作伙伴：不可为空！");
 			return "partner/page-partner-login";
 		}
 		if(passwd.length()<6 || passwd.length()>20) {
-			map.put("errmsg", "密码长度6-20字符！");
+			map.put("errmsg", "密码：长度6-20字符！");
 			return "partner/page-partner-login";
 		}
-		
-		UserBasic userBasic = UserService.getUserBasicById(userId);
-		VipBasic vipBasic = VipService.getVipBasic(userId);
-		if(userBasic == null || vipBasic == null || 
-				!"1".equals(userBasic.getStatus()) || !"1".equals(vipBasic.getStatus())) { //正常用户
-			try {
-				String signPwd = SignUtils.encodeSHA256Hex(passwd);
-				if("bindVip".equals(userTp)) {
-					JSONObject jsonRet = PartnerMgrService.getPartnerByVip(userId);
-					if(!jsonRet.containsKey("partner")) {
-						//map.put("errmsg", "系统中没有该会员绑定的合作伙伴信息！");
-						//return "partner/page-partner-login";
-					}else {
-						PartnerBasic myPartner = JSONObject.toJavaObject(jsonRet.getJSONObject("partner"), PartnerBasic.class);
-						PartnerSettle mySettle = null;
-						if(jsonRet.containsKey("settle")) {
-							mySettle = JSONObject.toJavaObject(jsonRet.getJSONObject("settle"), PartnerSettle.class);
-						}
-						if(signPwd.equals(vipBasic.getPasswd())) {
-							session.setAttribute("myPartner", myPartner); //保存session
-							session.setAttribute("mySettle", mySettle); //保存session
-							session.setAttribute("partnerBindVip", vipBasic); //保存session
-							session.setAttribute("partnerUserTP", userTp); //保存session
-							session.setAttribute("partnerPasswd", passwd); //保存session
-							return "redirect:" + localServerUrl + "/partner/manage";
-						}else {
-							map.put("errmsg", "会员ID与密码不正确！");
-							return "partner/page-partner-login";
-						}
-					}
-				}else {//员工
-					JSONObject jsonRet = PartnerMgrService.getPartnerSettleById(partnerId);
-					if(!jsonRet.containsKey("partner")) {//成功
-						map.put("errmsg", "系统中没有该合作伙伴信息！");
-						return "partner/page-partner-login";
-					}
-					PartnerBasic myPartner = JSONObject.toJavaObject(jsonRet.getJSONObject("partner"), PartnerBasic.class);
-					PartnerSettle mySettle = null;
-					if(jsonRet.containsKey("settle")) {
-						mySettle = JSONObject.toJavaObject(jsonRet.getJSONObject("settle"), PartnerSettle.class);
-					}
-					PartnerStaff staff = PartnerStaffService.getStaffByUserId(partnerId, userId);
-					if(staff == null) {
-						map.put("errmsg", "系统中没有该合作伙伴员工信息！");
-						return "partner/page-partner-login";
-					}
-					if(!signPwd.equals(staff.getPasswd())) {
-						map.put("errmsg", "用户ID与密码不正确！");
-						return "partner/page-partner-login";
-					}
-					session.setAttribute("myPartner", myPartner); //保存session
-					session.setAttribute("mySettle", mySettle); //保存session
-					session.setAttribute("partnerStaff", staff); //保存session
-					session.setAttribute("partnerUserTP", userTp); //保存session
-					session.setAttribute("partnerPasswd", passwd); //保存session
-					
-					return "redirect:" + localServerUrl + "/partner/manage";
+		try {
+			String source = CommonUtil.getPlatform(request);
+			String ip = CommonUtil.getIpAddr(request);
+			String referer = (String) map.get("fromUrl");
+			JSONObject jsonRet = LoginService.partnerLogin(userId,"bindVip".equals(userTp)?"1":"2",partnerId,source, ip, referer, session.getId(), passwd);
+			if(jsonRet.containsKey("vipBasic") || jsonRet.containsKey("staff")) {
+				VipBasic vipBasic = JSONObject.toJavaObject(jsonRet.getJSONObject("vipBasic"), VipBasic.class);
+				PartnerBasic myPartner = null;
+				if(jsonRet.containsKey("myPartner")) {
+					myPartner = JSONObject.toJavaObject(jsonRet.getJSONObject("myPartner"), PartnerBasic.class);
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				map.put("errmsg", "出现系统异常，异常信息：" + e.getMessage());
+				PartnerSettle mySettle = null;
+				if(jsonRet.containsKey("mySettle")) {
+					mySettle = JSONObject.toJavaObject(jsonRet.getJSONObject("mySettle"), PartnerSettle.class);
+				}
+				PartnerStaff staff = null;
+				if(jsonRet.containsKey("staff")) {
+					staff = JSONObject.toJavaObject(jsonRet.getJSONObject("staff"), PartnerStaff.class);
+				}
+				session.setAttribute("myPartner", myPartner); //保存session
+				session.setAttribute("mySettle", mySettle); //保存session
+				session.setAttribute("partnerBindVip", vipBasic); //保存session
+				session.setAttribute("partnerUserTP", userTp); //保存session
+				session.setAttribute("partnerPasswd", passwd); //保存session
+				session.setAttribute("partnerStaff", staff); //保存session
+				return "redirect:" + localServerUrl + "/partner/manage";
+			}else {
+				map.put("userTp", userTp);
+				map.put("userId", userId);
+				map.put("partnerId", partnerId);
+				map.put("errmsg", jsonRet.getString("errmsg"));
+				return "partner/page-partner-login";
 			}
-		}else {
-			map.put("errmsg", "系统中没有该正常用户或会员！" );
+		} catch (Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现系统异常，异常信息：" + e.getMessage());
 		}
-		
 		return "partner/page-partner-login";
 	}
 	

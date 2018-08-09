@@ -3,6 +3,7 @@ package com.mofangyouxuan.controller.ums;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -20,9 +21,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.UserBasic;
 import com.mofangyouxuan.dto.VipBasic;
+import com.mofangyouxuan.service.LoginService;
 import com.mofangyouxuan.service.UserService;
-import com.mofangyouxuan.service.VipService;
-import com.mofangyouxuan.utils.SignUtils;
+import com.mofangyouxuan.utils.CommonUtil;
 
 @Controller
 @SessionAttributes({"clientPF","userBasic","openId","vipBasic","fromUrl"})
@@ -42,34 +43,32 @@ public class LoginAction {
 	 */
 	@RequestMapping(value="/login")
 	public String login(String username,String password,
-			ModelMap map,HttpServletRequest request) {
+			ModelMap map,HttpServletRequest request,HttpSession session) {
 		if(username != null && password != null) {
-			UserBasic userBasic = UserService.getUserBasic(username);
-			if(userBasic != null && "1".equals(userBasic.getStatus())) { //有正常用户
-				try {
-					if(SignUtils.encodeSHA256Hex(password).equals(userBasic.getPasswd())) {
-						map.put("userBasic", userBasic);
-						map.put("openId", username);
-						VipBasic vipBasic = VipService.getVipBasic(userBasic.getUserId());
-						if(vipBasic != null) {
-							map.put("vipBasic", vipBasic);
-						}
-						String fromUrl = (String) map.get("fromUrl");
-						if(fromUrl != null && fromUrl.length()>0) {
-							return "redirect:" + localServerName + fromUrl;
-						}else {
-							return "redirect:" + localServerName + "/user/index/basic";
-						}
+			try {
+				String source = CommonUtil.getPlatform(request);
+				String ip = CommonUtil.getIpAddr(request);
+				String referer = (String) map.get("fromUrl");
+				JSONObject jsonRet = LoginService.userLogin(username, source, ip, referer, session.getId(), password);
+				if(jsonRet.containsKey("userBasic")) {
+					UserBasic userBasic = JSONObject.toJavaObject(jsonRet.getJSONObject("userBasic"), UserBasic.class);
+					VipBasic vipBasic = JSONObject.toJavaObject(jsonRet.getJSONObject("vipBasic"), VipBasic.class);
+					map.put("userBasic", userBasic);
+					map.put("openId", username);
+					map.put("vipBasic", vipBasic);
+					if(referer != null && referer.length()>0) {
+						return "redirect:" + localServerName + referer;
 					}else {
-						map.put("username", username);
-						map.put("errmsg", "用户名称与密码不正确！");
+						return "redirect:" + localServerName + "/user/index/basic";
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					map.put("errmsg", "出现系统异常，异常信息：" + e.getMessage());
+				}else {
+					map.put("username", username);
+					map.put("errmsg", jsonRet.getString("errmsg"));
 				}
-			}else {
-				map.put("errmsg", "系统中没有该用户！" );
+			
+			} catch (Exception e) {
+				e.printStackTrace();
+				map.put("errmsg", "出现系统异常，异常信息：" + e.getMessage());
 			}
 		}
 		return "user/page-login";
@@ -83,7 +82,7 @@ public class LoginAction {
 	@RequestMapping(value="/login-ajax")
 	@ResponseBody
 	public String loginAjax(String username,String password,
-			ModelMap map,HttpServletRequest request) {
+			ModelMap map,HttpServletRequest request,HttpSession session) {
 		JSONObject jsonRet = new JSONObject();
 		if(username == null || password == null) {
 			jsonRet.put("errcode", ErrCodes.COMMON_NO_LOGIN);
@@ -91,24 +90,21 @@ public class LoginAction {
 			return jsonRet.toJSONString();
 		}
 		try {
-			UserBasic userBasic = UserService.getUserBasic(username);
-			if(userBasic != null && "1".equals(userBasic.getStatus())) { //有正常用户
-				if(SignUtils.encodeSHA256Hex(password).equals(userBasic.getPasswd())) {
-					map.put("userBasic", userBasic);
-					map.put("openId", username);
-					VipBasic vipBasic = VipService.getVipBasic(userBasic.getUserId());
-					if(vipBasic != null) {
-						map.put("vipBasic", vipBasic);
-					}
-					jsonRet.put("errcode", 0);
-					jsonRet.put("errmsg", "ok");
-				}else {
-					jsonRet.put("errcode", ErrCodes.USER_PARAM_ERROR);
-					jsonRet.put("errmsg", "用户名称与密码不正确！");
-				}
+			String source = CommonUtil.getPlatform(request);
+			String ip = CommonUtil.getIpAddr(request);
+			String referer = (String) map.get("fromUrl");
+			JSONObject json = LoginService.userLogin(username, source, ip, referer, session.getId(), password);
+			if(json.containsKey("userBasic")) {
+				UserBasic userBasic = JSONObject.toJavaObject(json.getJSONObject("userBasic"), UserBasic.class);
+				VipBasic vipBasic = JSONObject.toJavaObject(json.getJSONObject("vipBasic"), VipBasic.class);
+				map.put("userBasic", userBasic);
+				map.put("openId", username);
+				map.put("vipBasic", vipBasic);
+				jsonRet.put("errcode", 0);
+				jsonRet.put("errmsg", "ok");
 			}else {
 				jsonRet.put("errcode", ErrCodes.USER_NO_EXISTS);
-				jsonRet.put("errmsg", "系统中没有该用户！" );
+				jsonRet.put("errmsg", json.getString("errmsg"));
 			}
 		}catch (Exception e) {
 			e.printStackTrace();

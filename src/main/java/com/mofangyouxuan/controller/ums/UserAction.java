@@ -81,11 +81,13 @@ public class UserAction {
 		String openId = (String)map.get("openId");
 		UserBasic userBasic = UserService.getUserBasic(openId);
 		if(userBasic != null) {
+			//userBasic.setPasswd(null);
 			map.put("userBasic", userBasic);
 		}
 		VipBasic vipBasic = VipService.getVipBasic(user.getUserId());
 		if(vipBasic != null) {
 			map.put("vipBasic", vipBasic);
+			//vipBasic.setPasswd(null);
 		}
 		JSONObject jsonCnt = CollectionService.getCnt(user.getUserId());
 		if(jsonCnt != null && jsonCnt.containsKey("cnt") && jsonCnt.getIntValue("cnt")>0) {

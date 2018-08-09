@@ -452,6 +452,10 @@ public class PartnerSaleOrderAction {
 				return "";
 			}
 			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
+			String orderBalStat = null;
+			if(jsonRet.containsKey("orderBalStat")) {
+				orderBalStat = jsonRet.getString("orderBalStat");
+			}
 			JSONObject jsonApprMcht = AppraiseService.getAppraise(orderId, "1");
 			JSONObject jsonApprUser = AppraiseService.getAppraise(orderId, "2");
 			JSONObject jsonaf = AftersaleService.getAftersale(orderId);
@@ -473,6 +477,7 @@ public class PartnerSaleOrderAction {
 					Aftersale aftersale = JSONObject.toJavaObject(jsonaf.getJSONObject("aftersale"), Aftersale.class);
 					map.put("aftersale", aftersale);
 				}
+				map.put("orderBalStat", orderBalStat);
 				map.put("order", order);
 			}else {
 				map.put("errmsg", "您没有权限查询该订单信息！");
@@ -525,7 +530,7 @@ public class PartnerSaleOrderAction {
 	 * @param map
 	 */
 	@RequestMapping("/appraise/review/{orderId}")
-	public String getApprReview(@PathVariable("orderId")String orderId,ModelMap map) {
+	public String showApprReview(@PathVariable("orderId")String orderId,ModelMap map) {
 		try {
 			PartnerBasic myPartner = (PartnerBasic) map.get("myPartner");
 			if(myPartner == null || !("S".equals(myPartner.getStatus()) || "C".equals(myPartner.getStatus())) ){

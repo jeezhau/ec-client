@@ -85,7 +85,7 @@
          <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
            <a href="/user/spread">
              <span class=" pull-right" style=""> 就加入  &gt;</span>
-             <img alt="" src="/icons/服务号-营销推广.png" width="20px" height="20px"> 我要推广
+             <img alt="" src="/icons/服务号-营销推广.png" width="20px" height="20px"> 推荐分享
            </a>
          </li>          
          <li style="background-color:white" >
@@ -257,7 +257,7 @@ containerVue.getOrderCounts();
 <footer>
   <div class="row" style="position:absolute;left:0px;right:0px;bottom:60px;height:100px;text-align:center;background-color:#D0D0D0">
 	<p>&nbsp;</p>
-	<span style="display:inline-block; margin:0 10px;">|</span>
+	<span style="display:inline-block; margin:0 10px;"></span>
 	Copyright <font style="font-family:'微软雅黑';">©</font> 2017-2020 昆明摩放优选科技服务有限责任公司 <a href="http://www.miitbeian.gov.cn/" target="_blank" rel="nofollow">滇ICP备18002601号-1</a> 
   </div>
   <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 

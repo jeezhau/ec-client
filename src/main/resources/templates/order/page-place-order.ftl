@@ -49,7 +49,9 @@
     <!-- 轮播（Carousel）项目 -->
     <div class="carousel-inner">
         <div  v-bind:class="[{active:(index===0)}, 'item']" v-for="imgpath,index in goods.courselImgPaths" >
+          <div class="row" style="width:100%;text-align:center">
             <img :src="'/shop/gimage/${(goods.partnerId)?string('#')}/' + imgpath" style="max-width:100%;max-height:600px;">
+          </div>
         </div>
     </div>
     <!-- 轮播（Carousel）导航 -->

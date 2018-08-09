@@ -20,7 +20,7 @@
   </#if>
   <div class="row" style="margin:3px 0px;background-color:white; color:red">
     <p/>
-  	<span>&nbsp;&nbsp;&nbsp;&nbsp;如果您已付款，取消后您的付款订单金额(不含手续费与国税)将返回至您的付款账户！手续费与国税将不会退回！！！</span>
+  	<span>&nbsp;&nbsp;&nbsp;&nbsp;如果您已付款，取消后您的付款订单金额(不含手续费)将返回至您的付款账户！手续费将不会退回！！！</span>
   </div>
   <div class="row" style="margin:3px 0">
     	  <label class="col-xs-3 control-label" style="padding-right:0">取消缘由<span style="color:red">*</span></label>

@@ -118,6 +118,7 @@ public class ReviewAction {
 			}else {
 				params.put("status", "0,S,R");
 			}
+			params.put("object", "1");
 			jsonRet = AppraiseService.searchApprs(params.toJSONString(),JSONObject.toJSONString(pageCond));
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();

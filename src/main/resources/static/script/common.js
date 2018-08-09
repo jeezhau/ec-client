@@ -38,6 +38,19 @@ function getOrderStatus(code){
 }
 
 /**
+ * 系统对账状态
+ */
+var oBalStatObj = { '':'还未对账','SS':'成功','S':'初步完成，需再次确认','0':'数据不完整','1':'需要人工核查'};
+function getOBalStatus(code){
+	var val = oBalStatObj[code];
+	if(val){
+		return val;
+	}else{
+		return code;
+	}
+}
+
+/**
  * 获取配送模式
  * @param code
  * @returns
@@ -325,15 +338,11 @@ function getGoodsRewResult(code){
  */
 function getAppraiseStatus(code){
 	if("0" == code) {
-		return "待评价";
-	}else if("1" == code) {
-		return "用户评价完成";
-	}else if("2" == code) {
-		return "商家评价完成";
+		return "待审核";
 	}else if("R" == code) {
 		return "审核拒绝";
 	}else if("S" == code) {
-		return "审核通过";
+		return "正常";
 	}
 	return code;
 }

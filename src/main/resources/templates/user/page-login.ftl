@@ -20,7 +20,7 @@
     		<div class="input-group">
         		<div class="input-group-addon"><i class="fa fa-key fa-fw"></i></div>	        		
             <input class="form-control" type="password" name="password"  required placeholder="******">           
-        </div>	
+        </div>
     	</div>
 		<div class="form-group">
 			<button type="submit" class="templatemo-blue-button width-100"> 登 录 </button>

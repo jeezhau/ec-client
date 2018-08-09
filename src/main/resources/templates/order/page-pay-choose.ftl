@@ -85,7 +85,8 @@
      <span v-if="param.payType == 1 " class="pull-right"><img src="/icons/选择.png" style="widht:20px;height:20px;"></span>
     </div>
     <div class="col-xs-12" style="margin:1px 5px;padding:10px 25px;">
-      <p>注意：使用 [会员余额] 之外的第三方支付将收取订单金额<span style="color:red"> 0.7%至3% </span>的手续费，手续费付给第三方支付平台！下述金额不包含手续费，手续费将额外收取！</p>
+      <p>注意：使用 [会员余额] 之外的第三方支付将收取订单金额<span style="color:red"> 0.7%至3% </span>的手续费，手续费付给第三方支付平台！
+      下述金额不包含手续费，手续费将额外收取！部分商家会将该手续费在交易确认完成后退到您的余额账户！！</p>
     </div>
   </div>
   

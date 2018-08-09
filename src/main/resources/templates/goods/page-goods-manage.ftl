@@ -200,7 +200,7 @@
  $("#container").scroll(scrollHandler);  
 
 </script>  
-<!-- 修改商品规格Model -->
+<!-- 修改商品规格(不包含名称)Model -->
 <div class="modal fade " id="editSpecDetailModal" tabindex="-1" role="dialog" aria-labelledby="editSpecDetailModalLabel" aria-hidden="true" data-backdrop="static">
    <div class="modal-dialog">
       <div class="modal-content">
@@ -229,13 +229,10 @@
 		               <th width="15%" style="padding:2px 2px">售价(¥)</th>
 		               <th width="15%" style="padding:2px 2px">带包装重量(kg)</th>
 		               <th width="15%" style="padding:2px 2px">库存件数</th>
-		               <th width="8%" style="padding:2px 2px;vertical-align:center">
-		                 <button type="button" class="btn btn-primary" style="padding:2px 2px" @click="addSpec">添加</button>
-		               </th>
 		             </tr>
 		             <tr v-for="(item,index) in specDetailArr" >
 		               <td style="padding:2px 0px">
-		                 <input type="text"  style="width:100%" maxlength="20" :value="item.name" @change="setSpecItem('name',index,$event)">
+		                 <input type="text"  style="width:100%" maxlength="20" :value="item.name" @change="setSpecItem('name',index,$event)" readonly>
 		               </td>
 		               <td style="padding:2px 0px">
 		                 <input type="number" style="width:100%" min=0 max=999999 :value="item.val" @change="setSpecItem('val',index,$event)">
@@ -252,9 +249,6 @@
 		               <td style="padding:2px 0px">
 		                 <input type="number" style="width:100%" min=0 max=999999 :value="item.stock" @change="setSpecItem('stock',index,$event)">
 		               </td>
-		               <th width="8%" style="padding:2px 2px;vertical-align:center">
-		                 <button type="button" class="btn btn-danger" style="padding:2px 2px" @click="delSpec(index)">删除</button>
-		               </th>
 		             </tr>
 		           </table>
 		        </div>       
@@ -277,15 +271,6 @@ var editSpecDetailVue = new Vue({
 		specDetailArr: []
 	},
 	methods:{
-		addSpec:function(){
-			if(this.specDetailArr == null){
-				this.specDetailArr = [];
-			}
-			this.specDetailArr.push(new Object({name:'',val:'',unit:'',price:'',grossWeight:'',stock:''}));
-		},
-		delSpec:function(index){
-			this.specDetailArr.splice(index,1);
-		},
 		setSpecItem:function(field,index,event){
 			var spec = this.specDetailArr[index];
 			var value = $(event.target).val();

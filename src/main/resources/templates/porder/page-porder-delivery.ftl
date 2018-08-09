@@ -29,9 +29,10 @@
    <p>${order.remark}</p>
   </div>
   <div class="row" style="margin:3px 0px;background-color:white; color:red">
-    <p/>
-  	<span>&nbsp;&nbsp;&nbsp;&nbsp;填写说明：官方配送则名称为“摩放优选”，单号为订单号；商家配送则名称为“商家名称”，单号为订单号；
+    <p/><span>&nbsp;&nbsp;&nbsp;&nbsp;填写说明：官方配送则名称为“摩放优选”，单号为订单号；商家配送则名称为“商家名称”，单号为订单号；
   	快递配送则名称为“快递公司名称”，单号为物流公司的单号；客户自取则名称为“客户昵称”，单号为订单号；</span>
+  	<p>&nbsp;&nbsp;&nbsp;&nbsp;特别提示：确认发货之前请查看一下订单明细中的“对账状态”，最好在状态为“成功”的情况下再发货；否则可能会出现资金问题!</p>
+  	
   </div>
   <div class="row" style="margin:3px 0">
     	  <label class="col-xs-3 control-label" style="padding-right:0">配送方名称<span style="color:red">*</span></label>

@@ -20,9 +20,11 @@
         <li v-for="item,index in courselImgPaths" data-target="#myCarousel" :data-slide-to="index" v-bind:class="{ active: index===0 }"></li>
     </ol>   
     <!-- 轮播（Carousel）项目 -->
-    <div class="carousel-inner">
-        <div  v-bind:class="[{active:(index===0)}, 'item']" v-for="imgpath,index in courselImgPaths" >
+    <div class="carousel-inner" >
+        <div  v-bind:class="[{active:(index===0)}, 'item']" v-for="imgpath,index in courselImgPaths" style="width:100%;text-align:center">
+          <div class="row" style="width:100%;text-align:center">
             <img :src="'/shop/gimage/${((goods.partnerId)!'')?string('#')}/' + imgpath"  style="max-width:100%;max-height:600px">
+          </div>
         </div>
     </div>
     <!-- 轮播（Carousel）导航 -->
@@ -201,7 +203,7 @@ var containerVue = new Vue({
 					method:'post',
 					data: {'begin':0,'pageSize':3},
 					success: function(jsonRet,status,xhr){
-						if(jsonRet && jsonRet.errcode == 0){//
+						if(jsonRet && jsonRet.datas){//
 							for(var i=0;i<jsonRet.datas.length;i++){
 								var appr = jsonRet.datas[i];
 								if(appr.appraiseInfo){//有评价内容

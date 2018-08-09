@@ -40,7 +40,7 @@
     </div>
     <div style="position:fixed;left:0;bottom:60px;width:100%">
       <p style="text-algin:left;padding:3px 3px;font-size:80%;color:gray">两种方式相见：<br>
-      	&nbsp;&nbsp;&nbsp;&nbsp;1、个人中心/我-基本/我要推广 <br>
+      	&nbsp;&nbsp;&nbsp;&nbsp;1、个人中心/我-基本/推荐分享 <br>
       	&nbsp;&nbsp;&nbsp;&nbsp;2、个人中心/我-会员/合作伙伴</p>
       <!-- <p style="text-align: right;padding:1px 3px">加入我们：18601672645</p> -->
     </div>

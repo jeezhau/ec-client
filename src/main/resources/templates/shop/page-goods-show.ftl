@@ -20,9 +20,11 @@
         <li v-for="item,index in courselImgPaths" data-target="#myCarousel" :data-slide-to="index" v-bind:class="{ active: index===0 }"></li>
     </ol>   
     <!-- 轮播（Carousel）项目 -->
-    <div class="carousel-inner" style="width:100%;text-align:center">
-        <div  v-bind:class="[{active:(index===0)}, 'item']" v-for="imgpath,index in courselImgPaths" style="width:100%;text-align:center;vertical-align:center">
+    <div class="carousel-inner" >
+        <div  v-bind:class="[{active:(index===0)}, 'item']" v-for="imgpath,index in courselImgPaths" >
+           <div class="row" style="width:100%;text-align:center">  
             <img :src="'/shop/gimage/${((goods.partnerId)!'')?string('#')}/' + imgpath" style="max-width:100%;max-height:600px;">
+           </div>
         </div>
     </div>
     <!-- 轮播（Carousel）导航 -->

@@ -5,12 +5,14 @@
         <ul class="nav navbar-nav nav-tabs" style="padding:0 5px;font-size:15px">
             <li class="active" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');getGoodsByCat(0)"> 
               <a href="javascript:;" style="padding:2px 3px">&nbsp;&nbsp;全&nbsp;&nbsp;部&nbsp;&nbsp; </a> 
-            </li>        
-        <#list categories as cat>
+            </li>
+          <#if categories??>        
+          <#list categories as cat>
             <li onclick="$(this).addClass('active');$(this).siblings().removeClass('active');getGoodsByCat(${cat.categoryId})"> 
               <a href="javascript:;" style="padding:2px 3px">${cat.categoryName}</a> 
             </li>
-        </#list>
+         </#list>
+         </#if>
         </ul>
     </div>
     <div class="row" style="margin:0 0">

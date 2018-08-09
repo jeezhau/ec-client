@@ -61,7 +61,7 @@
         <div class="caption">
           <h5><a :href="'/mypartners/detail/'+item.partnerId + '/show'" >{{item.busiName}}</a></h5>
           <p>
-              <a v-if="item.status == '0' || startWith(item.status,'S') || startWith(item.status,'R')" :href="'/mypartners/detail/'+item.partnerId + '/review'" class="btn btn-info" role="button" style="padding:0px 3px"> 审核/抽查 </a>
+              <a v-if="item.status == '0' || item.status =='S' || item.status =='R' || item.status =='A' || item.status =='B'" :href="'/mypartners/detail/'+item.partnerId + '/review'" class="btn btn-success" role="button" style="padding:0px 3px"> 审核/抽查 </a>
               <a v-if="item.pbTp == '1'" :href="'/mypartners/detail/'+item.partnerId + '/changeUp'" class="btn btn-default" role="button" style="padding:0px 3px"> 变更上级 </a>
           </p>
         </div>

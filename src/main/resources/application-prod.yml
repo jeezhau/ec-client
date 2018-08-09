@@ -170,6 +170,10 @@ mfyx:
   cash-update-stat-url: '/cash/updateStat'
   cash-getall-url: '/cash/getall'
    
+  login-user-in: '/login/uin'
+  login-partner-in: '/login/pin'
+  
+  
 ######系统参数############  
 sys:
   local-server-url: 'https://h5.mofangyouxuan.com'

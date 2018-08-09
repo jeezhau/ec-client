@@ -50,7 +50,7 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		params:{
-			userTp:'{userTp!""}'
+			userTp:'${userTp!""}'
 		}
 	}
 });
