@@ -22,7 +22,7 @@ public class ServerCenterAction {
 	@RequestMapping("/about")
 	public String getAbount(ModelMap map) {
 		
-		map.put("sys_func", "user");
+		map.put("sys_func", "srvc");
 		return "srvcenter/page-about-joinus";
 	}
 	

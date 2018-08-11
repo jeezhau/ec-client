@@ -217,7 +217,7 @@ function veriCodeTime(flag){
   <div style="position:absolute;left:0px;right:0px;bottom:60px;height:100px;text-align:center;background-color:#D0D0D0">
 	<p>&nbsp;</p>
 	<span style="display:inline-block; margin:0 10px;"></span>
-	Copyright <font style="font-family:'微软雅黑';">©</font> 2017-2020 昆明摩放优选科技服务有限责任公司 <a href="http://www.miitbeian.gov.cn/" target="_blank" rel="nofollow">滇ICP备18002601号-1</a> 
+	Copyright <font style="font-family:'微软雅黑';">©</font> 2017-2020 摩放优选 <a href="http://www.miitbeian.gov.cn/" target="_blank" rel="nofollow">滇ICP备18002601号-1</a> 
   </div>
   <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
 </footer>

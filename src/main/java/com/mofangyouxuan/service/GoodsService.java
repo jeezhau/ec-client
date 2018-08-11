@@ -1,17 +1,14 @@
 package com.mofangyouxuan.service;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
-import com.mofangyouxuan.dto.Category;
 import com.mofangyouxuan.dto.Goods;
 import com.mofangyouxuan.utils.HttpUtils;
 import com.mofangyouxuan.utils.ObjectToMap;
@@ -31,7 +28,6 @@ public class GoodsService {
 	private static String goodsGetallWithPartnerUrl;
 	private static String goodsChangeStatusUrl;
 	private static String goodsChangeSpecUrl;
-	private static String goodsCategoryUrl;
 	private static String goodsReviewUrl;
 	
 	@Value("${mfyx.mfyx-server-url}")
@@ -66,10 +62,6 @@ public class GoodsService {
 	@Value("${mfyx.goods-change-spec-url}")
 	public void setGoodsChangeSpecUrl(String goodsChangeSpecUrl) {
 		GoodsService.goodsChangeSpecUrl = goodsChangeSpecUrl;
-	}
-	@Value("${mfyx.goods-category-url}")
-	public void setGoodsCategoryUrl(String goodsCategoryUrl) {
-		GoodsService.goodsCategoryUrl = goodsCategoryUrl;
 	}
 	@Value("${mfyx.goods-review-url}")
 	public void setGoodsReviewUrl(String goodsReviewUrl) {
@@ -284,21 +276,4 @@ public class GoodsService {
 		return jsonRet;
 	}
 	
-	/**
-	 * 获取商品分类
-	 * @return 
-	 */
-	public static List<Category> getCategories(){
-		String url = mfyxServerUrl + goodsCategoryUrl;
-		String strRet = HttpUtils.doGet(url);
-		try {
-			JSONObject jsonRet = JSONObject.parseObject(strRet);
-			if(jsonRet.containsKey("errcode") && jsonRet.getIntValue("errcode") ==0) {
-				return JSONArray.parseArray(jsonRet.getJSONArray("categories").toJSONString(), Category.class);
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 }

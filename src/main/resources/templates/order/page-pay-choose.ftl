@@ -9,56 +9,17 @@
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
 <#include "/user/tpl-ajax-login-modal.ftl" encoding="utf8">
 
- <#if (order.orderId)?? >
+ <#if list?? && amount?? >
 <div class="container " id="container" style="padding:0;overflow:scroll">
- <!-- 收货人信息 -->
-  <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
-    <div class="col-xs-12">
-     <span>${(order.recvName)!''} , ${(order.recvPhone)!''}</span>
-    </div>
-    <div class="col-xs-12">
-        <span>${order.recvProvince}</span> 
-        <span>${order.recvCity}</span>
-        <span>${order.recvArea}</span>
-        <span>${order.recvAddr}</span>
-     </div>
-     <div class="col-xs-12">
-       {{getDispatchMode(${order.dispatchMode})}}
-     </div>
+  <div class="row">
+    <div class="col-xs-2"><a href="/user/index/basic"><img alt="" src="/icons/返回.png" style="width:18px;height:18px"></a></div>
+    <div class="col-xs-10"><h3 style="text-align:center;margin:3px">选择支付方式</h3></div>
   </div>
-
   <!-- 商品信息 -->
-  <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
-    <div class="col-xs-12" style="text-align:center;">${order.goodsName}</div>
-    <div class="col-xs-12" style="text-align:center;">
-      <a href="/shop/goods/${(order.goodsId)?string('#')}">
-       <img alt="" src="/shop/gimage/${(order.partnerId)?string('#')}/${(order.goodsMainImgPath)!''}" style="max-width:99%;max-height:380px;">
-      </a>
-    </div>
-    <div class="col-xs-12" style="padding:0px 3px">
-       <table class="table table-striped table-bordered table-condensed">
-         <tr>
-           <th width="30%" style="padding:2px 2px">规格名称</th>
-           <th width="15%" style="padding:2px 2px">量值</th>
-           <th width="15%" style="padding:2px 2px">售价(¥)</th>
-           <th width="20%" style="padding:2px 2px">购买数量</th>
-         </tr>
-         <tr v-for="item,index in goodsSpecArr" >
-           <td style="padding:2px 2px">
-             <span style="width:100%" >{{item.name}}</span>
-           </td>
-           <td style="padding:2px 2px">
-              <span style="width:100%" >{{item.val}} {{item.unit}}</span>
-           </td>
-           <td style="padding:2px 2px">
-              <span style="width:100%" >{{item.price}}</span>
-           </td> 	                         
-           <td style="padding:2px 2px;text-align:center">
-              <span style="width:100%" >{{item.buyNum}}</span>
-           </td>
-         </tr>
-       </table>    
-     </div>
+  <div class="row" style="margin:0px 1px ;padding:5px 0;" >
+    <#list list as order>
+     <#include "/common/tpl-order-buy-content-4fm.ftl" encoding="utf8">
+    </#list>
   </div> 
   
   <!-- 官方信息 -->
@@ -90,12 +51,12 @@
     </div>
   </div>
   
-  <!-- 支付 -->
+<!-- 支付 -->
 <footer >
   <div class="row" style="margin:50px 0"></div>
-  <div class="weui-tabbar" style="position:fixed;left:0px;bottom:5px">
+  <div class="weui-tabbar" style="position:fixed;left:0px;bottom:1px">
     	<span class="weui-tabbar__item " >
-	    <span class="weui-tabbar__label" >金额(含运费) <span style="color:red;font-size:18px">¥ ${order.amount}</span></span>
+	    <span class="weui-tabbar__label" >金额(含运费) <span style="color:red;font-size:18px">¥ ${amount}</span></span>
 	</span>   
      <a href="javascript:;" class="weui-tabbar__item " style='background-color:red;text-align:center;vertical-align:center;' @click="prepay">
 	    <span class="weui-tabbar__label" style="font-size:20px;color:white">立即支付</span>
@@ -108,9 +69,8 @@
 var containerVue = new Vue({
 	el:'#container',
 	data:{
-		goodsSpecArr:JSON.parse('${(order.goodsSpec)!"[]"}'),
 		param:{
-			orderId:'${(order.orderId)}',
+			orderIds:'${orderIds}',
 			payType:0 //支付方式:1-会员余额,2-微信，3-支付宝
 		}
 	},

@@ -252,8 +252,8 @@ function getAllData(isRefresh,isForward,url,searchParam,dataList,pageCond){
 		data: searchParam,
 		success: function(jsonRet,status,xhr){
 			if(jsonRet && jsonRet.datas){//
-				var i=0;
-				var j = jsonRet.datas.length;
+				var i = 0;
+				var j = jsonRet.datas.length-1;
 				for(;i<jsonRet.datas.length;){
 					if(isForward){
 						dataList.unshift(jsonRet.datas[j]);
@@ -280,23 +280,25 @@ function getAllData(isRefresh,isForward,url,searchParam,dataList,pageCond){
 
 /**
  * 滚动监测分页
- * @param scrollElId		监测的元素ID	
  * @param pageCond	分页信息{begin,pageSize,count}
  * @param dataList	查询结果存储数组
  * @param searchFun	执行的查询函数(isRefresh,isForward)，isRefresh：是否刷新已有数据，isForward：是否向前插入数据
  * @returns
  */
-function scrollPager(scrollElId,pageCond,dataList,searchFun){
+function scrollPager(pageCond,dataList,searchFun){
 	var winHeight = $(window).height(); //页面可视区域高度   
 	var scrollHandler = function () {  
 		var pageHieght = $(document.body).height();  
 		var scrollHeight = $(window).scrollTop(); //滚动条top   
 		var r = (pageHieght - winHeight - scrollHeight) / winHeight;
-		if (r>=0 && r < 0.2) {//上拉翻页 
+		if (r>=0 && r < 0.2 && scrollHeight>=winHeight) {//上拉翻页 
 			pageCond.begin = pageCond.begin + pageCond.pageSize;
 			searchFun(false,false);
 		}
-		if(scrollHeight<0){ //下拉翻页
+		if(scrollHeight <= 0){ //下拉翻页
+			if(pageCond.begin <= 0){
+    	 			return;
+    	 		}
 			var currPageCnt = dataList.length % pageCond.pageSize;//当前页的数量
 			if(currPageCnt == 0){
 				currPageCnt = pageCond.pageSize;
@@ -312,7 +314,7 @@ function scrollPager(scrollElId,pageCond,dataList,searchFun){
 		}
 	}
 	 //定义鼠标滚动事件  
-	$("#"+scrollElId).scroll(scrollHandler);
+	$(window).scroll(scrollHandler);
 }
 
 /**

@@ -275,7 +275,9 @@ public class MyPartnersAction {
 					return jsonRet.toString();
 				}
 			}
-			jsonRet = PartnerMgrService.getAll(myPartner.getPartnerId(), search, pageCond);
+			JSONObject sortParams = new JSONObject();
+			sortParams.put("time", "1#1");
+			jsonRet = PartnerMgrService.getAll(myPartner.getPartnerId(), search, sortParams,pageCond);
 		}catch(Exception e) {
 			e.printStackTrace();
 			jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);

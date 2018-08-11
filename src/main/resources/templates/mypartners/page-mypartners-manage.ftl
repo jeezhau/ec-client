@@ -78,86 +78,25 @@ var containerVue = new Vue({
 		search:{
 			
 		},
-		param:{
+		pageCond:{
 			begin:0,
 			pageSize:20
 		},
 		dataList:[]
 	},
 	methods:{
-		getPartners: function(isRefresh,isFirst){
-			$("#loadingData").show();
-			$("#nomoreData").hide();
-			 
-			 if(isRefresh){ //清空数据
-				 containerVue.param.count = 0;
-				 containerVue.dataList = [];
-			 }else{
-				 if(containerVue.dataList.lenght>=10*containerVue.param.pageSize){
-					 if(isFirst){//清除最后一页
-						 containerVue.dataList.splice(9*containerVue.param.pageSize,containerVue.param.pageSize);
-					 }else{//清除最前一页
-						 containerVue.dataList.splice(0,containerVue.param.pageSize); 
-					 }
-				 }
-			 }
-			 $.ajax({
-					url: '/mypartners/getall',
-					method:'post',
-					data: {'jsonSearchParams':JSON.stringify(this.search),'begin':this.param.begin,'pageSize':this.param.pageSize},
-					success: function(jsonRet,status,xhr){
-						if(jsonRet && jsonRet.datas){//
-							var i=0;
-							var j = jsonRet.datas.length;
-							for(;i<jsonRet.datas.length;){
-								if(isFirst){
-									containerVue.dataList.unshift(jsonRet.datas[j]);
-								}else{
-									containerVue.dataList.push(jsonRet.datas[i]);
-								}
-								i++;j--;
-							}
-							containerVue.param.pageSize = jsonRet.pageCond.pageSize;
-							containerVue.param.begin = jsonRet.pageCond.begin;
-						}
-						$("#loadingData").hide();
-					},
-					failure:function(){
-						$("#loadingData").hide();
-					},
-					dataType: 'json'
-				});	
+		getPartners: function(isRefresh,isForward){
+			var url = '/mypartners/getall';
+			var searchParam = {'jsonSearchParams':JSON.stringify(this.search),'begin':this.pageCond.begin,'pageSize':this.pageCond.pageSize};
+			getAllData(isRefresh,isForward,url,searchParam,containerVue.dataList,containerVue.pageCond);
 		}
 	}
 });
 //页面保留一页的数据
 containerVue.getPartners(true,false);  //初始获取数据
-var winHeight = $(window).height(); //页面可视区域高度   
-var scrollHandler = function () {  
-    var pageHieght = $(document.body).height();  
-    var scrollHeight = $(window).scrollTop(); //滚动条top   
-    var r = (pageHieght - winHeight - scrollHeight) / winHeight;
-    if (r >= 0 && r < 0.2) {//上拉后翻页
-   	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
-   	 	containerVue.getPartners(false,false);
-    }
-    if(scrollHeight<0){//下拉前翻页
-    		var currPageCnt = containerVue.dataList.length%containerVue.param.pageSize;//当前页的数量
-    		if(currPageCnt == 0){
-    			currPageCnt = containerVue.param.pageSize;
-    		}
-	 	containerVue.param.begin = containerVue.param.begin - (containerVue.dataList.length-currPageCnt);//总数据的开始
-    	 	containerVue.param.begin = containerVue.param.begin - containerVue.param.pageSize;
-     	if(containerVue.param.begin <= 0){
-     		containerVue.param.begin = 0;
-     		containerVue.getPartners(true,true);
-     	}else{
-     		containerVue.getPartners(false,true);
-     	}
-    }
-}  
-//定义鼠标滚动事件  
-$("#container").scroll(scrollHandler);
+
+//分页初始化
+scrollPager(containerVue.pageCond,containerVue.dataList,containerVue.getPartners);
 </script>
 
 <#if errmsg??>

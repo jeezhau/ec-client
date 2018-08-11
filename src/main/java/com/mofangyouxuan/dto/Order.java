@@ -1,8 +1,8 @@
 package com.mofangyouxuan.dto;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -85,6 +85,8 @@ public class Order {
 
     private String logistics;
     
+    private String incart;
+    
     //补充字段，仅方便商品显示
     private String goodsName;
     
@@ -103,6 +105,8 @@ public class Order {
     private String nickname;
     
     private Integer mchtUId;
+    
+    private List<GoodsSpec> specList;
 
     public String getOrderId() {
         return orderId;
@@ -305,6 +309,15 @@ public class Order {
 		this.signProlong = signProlong;
 	}
 
+	
+	public String getIncart() {
+		return incart;
+	}
+
+	public void setIncart(String incart) {
+		this.incart = incart;
+	}
+
 	public Long getRecvId() {
 		return recvId;
 	}
@@ -392,6 +405,14 @@ public class Order {
 
 	public void setMchtUId(Integer mchtUId) {
 		this.mchtUId = mchtUId;
+	}
+
+	public List<GoodsSpec> getSpecList() {
+		return specList;
+	}
+
+	public void setSpecList(List<GoodsSpec> specList) {
+		this.specList = specList;
 	}
     
 	

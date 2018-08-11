@@ -41,7 +41,17 @@
              <span class=" pull-right" style="border:none">查询所有  &gt;</span>
              <img alt="" src="/icons/订单.png" width="20px" height="20px"> 我的订单
            </a>
-           <span class="row">
+           <span class="row" style="margin:0">
+            <span class="col-xs-3" style="padding:0 3px">
+               <a href="/order/cart/show" class="weui-tabbar__item ">
+                  <span style="display: inline-block;position: relative;">
+                      <img src="/icons/购物车.png" alt="" class="weui-tabbar__icon" style="width:35px;height:30px">
+                      <span v-if="counts['CART']>0" class="weui-badge" style="position: absolute;top: -2px;right: -13px;">{{counts['CART']}}</span>
+                  </span>
+                  <p class="weui-tabbar__label">购物车</p>
+               </a>
+            </span>
+            <span class="col-xs-9" style="padding:0 3px">
              <span class="col-xs-3"  style="padding:0 3px">
                 <a href="/order/show/4pay" class="weui-tabbar__item ">
                     <span style="display: inline-block;position: relative;">
@@ -68,7 +78,6 @@
                     </span>
                     <p class="weui-tabbar__label">待收货</p>
                 </a>
-                </a>
               </span>
               <span class="col-xs-3" style="padding:0 3px">
                 <a href="/order/show/4appraise" class="weui-tabbar__item ">
@@ -79,7 +88,7 @@
                     <p class="weui-tabbar__label">待评价</p>
                 </a>
               </span>
-
+	         </span>
             </span>
          </li>
          <li style="background-color:white" onclick="$(this).addClass('active');$(this).siblings().removeClass('active')">
@@ -224,12 +233,12 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		collCnt:'${collCnt!""}',
-		counts:{'10':0,'20':0,'30':0,'40':0,'SA':0}
+		counts:{'10':0,'20':0,'30':0,'40':0,'SA':0,'CART':0}
 	},
 	methods:{
 		getOrderCounts :function(){
 			$.ajax({
-				url: '/order/count',
+				url: '/order/count/bystatus',
 				method:'post',
 				data: {},
 				success: function(jsonRet,status,xhr){
@@ -243,7 +252,22 @@ var containerVue = new Vue({
 							}
 						}
 					}else{
-						alertMsg('错误提示','系统失败！');
+						//alertMsg('错误提示','系统失败！');
+					}
+				},
+				dataType: 'json'
+			});
+		},
+		getIncartCounts :function(){
+			$.ajax({
+				url: '/order/count/incart',
+				method:'post',
+				data: {},
+				success: function(jsonRet,status,xhr){
+					if(jsonRet && jsonRet.cnt){
+						containerVue.counts['CART'] = jsonRet.cnt;
+					}else{
+						//alertMsg('错误提示','系统失败！');
 					}
 				},
 				dataType: 'json'
@@ -252,14 +276,10 @@ var containerVue = new Vue({
 	}
 });
 containerVue.getOrderCounts();
+containerVue.getIncartCounts();
 </script>
 
 <footer>
-  <div class="row" style="position:absolute;left:0px;right:0px;bottom:60px;height:100px;text-align:center;background-color:#D0D0D0">
-	<p>&nbsp;</p>
-	<span style="display:inline-block; margin:0 10px;"></span>
-	Copyright <font style="font-family:'微软雅黑';">©</font> 2017-2020 昆明摩放优选科技服务有限责任公司 <a href="http://www.miitbeian.gov.cn/" target="_blank" rel="nofollow">滇ICP备18002601号-1</a> 
-  </div>
   <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
 </footer>
 

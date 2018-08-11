@@ -70,62 +70,20 @@ var containerVue = new Vue({
 			this.param.begin = 0;
 			this.getAllFlow();
 		},
-		getAllFlow: function(){
-			 $("#loadingData").show();
-			 $("#nomoreData").hide();
-			 if(containerVue.flowList.length>100){
-			 	containerVue.flowList = [];
-			 }
-			$.ajax({
-				url: '/vip/flow/getall',
-				method:'post',
-				data: {'jsonParams':JSON.stringify(this.param),'begin':this.pageCond.begin,'pageSize':this.pageCond.pageSize},
-				success: function(jsonRet,status,xhr){
-					if(jsonRet && jsonRet.errcode == 0){//
-						for(var i=0;i<jsonRet.datas.length;i++){
-							containerVue.flowList.push(jsonRet.datas[i]);
-						}
-						containerVue.param.pageSize = jsonRet.pageCond.pageSize;
-						containerVue.param.begin = jsonRet.pageCond.begin;
-					}else{
-						if(jsonRet && jsonRet.errcode === -100000){
-							$('#ajaxLoginModal').modal('show');
-						}else{
-							//alertMsg('错误提示',jsonRet.errmsg);
-						}
-						$("#nomoreData").show();
-					}
-					$("#loadingData").hide();
-				},
-				failure:function(){
-					$("#loadingData").hide();
-				},
-				dataType: 'json'
-			});
+		getAllFlow: function(isRefresh,isForward){
+			var url = '/vip/flow/getall';
+			var searchParam = {
+				'jsonParams':JSON.stringify(this.param),
+				'begin':this.pageCond.begin,
+				'pageSize':this.pageCond.pageSize
+			};
+			getAllData(isRefresh,isForward,url,searchParam,containerVue.flowList,containerVue.pageCond);
 		}
 	}
 });
-containerVue.getAllFlow();
-
-var winHeight = $(window).height(); //页面可视区域高度   
-var scrollHandler = function () {  
-    var pageHieght = $(document.body).height();  
-    var scrollHeight = $(window).scrollTop(); //滚动条top   
-    var r = (pageHieght - winHeight - scrollHeight) / winHeight;
-    if (r < 0.5) {//上拉翻页 
-   	 	containerVue.begin = containerVue.pageCond.begin + containerVue.pageCond.pageSize;
-   	 	containerVue.getAll();
-    }
-    if(scrollHeight < 0){//下拉刷新
-    		containerVue.pageCond.begin = containerVue.pageCond.begin - containerVue.pageCond.pageSize;
-     	if(containerVue.pageCond.begin < 0){
-     		containerVue.pageCond.begin = 0;
-     	}
-   	 	containerVue.getAll();
-    }
-}  
-//定义鼠标滚动事件
-$("#container").scroll(scrollHandler); 
+containerVue.getAllFlow(true,false);
+//分页初始化
+scrollPager(containerVue.pageCond,containerVue.flowList,containerVue.getAllFlow);
 
 </script>
 

@@ -7,13 +7,13 @@
 <body class="light-gray-bg" style="overflow:scroll">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8">
-
-<div class="container" id="container" style="padding:0 1px;overflow:scroll;">
-  <header >
-    <#include "/menu/page-category-menu.ftl" encoding="utf8"> 
-  </header>
-  <div class="col-xs-12">
-   <span>您的当前收货位置：{{param.province}}{{param.city}}{{param.area}}{{param.town}}</span>
+<div id="goTopId" style="display:none;position:fixed;right:1px;bottom:200px;height:38px;width:38px;z-index:10000">
+  <img alt="顶部" src="/icons/顶部.png" style="width:100%;height:100%" onclick="$(window).scrollTop(1)">
+</div>
+<div class="container" id="listContainer" style="padding:0 1px;overflow:scroll;">
+  <#include "/menu/page-nbcategory-menu.ftl" encoding="utf8">
+  <div class="row" style="margin:0">
+   <span style="padding-left:5px"> 您的当前收货位置：{{param.province}}{{param.city}}{{param.area}}{{param.town}}</span>
    <a href="javascript:;" @click="showMap"><img alt="" src="/icons/收货地址.png" width=20px height=20px></a>
   </div>
   <div class="row" style="margin:0 0;">
@@ -49,14 +49,14 @@
 	    </div>
     </div>
   </div>
-  <div class="row" style="margin:10px 20px 100px 20px;">
+  <div class="row" style="margin:10px 20px -10px 20px;">
       <p style="color:gray">没有更多数据了....</p>
   </div>
 </div><!-- end of container -->
 
 <script type="text/javascript">
 var containerVue = new Vue({
- el:'#container',
+ el:'#listContainer',
  data:{
 	param:{
 		province:'${(receiverPosition.province)!''}',
@@ -68,10 +68,10 @@ var containerVue = new Vue({
 		categoryId:'', 
 		keywords:'',
 		pageSize:20,
-		begin:0
+		begin:0,
+		count:0
 	},
-	goodsList:[] ,
-	goodsCnt:0,
+	goodsList:[] 
  },
  methods:{
 	 getShortAddr(addr){
@@ -88,7 +88,7 @@ var containerVue = new Vue({
 		 }
 		 $("#loadingData").show();
 		 if(isRefresh){ //清空数据
-			 containerVue.goodsCnt = 0;
+			 containerVue.param.count = 0;
 			 containerVue.goodsList = [];
 		 }else{
 			 if(containerVue.goodsList.lenght>=300){
@@ -100,13 +100,13 @@ var containerVue = new Vue({
 			 }
 		 }
 		 $.ajax({
-				url: '/nearby/getall',
+				url: '/nearby/getall/goods',
 				method:'post',
 				data: this.param,
 				success: function(jsonRet,status,xhr){
 					if(jsonRet && jsonRet.errcode == 0){//
-						var i=0;
-						var j = jsonRet.datas.length;
+						var i = 0;
+						var j = jsonRet.datas.length-1;
 						for(;i<jsonRet.datas.length;){
 							if(isFirst){
 								containerVue.goodsList.unshift(jsonRet.datas[j]);
@@ -117,6 +117,7 @@ var containerVue = new Vue({
 						}
 						containerVue.param.pageSize = jsonRet.pageCond.pageSize;
 						containerVue.param.begin = jsonRet.pageCond.begin;
+						containerVue.param.count = jsonRet.pageCond.count;
 					}
 					$("#loadingData").hide();
 				},
@@ -177,17 +178,25 @@ var containerVue = new Vue({
 	 }
  } 
  
- var winHeight = $(window).height(); //页面可视区域高度   
+ var winHeight = $(window).height(); //页面可视区域高度 
  var scrollHandler = function () {  
+	 if($(window).scrollTop()>10){
+		  $('#goTopId').show();
+     }else{
+    	   $('#goTopId').hide();
+     }
      var pageHieght = $(document.body).height();  
      var scrollHeight = $(window).scrollTop(); //滚动条top   
      var r = (pageHieght - winHeight - scrollHeight) / winHeight;
-     if (r>0 && r < 0.2) {//上拉后翻页 
+     if (r>0 && r < 0.2 && containerVue.goodsList.length < containerVue.param.count) {//上拉后翻页 
     	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
     	 	containerVue.getAll(false,false);
      }
-     if(scrollHeight<0){ //下拉前翻页
-    	 var currPageCnt = containerVue.goodsList.length%containerVue.param.pageSize;//当前页的数量
+     if(scrollHeight <= 0){ //下拉前翻页
+    	 	if(containerVue.param.begin <= 0){
+ 	 		return;
+ 	 	}
+    	 	var currPageCnt = containerVue.goodsList.length%containerVue.param.pageSize;//当前页的数量
  		if(currPageCnt == 0){
  			currPageCnt = containerVue.param.pageSize;
  		}
@@ -199,10 +208,10 @@ var containerVue = new Vue({
      	}else{
     	 		containerVue.getAll(false,true);
      	}
-     }
+     };
  }  
  //定义鼠标滚动事件  
- $("#container").scroll(scrollHandler); 
+ $(window).scroll(scrollHandler); 
  
 </script> 
 
@@ -235,18 +244,23 @@ mapObj.plugin('AMap.Geolocation', function () {
     });
 });
 </script>
+<#else>
+<script>
+	containerVue.getAll(true,false);
+</script>
+</#if>
 <div id="showAddrMap" style="position:fixed;left:0;top:0;right:0;bottom:0;margin:0;width:100%;display:none;z-index:1000;background:rgba(0,0,0,0.2);display:none;">
-<div id="mapContainer" style="top:10px;width:100%;height:500px;"></div>
-<div id="myPageTop" style="left:10px">
+  <div id="mapContainer" style="top:10px;width:100%;height:500px;"></div>
+  <div id="myPageTop" style="left:10px">
     <table style="width:100%;text-align:right">
         <tr style="width:100%"><td class="column1"><label><a onclick="$('#showAddrMap').hide();">关闭</a></label></td></tr>
         <tr><td class="column1"><input type="text" style="width:90%" readonly id="lnglat" placeholder="点击地图选择地点"></td></tr>		        
         <tr><td class="column1"><input type="text" id="keyword" name="keyword" value="请输入关键字：(选定后搜索)" style="width:90%" onfocus='this.value=""'/></td> </tr>
     </table>
-</div>
-<script type="text/javascript">
-var windowsArr = [];
-   var marker = [];
+  </div>
+  <script type="text/javascript">
+    var windowsArr = [];
+    var marker = [];
     var map = new AMap.Map("mapContainer", {
         resizeEnable: true,
         zoom: 13,
@@ -291,15 +305,8 @@ var windowsArr = [];
         });
       }); 
    
-</script>
+  </script>
 </div>
-<script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
-<script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
-<#else>
-<script>
-	containerVue.getAll(true,false);
-</script>
-</#if>
 
 <footer >
   <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 

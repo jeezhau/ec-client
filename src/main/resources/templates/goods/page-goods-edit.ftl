@@ -321,7 +321,7 @@ var goodsContainerVue = new Vue({
 		},
 		getCategories: function(){
 			$.ajax({
-				url: '/goods/categories',
+				url: '/goods/queryCat',
 				method:'get',
 				data: {},
 				success: function(jsonRet,status,xhr){

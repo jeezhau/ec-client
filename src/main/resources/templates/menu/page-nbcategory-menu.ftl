@@ -6,8 +6,8 @@
             <li class="active" onclick="$(this).addClass('active');$(this).siblings().removeClass('active');getGoodsByCat(0)"> 
               <a href="javascript:;" style="padding:2px 3px">&nbsp;&nbsp;全&nbsp;&nbsp;部&nbsp;&nbsp; </a> 
             </li>
-          <#if topcats??>        
-          <#list topcats as cat>
+          <#if nbtopcats??>        
+          <#list nbtopcats as cat>
             <li onclick="$(this).addClass('active');$(this).siblings().removeClass('active');getGoodsByCat(${cat.categoryId})"> 
               <a href="javascript:;" style="padding:2px 3px">${cat.categoryName}</a> 
             </li>

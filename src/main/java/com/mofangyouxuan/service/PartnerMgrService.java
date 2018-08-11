@@ -319,11 +319,12 @@ public class PartnerMgrService {
 	
 	/**
 	 * 查询指定查询条件、排序条件、分页条件的信息；
-	 * @param jsonSearchParams	查询条件:{partnerId,pbTp,upPartnerId,country,province,city,area,busiName,legalPername,legalPeridno,compType,compName,licenceNo,phone,status,beginUpdateTime,endUpdateTime}
+	 * @param jsonSearchParams	查询条件:{partnerId,pbTp,upPartnerId,keywords,country,province,city,area,busiName,legalPername,legalPeridno,compType,compName,licenceNo,phone,status,beginUpdateTime,endUpdateTime,currUserLocX,currUserLocY}
 	 * @param jsonPageCond		分页信息:{begin, pageSize}
+	 * @param jsonSortParams  	排序条件 {time:"N#0/1",dist:"N#0",sale:"N"#0/1}；time 表示按更新时间排序，N为排序位置，0为升序，1为降序；dist表示按距离排序，仅对有城市条件使用;
 	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
 	 */
-	public static JSONObject getAll(Integer upPartnerId,JSONObject search,PageCond pageCond) {
+	public static JSONObject getAll(Integer upPartnerId,JSONObject search,JSONObject sort,PageCond pageCond) {
 		String url = mfyxServerUrl + partnerGetAllUrl;
 		url = url.replace("{upPartnerId}", upPartnerId +"");
 		Map<String, Object> params = new HashMap<String,Object>();
@@ -334,6 +335,7 @@ public class PartnerMgrService {
 			pageCond = new PageCond(0,30);
 		}
 		params.put("jsonSearchParams", search.toJSONString());
+		params.put("jsonSortParams", sort.toJSONString());
 		params.put("jsonPageCond", JSONObject.toJSONString(pageCond));
 		String strRet = HttpUtils.doPost(url, params);
 		JSONObject jsonRet = new JSONObject();

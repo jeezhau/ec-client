@@ -63,13 +63,10 @@ var containerVue = new Vue({
 		getOrders:function(stat,event){
 			$("#loadingData").show();
 			$("#nomoreData").hide();
-			if(event){
-				$(event.target).addClass('active');$(event.target.parentElement).addClass('active');
-				$(event.target).siblings().removeClass('active');$(event.target.parentElement).siblings().removeClass('active');
+			if(stat){
+				this.param.status = stat;
 			}
-			this.param.status = stat;
 			containerVue.orders = [];
-			
 			$.ajax({
 				url: '/aftersale/getall/' + this.param.status,
 				method:'post',
@@ -91,7 +88,7 @@ var containerVue = new Vue({
 							}else{
 								//alertMsg('错误提示',jsonRet.errmsg);
 							}
-							$("#nomoreData").show();
+							//$("#nomoreData").show();
 						}
 					}
 					$("#loadingData").hide();
@@ -105,6 +102,9 @@ var containerVue = new Vue({
 	}
 });
 containerVue.getOrders("${status!'refunding'}");
+//分页初始化
+scrollPager(containerVue.param,containerVue.orders,containerVue.getOrders) 
+
 </script>
 
 

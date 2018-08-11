@@ -6,6 +6,9 @@
 <body class="light-gray-bg" style="position:relative;overflow:scroll;min-height:100%;">
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 <#include "/common/tpl-loading-and-nomore-data.ftl" encoding="utf8"> 
+<div id="goTopId" style="display:none;position:fixed;right:1px;bottom:200px;height:38px;width:38px;z-index:10000">
+  <img alt="顶部" src="/icons/顶部.png" style="width:100%;height:100%" onclick="$(window).scrollTop(1)">
+</div>
 <div class="container " id="container" style="padding:0 1px; min-height:100%;">
   <header >
     <#include "/menu/page-category-menu.ftl" encoding="utf8"> 
@@ -43,17 +46,17 @@ var containerVue = new Vue({
 		categoryId:'', 
 		keywords:'',
 		pageSize:20,
-		begin:0
+		begin:0,
+		count:0
 	},
-	goodsList:[] ,
-	goodsCnt:0,
+	goodsList:[] 
  },
  methods:{
 	 getAll: function(isRefresh,isFirst){
 		 $("#loadingData").show();
 		 $("#nomoreData").hide();
 		 if(isRefresh){ //清空数据
-			 containerVue.goodsCnt = 0;
+			 containerVue.param.count = 0;
 			 containerVue.goodsList = [];
 		 }else{
 			 if(containerVue.goodsList.lenght >= 300){
@@ -70,8 +73,8 @@ var containerVue = new Vue({
 				data: this.param,
 				success: function(jsonRet,status,xhr){
 					if(jsonRet && jsonRet.errcode == 0){//
-						var i=0;
-						var j = jsonRet.datas.length;
+						var i = 0;
+						var j = jsonRet.datas.length-1;
 						for(;i<jsonRet.datas.length;){
 							if(isFirst){
 								containerVue.goodsList.unshift(jsonRet.datas[j]);
@@ -82,9 +85,10 @@ var containerVue = new Vue({
 						}
 						containerVue.param.pageSize = jsonRet.pageCond.pageSize;
 						containerVue.param.begin = jsonRet.pageCond.begin;
+						containerVue.param.count = jsonRet.pageCond.count;
 					}else{
 						//alert(jsonRet.errmsg);
-						$("#nomoreData").show();
+						//$("#nomoreData").show();
 					}
 					$("#loadingData").hide();
 				},
@@ -135,15 +139,23 @@ var containerVue = new Vue({
  
  var winHeight = $(window).height(); //页面可视区域高度   
  var scrollHandler = function () {  
+	 if($(window).scrollTop()>10){
+		  $('#goTopId').show();
+    }else{
+   	   $('#goTopId').hide();
+    }
      var pageHieght = $(document.body).height();  
      var scrollHeight = $(window).scrollTop(); //滚动条top   
      var r = (pageHieght - winHeight - scrollHeight) / winHeight;
-     if (r>=0 && r < 0.2) {//上拉翻页 
+     if (r>=0 && r < 0.2 && containerVue.param.count > containerVue.goodsList.length) {//上拉翻页 
     	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
     	 	containerVue.getAll(false,false);
      }
-     if(scrollHeight<0){ //下拉翻页
-    	 var currPageCnt = containerVue.goodsList.length%containerVue.param.pageSize;//当前页的数量
+     if(scrollHeight <= 0){ //下拉翻页
+    	 	if(containerVue.param.begin <= 0){
+    	 		return;
+    	 	}
+    	 	var currPageCnt = containerVue.goodsList.length%containerVue.param.pageSize;//当前页的数量
  		if(currPageCnt == 0){
  			currPageCnt = containerVue.param.pageSize;
  		}
@@ -158,17 +170,18 @@ var containerVue = new Vue({
      }
  }  
  //定义鼠标滚动事件  
- $("#container").scroll(scrollHandler);
+$(window).scroll(scrollHandler);
 
 </script> 
 
 
 <footer >
-  <div class="row" style="position:absolute;left:0px;right:0px;bottom:60px;height:100px;text-align:center;background-color:#D0D0D0">
+  <div class="row" style="position:absolute;bottom:60px;left:0;right:0;height:80px;text-align:center;background-color:#D0D0D0">
 	<p>&nbsp;</p>
 	<span style="display:inline-block; margin:0 10px;"></span>
-	Copyright <font style="font-family:'微软雅黑';">©</font> 2017-2020 昆明摩放优选科技服务有限责任公司 <a href="http://www.miitbeian.gov.cn/" target="_blank" rel="nofollow">滇ICP备18002601号-1</a> 
+	Copyright <font style="font-family:'微软雅黑';">©</font> 2017-2020 摩放优选 <a href="http://www.miitbeian.gov.cn/" target="_blank" rel="nofollow">滇ICP备18002601号-1</a> 
   </div>
+  <div style="min-height:60px"></div>
   <#include "/menu/page-bottom-menu.ftl" encoding="utf8"> 
 </footer>
 

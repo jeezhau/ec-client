@@ -111,37 +111,10 @@
 		goodsList:[] 
 	 },
 	 methods:{
-		 getAll: function(isFirst){
-			 $("#loadingData").show();
-			 $("#nomoreData").hide();
-			 
-			 containerVue.goodsList = [];
-			 
-			 $.ajax({
-					url: '/goods/getall',
-					method:'post',
-					data: this.param,
-					success: function(jsonRet,status,xhr){
-						if(jsonRet && jsonRet.errcode == 0){//
-							for(var i=0;i<jsonRet.datas.length;i++){
-								containerVue.goodsList.push(jsonRet.datas[i]);
-							}
-							containerVue.param.pageSize = jsonRet.pageCond.pageSize;
-							containerVue.param.begin = jsonRet.pageCond.begin;
-						}else{
-							if(jsonRet.errmsg !=='ok'){
-								if(containerVue.goodsList.lenght == 0){
-									$("#nomoreData").show();
-								}
-							}
-						}
-						$("#loadingData").hide();
-					},
-					failure:function(){
-						$("#loadingData").hide();
-					},
-					dataType: 'json'
-				});			 
+		 getAll: function(isRefresh,isForward){
+			var url = '/goods/getall';
+			var searchParam = this.param;
+			getAllData(isRefresh,isForward,url,searchParam,containerVue.goodsList,containerVue.param);
 		 },
 		 changeStatus: function(newStat){
 			 if(this.selectedArr.length<1){
@@ -179,25 +152,8 @@
  containerVue.getAll(true); //初始化
  
  
- var winHeight = $(window).height(); //页面可视区域高度   
- var scrollHandler = function () {  
-     var pageHieght = $(document.body).height();  
-     var scrollHeight = $(window).scrollTop(); //滚动条top   
-     var r = (pageHieght - winHeight - scrollHeight) / winHeight;
-     if (r < 0.5) {//上拉翻页 
-    	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
-    	 	containerVue.getAll(false);
-     }
-     if(scrollHeight<0){//下拉翻页
-    	 	containerVue.param.begin = containerVue.param.begin - containerVue.param.pageSize;
-    	 	if(containerVue.param.begin <= 0){
-    	 		containerVue.param.begin = 0;
-    	 	}
-    	 	containerVue.param.getAll(true);
-     }
- }  
- //定义鼠标滚动事件  
- $("#container").scroll(scrollHandler);  
+//分页初始化
+ scrollPager(containerVue.param,containerVue.goodsList,containerVue.getAll); 
 
 </script>  
 <!-- 修改商品规格(不包含名称)Model -->

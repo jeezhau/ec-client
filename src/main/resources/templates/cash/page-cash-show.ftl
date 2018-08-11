@@ -48,7 +48,8 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		dataList:[],
-		search:{
+		search:{},
+		pageCond:{
 			begin:0,
 			pageSize:20,
 			count:0
@@ -62,35 +63,19 @@ var containerVue = new Vue({
 			delCashApplyVue.param.accountNo = item.accountNo;
 			delCashApplyVue.param.cashAmount = item.cashAmount/100;
 		},
-		getAll :function(){
-			$.ajax({
-				url: '/cash/getall',
-				method:'post',
-				data: this.search,
-				success: function(jsonRet,status,xhr){
-					containerVue.dataList = [];
-					if(jsonRet && jsonRet.pageCond){
-						if(jsonRet.datas){
-							for(var i=0;i<jsonRet.datas.length;i++){
-								var item =jsonRet.datas[i];
-								containerVue.dataList.push(item);
-							}
-						}
-						containerVue.search.count = jsonRet.pageCond.count;
-					}else{
-						if(jsonRet.errcode === -100000){
-							$('#ajaxLoginModal').modal('show');
-						}else{
-							alertMsg('错误提示',jsonRet.errmsg);
-						}
-					}
-				},
-				dataType: 'json'
-			});
+		getAll :function(isRefresh,isForward){
+			var url = '/cash/getall';
+			var searchParam = {
+				'begin':containerVue.pageCond.begin,
+				'pageSize':containerVue.pageCond.pageSize
+			};
+			getAllData(isRefresh,isForward,url,searchParam,containerVue.dataList,containerVue.pageCond);
 		}
 	}
 });
 containerVue.getAll();
+//分页初始化
+scrollPager(containerVue.pageCond,containerVue.dataList,containerVue.getAll); 
 </script>
 
 <!-- 删除申请模态框（Modal） -->

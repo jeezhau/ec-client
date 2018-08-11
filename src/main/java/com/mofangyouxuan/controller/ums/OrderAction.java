@@ -5,8 +5,13 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -121,14 +126,13 @@ public class OrderAction {
 	}
 
 	/**
-	 * 选中商品开始下单
+	 * 选中商品开始下单，返回下单或加入购物车页面
 	 * @param goodsId
 	 * @param map
 	 * @return
 	 */
 	@RequestMapping("/place/{goodsId}")
 	public String placeOrder(@PathVariable("goodsId")Long goodsId,ModelMap map) {
-		//UserBasic user = (UserBasic) map.get("userBasic");
 		Goods goods = null;
 		JSONObject jsonRet = GoodsService.getGoods(true,goodsId,false);
 		if(jsonRet == null || !jsonRet.containsKey("goods")) {
@@ -152,16 +156,6 @@ public class OrderAction {
 		try {
 			map.put("order", order);
 			UserBasic user = (UserBasic) map.get("userBasic");
-			
-			Goods goods = null;
-			JSONObject ret = GoodsService.getGoods(true,order.getGoodsId(),false);
-			if(ret == null || !ret.containsKey("goods")) {
-				map.put("errmsg", "系统中没有该商户信息！");
-				return "order/page-place-order";
-			}else {
-				goods = JSONObject.toJavaObject(ret.getJSONObject("goods"),Goods.class);
-				map.put("goods", goods);
-			}
 			//信息验证结果处理
 			if(result.hasErrors()){
 				StringBuilder sb = new StringBuilder();
@@ -193,6 +187,7 @@ public class OrderAction {
 			}
 			//数据处理
 			order.setUserId(user.getUserId());
+			order.setIncart("0");
 			JSONObject jsonRet = OrderService.createOrder(order, user.getUserId());
 			if(jsonRet != null && jsonRet.containsKey("orderId")){
 				String orderId = jsonRet.getString("orderId");
@@ -207,6 +202,156 @@ public class OrderAction {
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
 		}
 		return "order/page-place-order";
+	}
+	
+	/**
+	 * 添加购物车
+	 * 生成新点单，添加指购物车中
+	 * @param order
+	 * @return
+	 */
+	@RequestMapping("/cart/add")
+	@ResponseBody
+	public String addIncart(@Valid Order order,BindingResult result,ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		try {
+			UserBasic user = (UserBasic) map.get("userBasic");
+			//信息验证结果处理
+			if(result.hasErrors()){
+				StringBuilder sb = new StringBuilder();
+				List<ObjectError> list = result.getAllErrors();
+				for(ObjectError e :list){
+					sb.append(e.getDefaultMessage());
+				}
+				jsonRet.put("errcode",ErrCodes.COMMON_PARAM_ERROR);
+				jsonRet.put("errmsg", "购买信息格式有误！不可为空！");
+				return jsonRet.toJSONString();
+			}
+			//购买信息检查
+			List<GoodsSpec> specList = JSONArray.parseArray(order.getGoodsSpec(), GoodsSpec.class);
+			if(specList == null || specList.size()<1) {
+				jsonRet.put("errcode",ErrCodes.COMMON_PARAM_ERROR);
+				jsonRet.put("errmsg", "购买信息格式有误！不可为空！");
+				return jsonRet.toJSONString();
+			}
+			for(int i=0; i<specList.size();i++) {
+				GoodsSpec spec = specList.get(i);
+				if(spec.getName() == null || spec.getName().trim().length()<1) {
+					specList.remove(i);
+				}
+				if(spec.getBuyNum() == null || spec.getBuyNum()<1) {
+					specList.remove(i);
+				}
+			}
+			if(specList == null || specList.size()<1) {
+				jsonRet.put("errcode",ErrCodes.COMMON_PARAM_ERROR);
+				jsonRet.put("errmsg", "购买信息格式有误！不可为空！");
+				return jsonRet.toJSONString();
+			}
+			//数据处理
+			order.setUserId(user.getUserId());
+			order.setIncart("1");
+			jsonRet = OrderService.createOrder(order, user.getUserId());
+			if(jsonRet == null || !jsonRet.containsKey("errmsg")){
+				jsonRet.put("errcode",-1);
+				jsonRet.put("errmsg", "添加到购物车失败，出现系统错误！");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toJSONString();
+	}
+	
+	/**
+	 * 修改订单
+	 * @param order
+	 * @return
+	 */
+	@RequestMapping("/update")
+	@ResponseBody
+	public String updateorder(@Valid Order order,BindingResult result,ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		try {
+			UserBasic user = (UserBasic) map.get("userBasic");
+			//信息验证结果处理
+			if(result.hasErrors()){
+				StringBuilder sb = new StringBuilder();
+				List<ObjectError> list = result.getAllErrors();
+				for(ObjectError e :list){
+					sb.append(e.getDefaultMessage());
+				}
+				jsonRet.put("errcode",ErrCodes.COMMON_PARAM_ERROR);
+				jsonRet.put("errmsg", "购买信息格式有误！不可为空！");
+				return jsonRet.toJSONString();
+			}
+			if(order.getOrderId() == null) {
+				jsonRet.put("errcode",ErrCodes.COMMON_PARAM_ERROR);
+				jsonRet.put("errmsg", "订单ID：不可为空！");
+				return jsonRet.toJSONString();
+			}
+			//购买信息检查
+			List<GoodsSpec> specList = JSONArray.parseArray(order.getGoodsSpec(), GoodsSpec.class);
+			if(specList == null || specList.size()<1) {
+				jsonRet.put("errcode",ErrCodes.COMMON_PARAM_ERROR);
+				jsonRet.put("errmsg", "购买信息格式有误！不可为空！");
+				return jsonRet.toJSONString();
+			}
+			for(int i=0; i<specList.size();i++) {
+				GoodsSpec spec = specList.get(i);
+				if(spec.getName() == null || spec.getName().trim().length()<1) {
+					specList.remove(i);
+				}
+				if(spec.getBuyNum() == null || spec.getBuyNum()<1) {
+					specList.remove(i);
+				}
+			}
+			if(specList == null || specList.size()<1) {
+				jsonRet.put("errcode",ErrCodes.COMMON_PARAM_ERROR);
+				jsonRet.put("errmsg", "购买信息格式有误！不可为空！");
+				return jsonRet.toJSONString();
+			}
+			//数据处理
+			order.setUserId(user.getUserId());
+			jsonRet = OrderService.updateOrder(order, user.getUserId());
+			if(jsonRet == null || !jsonRet.containsKey("errmsg")){
+				jsonRet.put("errcode",-1);
+				jsonRet.put("errmsg", "修改订单，出现系统错误！");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toJSONString();
+	}
+	
+	/**
+	 * 删除购物车
+	 * @param orderId
+	 * @return
+	 */
+	@RequestMapping("/cart/remove/{orderId}")
+	@ResponseBody
+	public String removeIncart(@PathVariable("orderId")String orderId,
+			String passwd,
+			ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		try {
+			UserBasic user = (UserBasic) map.get("userBasic");
+			//数据处理
+			jsonRet = OrderService.removeIncart(orderId, user.getUserId(), passwd);
+			if(jsonRet == null || !jsonRet.containsKey("errmsg")){
+				jsonRet.put("errcode",-1);
+				jsonRet.put("errmsg", "删除购物车订单失败，出现系统错误！");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return jsonRet.toJSONString();
 	}
 	
 	/**
@@ -228,13 +373,69 @@ public class OrderAction {
 					map.put("errmsg", "该订单不是您的宝贝订单！");
 				}else {
 					if( "10".equals(order.getStatus()) || "12".equals(order.getStatus())) {//可支付
-						map.put("order", order);
+						order.setSpecList(JSONArray.parseArray(order.getGoodsSpec(), GoodsSpec.class));
+						List<Order> list = new ArrayList<Order>();
+						list.add(order);
+						map.put("list", list);
+						map.put("amount", order.getAmount().doubleValue());
+						map.put("orderIds", orderId);
 					}else {
 						map.put("errmsg", "该订单当前不可再次支付！");
 					}
 				}
 			}else {
 				map.put("errmsg", "获取订单信息失败！");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return "order/page-pay-choose";
+	}
+	
+	/**
+	 * 获取支付工具选择页面
+	 * @param orderId
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/pay/btchoose")
+	public String batchChoosePlay(@RequestParam(value="orderIds",required=true)String orderIds,
+			HttpServletRequest request,ModelMap map) {
+		Order order = null;
+		try {
+			Set<String> orderArr = new HashSet<String>();
+			for(String s:orderIds.split(",")) {
+				orderArr.add(s);
+			}
+			List<Order> list = new ArrayList<Order>();
+			BigDecimal amount = new BigDecimal(0);
+			String errids = "";
+			for(String orderId:orderArr) {
+				orderId = orderId.trim();
+				if(orderId.length()>20) {
+					JSONObject jsonRet = OrderService.getOrder(orderId);
+					if(jsonRet != null && jsonRet.containsKey("order")) {
+						order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
+						if( "10".equals(order.getStatus()) || "12".equals(order.getStatus())) {//可支付
+							order.setSpecList(JSONArray.parseArray(order.getGoodsSpec(), GoodsSpec.class));
+							list.add(order);
+							amount = amount.add(order.getAmount());
+						}else {
+							errids += "," + orderId;
+						}
+					}else {
+						errids += "," + orderId;
+					}
+				}
+			}
+			if(errids.length()>0) {
+				map.put("ermsg", "下列订单不存在或不可再次支付，订单ID列表：【" + errids.substring(1)+ "】");
+			}
+			if(list.size()>0) {
+				map.put("list", list);
+				map.put("amount", amount.doubleValue());
+				map.put("orderIds", Arrays.toString(orderArr.toArray()).replace("[", "").replace("]", ""));
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -656,8 +857,8 @@ public class OrderAction {
 	
 	/**
 	 * 买家订单显示界面获取
-	 * @param status 订单状态:all(全部)、forPay（待付款）、forDlivery（待发货）、
-	 * 				forTake（待收货）、forAppraise（待评价）、forRefund（待退款）
+	 * @param status 订单状态:all(全部)、4pay（待付款）、4dlivery（待发货）、
+	 * 				4sign（待收货）、4appraise（待评价）、refund（退款）、exchange(换货)
 	 * @return
 	 */
 	@RequestMapping("/show/{status}")
@@ -676,16 +877,27 @@ public class OrderAction {
 		return "order/page-order-show";
 	}
 	
+	/**
+	 * 获取购物车订单显示页面
+	 * @return
+	 */
+	@RequestMapping("/cart/show")
+	public String showCart(ModelMap map) {
+		return "order/page-cart-show";
+	}
 	
 	/**
 	 * 买家订单查询
 	 * @param status
+	 * @param incart 是否在购物车中(0-否，1-是）
 	 * @param map
 	 * @return {errcode:0,errmsg:"ok",pageCond:{},datas:[{}...]} 
 	 */
-	@RequestMapping("/getall")
+	@RequestMapping("/getall/{incart}")
 	@ResponseBody
-	public String getAll(@RequestParam(required=true)String status,PageCond pageCond,ModelMap map) {
+	public String getAll(@PathVariable(value="incart",required=true)String incart,
+			String status,
+			PageCond pageCond,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		UserBasic user = (UserBasic) map.get("userBasic");
 		try {
@@ -715,16 +927,19 @@ public class OrderAction {
 			if(!flag) {
 				statCode = null;
 			}
-			JSONObject params = new JSONObject();
+			if(incart == null || (!"0".equals(incart) && !"1".equals(incart))) {
+				incart = "0";
+			}
 			
+			JSONObject params = new JSONObject();
 			params.put("userId", user.getUserId());
 			params.put("status", statCode);
-			
+			params.put("incart", incart);
 			JSONObject sortParams = new JSONObject();
 			sortParams.put("createTime", "1#1");
 			
 			JSONObject showGroups = new JSONObject();
-			//needReceiver,needLogistics,needAppr,needAfterSales,needGoodsAndUser
+			//needReceiver,needLogistics,needGoodsAndUser
 			showGroups.put("needReceiver", true);
 			showGroups.put("needLogistics", true);
 			showGroups.put("needAppr", true);
@@ -754,9 +969,8 @@ public class OrderAction {
 	@RequestMapping("/search/{status}")
 	@ResponseBody
 	public String search(String status,String orderId,PageCond pageCond) {
-		String[] arr = new String[]{"all","forPay","forDelivery","forTake","forAppraise","forRefund"};
 		boolean flag = false;
-		for(String s:arr) {
+		for(String s:statusArr) {
 			if(s.equals(status)) {
 				flag = true;
 				break;
@@ -774,13 +988,42 @@ public class OrderAction {
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/count")
+	@RequestMapping("/count/bystatus")
 	@ResponseBody
 	public String getCounts4User(ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		try {
 			UserBasic user = (UserBasic) map.get("userBasic");
 			jsonRet = OrderService.countPartiByStatus(user.getUserId(), null, null);
+			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
+				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
+				jsonRet.put("errmsg", "出现系统错误！");
+				return jsonRet.toString();
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
+			jsonRet.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+			jsonRet.toString();
+		}
+		return jsonRet.toString();
+	}
+	
+	/**
+	 * 获取用户的订单统计：按状态分组
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/count/incart")
+	@ResponseBody
+	public String getCountsIncart(ModelMap map) {
+		JSONObject jsonRet = new JSONObject();
+		try {
+			UserBasic user = (UserBasic) map.get("userBasic");
+			JSONObject params = new JSONObject();
+			params.put("userId", user.getUserId());
+			params.put("incart", "1");
+			jsonRet = OrderService.countOrders(params.toJSONString());
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");

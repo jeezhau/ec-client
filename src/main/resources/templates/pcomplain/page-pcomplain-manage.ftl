@@ -116,7 +116,7 @@ var containerVue = new Vue({
 	}
 });
 //分页初始化
-scrollPager('container',containerVue.pageCond,containerVue.dataList,containerVue.getAll) 
+scrollPager(containerVue.pageCond,containerVue.dataList,containerVue.getAll) 
 
 </script> 
 

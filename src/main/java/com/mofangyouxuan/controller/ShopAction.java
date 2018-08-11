@@ -24,6 +24,7 @@ import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.Category;
 import com.mofangyouxuan.dto.Goods;
 import com.mofangyouxuan.dto.PartnerBasic;
+import com.mofangyouxuan.service.CategoryService;
 import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.service.PartnerMgrService;
 import com.mofangyouxuan.service.PartnerStaffService;
@@ -37,7 +38,7 @@ import com.mofangyouxuan.utils.PageCond;
  */
 @Controller
 @RequestMapping("/shop")
-@SessionAttributes({"clientPF","isDayFresh","sys_func","categories"})
+@SessionAttributes({"clientPF","sys_func","topcats"})
 public class ShopAction {
 	
 	@Value("${sys.tmp-file-dir}")
@@ -56,13 +57,15 @@ public class ShopAction {
 	@SuppressWarnings("unchecked")
 	@RequestMapping("/index")
 	public String getIndex(ModelMap map,HttpServletRequest request) {
-		List<Category> categories = (List<Category>) map.get("categories");
+		List<Category> categories = (List<Category>) map.get("topcats");
 		if(categories == null) {
-			categories = GoodsService.getCategories();
-			map.put("categories", categories);
+			JSONObject search = new JSONObject();
+			search.put("status", "1");
+			search.put("isCwide", "0");
+			search.put("parentId", 0);
+			categories = CategoryService.getAll(search);
+			map.put("topcats", categories);
 		}
-		map.put("isFirstWxPage", request.getAttribute("isFirstWxPage"));
-		map.put("isDayFresh", "0");	//系统默认为访问商城管理
 		map.put("sys_func", "shop");
 		
 		return "shop/page-shop-index";

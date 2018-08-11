@@ -64,14 +64,12 @@ var containerVue = new Vue({
 		orders:[]
 	},
 	methods:{
-		getOrders:function(stat,event){
+		getOrders:function(stat){
 			$("#loadingData").show();
 			$("#nomoreData").hide();
-			if(event){
-				$(event.target).addClass('active');$(event.target.parentElement).addClass('active');
-				$(event.target).siblings().removeClass('active');$(event.target.parentElement).siblings().removeClass('active');
+			if(stat){
+				this.param.status = stat;
 			}
-			this.param.status = stat;
 			containerVue.orders = [];
 			$.ajax({
 				url: '/psaleorder/getall',
@@ -90,7 +88,7 @@ var containerVue = new Vue({
 					}else{
 						if(jsonRet && jsonRet.errmsg){
 							//alert(jsonRet.errmsg);
-							$("#nomoreData").show();
+							//$("#nomoreData").show();
 						}
 					}
 					$("#loadingData").hide();
@@ -112,26 +110,11 @@ var containerVue = new Vue({
 	}
 });
 containerVue.getOrders('${status!''}');
-var winHeight = $(window).height(); //页面可视区域高度   
-var scrollHandler = function () {  
-    var pageHieght = $(document.body).height();  
-    var scrollHeight = $(window).scrollTop(); //滚动条top   
-    var r = (pageHieght - winHeight - scrollHeight) / winHeight;
-    if (r < 0.5) {//上拉翻页 
-   	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
-   	    containerVue.getOrders(containerVue.param.status);
-    }
-    if(scrollHeight<0){//下拉翻页
-   	 	containerVue.param.begin = containerVue.param.begin - containerVue.param.pageSize;
-   	 	if(containerVue.param.begin <= 0){
-   	 		containerVue.param.begin = 0;
-   	 	}
-   	    containerVue.getOrders(containerVue.param.status);
-    }
-}  
-//定义鼠标滚动事件  
-$("#container").scroll(scrollHandler);
+//分页初始化
+scrollPager(containerVue.param,containerVue.orders,containerVue.getOrders) 
+
 </script>
+
 <!-- 卖家协商取消订单（Modal） -->
 <div class="modal fade " id="cancelOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrderTitle" aria-hidden="false" data-backdrop="static" style="top:20%">
 	<div class="modal-dialog">

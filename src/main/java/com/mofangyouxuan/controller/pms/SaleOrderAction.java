@@ -33,7 +33,7 @@ import com.mofangyouxuan.utils.PageCond;
 @Controller
 @RequestMapping("/psaleorder")
 @SessionAttributes({"sys_func","partnerUserTP","partnerPasswd","partnerStaff","partnerBindVip","myPartner"})
-public class PartnerSaleOrderAction {
+public class SaleOrderAction {
 	
 	private String[] statusArr = new String[]{"all","4pay","4delivery","4sign","4appraise","4refund","4exchange"};
 	
@@ -118,15 +118,13 @@ public class PartnerSaleOrderAction {
 			
 			params.put("partnerId", myPartner.getPartnerId());
 			params.put("status", statCode);
-			
+			params.put("incart", 0);
 			JSONObject sortParams = new JSONObject();
 			sortParams.put("createTime", "1#1");
 			JSONObject showGroups = new JSONObject();
-			//needReceiver,needLogistics,needAppr,needAfterSales,needGoodsAndUser
+			//needReceiver,needLogistics,needGoodsAndUser
 			showGroups.put("needReceiver", false);
 			showGroups.put("needLogistics", false);
-			showGroups.put("needAppr", false);
-			showGroups.put("needAfterSales", false);
 			showGroups.put("needGoodsAndUser", true);
 			jsonRet = OrderService.searchOrders(showGroups.toJSONString(),params.toJSONString(), sortParams.toString(), JSONObject.toJSONString(pageCond));
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {

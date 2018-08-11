@@ -11,10 +11,10 @@
 <div class="container " id="container" style="padding:0">
   <div class="row" style="margin:5px ;text-align:center" >
     <ul class="nav navbar-nav nav-tabs" style="width:100%;padding:0 5px;font-size:18px;font-weight:bold;">  
-        <li class="<#if status='refunding'> active </#if>" style="width:50%" @click="getOrders('refunding',$event)"> 
+        <li class="<#if status='refunding'> active </#if>" style="width:50%" @click="window.location.href='/paftersale/manage/refunding'"> 
           <a href="javascript:;"> 退款 </a> 
         </li> 
-        <li class="<#if status='exchanging'> active </#if>" style="width:50%" @click="getOrders('exchanging',$event)"> 
+        <li class="<#if status='exchanging'> active </#if>" style="width:50%" @click="window.location.href='/paftersale/manage/exchanging'"> 
           <a href="javascript:;" > 换货 </a> 
         </li>                      
      </ul>
@@ -47,16 +47,13 @@ var containerVue = new Vue({
 		orders:[]
 	},
 	methods:{
-		getOrders:function(stat,event){
+		getOrders:function(stat){
 			$("#loadingData").show();
 			$("#nomoreData").hide();
-			if(event){
-				$(event.target).addClass('active');$(event.target.parentElement).addClass('active');
-				$(event.target).siblings().removeClass('active');$(event.target.parentElement).siblings().removeClass('active');
+			if(stat){
+				this.param.status = stat;
 			}
-			this.param.status = stat;
 			containerVue.orders = [];
-			
 			$.ajax({
 				url: '/paftersale/getall/' + this.param.status,
 				method:'post',
@@ -74,7 +71,7 @@ var containerVue = new Vue({
 					}else{
 						if(jsonRet && jsonRet.errmsg){
 							//alert(jsonRet.errmsg);
-							$("#nomoreData").show();
+							//$("#nomoreData").show();
 						}
 					}
 					$("#loadingData").hide();
@@ -88,6 +85,10 @@ var containerVue = new Vue({
 	}
 });
 containerVue.getOrders("${status!'refunding'}");
+
+//分页初始化
+scrollPager(containerVue.param,containerVue.orders,containerVue.getOrders) ;
+
 </script>
 
 

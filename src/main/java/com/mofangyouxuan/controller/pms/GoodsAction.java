@@ -33,6 +33,7 @@ import com.mofangyouxuan.dto.GoodsSpec;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.PartnerStaff;
 import com.mofangyouxuan.dto.VipBasic;
+import com.mofangyouxuan.service.CategoryService;
 import com.mofangyouxuan.service.GoodsService;
 import com.mofangyouxuan.utils.PageCond;
 
@@ -43,7 +44,7 @@ import com.mofangyouxuan.utils.PageCond;
  */
 @Controller
 @RequestMapping("/goods")
-@SessionAttributes({"partnerUserTP","partnerPasswd","partnerStaff","partnerBindVip","myPartner","categories"})
+@SessionAttributes({"partnerUserTP","partnerPasswd","partnerStaff","partnerBindVip","myPartner"})
 public class GoodsAction {
 	
 	@InitBinder
@@ -84,12 +85,6 @@ public class GoodsAction {
 			return "redirect:/partner/manage" + "?errmsg=" + URLEncoder.encode(errmsg, "utf8");
 		}
 		
-		@SuppressWarnings("unchecked")
-		List<Category> categories = (List<Category>) map.get("categories");
-		if(categories == null) {
-			categories = GoodsService.getCategories();
-			map.put("categories", categories);
-		}
 		map.put("errmsg", outErrmsg);
 		map.put("sys_func", "partner-goods");
 		return "goods/page-goods-manage";
@@ -569,18 +564,26 @@ public class GoodsAction {
 	}
 	
 	/**
-	 * 获取商品分类
+	 * 查询商品分类
 	 * @param map
 	 * @return {errcode:0,errmsg:"",categories:[{},{},...]}
 	 */
 	@SuppressWarnings("unchecked")
-	@RequestMapping("/categories")
+	@RequestMapping("/queryCat")
 	@ResponseBody
-	public String getCategories(ModelMap map) {
+	public String queryCat(String keywords,Integer partnerId,ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
 		List<Category> categories = (List<Category>) map.get("categories");
 		if(categories == null || categories.size()<1) {
-			categories = GoodsService.getCategories();
+			JSONObject search = new JSONObject();
+			search.put("status", "1");
+			if(keywords != null && keywords.trim().length()>0) {
+				search.put("keywords", keywords.trim());
+			}
+			if(partnerId != null) {
+				search.put("partnerId", partnerId);
+			}
+			categories = CategoryService.getAll(search);
 		}
 		jsonRet.put("errcode", 0);
 		jsonRet.put("errmsg", "ok");

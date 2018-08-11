@@ -60,7 +60,7 @@
   </div>
   
   <!-- 商家信息 -->
-  <div class="row" style="margin:3px 15px;background-color:white;padding:3px 8px;">
+  <div class="row" style="margin:1px 0;background-color:white;padding:3px 8px;">
     <a href="/shop/mcht/${(goods.partnerId)?string('#')}">
      <img class="pull-left" alt="" src="/shop/pcert/logo/${(goods.partnerId)?string('#')}" style="width:25px;height:25px;border-radius:30%">
     </a>
@@ -68,21 +68,21 @@
   </div> 
   
   <!-- 限购信息 -->
-  <div v-if="goods.limitedNum > 0" class="row" style="margin:3px 15px;background-color:white;color:red;padding:3px 8px;">
+  <div v-if="goods.limitedNum > 0" class="row" style="margin:1px 0;background-color:white;color:red;padding:3px 8px;">
    <span class="pull-left">每人限购数量(包括已购)：{{goods.limitedNum}} 件</span>
    <span class="pull-right">限购时间：{{goods.beginTime}} 至 {{goods.endTime}}</span>
   </div>  
   
   <form action="/order/create" method="post" style="margin-bottom:80px">
     <input type="hidden" name="goodsId" value="${(goods.goodsId)?string('#')}">
-    <div class="row" style="margin:15px 1px;">
-      <div class="row" style="margin:3px 15px 3px 15px;padding:3px 3px">
-        <label class="col-xs-12 control-label">购买数量(具体库存以付款提交时为准)<span style="color:red">*</span>:</label>
-        <div class="col-xs-12" style="padding:0px 3px">
+    <div class="row" style="margin:0;">
+      <div class="row" style="margin:3px 0;padding:3px 3px">
+        <label class="row control-label" style="maring:0;padding:0 15px">购买数量(具体库存以付款提交时为准)<span style="color:red">*</span>:</label>
+        <div class="row" style="margin:0;padding:0px 3px">
 	       <table class="table table-striped table-bordered table-condensed" style="font-size:15px">
 	         <tr >
 	           <th width="30%" style="padding:2px 2px">规格名称</th>
-	           <th width="20%" style="padding:2px 2px">销售单位</th>
+	           <th width="20%" style="padding:2px 2px">规格</th>
 	           <th width="15%" style="padding:2px 2px">售价(¥)</th>
 	           <th width="35%" style="padding:2px 2px;color:red;text-align:center">购买数量</th>
 	         </tr>
@@ -91,7 +91,7 @@
 	             <span style="width:100%" >{{item.name}}</span>
 	           </td>
 	           <td style="padding:2px 2px">
-	              <span style="width:100%" >{{item.val}} {{item.unit}}</span>
+	              <span style="width:100%" >{{item.val}}{{item.unit}}</span>
 	           </td>
 	           <td style="padding:2px 2px">
 	              <span style="width:100%" >{{item.price}}</span>
@@ -105,10 +105,9 @@
 	       </table>    
         </div>
       </div>
-      <div class="row" style="margin:3px 15px 3px 15px;padding:5px 3px;" id="receiverAddr">
+      <div class="row" style="margin:3px 0;padding:5px 3px;" id="receiverAddr">
         <!-- <label class="col-xs-12 control-label" style="vertical-algin:center;">配送信息(选择收货地址)<span style="color:red">*</span>:</label> -->
-        <div class="col-xs-12">
-          <div class="row">
+          <div class="row" style="margin:0">
             <div class="col-xs-9" style="padding:0;font-weight:bolder">
               <div class="row" style="margin:0">
 	              <div class="col-xs-6" style="padding:0">
@@ -132,24 +131,23 @@
                  </div>                                  
               </div>
             </div>
-            <div class="col-xs-3" style="vertical-algin:center;font-weight:bolder;">
+            <div class="col-xs-3" style="padding-left:1px;vertical-algin:center;font-weight:bolder;">
               <a class="btn btn-default" href="javascript:;" @click="selectReceiver">
                <img alt="" src="/icons/收货地址.png" width="70%" height="70%" style="max-width:30px;max-height:30px"><br>
                <span style="font-size:14px">收货地址</span>
               </a>
             </div>
           </div>
-          <div class="row" style="font-weight:bolder">
+          <div class="row" style="margin:0;font-weight:bolder">
             <input type="text" class="form-control" name="recvAddr" v-model="param.recvAddr" disabled placeholder="收货人地址" required>
           </div>
-        </div>
       </div> 
       <div class="row" style="text-align:right;">
         <div class="col-xs-12" style="padding-right:40px">
          <button v-if="param.flag == 0" type="button" class="btn btn-sm btn-danger" @click="checkData">请点击确认购买内容与收货信息</button>
         </div>
       </div>
-      <div class="row" style="margin:8px 15px 3px 15px;">
+      <div class="row" style="margin:3px 0;">
         <label class="col-xs-3 control-label" style="padding-right:0">配送方式<span style="color:red">*</span>:</label>
         <div class="col-sx-9" style="padding-left:0">
           <select required v-model="param.postageIdAndMode" @change="changeDispatch">
@@ -160,7 +158,7 @@
           </select>
         </div>
        </div>
-       <div class="row" style="margin:8px 15px 3px 15px;">
+       <div class="row" style="margin:3px 0;">
          <label class="col-xs-3 control-label" style="padding-right:0">买家留言:</label>
          <div class="col-sx-9" style="padding-left:0">
            <textarea class="form-control" style="width:66%" maxlength=600 name="remark"></textarea>
@@ -200,7 +198,8 @@
          <input type="hidden" name="dispatchMode" v-model="param.dispatchMode" required>
 	     <input type="hidden" name="postageId" v-model="param.postageId" required>
 	     <button v-if="param.flag == 1" type="button" class="btn btn-sm btn-danger" >请选择配送方式</button>
-         <button v-if="param.flag == 2" type="submit" class="btn btn-sm btn-danger" style="font-size:18px;font-weight:bold" @click="submitCheck">立即下单</button>
+         <button v-if="param.flag == 2" type="submit" class="btn btn-sm btn-danger" style="font-size:18px;font-weight:bold" @click="submitCheck">立即下单</button><br>
+         <button v-if="param.flag == 2" type="button" class="btn btn-sm btn-success" style="margin-top:2px;font-size:18px;font-weight:bold" @click="addIncart">加入购物车</button>
        </div>
     </div>
     </form>
@@ -386,6 +385,29 @@ var containerVue = new Vue({
 						}
 					}else{
 						alertMsg('错误提示','系统数据访问失败！')
+					}
+				},
+				dataType: 'json'
+			});
+		},
+		addIncart: function(){
+			$.ajax({
+				url: '/order/cart/add',
+				method:'post',
+				data: containerVue.param,
+				success: function(jsonRet,status,xhr){
+					if(jsonRet && jsonRet.errmsg){
+						if(jsonRet.errcode ==0 ){
+							window.location.href = "/order/cart/show";
+						}else{//出现逻辑错误
+							if(jsonRet.errcode === -100000){
+								$('#ajaxLoginModal').modal('show');
+							}else{
+								alertMsg('错误提示',jsonRet.errmsg);
+							}
+						}
+					}else{
+						alertMsg('错误提示','系统数据访问失败！');
 					}
 				},
 				dataType: 'json'

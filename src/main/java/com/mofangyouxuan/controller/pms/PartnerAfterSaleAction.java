@@ -34,7 +34,7 @@ public class PartnerAfterSaleAction {
 	@RequestMapping("/manage/{status}")
 	public String getManage(@PathVariable("status")String status,ModelMap map) {
 		if(!"4refund".equals(status) && !"4exchange".equals(status) &&
-				!"refunding".equals(status) && !"exchangeing".equals(status)) {
+				!"refunding".equals(status) && !"exchanging".equals(status)) {
 			status = "refunding";
 		}
 		map.put("status", status);

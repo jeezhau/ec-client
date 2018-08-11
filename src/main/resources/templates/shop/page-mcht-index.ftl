@@ -19,9 +19,9 @@
      </div>
      <div class="col-xs-4" style="text-align:center;">
        <div style="">
-        <span>品质：{{getAvgScore(${(mcht.scoreGoods)!'暂无'})}}</span><br>
-        <span>物流：{{getAvgScore(${(mcht.scoreLogis)!'暂无'})}}</span><br>
-        <span>服务：{{getAvgScore(${(mcht.scoreServ)!'暂无'})}}</span><br>
+        <span>品质：<span style="color:red">{{getAvgScore("${(mcht.scoreGoods)!'暂无'}")}}</span></span><br>
+        <span>物流：<span style="color:red">{{getAvgScore("${(mcht.scoreLogis)!'暂无'}")}}</span></span><br>
+        <span>服务：<span style="color:red">{{getAvgScore("${(mcht.scoreServ)!'暂无'}")}}</span></span><br>
        </div>
      </div>
      <div class="col-xs-4" style="text-align:center;">
@@ -106,11 +106,15 @@ var containerVue = new Vue({
 			if('暂无' == score){
 				return score;
 			}
-			var pattern = new RegExp(('\d+/\d+')|('\d*')) ;
-			if(!pattern.exec(score)){
+			if(score.indexOf("/")<=0){
 				return '暂无';
 			}
-			var avg = new Number(score).toFixed(2);
+			var arr = score.split("/");
+			var pattern = /\d+/;
+			if(!pattern.exec(arr[0]) || !pattern.exec(arr[1])){
+				return '暂无';
+			}
+			var avg = (new Number(arr[0])/new Number(arr[1])).toFixed(2);
 			return avg;
 		},
 		getAllGoods: function(){
@@ -148,7 +152,7 @@ var containerVue = new Vue({
 								if(appr.content){//有评价内容
 									appr.content = JSON.parse(appr.content);
 								}else{
-									appr.content = {'time':appr.updateTime,'content':"卖家太懒，啥也没留下！！！"}
+									appr.content = [{'time':appr.updateTime,'content':"卖家太懒，啥也没留下！！！"}];
 								}
 								appr.headimgurl = startWith(appr.headimgurl,'http')?appr.headimgurl:('/user/headimg/show/'+appr.userId)
 								containerVue.apprList.push(appr);
