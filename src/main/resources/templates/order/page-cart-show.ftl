@@ -108,7 +108,7 @@ var containerVue = new Vue({
 			 }else{
 				 this.param.amountAll -= amount;
 			 }
-			 this.param.orderIds = this.param.selOrrders.join(',');
+			 this.param.orderIds = this.param.selOrrders.join('_');
 		 },
 		 getOrders:function(stat){
 			$("#loadingData").show();

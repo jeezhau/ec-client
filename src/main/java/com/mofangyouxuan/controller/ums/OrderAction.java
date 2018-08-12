@@ -8,10 +8,9 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -395,32 +394,39 @@ public class OrderAction {
 	
 	/**
 	 * 获取支付工具选择页面
-	 * @param orderId
+	 * @param orderIds	多个使用_分隔
 	 * @param map
 	 * @return
 	 */
 	@RequestMapping("/pay/btchoose")
 	public String batchChoosePlay(@RequestParam(value="orderIds",required=true)String orderIds,
 			HttpServletRequest request,ModelMap map) {
+		UserBasic user = (UserBasic) map.get("userBasic");
 		Order order = null;
 		try {
-			Set<String> orderArr = new HashSet<String>();
-			for(String s:orderIds.split(",")) {
+			Set<String> orderArr = new TreeSet<String>(); //排序集
+			for(String s:orderIds.split("_")) {
 				orderArr.add(s);
+			}
+			if(orderArr.size()>10) {
+				map.put("errmsg", "您选择批量支付的订单数量超过上限！");
+				return "order/page-pay-choose";
 			}
 			List<Order> list = new ArrayList<Order>();
 			BigDecimal amount = new BigDecimal(0);
 			String errids = "";
+			String okids = "";
 			for(String orderId:orderArr) {
 				orderId = orderId.trim();
 				if(orderId.length()>20) {
 					JSONObject jsonRet = OrderService.getOrder(orderId);
 					if(jsonRet != null && jsonRet.containsKey("order")) {
 						order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
-						if( "10".equals(order.getStatus()) || "12".equals(order.getStatus())) {//可支付
+						if( ("10".equals(order.getStatus()) || "12".equals(order.getStatus())) && user.getUserId().equals(order.getUserId())) {//可支付
 							order.setSpecList(JSONArray.parseArray(order.getGoodsSpec(), GoodsSpec.class));
 							list.add(order);
 							amount = amount.add(order.getAmount());
+							okids += "_" + orderId;
 						}else {
 							errids += "," + orderId;
 						}
@@ -435,7 +441,7 @@ public class OrderAction {
 			if(list.size()>0) {
 				map.put("list", list);
 				map.put("amount", amount.doubleValue());
-				map.put("orderIds", Arrays.toString(orderArr.toArray()).replace("[", "").replace("]", ""));
+				map.put("orderIds", okids.substring(1));
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -448,35 +454,55 @@ public class OrderAction {
 	 * 用户选择支付方式后，根据支付方式生成付款单
 	 * 1、如果是微信支付，则项微信支付发送预付单生成请求，成功返回后生成预付单；
 	 * 2、余额支付则直接生成预付单；
-	 * @param orderId
+	 * @param orderIds	多个ID使用_分隔
 	 * @param payType 支付方式：1-余额，2-微信
 	 * @param map
 	 * @return {errcode,errmsg,payType,prepay_id,outPayUrl}
 	 */
-	@RequestMapping("/prepay/{orderId}/{payType}")
+	@RequestMapping("/prepay/{payType}/{orderIds}")
 	@ResponseBody
-	public String createPrepay(@PathVariable("orderId")String orderId,
+	public String createPrepay(@PathVariable(value="orderIds",required=true)String orderIds,
 			@PathVariable("payType")Integer payType,HttpServletRequest request,
 			HttpSession session,ModelMap map) {
 		UserBasic user = (UserBasic) map.get("userBasic");
 		JSONObject jsonRet = new JSONObject();
 		try {
-			jsonRet = OrderService.getOrder(orderId);
-			if(jsonRet == null || !jsonRet.containsKey("order")) {
-				jsonRet.put("errmsg", "系统中没有该订单信息！");
-				jsonRet.put("errcode", ErrCodes.ORDER_NO_EXISTS);
-				return jsonRet.toString();
+			Set<String> orderArr = new TreeSet<String>(); //排序集
+			for(String s:orderIds.split("_")) {
+				orderArr.add(s);
 			}
-			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
-			if(!order.getUserId().equals(user.getUserId())) {
-				jsonRet.put("errmsg", "您没有权限查询该订单信息！");
-				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
-				return jsonRet.toString();
+			if(orderArr.size()>10) {
+				jsonRet.put("errcode", ErrCodes.COMMON_PARAM_ERROR);
+				jsonRet.put("errmsg", "您选择批量支付的订单数量超过上限！");
+				return jsonRet.toJSONString();
 			}
-			if(!"10".equals(order.getStatus()) && !"12".equals(order.getStatus())) {
-				jsonRet.put("errmsg", "您当前不可再次申请支付订单！");
-				jsonRet.put("errcode", ErrCodes.ORDER_PRIVILEGE_ERROR);
-				return jsonRet.toString();
+			List<Order> list = new ArrayList<Order>();
+			BigDecimal amount = new BigDecimal(0);
+			String errids = "";
+			String okids = "";
+			for(String orderId:orderArr) {
+				orderId = orderId.trim();
+				if(orderId.length()>20) {
+					jsonRet = OrderService.getOrder(orderId);
+					if(jsonRet != null && jsonRet.containsKey("order")) {
+						Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
+						if( ("10".equals(order.getStatus()) || "12".equals(order.getStatus())) && user.getUserId().equals(order.getUserId())) {//可支付
+							order.setSpecList(JSONArray.parseArray(order.getGoodsSpec(), GoodsSpec.class));
+							list.add(order);
+							amount = amount.add(order.getAmount());
+							okids += "_" + orderId;
+						}else {
+							errids += "," + orderId;
+						}
+					}else {
+						errids += "," + orderId;
+					}
+				}
+			}
+			if(errids.length()>0) {
+				jsonRet.put("ermsg", "下列订单不存在或不可再次支付，订单ID列表：【" + errids.substring(1)+ "】");
+				jsonRet.put("errcode", ErrCodes.ORDER_PARAM_ERROR);
+				return jsonRet.toJSONString();
 			}
 			if(1 != payType && 2 != payType && 3 != payType) {
 				jsonRet.put("errcode", ErrCodes.ORDER_PARAM_ERROR);
@@ -518,7 +544,8 @@ public class OrderAction {
 			}
 			String ip = request.getRemoteHost();
 			ip = CommonUtil.getIpAddr(request);
-			jsonRet = OrderService.createPay(payType, order, user, ip);
+			orderIds = okids.substring(1);//排序ID列表
+			jsonRet = OrderService.createPay(payType, orderIds, user, ip);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet.put("errcode",ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "出现系统错误！");
@@ -526,13 +553,13 @@ public class OrderAction {
 			}else {
 				if(jsonRet.containsKey("outPayUrl") && 22 == payType) { //微信H5支付
 					String outPayUrl = jsonRet.getString("outPayUrl");
-					String redirectUrl = this.localServerName + "/order/pay/finish/" + orderId;
+					String redirectUrl = this.localServerName + "/order/pay/finish/" + orderIds;
 					redirectUrl = URLEncoder.encode(redirectUrl, "utf8");
 					outPayUrl = outPayUrl + "&redirect_url=" + redirectUrl;
 					jsonRet.put("outPayUrl", outPayUrl);
 				}
 				if(jsonRet.containsKey("AliPayForm") && (payType==31 || payType ==32)) {
-					session.setAttribute("AliPayForm_" + order.getOrderId(), jsonRet.getString("AliPayForm"));
+					session.setAttribute("AliPayForm_" + orderIds, jsonRet.getString("AliPayForm"));
 				}
 			}
 		}catch(Exception e) {
@@ -545,6 +572,74 @@ public class OrderAction {
 	}
 
 	/**
+	 * 使用微信扫码进行支付
+	 * @param orderId
+	 * @return
+	 */
+	@RequestMapping("/pay/use/wxqrcode/{orderIds}")
+	public String useWxPay(@PathVariable(value="orderIds",required=true)String orderIds,ModelMap map) {
+		Order order = null;
+		try {
+			UserBasic user = (UserBasic)map.get("userBasic");
+			Set<String> orderArr = new TreeSet<String>();
+			for(String s:orderIds.split("_")) {
+				orderArr.add(s);
+			}
+			if(orderArr.size()>10) {
+				map.put("errmsg", "您选择批量支付的订单数量超过上限！");
+				return "order/page-pay-usewx";
+			}
+			List<Order> list = new ArrayList<Order>();
+			BigDecimal amount = new BigDecimal(0);
+			String errids = "";
+			String okids = "";
+			for(String orderId:orderArr) {
+				orderId = orderId.trim();
+				if(orderId.length()>20) {
+					JSONObject jsonRet = OrderService.getOrder(orderId);
+					if(jsonRet != null && jsonRet.containsKey("order")) {
+						order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
+						if( ("10".equals(order.getStatus()) || "12".equals(order.getStatus())) && user.getUserId().equals(order.getUserId())) {//可支付
+							order.setSpecList(JSONArray.parseArray(order.getGoodsSpec(), GoodsSpec.class));
+							list.add(order);
+							amount = amount.add(order.getAmount());
+							okids += "_" + orderId;
+						}else {
+							errids += "," + orderId;
+						}
+					}else {
+						errids += "," + orderId;
+					}
+				}
+			}
+			if(errids.length()>0) {
+				map.put("ermsg", "下列订单不存在或不可再次支付，订单ID列表：【" + errids.substring(1)+ "】");
+				return "order/page-pay-usewx";
+			}
+			orderIds = okids.substring(1);
+			if(list.size()>0) {
+				map.put("list", list);
+				map.put("amount", amount.doubleValue());
+				map.put("orderIds", orderIds);
+			}
+			//获取批量支付流水
+			JSONObject jsonRet =  OrderService.getPayFlow(orderIds, user.getUserId(), "1");
+			if(jsonRet == null || !jsonRet.containsKey("payFlow")) {
+				map.put("errmsg", "该订单的支付流水获取失败！");
+				return "order/page-pay-usewx";
+			}
+			PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
+			map.put("payFlow", payFlow);
+			map.put("orderIds", orderIds);
+			return "order/page-pay-usewx";
+		}catch(Exception e) {
+			e.printStackTrace();
+			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
+		}
+		return "order/page-pay-usewx";
+	}
+
+	/**
 	 * 显示微信扫码支付的二维码
 	 * @param orderId
 	 * @param out
@@ -552,26 +647,16 @@ public class OrderAction {
 	 * @param response
 	 * @param map
 	 */
-	@RequestMapping("/pay/show/wxqrcode/{orderId}")
-	public void showWXPayQrcode(@PathVariable(value="orderId",required=true)String orderId,
+	@RequestMapping("/pay/show/wxqrcode/{orderIds}")
+	public void showWXPayQrcode(@PathVariable(value="orderIds",required=true)String orderIds,
 			OutputStream out,HttpServletRequest request,HttpServletResponse response,ModelMap map) {
-		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
-			JSONObject jsonRet = OrderService.getOrder(orderId);
-			if(jsonRet == null || !jsonRet.containsKey("order")) {
-				//response.sendRedirect("/show/all"); //重定向至订单显示
-				return;
+			Set<String> orderArr = new TreeSet<String>();
+			for(String s:orderIds.split("_")) {
+				orderArr.add(s);
 			}
-			order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
-			if(!user.getUserId().equals(order.getUserId())) {
-				//response.sendRedirect("/show/all"); //重定向至订单显示
-				return;
-			}
-			if( !"10".equals(order.getStatus()) && !"12".equals(order.getStatus())) {//可支付
-				return;
-			}
-			jsonRet = OrderService.getPayFlow(order, user.getUserId(), "1");
+			JSONObject jsonRet = OrderService.getPayFlow(orderIds, user.getUserId(), "1"); //获取批量支付流水
 			if(jsonRet == null || !jsonRet.containsKey("payFlow")) {
 				return;
 			}
@@ -608,51 +693,12 @@ public class OrderAction {
 	}
 
 	/**
-	 * 使用微信扫码进行支付
-	 * @param orderId
-	 * @return
-	 */
-	@RequestMapping("/pay/use/wxqrcode/{orderId}")
-	public String useWxPay(@PathVariable(value="orderId",required=true)String orderId,ModelMap map) {
-		Order order = null;
-		try {
-			UserBasic user = (UserBasic)map.get("userBasic");
-			JSONObject jsonRet = OrderService.getOrder(orderId);
-			if(jsonRet != null && jsonRet.containsKey("order")) {
-				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
-				if(!user.getUserId().equals(order.getUserId())) {
-					map.put("errmsg", "该订单不是您的订单！");
-					return "order/page-pay-usewx";
-				}
-				if( "10".equals(order.getStatus()) || "12".equals(order.getStatus())) {//可支付
-					map.put("order", order);
-					jsonRet = OrderService.getPayFlow(order, user.getUserId(), "1");
-					if(jsonRet == null || !jsonRet.containsKey("payFlow")) {
-						map.put("errmsg", "该订单的支付待支付流水获取失败！");
-						return "order/page-pay-usewx";
-					}
-					PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
-					map.put("payFlow", payFlow);
-				}else {
-					map.put("errmsg", "该订单当前不可再次支付！");
-				}
-				return "order/page-pay-usewx";
-			}
-			map.put("errmsg", "获取订单信息失败！");
-		}catch(Exception e) {
-			e.printStackTrace();
-			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
-		}
-		return "order/page-pay-usewx";
-	}
-	
-	/**
 	 * 使用支付宝表单进行支付
 	 * @param orderId
 	 * @return
 	 */
-	@RequestMapping("/pay/use/aliform/{orderId}")
-	public void useAliPay(@PathVariable(value="orderId",required=true)String orderId,
+	@RequestMapping("/pay/use/aliform/{orderIds}")
+	public void useAliPay(@PathVariable(value="orderIds",required=true)String orderIds,
 			HttpServletRequest request,HttpServletResponse response,ModelMap map,HttpSession session) {
 		try {
 			
@@ -664,20 +710,45 @@ public class OrderAction {
 			}else {
 				payType = 32; //web支付
 			}
-			JSONObject jsonRet = OrderService.getOrder(orderId);
-			if(jsonRet == null || !jsonRet.containsKey("order")) {
-				return;
+			Set<String> orderArr = new TreeSet<String>();
+			for(String s:orderIds.split("_")) {
+				orderArr.add(s);
 			}
-			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
-			if(!order.getUserId().equals(user.getUserId())) {
-				return;
+			if(orderArr.size()>10) {
+				map.put("errmsg", "您选择批量支付的订单数量超过上限！");
+				return ;
 			}
-			if(!"10".equals(order.getStatus()) && !"12".equals(order.getStatus())) {
-				return;
+			List<Order> list = new ArrayList<Order>();
+			BigDecimal amount = new BigDecimal(0);
+			String errids = "";
+			String okids = "";
+			for(String orderId:orderArr) {
+				orderId = orderId.trim();
+				if(orderId.length()>20) {
+					JSONObject jsonRet = OrderService.getOrder(orderId);
+					if(jsonRet != null && jsonRet.containsKey("order")) {
+						Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
+						if( ("10".equals(order.getStatus()) || "12".equals(order.getStatus())) && user.getUserId().equals(order.getUserId())) {//可支付
+							order.setSpecList(JSONArray.parseArray(order.getGoodsSpec(), GoodsSpec.class));
+							list.add(order);
+							amount = amount.add(order.getAmount());
+							okids += "_" + orderId;
+						}else {
+							errids += "," + orderId;
+						}
+					}else {
+						errids += "," + orderId;
+					}
+				}
 			}
-			String aliPayForm = (String) session.getAttribute("AliPayForm_" + orderId);
+			if(errids.length()>0) {
+				map.put("ermsg", "下列订单不存在或不可再次支付，订单ID列表：【" + errids.substring(1)+ "】");
+				return ;
+			}
+			orderIds = okids.substring(1);
+			String aliPayForm = (String) session.getAttribute("AliPayForm_" + orderIds);
 			if(aliPayForm == null) {
-				jsonRet = OrderService.createPay(payType, order, user, "111");
+				JSONObject jsonRet = OrderService.createPay(payType, orderIds, user, "111");
 				if(jsonRet == null || !jsonRet.containsKey("AliPayForm")) {
 					return;
 				}
@@ -695,43 +766,71 @@ public class OrderAction {
 	
 	/**
 	 * 使用余额进行支付
-	 * @param orderId
+	 * @param orderIds
 	 * @return
 	 */
 	@RequestMapping("/pay/use/bal/{orderId}")
-	public String useBalPay(@PathVariable(value="orderId",required=true)String orderId,ModelMap map) {
+	public String useBalPay(@PathVariable(value="orderIds",required=true)String orderIds,ModelMap map) {
 		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
 			VipBasic vip = (VipBasic) map.get("vipBasic");
 			if(vip == null || !"1".equals(vip.getStatus())) {
 				map.put("errmsg", "您还未开通会员，不可使用余额支付！");
+				return "order/page-pay-usebal";
 			}else if(vip.getPasswd() == null || vip.getPasswd().length()<10) {
 				map.put("errmsg", "您还未设置会员操作密码，不可使用余额支付！");
-			}else {
-				JSONObject jsonRet = OrderService.getOrder(orderId);
-				if(jsonRet != null && jsonRet.containsKey("order")) {
-					order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
-					if(!user.getUserId().equals(order.getUserId())) {
-						map.put("errmsg", "该订单不是您的订单！");
-						return "order/page-pay-usebal";
-					}
-					if( "10".equals(order.getStatus()) || "12".equals(order.getStatus())) {//可支付
-						map.put("order", order);
-						jsonRet = OrderService.getPayFlow(order, user.getUserId(), "1");
-						if(jsonRet == null || !jsonRet.containsKey("payFlow")) {
-							map.put("errmsg", "该订单的支付待支付流水获取失败！");
-							return "order/page-pay-usebal";
-						}
-						PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
-						map.put("payFlow", payFlow);
-					}else {
-						map.put("errmsg", "该订单当前不可再次支付！");
-					}
-					return "order/page-pay-usebal";
-				}
-				map.put("errmsg", "获取订单信息失败！");
+				return "order/page-pay-usebal";
 			}
+			Set<String> orderArr = new TreeSet<String>();
+			for(String s:orderIds.split("_")) {
+				orderArr.add(s);
+			}
+			if(orderArr.size()>10) {
+				map.put("errmsg", "您选择批量支付的订单数量超过上限！");
+				return "order/page-pay-usewx";
+			}
+			List<Order> list = new ArrayList<Order>();
+			BigDecimal amount = new BigDecimal(0);
+			String errids = "";
+			String okids = "";
+			for(String orderId:orderArr) {
+				orderId = orderId.trim();
+				if(orderId.length()>20) {
+					JSONObject jsonRet = OrderService.getOrder(orderId);
+					if(jsonRet != null && jsonRet.containsKey("order")) {
+						order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
+						if( ("10".equals(order.getStatus()) || "12".equals(order.getStatus())) && user.getUserId().equals(order.getUserId())) {//可支付
+							order.setSpecList(JSONArray.parseArray(order.getGoodsSpec(), GoodsSpec.class));
+							list.add(order);
+							amount = amount.add(order.getAmount());
+							okids += "_" + orderId;
+						}else {
+							errids += "," + orderId;
+						}
+					}else {
+						errids += "," + orderId;
+					}
+				}
+			}
+			if(errids.length()>0) {
+				map.put("ermsg", "下列订单不存在或不可再次支付，订单ID列表：【" + errids.substring(1)+ "】");
+				return "order/page-pay-usewx";
+			}
+			if(list.size()>0) {
+				map.put("list", list);
+				map.put("amount", amount.doubleValue());
+				map.put("orderIds", okids.substring(1));
+			}
+			orderIds = okids.substring(1);
+			JSONObject jsonRet = OrderService.getPayFlow(orderIds, user.getUserId(), "1");
+			if(jsonRet == null || !jsonRet.containsKey("payFlow")) {
+				map.put("errmsg", "该订单的支付流水获取失败！");
+				return "order/page-pay-usebal";
+			}
+			PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
+			map.put("payFlow", payFlow);
+			return "order/page-pay-usebal";
 		}catch(Exception e) {
 			e.printStackTrace();
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
@@ -745,9 +844,9 @@ public class OrderAction {
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/pay/submit/bal/{orderId}")
+	@RequestMapping("/pay/submit/bal/{orderIds}")
 	@ResponseBody
-	public String submitBalPay(@PathVariable(value="orderId",required=true)String orderId,
+	public String submitBalPay(@PathVariable(value="orderIds",required=true)String orderIds,
 			@RequestParam(value="passwd",required=true)String passwd,
 			ModelMap map) {
 		JSONObject jsonRet = new JSONObject();
@@ -762,11 +861,48 @@ public class OrderAction {
 				jsonRet.put("errmsg", "您还未设置会员操作密码，不可使用余额支付！");
 				return jsonRet.toJSONString();
 			}
-			
-			jsonRet = OrderService.submitBalPay(orderId, vip.getVipId(), passwd);
+			Set<String> orderArr = new TreeSet<String>();
+			for(String s:orderIds.split("_")) {
+				orderArr.add(s);
+			}
+			if(orderArr.size()>10) {
+				jsonRet.put("errmsg", "您选择批量支付的订单数量超过上限！");
+				jsonRet.put("errcode", -1);
+				return jsonRet.toJSONString();
+			}
+			List<Order> list = new ArrayList<Order>();
+			BigDecimal amount = new BigDecimal(0);
+			String errids = "";
+			String okids = "";
+			for(String orderId:orderArr) {
+				orderId = orderId.trim();
+				if(orderId.length()>20) {
+					jsonRet = OrderService.getOrder(orderId);
+					if(jsonRet != null && jsonRet.containsKey("order")) {
+						Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
+						if( ("10".equals(order.getStatus()) || "12".equals(order.getStatus())) && vip.getVipId().equals(order.getUserId())) {//可支付
+							order.setSpecList(JSONArray.parseArray(order.getGoodsSpec(), GoodsSpec.class));
+							list.add(order);
+							amount = amount.add(order.getAmount());
+							okids += "_" + orderId;
+						}else {
+							errids += "," + orderId;
+						}
+					}else {
+						errids += "," + orderId;
+					}
+				}
+			}
+			if(errids.length()>0) {
+				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
+				jsonRet.put("ermsg", "下列订单不存在或不可再次支付，订单ID列表：【" + errids.substring(1)+ "】");
+				return jsonRet.toJSONString();
+			}
+			orderIds = okids.substring(1);
+			jsonRet = OrderService.submitBalPay(orderIds, vip.getVipId(), passwd);
 			if(jsonRet == null || !jsonRet.containsKey("errcode")) {
 				jsonRet = new JSONObject();
-				jsonRet.put("errcode", ErrCodes.COMMON_DB_ERROR);
+				jsonRet.put("errcode", ErrCodes.COMMON_EXCEPTION);
 				jsonRet.put("errmsg", "支付提交失败！");
 			}
 		}catch(Exception e) {
@@ -784,36 +920,64 @@ public class OrderAction {
 	 * @param orderId
 	 * @return
 	 */
-	@RequestMapping("/pay/finish/{orderId}")
-	public String finishPay(@PathVariable("orderId")String orderId,
+	@RequestMapping("/pay/finish/{orderIds}")
+	public String finishPay(@PathVariable("orderIds")String orderIds,
 			ModelMap map) {
-		Order order = null;
 		try {
 			UserBasic user = (UserBasic)map.get("userBasic");
-			JSONObject jsonRet = OrderService.getOrder(orderId);
-			
-			if(jsonRet != null && jsonRet.containsKey("order")) {
-				order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
-				if(!user.getUserId().equals(order.getUserId())) {
-					map.put("errmsg", "该订单不是您的宝贝订单！");
-				}else {//判断系统是否已经支付成功
-					jsonRet = OrderService.payFinish(order, user);
-					if(jsonRet != null && jsonRet.containsKey("errcode")) {
-						map.put("payRetCode", jsonRet.getIntValue("errcode"));
-						map.put("payRetMsg", jsonRet.getString("errmsg"));
-						map.put("payType", jsonRet.getString("payType"));
-						map.put("payTime", jsonRet.getString("payTime"));
-						map.put("amount", jsonRet.getDouble("amount"));
-						map.put("fee", jsonRet.getDouble("fee"));
-						map.put("order", order);
+			Set<String> orderArr = new TreeSet<String>();
+			for(String s:orderIds.split("_")) {
+				orderArr.add(s);
+			}
+			if(orderArr.size()>10) {
+				map.put("errmsg", "您选择批量支付的订单数量超过上限！");
+				return "order/page-pay-usewx";
+			}
+			List<Order> list = new ArrayList<Order>();
+			String errids = "";
+			String okids = "";
+			for(String orderId:orderArr) {
+				orderId = orderId.trim();
+				if(orderId.length()>20) {
+					JSONObject jsonRet = OrderService.getOrder(orderId);
+					if(jsonRet != null && jsonRet.containsKey("order")) {
+						Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"),Order.class);
+						if(user.getUserId().equals(order.getUserId())) {//可支付
+							order.setSpecList(JSONArray.parseArray(order.getGoodsSpec(), GoodsSpec.class));
+							list.add(order);
+							okids += "_" + orderId;
+						}else {
+							errids += "," + orderId;
+						}
 					}else {
-						map.put("errmsg", "获取支付结果信息失败！");
+						errids += "," + orderId;
 					}
 				}
-			}else {
-				map.put("errmsg", "获取订单信息失败！");
 			}
-			
+			if(errids.length()>0) {
+				map.put("ermsg", "您没有权限处理下列订单，订单ID列表：【" + errids.substring(1)+ "】");
+				return "order/page-pay-finished";
+			}
+			orderIds = okids.substring(1);
+			if(list.size()>0) {
+				map.put("list", list);
+				map.put("orderIds", orderIds);
+			}
+			//获取批量支付流水
+			JSONObject jsonRet =  OrderService.getPayFlow(orderIds, user.getUserId(), null);
+			if(jsonRet == null || !jsonRet.containsKey("payFlow")) {
+				map.put("errmsg", "该订单的支付流水获取失败！");
+				return "order/page-pay-finished";
+			}
+			PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
+			map.put("payFlow", payFlow);
+			jsonRet = OrderService.payFinish(orderIds, user);
+			if(jsonRet != null && jsonRet.containsKey("errcode")) {
+				map.put("payRetCode", jsonRet.getIntValue("errcode"));
+				map.put("payRetMsg", jsonRet.getString("errmsg"));
+			}else {
+				map.put("errmsg", "获取支付结果信息失败！");
+			}
 		}catch(Exception e) {
 			e.printStackTrace();
 			map.put("errmsg", "出现异常，异常信息：" + e.getMessage());
@@ -841,7 +1005,7 @@ public class OrderAction {
 					jsonRet.put("errcode", -1);
 					jsonRet.put("errmsg", "该订单不是您的宝贝订单！");
 				}else {//判断系统是否已经支付成功
-					jsonRet = OrderService.payFinish(order, user);
+					jsonRet = OrderService.payFinish(orderId, user);
 				}
 			}else {
 				jsonRet.put("errcode", -1);
@@ -1062,7 +1226,7 @@ public class OrderAction {
 			Order order = JSONObject.toJavaObject(jsonRet.getJSONObject("order"), Order.class);
 			JSONObject jsonaf = AftersaleService.getAftersale(orderId);
 			if(order.getUserId().equals(user.getUserId())) {
-				jsonRet = OrderService.getPayFlow(order, user.getUserId(), null);
+				jsonRet = OrderService.getPayFlow(orderId, user.getUserId(), null);
 				if(jsonRet != null && jsonRet.containsKey("payFlow")) {
 					PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
 					map.put("payFlow", payFlow);
@@ -1108,7 +1272,7 @@ public class OrderAction {
 						!"20".equals(order.getStatus()) && !"DF".equals(order.getStatus())) {
 						map.put("errmsg", "您当前不可取消订单！");
 					}else {
-						jsonRet = OrderService.getPayFlow(order, user.getUserId(), "1");
+						jsonRet = OrderService.getPayFlow(orderId, user.getUserId(), "1");
 						if(jsonRet != null && jsonRet.containsKey("payFlow")) {
 							PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
 							map.put("payFlow", payFlow);

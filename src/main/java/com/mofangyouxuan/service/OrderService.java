@@ -345,11 +345,11 @@ public class OrderService {
 	 * 1、如果是微信支付，则项微信支付发送预付单生成请求，成功返回后向服务中心申请生成预付单；
 	 * 2、余额支付则直接完成付款；
 	 * @param payType 支付方式
-	 * @param order
+	 * @param orderId
 	 * @param userId
 	 * @return {errcode,errmsg,payType,appId,timeStamp,nonceStr,prepay_id,paySign}
 	 */
-	public static JSONObject createPay(Integer payType,Order order,UserBasic user,String ip) {
+	public static JSONObject createPay(Integer payType,String orderIds,UserBasic user,String ip) {
 		JSONObject jsonRet = new JSONObject();
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("payType", payType);
@@ -358,7 +358,7 @@ public class OrderService {
 		//向服务中心发送申请
 		String url = mfyxServerUrl + orderPrepayUrl;
 		url = url.replace("{userId}", user.getUserId() + "");
-		url = url.replace("{orderId}", order.getOrderId() + "");
+		url = url.replace("{orderId}", orderIds);
 		String strRet = HttpUtils.doPost(url, params);
 		try {
 			jsonRet = JSONObject.parseObject(strRet);
@@ -376,14 +376,14 @@ public class OrderService {
 	 * @param type 1-消费，2-退款，为空则最新
 	 * @return {errcode,errmsg,payflow:{}}
 	 */
-	public static JSONObject getPayFlow(Order order,Integer userId,String type) {
+	public static JSONObject getPayFlow(String orderIds,Integer userId,String type) {
 		JSONObject jsonRet = new JSONObject();
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("type", type);
 		//向服务中心发送申请
 		String url = mfyxServerUrl + orderGetPayFlowUrl;
 		url = url.replace("{userId}", userId + "");
-		url = url.replace("{orderId}", order.getOrderId() + "");
+		url = url.replace("{orderId}", orderIds);
 		
 		String strRet = HttpUtils.doPost(url, params);
 		try {
@@ -397,12 +397,12 @@ public class OrderService {
 	
 	/**
 	 * 发送余额支付请求
-	 * @param orderId
+	 * @param orderIds
 	 * @param userId
 	 * @param pwd 会员密码
 	 * @return
 	 */
-	public static JSONObject submitBalPay(String orderId,Integer userId,String pwd) {
+	public static JSONObject submitBalPay(String orderIds,Integer userId,String pwd) {
 		JSONObject jsonRet = new JSONObject();
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("passwd",pwd);
@@ -410,7 +410,7 @@ public class OrderService {
 		//向服务中心发送申请
 		String url = mfyxServerUrl + orderBalPaySubmitUrl;
 		url = url.replace("{userId}", userId + "");
-		url = url.replace("{orderId}", orderId + "");
+		url = url.replace("{orderId}", orderIds);
 		String strRet = HttpUtils.doPost(url, params);
 		try {
 			jsonRet = JSONObject.parseObject(strRet);
@@ -429,14 +429,14 @@ public class OrderService {
 	 * @param user
 	 * @return
 	 */
-	public static JSONObject payFinish(Order order,UserBasic user) {
+	public static JSONObject payFinish(String orderIds,UserBasic user) {
 		JSONObject jsonRet = new JSONObject();
 		Map<String,Object> params = new HashMap<String,Object>();
 		
 		//向服务中心发送申请
 		String url = mfyxServerUrl + orderPayFinishUrl;
 		url = url.replace("{userId}", user.getUserId() + "");
-		url = url.replace("{orderId}", order.getOrderId() + "");
+		url = url.replace("{orderId}", orderIds);
 		String strRet = HttpUtils.doPost(url, params);
 		try {
 			jsonRet = JSONObject.parseObject(strRet);

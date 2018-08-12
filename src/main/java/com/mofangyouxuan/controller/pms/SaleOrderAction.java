@@ -458,7 +458,7 @@ public class SaleOrderAction {
 			JSONObject jsonApprUser = AppraiseService.getAppraise(orderId, "2");
 			JSONObject jsonaf = AftersaleService.getAftersale(orderId);
 			if(myPartner.getPartnerId().equals(order.getPartnerId())) {
-				jsonRet = OrderService.getPayFlow(order, order.getUserId(), null);
+				jsonRet = OrderService.getPayFlow(orderId, order.getUserId(), null);
 				if(jsonRet != null && jsonRet.containsKey("payFlow")) {
 					PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
 					map.put("payFlow", payFlow);

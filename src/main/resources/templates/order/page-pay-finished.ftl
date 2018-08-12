@@ -15,68 +15,34 @@
     </div>
   </div>
   <!-- 支付明细 -->
+  <#if (payFlow.flowId)??>
   <div class="row" style="margin:5px 1px ;padding:3px 0;background-color:white" >
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" style="text-align:cneter;padding:0 3px">
-       <label class="col-xs-3" style="padding:0">订单号：</label>
-       <span class="col-xs-8" style="padding:0">${order.orderId!''}</span>
-    </div>
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" style="text-align:cneter;padding:0 3px">
         <label class="col-xs-3" style="padding:0">支付方式：</label>
-        <span class="col-xs-8"  style="padding:0">{{getPayType('${payType!''}')}}</span>    
+        <span class="col-xs-8"  style="padding:0">{{getPayType('${(payFlow.payType)!''}')}}</span>    
     </div>
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" style="text-align:cneter;padding:0 3px">
         <label class="col-xs-3"  style="padding:0">支付时间：</label>
-        <span class="col-xs-8"  style="padding:0">${payTime!''}</span>
+        <span class="col-xs-8"  style="padding:0">${(payFlow.createTime)?string('yyyy-MM-dd hh:mm:ss')}</span>
     </div>   
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" style="text-align:cneter;padding:0 3px">
         <label class="col-xs-3" style="padding:0">订单额¥：</label>
-        <span class="col-xs-8"  style="padding:0">${amount!''}</span>
+        <span class="col-xs-8"  style="padding:0">${(payFlow.payAmount/100)}</span>
     </div>
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" style="text-align:cneter;padding:0 3px">
         <label class="col-xs-3"  style="padding:0">手续费¥：</label>
-        <span class="col-xs-8"  style="padding:0">${fee!''}</span>
+        <span class="col-xs-8"  style="padding:0">${payFlow.feeAmount/100}</span>
     </div>    
   </div> 
-  <!-- 商家 -->
-  <div class="row" style="margin:0px 0px;padding:5px 10px;background-color:white">
-      <a class="pull-left" href="/shop/mcht/${(order.partnerId)?string('#')}">
-        <img alt="头像" src="/shop/pcert/logo/${(order.partnerId)?string('#')}" width="20px" height="20px" style="border-radius:50%"> 
-        ${order.partnerBusiName}
-      </a>
-  </div>
+  </#if>
   <!-- 商品信息 -->
-  <div class="row" style="margin:3px 1px ;padding:3px 0;background-color:white" >
-    <div class="col-xs-12" style="text-align:center;">${order.goodsName}</div>
-    <div class="col-xs-12" style="text-align:center;">
-      <a href="/shop/goods/${(order.goodsId)?string('#')}">
-       <img alt="" src="/shop/gimage/${(order.partnerId)?string('#')}/${(order.goodsMainImgPath)!''}" style="max-width:99%;max-height:380px;">
-      </a>
-    </div>
-    <div class="col-xs-12" style="padding:0px 3px">
-       <table class="table table-striped table-bordered table-condensed">
-         <tr>
-           <th width="30%" style="padding:2px 2px">规格名称</th>
-           <th width="15%" style="padding:2px 2px">量值</th>
-           <th width="15%" style="padding:2px 2px">售价(¥)</th>
-           <th width="20%" style="padding:2px 2px">购买数量</th>
-         </tr>
-         <tr v-for="item,index in goodsSpecArr" >
-           <td style="padding:2px 2px">
-             <span style="width:100%" >{{item.name}}</span>
-           </td>
-           <td style="padding:2px 2px">
-              <span style="width:100%" >{{item.val}} {{item.unit}}</span>
-           </td>
-           <td style="padding:2px 2px">
-              <span style="width:100%" >{{item.price}}</span>
-           </td> 	                         
-           <td style="padding:2px 2px;text-align:center">
-              <span style="width:100%" >{{item.buyNum}}</span>
-           </td>
-         </tr>
-       </table>    
-     </div>
+  <#if list??>
+  <div class="row" style="margin:0px 1px ;padding:5px 0;" >
+    <#list list as order>
+     <#include "/common/tpl-order-buy-content-4fm.ftl" encoding="utf8">
+    </#list>
   </div> 
+  </#if>
 </#if>    
 </div><!-- end of container -->
 

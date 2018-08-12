@@ -141,7 +141,7 @@ public class PartnerAfterSaleAction {
 							!"63".equals(order.getStatus()) ) {
 						map.put("errmsg", "您当前不可对该订单进行退款处理！");
 					}else {
-						jsonRet = OrderService.getPayFlow(order, order.getUserId(), "1");
+						jsonRet = OrderService.getPayFlow(orderId, order.getUserId(), "1");
 						if(jsonRet != null && jsonRet.containsKey("payFlow")) {
 							PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
 							map.put("payFlow", payFlow);
@@ -308,7 +308,7 @@ public class PartnerAfterSaleAction {
 							!"53".equals(order.getStatus()) ) {
 						map.put("errmsg", "您当前不可对该订单进行换货处理！");
 					}else {
-						jsonRet = OrderService.getPayFlow(order, order.getUserId(), "1");
+						jsonRet = OrderService.getPayFlow(orderId, order.getUserId(), "1");
 						if(jsonRet != null && jsonRet.containsKey("payFlow")) {
 							PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
 							map.put("payFlow", payFlow);

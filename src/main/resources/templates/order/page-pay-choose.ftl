@@ -70,7 +70,7 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		param:{
-			orderIds:'${orderIds}',
+			orderId:'${orderIds}',
 			payType:0 //支付方式:1-会员余额,2-微信，3-支付宝
 		}
 	},
@@ -85,7 +85,7 @@ var containerVue = new Vue({
 				return;
 			}
 			$.ajax({
-				url: '/order/prepay/' + this.param.orderId + '/' + this.param.payType,
+				url: '/order/prepay/' + this.param.payType + '/' + this.param.orderId,
 				method:'post',
 				data: {},
 				success: function(jsonRet,status,xhr){
