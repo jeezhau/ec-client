@@ -7,8 +7,7 @@
 <#include "/common/tpl-msg-alert.ftl" encoding="utf8">
 
 <div class="container " id="container" >
-	<div class="row"><!-- 投诉内容 -->
-	 <form class="form-horizontal" role="form" >
+	<div class="row" style="background-color:white"><!-- 投诉内容 -->
 	   <h3 style="text-align:center;padding:3px 0 0 0;">投诉信息</h3>
 	   <div v-if="complain.cpType=='1'" class="row" style="margin:3px 5px 3px 15px;padding:3px 3px;">
          <label class="col-xs-3 control-label">订单ID</label>
@@ -34,7 +33,34 @@
            <textarea class="form-control" style="width:66%" maxlength="600" rows=8 v-model="complain.content" disabled></textarea>
          </div>
         </div>
-	   </form>
+	    <div v-if="complain.dealLog && complain.dealLog.length>0" class="row form-group" style="margin:3px 5px 3px 15px;padding:3px 3px;">
+		  <label class="row control-label" style="margin:0">处理结果：</label>
+          <div class="row" style="margin:0">
+		    <div v-for="deal in complain.dealLog" v-if="deal && deal.time" class="row" style="margin:1px 0px;padding:0 20px;">
+		     <div class="row">
+		       <span class="pull-left">处理人ID：{{deal.oprid}}</span>
+		       <span class="pull-right">处理时间：{{deal.time}}</span>
+		     </div>
+		     <div class="row">
+		       <p>处理内容：{{deal.result}}</p>
+		     </div>
+		    </div>
+		  </div>
+	    </div>
+	    <div v-if="complain.revisitLog && complain.revisitLog.length>0" class="row form-group" style="margin:3px 5px 3px 15px;padding:3px 3px;">
+		  <label class="row control-label" style="margin:0">回访结果：</label>
+          <div class="row" style="margin:0">
+		    <div v-for="revisit in complain.revisitLog" v-if="revisit && revisit.time" class="row" style="margin:1px 0px;padding:0 20px;">
+		     <div class="row">
+		       <span class="pull-left">回访人ID：{{revisit.oprid}}</span>
+		       <span class="pull-right">回访时间：{{revisit.time}}</span>
+		     </div>
+		     <div class="row">
+		       <p>回访内容：{{revisit.result}}</p>
+		     </div>
+		    </div>
+		  </div>
+	    </div>
 	 </div>
 	<div class="row"><!-- 处理或回访 -->
 	 <form class="form-horizontal" role="form">
@@ -89,6 +115,8 @@ var containerVue = new Vue({
 				success: function(jsonRet,status,xhr){
 					if(jsonRet && jsonRet.datas){
 						containerVue.complain =jsonRet.datas[0];
+						containerVue.complain.dealLog = JSON.parse(containerVue.complain.dealLog?containerVue.complain.dealLog:"[]");
+						containerVue.complain.revisitLog = JSON.parse(containerVue.complain.revisitLog?containerVue.complain.revisitLog:"[]");
 					}else{
 						alertMsg('错误提示',jsonRet.errmsg);
 					}

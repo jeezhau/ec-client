@@ -105,7 +105,8 @@
 			status:'1', 
 			reviewResult:'S',
 			pageSize:30,
-			begin:'0'
+			begin:0,
+			count:0
 		},
 		selectedArr:[],
 		goodsList:[] 

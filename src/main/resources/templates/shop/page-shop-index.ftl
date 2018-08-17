@@ -147,7 +147,7 @@ var containerVue = new Vue({
      var pageHieght = $(document.body).height();  
      var scrollHeight = $(window).scrollTop(); //滚动条top   
      var r = (pageHieght - winHeight - scrollHeight) / winHeight;
-     if (r>=0 && r < 0.2 && containerVue.param.count > containerVue.goodsList.length) {//上拉翻页 
+     if (r>=0 && r < 0.1 && containerVue.param.count > containerVue.goodsList.length) {//上拉翻页 
     	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
     	 	containerVue.getAll(false,false);
      }

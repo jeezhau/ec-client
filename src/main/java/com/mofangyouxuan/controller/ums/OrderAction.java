@@ -769,7 +769,7 @@ public class OrderAction {
 	 * @param orderIds
 	 * @return
 	 */
-	@RequestMapping("/pay/use/bal/{orderId}")
+	@RequestMapping("/pay/use/bal/{orderIds}")
 	public String useBalPay(@PathVariable(value="orderIds",required=true)String orderIds,ModelMap map) {
 		Order order = null;
 		try {
@@ -788,7 +788,7 @@ public class OrderAction {
 			}
 			if(orderArr.size()>10) {
 				map.put("errmsg", "您选择批量支付的订单数量超过上限！");
-				return "order/page-pay-usewx";
+				return "order/page-pay-usebal";
 			}
 			List<Order> list = new ArrayList<Order>();
 			BigDecimal amount = new BigDecimal(0);
@@ -815,7 +815,7 @@ public class OrderAction {
 			}
 			if(errids.length()>0) {
 				map.put("ermsg", "下列订单不存在或不可再次支付，订单ID列表：【" + errids.substring(1)+ "】");
-				return "order/page-pay-usewx";
+				return "order/page-pay-usebal";
 			}
 			if(list.size()>0) {
 				map.put("list", list);
@@ -1452,6 +1452,7 @@ public class OrderAction {
 							Appraise appraise = JSONObject.toJavaObject(jsonRetAppr.getJSONObject("appraise"), Appraise.class);
 							map.put("appraise", appraise);
 						}
+						order.setSpecList(JSONArray.parseArray(order.getGoodsSpec(), GoodsSpec.class));
 						map.put("order", order);
 					}
 				}

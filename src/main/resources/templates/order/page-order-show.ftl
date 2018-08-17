@@ -61,7 +61,8 @@ var containerVue = new Vue({
 		param:{
 			status:'',
 			begin:0,
-			pageSize:100
+			pageSize:30,
+			count:0
 		},
 		orders:[]
 	},
@@ -109,8 +110,9 @@ var containerVue = new Vue({
 							item.headimgurl = startWith(item.headimgurl,'http')? item.headimgurl: ('/user/headimg/show/'+item.userId);
 							containerVue.orders.push(item);
 						}
-						containerVue.begin = jsonRet.pageCond.begin;
-						containerVue.pageSize = jsonRet.pageCond.pageSize;
+						containerVue.param.begin = jsonRet.pageCond.begin;
+						containerVue.param.pageSize = jsonRet.pageCond.pageSize;
+						containerVue.param.count = jsonRet.pageCond.count;
 					}else{
 						if(jsonRet && jsonRet.errmsg){
 							if(jsonRet.errcode === -100000){

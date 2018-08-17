@@ -268,6 +268,11 @@ function getAllData(isRefresh,isForward,url,searchParam,dataList,pageCond){
 			}else{
 				//alert(jsonRet.errmsg);
 				//$("#nomoreData").show();
+				if(jsonRet.errcode === -100000){
+					$('#ajaxLoginModal').modal('show');
+				}else{
+					alertMsg('错误提示',jsonRet.errmsg);
+				}
 			}
 			$("#loadingData").hide();
 		},
@@ -291,7 +296,7 @@ function scrollPager(pageCond,dataList,searchFun){
 		var pageHieght = $(document.body).height();  
 		var scrollHeight = $(window).scrollTop(); //滚动条top   
 		var r = (pageHieght - winHeight - scrollHeight) / winHeight;
-		if (r>=0 && r < 0.2 && scrollHeight>=winHeight) {//上拉翻页 
+		if (r>=0 && r < 0.1 && pageCond.count > dataList.length) {//上拉翻页 
 			pageCond.begin = pageCond.begin + pageCond.pageSize;
 			searchFun(false,false);
 		}

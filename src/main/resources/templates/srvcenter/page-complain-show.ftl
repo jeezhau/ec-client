@@ -13,19 +13,22 @@
      <h3 class="col-xs-9" style="margin:5px 0;text-align:center" >我的投诉</h3>
    </div>
    <div class="row">
-	   <div v-for="item in dataList" class="row" style="margin:1px 0px;background-color:white;">
-	    <div class="col-xs-12" style="padding:0 3px">
-	      <span class="pull-left">订单ID：{{item.orderId}}</span>
-	      <span class="pull-right">投诉时间：{{item.createTime}}</span>
+	 <div v-for="item in dataList" class="row" style="margin:1px 0px;padding:0 3px;background-color:white;">
+	    <div class="row" style="margin:0;padding:0 3px">
+	      <span class="pull-left">{{item.orderId}}</span>
+	      <span class="pull-right">{{getCpStatus(item.status)}}</span>
 	    </div>
-	    <div class="col-xs-12" style="padding:0 3px">
+	    <div class="row" style="margin:0;padding:0 3px">
+	      <p>投诉时间：{{item.createTime}}</p>
+	    </div>
+	    <div class="row" style="margin:0;padding:0 3px">
 	      <p>投诉内容：{{item.content}}</p>
 	    </div>
-	    <div class="col-xs-12" style="padding:0 3px;color:gray">
+	    <div v-if="item.dealLog && item.dealLog.length>0" class="row" style="margin:0;padding:0 3px;color:gray">
 		    <div class="row" style="margin:1px 0px;background-color:white;">
 		      <span class="pull-left" style="padding:0 10px;font-weight:bolder;color:gray">处理结果</span>
 		    </div>
-		    <div v-for="deal in item.dealLog" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
+		    <div v-for="deal in JSON.parse(item.dealLog)" v-if="deal && deal.time" class="row" style="margin:1px 0px;padding:0 20px;background-color:white;">
 		     <div class="row">
 		       <span class="pull-left">{{deal.time}}</span>
 		     </div>
@@ -46,43 +49,38 @@ var containerVue = new Vue({
 	el:'#container',
 	data:{
 		dataList:[],
-		search:{
+		pageCond:{
 			begin:0,
-			pageSize:1,
+			pageSize:30,
 			count:0
 		}
 	},
 	methods:{
-		getComplain :function(){
-			$.ajax({
-				url: '/complain/getall',
-				method:'post',
-				data: this.search,
-				success: function(jsonRet,status,xhr){
-					containerVue.dataList = [];
-					if(jsonRet && jsonRet.pageCond){
-						if(jsonRet.datas){
-							for(var i=0;i<jsonRet.datas.length;i++){
-								var complain =jsonRet.datas[i];
-								complain.dealLog = JSON.parse(complain.dealLog?complain.dealLog:'{}');
-								containerVue.dataList.push(complain);
-							}
-						}
-						containerVue.search.count = jsonRet.pageCond.count;
-					}else{
-						if(jsonRet.errcode === -100000){
-							$('#ajaxLoginModal').modal('show');
-						}else{
-							alertMsg('错误提示',jsonRet.errmsg);
-						}
-					}
-				},
-				dataType: 'json'
-			});
+		getCpStatus:function(code){
+			if(code =='0'){
+				return '待处理';
+			}else if(code =='1'){
+				return '待回访';
+			}else if(code =='2'){
+				return '完成';
+			}
+			return '其他';
+		},
+		getComplains :function(isRefresh,isForward){
+			var url = '/complain/getall';
+			var searchParam = {
+				'begin':containerVue.pageCond.begin,
+				'pageSize':containerVue.pageCond.pageSize
+			};
+			getAllData(isRefresh,isForward,url,searchParam,containerVue.dataList,containerVue.pageCond);
 		}
 	}
 });
-containerVue.getComplain();
+containerVue.getComplains(true,false);
+
+//分页初始化
+scrollPager(containerVue.pageCond,containerVue.dataList,containerVue.getComplains);
+
 </script>
 
 <footer>

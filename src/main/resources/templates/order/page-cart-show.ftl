@@ -33,9 +33,9 @@
   <footer >
     <form action="/order/pay/btchoose" method="post">
       <input type="hidden" name="orderIds" v-model="param.orderIds">
-	  <div class="row" style="margin:50px 0"></div>
-	  <p v-if="orders.length>0 && param.selOrrders.length==0" style="text-align:center;position:fixed;left:3px;bottom:1px">选择订单可完成批量支付</p>
-	  <div v-if="param.selOrrders.length>0" class="weui-tabbar" style="position:fixed;left:0px;bottom:1px">
+	  <div class="row" style="margin:30px 0"></div>
+	  <p v-if="orders.length>0 && param.selOrrders.length==0" style="text-align:center;position:fixed;left:3px;bottom:61px">选择订单可完成批量支付</p>
+	  <div v-if="param.selOrrders.length>0" class="weui-tabbar" style="position:fixed;left:0px;bottom:61px">
 	    	<span class="weui-tabbar__item " style="width:70%">
 	      <span class="weui-tabbar__label" >
 	      	 <span>共 <span style="color:red;font-size:18px">{{param.countAll}}</span> 件</span>
@@ -126,8 +126,9 @@ var containerVue = new Vue({
 							item.headimgurl = startWith(item.headimgurl,'http')? item.headimgurl: ('/user/headimg/show/'+item.userId);
 							containerVue.orders.push(item);
 						}
-						containerVue.begin = jsonRet.pageCond.begin;
-						containerVue.pageSize = jsonRet.pageCond.pageSize;
+						containerVue.pageCond.begin = jsonRet.pageCond.begin;
+						containerVue.pageCond.pageSize = jsonRet.pageCond.pageSize;
+						containerVue.pageCond.count = jsonRet.pageCond.count;
 					}else{
 						if(jsonRet && jsonRet.errmsg){
 							if(jsonRet.errcode === -100000){
@@ -158,6 +159,7 @@ scrollPager(containerVue.pageCond,containerVue.orders,containerVue.getOrders) ;
 
 </script>
 
+<#include "/menu/page-bottom-menu.ftl" encoding="utf8">
 
 
 </body>

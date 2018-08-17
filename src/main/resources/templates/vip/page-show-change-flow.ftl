@@ -31,8 +31,11 @@
 	   <span class="col-xs-9" style="padding:0">{{getChangeFlowType(flow.changeType)}}</span>
 	 </div>
 	 <div class="col-xs-12">
-	   <label class="col-xs-3" style="padding:0">相关金额(分)</label>
-	   <span class="col-xs-9" style="padding:0">{{flow.amount}}</span>
+	   <label class="col-xs-3" style="padding:0">相关金额(元)</label>
+	   <span class="col-xs-9" style="padding:0">
+	     <span v-if="startWith(flow.changeType,'2') || startWith(flow.changeType,'4')">-</span>
+	     <span>{{new Number(flow.amount/100).toFixed(2)}}</span>
+	   </span>
 	 </div>
 	 <div class="col-xs-12">
 	   <label class="col-xs-3"  style="padding:0">创建时间</label>
@@ -61,7 +64,8 @@ var containerVue = new Vue({
 		},
 		pageCond:{
 			begin:0,
-			pageSize:30
+			pageSize:30,
+			count:0
 		}
 	},
 	methods:{

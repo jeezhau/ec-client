@@ -10,10 +10,10 @@
 
 <div class="container" id="container" style="padding:0;oveflow:scroll">
    <div class="row">
-     <h3 class="row" style="margin:5px 0;text-align:center" >商品评价({{appr.apprCnt}})</h3>
+     <h3 class="row" style="margin:5px 0;text-align:center" >商品评价({{param.count}})</h3>
    </div>
    <div class="row" style="margin:1px 0px;">
-     <div class="row" v-for="order in appr.apprList" style="margin:1px 0;background-color:white;">
+     <div class="row" v-for="order in apprList" style="margin:1px 0;background-color:white;">
        <div class="row" style="margin:1px 2px;padding:3px 10px">
          <span class="pull-left"><img alt="头像" :src="order.headimgurl" width="20px" height="20px" style="border-radius:50%">{{order.nickname}}</span>
          <span class="pull-right">{{order.updateTime}}</span>
@@ -32,31 +32,30 @@
 var containerVue = new Vue({
 	el:'#container',
 	data:{
-		appr:{
-			apprList:[],
-			apprCnt:0,
-		},
+		apprList:[],
 		param:{
 			objNm: '${objNm}',
 			objId: '${objId?string("#")}',
 			begin:0,
 			pageSize:100,
+			count:0
 		}
 	},
 	methods:{
 		getAllAppr: function(isRefresh,isFirst){//是否刷新，是否从前面插入
 			 $("#loadingData").show();
 			 if(isRefresh){ //清空数据
-			 	containerVue.appr.apprCnt = 0;
-			 	containerVue.appr.apprList = [];
+			 	this.param.count = 0;
+			 	this.apprList = [];
 			 }
-			 if(containerVue.appr.apprList.lenght>=300){
-				 if(isFirst){//清除后一百条
-					 containerVue.appr.apprList.splice(200,100);
-				 }else{
-					 containerVue.appr.apprList.splice(0,100); 
-				 }
+			 if(this.dataList.lenght >= 10*this.param.pageSize){
+				if(isFirst){//清除最有一页
+					this.dataList.splice(9*this.param.pageSize,this.param.pageSize);
+				}else{//清除最前一页
+					this.dataList.splice(0,this.param.pageSize); 
+				}
 			 }
+			 
 			 var url = '';
 			 if(this.param.objNm == 'goods'){
 				 url = '/appraise/getall/goods/' + this.param.objId;
@@ -89,14 +88,15 @@ var containerVue = new Vue({
 								appr.goodsSpec = JSON.parse(appr.goodsSpec);
 								appr.headimgurl = startWith(appr.headimgurl,'http')?appr.headimgurl:('/user/headimg/show/'+appr.userId);
 								if(isFirst){	
-									containerVue.appr.apprList.unshift(appr);
+									containerVue.apprList.unshift(appr);
 								}else{
-									containerVue.appr.apprList.push(appr);
+									containerVue.apprList.push(appr);
 								}
 								i++;j--;
 							}
+							containerVue.param.pageSize = jsonRet.pageCond.pageSize;
 							containerVue.param.begin = jsonRet.pageCond.begin;
-							containerVue.appr.apprCnt = jsonRet.pageCond.count;
+							containerVue.param.count = jsonRet.pageCond.count;
 						}else{
 							if(jsonRet && jsonRet.errcode === -100000){
 								$('#ajaxLoginModal').modal('show');
@@ -114,29 +114,10 @@ var containerVue = new Vue({
 	}
 });
 containerVue.getAllAppr(true,false);
-var winHeight = $(window).height(); //页面可视区域高度   
-var scrollHandler = function () {  
-    var pageHieght = $(document.body).height();  
-    var scrollHeight = $(window).scrollTop(); //滚动条top   
-    var r = (pageHieght - winHeight - scrollHeight) / winHeight;
-    if (r < 0.5) {//上拉翻页 
-   	 	containerVue.param.begin = containerVue.param.begin + containerVue.param.pageSize;
-   	 	containerVue.getAllAppr(false,false);
-    }
-    if(scrollHeight<0){//下拉翻页
-    		var cnt = containerVue.appr.apprList.length%containerVue.param.pageSize;
-    		cnt = containerVue.appr.apprList.length - cnt;
-   	 	containerVue.param.begin = containerVue.param.begin - cnt;
-   	 	if(containerVue.param.begin <= 0){
-   	 		containerVue.param.begin = 0;
-   	 		containerVue.param.getAllAppr(true,true);
-   	 	}else{
-   	 		containerVue.param.getAllAppr(false,true);
-   	 	}
-    }
-}  
-//定义鼠标滚动事件  
-$("#container").scroll(scrollHandler); 
+
+//分页初始化
+scrollPager(containerVue.param,containerVue.apprList,containerVue.getAllAppr) 
+
 </script>
 
 <footer>

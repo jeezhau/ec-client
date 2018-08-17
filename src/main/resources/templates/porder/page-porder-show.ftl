@@ -59,7 +59,8 @@ var containerVue = new Vue({
 		param:{
 			status:'',
 			begin:0,
-			pageSize:100
+			pageSize:30,
+			count:0
 		},
 		orders:[]
 	},
@@ -85,6 +86,7 @@ var containerVue = new Vue({
 						}
 						containerVue.param.pageSize = jsonRet.pageCond.pageSize;
 						containerVue.param.begin = jsonRet.pageCond.begin;
+						containerVue.param.count = jsonRet.pageCond.count;
 					}else{
 						if(jsonRet && jsonRet.errmsg){
 							//alert(jsonRet.errmsg);

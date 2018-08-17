@@ -198,7 +198,7 @@
          <input type="hidden" name="dispatchMode" v-model="param.dispatchMode" required>
 	     <input type="hidden" name="postageId" v-model="param.postageId" required>
 	     <button v-if="param.flag == 1" type="button" class="btn btn-sm btn-danger" >请选择配送方式</button>
-         <button v-if="param.flag == 2" type="submit" class="btn btn-sm btn-danger" style="font-size:18px;font-weight:bold" @click="submitCheck">立即下单</button><br>
+         <button v-if="param.flag == 2" type="submit" class="btn btn-sm btn-danger" style="font-size:18px;font-weight:bold" @click="submitCheck">立即支付</button><br>
          <button v-if="param.flag == 2" type="button" class="btn btn-sm btn-success" style="margin-top:2px;font-size:18px;font-weight:bold" @click="addIncart">加入购物车</button>
        </div>
     </div>

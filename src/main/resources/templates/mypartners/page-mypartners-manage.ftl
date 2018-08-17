@@ -80,7 +80,8 @@ var containerVue = new Vue({
 		},
 		pageCond:{
 			begin:0,
-			pageSize:20
+			pageSize:20,
+			count:0
 		},
 		dataList:[]
 	},

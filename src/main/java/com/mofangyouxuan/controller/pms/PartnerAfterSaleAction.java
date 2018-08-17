@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mofangyouxuan.common.ErrCodes;
 import com.mofangyouxuan.dto.Aftersale;
+import com.mofangyouxuan.dto.GoodsSpec;
 import com.mofangyouxuan.dto.Order;
 import com.mofangyouxuan.dto.PartnerBasic;
 import com.mofangyouxuan.dto.PartnerStaff;
@@ -146,6 +148,7 @@ public class PartnerAfterSaleAction {
 							PayFlow payFlow = JSONObject.toJavaObject(jsonRet.getJSONObject("payFlow"), PayFlow.class);
 							map.put("payFlow", payFlow);
 						}
+						order.setSpecList(JSONArray.parseArray(order.getGoodsSpec(), GoodsSpec.class));
 						map.put("order", order);
 					}
 				}
@@ -315,6 +318,7 @@ public class PartnerAfterSaleAction {
 						}
 						Aftersale aftersale = JSONObject.toJavaObject(jsonaf.getJSONObject("aftersale"), Aftersale.class);
 						map.put("aftersale", aftersale);
+						order.setSpecList(JSONArray.parseArray(order.getGoodsSpec(), GoodsSpec.class));
 						map.put("order", order);
 					}
 				}
